@@ -1,0 +1,37 @@
+{
+  "checks": [
+    {
+      "name": "accepted_context",
+      "result": "pass",
+      "detail": "Browser accepted proposal; list, overview, current review and downloaded Markdown show current goal/scope; frozen review/download retain old values."
+    },
+    {
+      "name": "knowledge_links",
+      "result": "pass",
+      "detail": "Clicked Markdown Chinese/space relative link and read actual file; ../ escape rejected in browser and API."
+    },
+    {
+      "name": "team_execution",
+      "result": "pass",
+      "detail": "Queued job stayed idle before enabling; browser explicit account enable dispatched synthetic executor and saved succeeded result in team; personal item/run reads 404 and personal list empty; isolated environment did not inherit arbitrary env. Real AI account/network not exercised."
+    },
+    {
+      "name": "result_links_and_html",
+      "result": "pass",
+      "detail": "From run result, clicked README.md:2 and src/example.py:1; popups showed this isolated run files. Script/event/javascript payload absent and no script execution."
+    },
+    {
+      "name": "outputs_page",
+      "result": "pass",
+      "detail": "Item outputs displayed completed run, opened readable AI result modal."
+    },
+    {
+      "name": "browser_errors",
+      "result": "pass",
+      "detail": "No uncaught browser errors across paths; API mutation traffic routed exclusively to disposable database."
+    }
+  ],
+  "pageErrors": [],
+  "httpErrors": [],
+  "databaseCleaned": "test_recheck_49f07ed0f6"
+}

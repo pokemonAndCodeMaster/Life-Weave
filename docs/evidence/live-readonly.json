@@ -1,0 +1,35 @@
+{
+  "pages": [
+    {
+      "path": "personal/items",
+      "heading": "工作事项",
+      "errorAlerts": []
+    },
+    {
+      "path": "personal/items/item-85b6472a17f64292/outputs",
+      "heading": "共作首次交付检查",
+      "errorAlerts": []
+    },
+    {
+      "path": "personal/runs",
+      "heading": "AI 委托",
+      "errorAlerts": []
+    },
+    {
+      "path": "team/settings",
+      "heading": "设置与连接",
+      "errorAlerts": []
+    }
+  ],
+  "pageErrors": [],
+  "sourceLinks": [
+    {
+      "href": "/api/gongzuo/personal/runs/gzrun-20260918-160526-18eb2f21/source?path=README.md",
+      "bodyPrefix": "# 共作工作台\n\n把想法变成可推进的工作，把背景、AI 委托、成果和知识留在同一个地方。\n\n这是独立的本机应用与 Git 仓库。数据、依赖和进程都由本目录管理，不启动 Omni-Brain 或质检平台"
+    },
+    {
+      "href": "/api/gongzuo/personal/runs/gzrun-20260918-160526-18eb2f21/source?path=src%2Fapi%2Fapp.py",
+      "bodyPrefix": "from __future__ import annotations\n\nimport asyncio\nimport json\nimport os\nimport secrets\nimport loggi"
+    }
+  ]
+}
