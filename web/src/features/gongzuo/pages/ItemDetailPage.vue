@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, watch } from 'vue'
+import { computed, watch, shallowRef, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import GongzuoIcon from '../components/GongzuoIcon.vue'
 import ItemActivityTab from '../components/ItemActivityTab.vue'
@@ -11,11 +11,13 @@ import LoadingState from '../components/LoadingState.vue'
 import PageHeader from '../components/PageHeader.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 import { useGongzuoWorkspace } from '../composables/useGongzuoWorkspace'
+import {listRuns} from '../api/gongzuo'
+import type {GongzuoRun} from '../types'
 import type { ItemTab } from '../types'
 
 const route = useRoute()
 const router = useRouter()
-const { activeWorkspace, loading, error, itemDetails, rootOf, loadItem, runs, openModal } = useGongzuoWorkspace()
+const { activeWorkspace, loading, error, itemDetails, rootOf, loadItem, openModal } = useGongzuoWorkspace()
 const itemId = computed(() => String(route.params.itemId ?? ''))
 const item = computed(() => itemDetails.value[itemId.value])
 const rootItem = computed(() => item.value ? rootOf(item.value) : undefined)
@@ -23,7 +25,14 @@ const tab = computed(() => (['overview', 'context', 'outputs', 'activity', 'retr
 const tabs: Array<{ key: ItemTab; label: string }> = [
   { key: 'overview', label: '概览' }, { key: 'context', label: '共享上下文' }, { key: 'outputs', label: '成果与验证' }, { key: 'activity', label: '推进记录' }, { key: 'retro', label: '复盘与成长' },
 ]
-const itemRuns = computed(() => runs.value.filter((run) => run.itemId === item.value?.id || run.itemId === rootItem.value?.id))
+const itemRuns=shallowRef<GongzuoRun[]>([])
+let runTimer:ReturnType<typeof setTimeout>|undefined;let mounted=true;let runGeneration=0
+async function refreshItemRuns(ticket:number){
+ const workspace=activeWorkspace.value;const id=itemId.value
+ try{const rows=await listRuns(workspace,{itemId:id,limit:100});if(mounted&&ticket===runGeneration)itemRuns.value=rows}catch{/* The global API error remains visible; retry on next poll. */}
+ if(mounted&&ticket===runGeneration)runTimer=setTimeout(()=>void refreshItemRuns(ticket),4000)
+}
+onBeforeUnmount(()=>{mounted=false;runGeneration++;clearTimeout(runTimer)})
 
 async function loadDetail(id: string) {
   const detail = await loadItem(id)
@@ -40,7 +49,7 @@ function delegateCurrentItem() {
   else openModal('context-establish', { item: rootItem.value })
 }
 
-watch(itemId, (id) => { if (id) void loadDetail(id) }, { immediate: true })
+watch([itemId,activeWorkspace], ([id]) => {runGeneration++;clearTimeout(runTimer);itemRuns.value=[];if(id){void loadDetail(id);void refreshItemRuns(runGeneration)}}, { immediate: true })
 </script>
 
 <template>
@@ -58,7 +67,7 @@ watch(itemId, (id) => { if (id) void loadDetail(id) }, { immediate: true })
       <section class="gz-detail-main" aria-label="事项内容">
         <ItemOverviewTab v-if="tab === 'overview'" :item="item" :root-item="rootItem" @tab="setTab" @feedback="openModal('feedback', { item, anchor: $event })" />
         <ItemContextTab v-else-if="tab === 'context'" :item="item" :root-item="rootItem" />
-        <ItemOutputsTab v-else-if="tab === 'outputs'" :item="item" />
+        <ItemOutputsTab v-else-if="tab === 'outputs'" :item="item" :runs="itemRuns" />
         <ItemActivityTab v-else-if="tab === 'activity'" :item="item" :root-item="rootItem" />
         <ItemRetroTab v-else :item="item" :root-item="rootItem" />
       </section>

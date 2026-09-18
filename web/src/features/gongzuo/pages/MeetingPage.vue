@@ -53,7 +53,7 @@ function displayValue(value: unknown): string {
   if (Array.isArray(value)) return value.map((entry) => typeof entry === 'object' ? JSON.stringify(entry) : String(entry)).join('、') || '无'
   if (value && typeof value === 'object') return Object.entries(value as Record<string, unknown>).map(([key, entry]) => `${fieldLabel(key)}：${displayValue(entry)}`).join('；')
   if (value === null || value === undefined || value === '') return '未登记'
-  return String(value)
+  return ({open:'待确认',planned:'已计划',in_progress:'进行中',blocked:'已阻塞',awaiting_acceptance:'待验收',completed:'已完成',cancelled:'已取消'} as Record<string,string>)[String(value)]??String(value)
 }
 function displayFields(entry: MeetingPreviewEntry) {
   return Object.entries(entry.values ?? {}).filter(([key]) => key !== 'title').map(([key, value]) => ({ key, label: fieldLabel(key), value: displayValue(value) }))

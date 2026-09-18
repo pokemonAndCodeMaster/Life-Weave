@@ -143,7 +143,9 @@ class GongzuoWorker:
         heartbeat_seconds: float = 5,
         concurrency: int = 1,
         repository_map: dict[str, str] | None = None,
+        authentication_sources: dict[str, str] | None = None,
     ) -> None:
+        self.authentication_sources = authentication_sources or {}
         self.client = client
         self.executors = executors
         self.runtime_root = runtime_root.resolve()
@@ -198,7 +200,7 @@ class GongzuoWorker:
                 {name: value for name, value in os.environ.items() if name in safe_names | allowlist}
             )
         if engine == "codex":
-            configured = os.environ.get("GONGZUO_TEAM_CODEX_HOME") if workspace == "team" else None
+            configured = (self.authentication_sources.get("GONGZUO_TEAM_CODEX_HOME") or os.environ.get("GONGZUO_TEAM_CODEX_HOME")) if workspace == "team" else None
             if workspace == "team" and not configured:
                 raise FileNotFoundError(
                     "团队 Codex 凭证未配置：必须设置 GONGZUO_TEAM_CODEX_HOME"
@@ -212,8 +214,8 @@ class GongzuoWorker:
                 self._copy_auth_file(codex_source / name, home / ".codex" / name)
         elif engine == "opencode":
             if workspace == "team":
-                data_source_value = os.environ.get("GONGZUO_TEAM_OPENCODE_DATA_HOME")
-                config_source_value = os.environ.get("GONGZUO_TEAM_OPENCODE_CONFIG_HOME")
+                data_source_value = (self.authentication_sources.get("GONGZUO_TEAM_OPENCODE_DATA_HOME") or os.environ.get("GONGZUO_TEAM_OPENCODE_DATA_HOME"))
+                config_source_value = (self.authentication_sources.get("GONGZUO_TEAM_OPENCODE_CONFIG_HOME") or os.environ.get("GONGZUO_TEAM_OPENCODE_CONFIG_HOME"))
                 explicit_config = os.environ.get("GONGZUO_TEAM_OPENCODE_CONFIG")
                 if not data_source_value or not (config_source_value or explicit_config):
                     raise FileNotFoundError(

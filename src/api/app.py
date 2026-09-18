@@ -1,10 +1,7 @@
 from __future__ import annotations
 
-import asyncio
-import json
 import os
 import secrets
-import logging
 from contextlib import asynccontextmanager
 from pathlib import Path
 
@@ -30,12 +27,14 @@ from src.gongzuo_runtime.repository import GongzuoRuntimeRepository
 from src.gongzuo_runtime.service import GongzuoRuntimeService
 from src.gongzuo_runtime.router import router as runtime_router
 from src.gongzuo_runtime.models import RunOut
-from src.gongzuo_runtime.worker import GongzuoWorker, ServiceWorkerClient
+from src.gongzuo_runtime.local_workers import LocalWorkers
 
 ROOT = Path(__file__).resolve().parents[2]
 
 
 def create_app() -> FastAPI:
+    (ROOT / '.runtime').mkdir(exist_ok=True)
+    (ROOT / '.runtime').chmod(0o700)
     config = ConfigManager(project_root=ROOT)
     manager = DatabaseManager(config)
     work = GongzuoService(GongzuoRepository(manager.postgres()))
@@ -48,45 +47,17 @@ def create_app() -> FastAPI:
     runtime = GongzuoRuntimeService(repository=GongzuoRuntimeRepository(manager.postgres()), gongzuo_service=work, executors=engines, runtime_root=ROOT / '.runtime/runs', repository_root=None, registration_tokens=registration, capability_provider=knowledge.published_context)
     knowledge.run_reader = lambda workspace, run_id: RunOut.model_validate(runtime.get_run(workspace, run_id)).model_dump(by_alias=True, mode='json')
 
+    local_workers = LocalWorkers(ROOT, runtime, engines, registration)
+
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         manager.postgres().open()
         runtime.recover_expired_leases()
-        tasks = []
-        if os.environ.get('GONGZUO_LOCAL_WORKER', '1') == '1':
-            # The personal worker belongs to this installation. Reuse its identity after restart.
-            file = ROOT / '.runtime/local-worker.json'
-            if file.exists():
-                identity = json.loads(file.read_text())
-                try:
-                    runtime.authenticate_worker('personal', identity['id'], identity['worker_token'])
-                except PermissionError:
-                    identity = None
-            else:
-                identity = None
-            if identity is None:
-                identity = runtime.register_machine('personal', registration_token=registration['personal'], name='这台电脑', capacity=1, engines=list(engines), runtimes=['native'], images=[], labels={'local': 'true'})
-                file.parent.mkdir(parents=True, exist_ok=True)
-                fd = os.open(file, os.O_WRONLY | os.O_CREAT | os.O_TRUNC, 0o600)
-                with os.fdopen(fd, 'w') as handle:
-                    json.dump({'id': identity['id'], 'worker_token': identity['worker_token']}, handle)
-            worker = GongzuoWorker(client=ServiceWorkerClient(runtime, 'personal', identity['id'], identity['worker_token']), executors=engines, runtime_root=ROOT / '.runtime/executions', machine_id=identity['id'])
-            async def loop():
-                while True:
-                    try:
-                        runtime.recover_expired_leases()
-                        await worker.client.heartbeat([], 30)
-                        await worker.execute_once()
-                    except Exception:
-                        logging.exception("本机执行节点暂时失败，将重试")
-                    await asyncio.sleep(1)
-            tasks.append(asyncio.create_task(loop()))
         try:
+            await local_workers.initialize()
             yield
         finally:
-            for task in tasks:
-                task.cancel()
-            await asyncio.gather(*tasks, return_exceptions=True)
+            await local_workers.close()
             manager.close()
 
     app = FastAPI(title='共作工作台', version='0.1.0', lifespan=lifespan)
@@ -96,6 +67,7 @@ def create_app() -> FastAPI:
     app.state.gongzuo_knowledge_service = knowledge
     app.state.gongzuo_runtime_service = runtime
     app.state.executors = engines
+    app.state.local_workers = local_workers
     app.state.root = ROOT
     app.state.linear = LinearService(manager.postgres(), LinearConnection(ROOT), work)
     app.state.library = Library(manager.postgres(), roots)

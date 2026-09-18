@@ -13,7 +13,7 @@ def owned_process(pid):
  except (FileNotFoundError,ProcessLookupError):return False
 
 def main():
- parser=argparse.ArgumentParser(description='共作：安装、启动、停止与备份');parser.add_argument('action',choices=['setup','start','stop','status','backup']);args=parser.parse_args();RUNTIME.mkdir(exist_ok=True);pidfile=RUNTIME/'server.pid'
+ parser=argparse.ArgumentParser(description='共作：安装、启动、停止与备份');parser.add_argument('action',choices=['setup','start','stop','status','backup']);args=parser.parse_args();RUNTIME.mkdir(exist_ok=True);RUNTIME.chmod(0o700);pidfile=RUNTIME/'server.pid'
  if args.action=='setup':
   if not PYTHON.exists():command([sys.executable,'-m','venv',ROOT/'.venv'])
   command([PYTHON,'-m','pip','install','-e','.[dev]']);command(['npm','ci','--no-audit','--no-fund'],ROOT/'web');command(['npm','run','build'],ROOT/'web');command(['bash','scripts/postgres.sh','init']);command([PYTHON,'-m','src.cli']);print('安装完成。启动：python scripts/workbench.py start')
@@ -47,6 +47,7 @@ def main():
    with urllib.request.urlopen('http://127.0.0.1:8010/api/health',timeout=2) as response:print(json.dumps(json.load(response),ensure_ascii=False))
   except OSError:raise SystemExit('工作台未启动')
  elif args.action=='backup':
+  if pidfile.exists() and owned_process(int(pidfile.read_text())):raise SystemExit('请先运行 stop，确保数据库与知识文件在同一静止状态，再备份；完成后可 start。')
   import tarfile
   command(['bash','scripts/postgres.sh','backup']);target=RUNTIME/'backups'/f'knowledge-{time.strftime("%Y%m%d-%H%M%S")}.tar.gz'
   with tarfile.open(target,'w:gz') as archive:

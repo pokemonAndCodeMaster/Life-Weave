@@ -1,5 +1,6 @@
 export function resolveKnowledgePath(current: string, href: string) {
-  const raw = href.split('#')[0]?.split('?')[0] ?? ''
+  let raw:string
+  try{raw=decodeURIComponent(href.split('#')[0]?.split('?')[0]??'')}catch{return null}
   if (!raw || raw.startsWith('/') || /^[a-z][a-z0-9+.-]*:/i.test(raw) || !raw.toLowerCase().endsWith('.md')) return null
   const parts = current.split('/').slice(0, -1)
   for (const part of raw.split('/')) {

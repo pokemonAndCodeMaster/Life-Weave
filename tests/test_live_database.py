@@ -29,6 +29,7 @@ def client(tmp_path_factory):
             migrate()
             app = create_app()
             app.state.task_sources.root = root
+            app.state.local_workers.root = root
             with TestClient(app) as active:
                 yield active
         finally:
@@ -165,3 +166,29 @@ def test_manual_result_body_is_readable_and_duplicate_save_is_idempotent(client)
     entity=client.get('/api/gongzuo/personal/entities/'+first['artifactId']).json()
     assert entity['payload']['body']==body['content']
     assert client.post('/api/gongzuo/team/items/'+item['id']+'/manual-results',json=body).status_code==404
+
+
+def test_current_context_reaches_lists_meeting_and_export_without_rewriting_snapshot(client):
+    item=post(client,'/items',{'itemType':'research','title':'多入口共识验证','payload':{'goal':'旧目标','scope':'旧范围','owner':'独立负责人'}})
+    meeting=client.get('/api/gongzuo/personal/state').json()['meeting']
+    response=client.put('/api/gongzuo/personal/meeting',json={'version':meeting['version'],'config':{'title':'范围验证','sections':[{'key':'deliveries','title':'交付','enabled':True,'mode':'generic','filters':{'itemIds':[item['id']]},'fields':['title','payload'],'payloadFields':['goal','scope','owner']}]}})
+    assert response.status_code==200,response.text
+    snapshot=post(client,'/meeting/freeze',{})
+    proposal=post(client,'/items/'+item['id']+'/context/proposals',{'baseVersion':1,'title':'澄清目标','proposedContent':{'goal':'新目标','scope':'新范围'}})
+    pending=next(row for row in client.get('/api/gongzuo/personal/state').json()['items'] if row['id']==item['id'])
+    assert pending['contextProposals'][0]['id']==proposal['id']
+    post(client,'/context-proposals/'+proposal['id']+'/accept',{'version':1},200)
+    current=next(row for row in client.get('/api/gongzuo/personal/state').json()['items'] if row['id']==item['id'])
+    assert current['context']['content']['goal']=='新目标' and current['payload']['goal']=='旧目标'
+    preview=client.get('/api/gongzuo/personal/meeting/preview').json()
+    assert preview['sections'][0]['entries'][0]['values']['payload']=={'goal':'新目标','scope':'新范围','owner':'独立负责人'}
+    exported=client.get('/api/gongzuo/personal/meeting/markdown').text
+    assert '目标：新目标' in exported and '范围：新范围' in exported
+    frozen=client.get('/api/gongzuo/personal/meeting/markdown',params={'snapshotId':snapshot['id']}).text
+    assert '目标：旧目标' in frozen and '新目标' not in frozen
+
+
+def test_team_local_worker_requires_explicit_account_choice(client):
+    response=client.put('/api/gongzuo/team/settings/local-worker',json={'enabled':True,'useLocalAccount':False})
+    assert response.status_code==409
+    assert client.get('/api/gongzuo/team/settings').json()['localWorker']['enabled'] is False

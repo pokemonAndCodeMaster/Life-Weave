@@ -123,8 +123,8 @@ export async function mutateWorkspace<T>(
   return data
 }
 
-export async function listRuns(workspace: WorkspaceKind) {
-  const { data } = await http.get<GongzuoRun[] | { items: GongzuoRun[] }>(`${root(workspace)}/runs`)
+export async function listRuns(workspace: WorkspaceKind, params: {itemId?:string;limit?:number} = {}) {
+  const { data } = await http.get<GongzuoRun[] | { items: GongzuoRun[] }>(`${root(workspace)}/runs`,{params})
   return Array.isArray(data) ? data : data.items
 }
 

@@ -17,7 +17,7 @@ def call(fn,*args):
 @router.get('/settings')
 def settings(request:Request,workspace:WorkspaceKey):
  health={name:executor.health().__dict__ for name,executor in request.app.state.executors.items()}
- return {'executors':health,'linearConfigured':request.app.state.linear.connection.configured(),'existingCredentialAvailable':(Path.home()/'.config/omni-brain/linear-api-key').is_file(),'identityMode':'本机单用户','workspace':workspace}
+ return {'executors':health,'linearConfigured':request.app.state.linear.connection.configured(),'existingCredentialAvailable':(Path.home()/'.config/omni-brain/linear-api-key').is_file(),'localWorker':request.app.state.local_workers.status(workspace),'identityMode':'本机单用户','workspace':workspace}
 @router.post('/connections/linear')
 def connect(request:Request,workspace:WorkspaceKey,body:ConnectionInput):
  return call(request.app.state.linear.connection.save,body.token,body.credentialFile)
@@ -40,3 +40,11 @@ class MethodsInput(BaseModel):
 def methods(request:Request,workspace:WorkspaceKey):return call(request.app.state.task_sources.catalog,workspace)
 @router.post('/methods/roots')
 def methods_root(request:Request,workspace:WorkspaceKey,body:MethodsInput):return call(request.app.state.task_sources.add_root,workspace,body.root)
+
+class LocalWorkerInput(BaseModel):
+ enabled:bool
+ useLocalAccount:bool=False
+@router.put('/settings/local-worker')
+async def local_worker(request:Request,workspace:WorkspaceKey,body:LocalWorkerInput):
+ try:return await request.app.state.local_workers.configure(workspace,body.enabled,body.useLocalAccount)
+ except (ValueError,OSError) as exc:raise HTTPException(409,str(exc)) from exc

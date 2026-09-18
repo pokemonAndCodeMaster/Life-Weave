@@ -4,11 +4,11 @@ import ManualResultEditor from './ManualResultEditor.vue'
 import GongzuoIcon from './GongzuoIcon.vue'
 import StatusBadge from './StatusBadge.vue'
 import { useGongzuoWorkspace } from '../composables/useGongzuoWorkspace'
-import type { WorkItem } from '../types'
+import type { WorkItem,GongzuoRun } from '../types'
 
-const props = defineProps<{ item: WorkItem }>()
+const props = defineProps<{ item: WorkItem; runs?:GongzuoRun[] }>()
 const { openModal, runs } = useGongzuoWorkspace()
-const results = computed(()=>runs.value.filter(run=>run.itemId===props.item.id && run.result))
+const results = computed(()=>(props.runs??runs.value).filter(run=>run.itemId===props.item.id && run.result))
 const manualResult = shallowRef(false)
 const proven = computed(() => props.item.evidence.filter((entry) => entry.result === '已证明').length)
 </script>

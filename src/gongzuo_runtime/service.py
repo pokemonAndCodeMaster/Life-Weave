@@ -456,6 +456,7 @@ class GongzuoRuntimeService:
         ]
         return {
             **row,
+            "directory": (row.get("environment_snapshot") or {}).get("actualDirectory") or row["directory"],
             "machine": row.get("machine_id"),
             "session": row.get("session_id"),
             "rev": int(row["context_revision_no"]),

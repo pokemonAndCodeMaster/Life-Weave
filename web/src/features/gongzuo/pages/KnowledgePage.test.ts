@@ -13,3 +13,11 @@ describe('KnowledgePage links', () => {
     expect(resolveKnowledgePath('docs/current.md', 'javascript:alert(1)')).toBeNull()
   })
 })
+
+describe('真实中文链接', () => {
+  it('只解码一次并保持目录边界', () => {
+    expect(resolveKnowledgePath('index.md', '%E5%BC%80%E5%A7%8B%E4%BD%BF%E7%94%A8.md')).toBe('开始使用.md')
+    expect(resolveKnowledgePath('目录/入口.md', '../有%20空格.md')).toBe('有 空格.md')
+    expect(resolveKnowledgePath('index.md', '%2E%2E/outside.md')).toBeNull()
+  })
+})

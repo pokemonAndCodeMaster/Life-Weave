@@ -6,6 +6,7 @@ import { apiError } from '../api/gongzuo'
 import { useGongzuoWorkspace } from '../composables/useGongzuoWorkspace'
 import PageHeader from '../components/PageHeader.vue'
 import MarkdownBody from '../components/MarkdownBody.vue'
+import { resolveKnowledgePath } from '../utils/knowledgeLinks'
 import { downloadText } from '../utils/download'
 const { activeWorkspace } = useGongzuoWorkspace()
 const route = useRoute(); const router = useRouter()
@@ -17,11 +18,13 @@ const form = reactive({path:'',content:'',reason:''})
 const pending = computed(() => changes.value.filter(r => r.status === 'draft').length)
 async function action(fn:()=>Promise<void>) { busy.value=true;error.value='';message.value=''; try { await fn() } catch(e) { error.value=apiError(e).message } finally { busy.value=false } }
 async function refresh() {
+ const scope=activeWorkspace.value
  const [catalog,revisions] = await Promise.all([library.documents(activeWorkspace.value,query.value),library.revisions(activeWorkspace.value)])
+ if(scope!==activeWorkspace.value)return
  entries.value=catalog.items;changes.value=revisions
  if(catalog.unavailableSources.length) error.value=`来源暂不可用：${catalog.unavailableSources.join('、')}`
 }
-async function read(doc:Pick<library.Document,'path'|'sourceId'>) { await action(async()=> { selected.value=await library.document(activeWorkspace.value,doc.path,doc.sourceId);editing.value=false; await router.replace({query:{path:doc.path,source:doc.sourceId}}) }) }
+async function read(doc:Pick<library.Document,'path'|'sourceId'>) { await action(async()=> { const scope=activeWorkspace.value;const document=await library.document(scope,doc.path,doc.sourceId);if(scope!==activeWorkspace.value)return;selected.value=document;editing.value=false; await router.replace({query:{path:doc.path,source:doc.sourceId}}) }) }
 function edit(create=false) { if(create) selected.value=null;form.path=selected.value?.path??'';form.content=selected.value?.content??'# 新的知识\n\n';form.reason='';editing.value=true }
 async function save() { await action(async()=> { selectedChange.value=await library.propose(activeWorkspace.value,{...form,sourceId:selected.value?.sourceId??'local',baseVersion:selected.value?.version??'new'});editing.value=false;tab.value='revisions';await refresh();message.value='修订已保存。查看差异后，再决定是否接受。' }) }
 async function decide(accept:boolean) { if(!selectedChange.value)return;await action(async()=> { selectedChange.value=await library.decide(activeWorkspace.value,selectedChange.value!.id,accept);await refresh();selected.value=null;message.value=accept?'已接受修订，知识原文已更新。':'已拒绝修订，原文保持不变。' }) }
@@ -30,9 +33,9 @@ function follow(event:MouseEvent) {
  const href=anchor.getAttribute('href')??''
  if(href.startsWith('#'))return
  if(/^[a-z]+:/i.test(href)){anchor.target='_blank';anchor.rel='noopener noreferrer';return}
- if(href.split('#')[0]?.endsWith('.md')) { event.preventDefault();const path=new URL(href,'https://local/'+selected.value.path).pathname.slice(1);void read({path,sourceId:selected.value.sourceId}) }
+ if(href.split('#')[0]?.endsWith('.md')) { event.preventDefault();const path=resolveKnowledgePath(selected.value.path,href);if(path)void read({path,sourceId:selected.value.sourceId});else error.value='此链接超出了所选知识目录。' }
 }
-watch(activeWorkspace,()=> { selected.value=null;selectedChange.value=null;editing.value=false;void action(async()=> { await refresh();const path=String(route.query.path??'');if(path) selected.value=await library.document(activeWorkspace.value,path,String(route.query.source??'local')) }) },{immediate:true})
+watch([activeWorkspace,()=>route.query.path,()=>route.query.source],()=> { selected.value=null;selectedChange.value=null;editing.value=false;void action(async()=> { await refresh();const path=String(route.query.path??'');if(path) selected.value=await library.document(activeWorkspace.value,path,String(route.query.source??'local')) }) },{immediate:true})
 </script>
 <template>
  <PageHeader title="知识与材料" subtitle="读完整正文，把有用的发现留成下一次能用的知识。"><button class="gz-btn primary" @click="tab='documents';edit(true)">新建知识</button></PageHeader>

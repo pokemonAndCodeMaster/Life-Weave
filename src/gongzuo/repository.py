@@ -39,7 +39,16 @@ class GongzuoRepository:
         page = 'LIMIT %(limit)s OFFSET %(offset)s' if limit is not None else ''
         if limit is not None: p['limit'] = limit
         rows=self._postgres.fetch_all(f"SELECT id,workspace_key,item_type,title,status,payload,version,created_by,created_at,updated_by,updated_at,count(*) OVER() total FROM {self.items} WHERE {' AND '.join(where)} ORDER BY updated_at DESC,id DESC {page}",p)
-        return [self._camel({k:v for k,v in r.items() if k!='total'}) for r in rows], int(rows[0]['total']) if rows else 0
+        items = [self._camel({k:v for k,v in row.items() if k!='total'}) for row in rows]
+        if items:
+            ids = [item['id'] for item in items]
+            contexts = self._postgres.fetch_all(f'SELECT c.*,v.revision_no,v.content,v.provenance FROM {self.contexts} c LEFT JOIN {self.versions} v ON v.id=c.current_version_id WHERE c.workspace_key=%s AND c.item_id=ANY(%s)', (workspace,ids))
+            by_item = {row['item_id']: self._camel(row) for row in contexts}
+            proposals = self._postgres.fetch_all(f"SELECT p.*,c.item_id FROM {self.proposals} p JOIN {self.contexts} c ON c.id=p.context_id WHERE c.workspace_key=%s AND c.item_id=ANY(%s) AND p.status='open' ORDER BY p.created_at", (workspace,ids))
+            for item in items:
+                item['context'] = by_item.get(item['id'])
+                item['contextProposals'] = [self._camel(row) for row in proposals if row['item_id']==item['id']]
+        return items, int(rows[0]['total']) if rows else 0
 
     def get_item(self, workspace: str, item_id: str) -> dict[str, Any] | None:
         return self._one(f'SELECT id,workspace_key,item_type,title,status,payload,version,created_by,created_at,updated_by,updated_at FROM {self.items} WHERE workspace_key=%(workspace)s AND id=%(id)s', {'workspace':workspace,'id':item_id})

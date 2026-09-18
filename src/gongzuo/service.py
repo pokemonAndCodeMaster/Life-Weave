@@ -213,6 +213,14 @@ class GongzuoService:
     def meeting_projection(self, workspace: str, state: dict[str, Any] | None = None) -> dict[str, Any]:
         workspace=self._workspace(workspace); state=state or self.repository.state(workspace); meeting=state['meeting']
         if meeting is None: raise KeyError('meeting')
+        # A view combines current accepted background with separately owned planning fields.
+        # Never rewrite the historical payload or an already frozen meeting snapshot.
+        projected_items = []
+        for item in state['items']:
+            background = (item.get('context') or {}).get('content') or {}
+            payload = {**item.get('payload', {}), **{key:background[key] for key in ('goal','scope','decisions','facts','unknowns','constraints','acceptance','requirements') if key in background}}
+            projected_items.append({**item, 'payload':payload})
+        state = {**state, 'items':projected_items}
         seen:set[str]=set(); sections=[]; pending=self.repository.item_ids_with_open_proposals(workspace)
         for section in meeting['config'].get('sections',[]):
             if not section.get('enabled',True): continue
@@ -253,8 +261,8 @@ class GongzuoService:
                 presentation='full' if not already_seen else ('decision' if decisions else 'summary')
                 seen.add(item['id'])
                 # Payload can be large and is not a presentation contract. Decisions are emitted separately.
-                fields=section.get('fields') or ['title','status']
-                values={field:(item.get(field) if field!='payload' else {key:payload[key] for key in (section.get('payloadFields') or payload.keys()) if key in payload}) for field in fields}
+                fields=section.get('fields') or (['title','status','payload'] if presentation=='full' else ['title','status'])
+                values={field:(item.get(field) if field!='payload' else {key:payload[key] for key in (section.get('payloadFields') or ['goal','scope','update','owner','due']) if key in payload}) for field in fields}
                 entries.append({'itemId':item['id'],'presentation':presentation,'group':payload.get(section.get('groupBy',''),None) if section.get('groupBy') else None,'values':values,'decisions':decisions})
             sections.append({'key':key,'title':section.get('title',key),'entries':entries})
         return {'meetingId':meeting['id'],'meetingVersion':meeting['version'],'sections':sections}
@@ -284,6 +292,9 @@ class GongzuoService:
                         for payload_name,payload_value in value.items():
                             rendered=json.dumps(payload_value,ensure_ascii=False) if isinstance(payload_value,(dict,list)) else str(payload_value)
                             lines += [f"{labels.get(payload_name,payload_name)}：{rendered}",'']
+                    elif name == 'status':
+                        label={'open':'待确认','planned':'已计划','in_progress':'进行中','blocked':'已阻塞','awaiting_acceptance':'待验收','completed':'已完成','cancelled':'已取消'}.get(value,value)
+                        lines += [f'状态：{label}','']
                     elif name != 'payload': lines += [f'{name}：{value}','']
                 for decision in entry.get('decisions',[]): lines += [f"决定：{decision.get('body',decision.get('title','未命名决定'))}",'']
         notes = self.repository.meeting_snapshot_notes(workspace,snapshot_id) if frozen else source['meetingNotes']
