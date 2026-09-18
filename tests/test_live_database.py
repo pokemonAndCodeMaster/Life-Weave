@@ -130,11 +130,16 @@ def test_task_inputs_are_frozen_and_run_limits_are_enforced(client, tmp_path):
     catalog = post(client,'/methods/roots',{'root':str(root)},200)
     method_id = catalog['items'][0]['id']
     item = post(client,'/items',{'itemType':'research','title':'验证委托输入','payload':{}})
-    payload = {'itemId':item['id'],'instruction':'只分析指定依据','engine':'codex','methodId':method_id,'knowledgeRefs':['local:学习/笔记.md']*10}
+    refs=[]
+    for number in range(10):
+        name=f'combination-{number}.md'
+        (client.app.state.library.roots['personal']/name).write_text(f'# 文档 {number}\n独立事实 {number}')
+        refs.append('local:'+name)
+    payload = {'itemId':item['id'],'instruction':'只分析指定依据','engine':'codex','methodId':method_id,'knowledgeRefs':refs}
     run = post(client,'/runs',payload,202)
     snapshot = client.app.state.gongzuo_runtime_service.get_run_snapshot('personal',run['id'])
     entries = snapshot['capability_snapshot']
-    assert len(entries) == 2 and entries[0]['files']['references/example.md'] == '原方法依据'
+    assert len(entries) == 11 and entries[0]['files']['references/example.md'] == '原方法依据'
     support.write_text('源方法后来变化')
     assert snapshot['capability_snapshot'][0]['files']['references/example.md'] == '原方法依据'
     assert client.post('/api/gongzuo/personal/runs',json={**payload,'knowledgeRefs':['local:学习/笔记.md']*11}).status_code == 422
@@ -147,3 +152,16 @@ def test_task_inputs_are_frozen_and_run_limits_are_enforced(client, tmp_path):
 
 def test_origin_boundary(client):
     assert client.post('/api/gongzuo/personal/items',json={'itemType':'personal','title':'不应创建'},headers={'Origin':'https://elsewhere.test'}).status_code == 403
+
+
+def test_manual_result_body_is_readable_and_duplicate_save_is_idempotent(client):
+    item=post(client,'/items',{'itemType':'research','title':'人工工作闭环','payload':{}})
+    body={'title':'验证记录','content':'# 实际结果\n正文可阅读','verification':'已核对关键路径；远程协作尚未覆盖','environment':'本机浏览器'}
+    first=post(client,'/items/'+item['id']+'/manual-results',body)
+    again=post(client,'/items/'+item['id']+'/manual-results',body)
+    assert first==again
+    detail=client.get('/api/gongzuo/personal/items/'+item['id']).json()
+    assert len(detail['evidence'])==1 and detail['evidence'][0]['payload']['body']==body['content']
+    entity=client.get('/api/gongzuo/personal/entities/'+first['artifactId']).json()
+    assert entity['payload']['body']==body['content']
+    assert client.post('/api/gongzuo/team/items/'+item['id']+'/manual-results',json=body).status_code==404

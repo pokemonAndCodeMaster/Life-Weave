@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from typing import Annotated
+from pathlib import Path
 
 from fastapi import APIRouter, Depends, Header, HTTPException, Query, Request, Response, status
 
@@ -104,6 +105,29 @@ def run_result_artifact(workspace: Workspace, run_id: str, service: Service) -> 
         media_type="text/plain; charset=utf-8",
         headers=headers,
     )
+
+
+@router.get('/runs/{run_id}/source', response_class=Response)
+def run_source(workspace: Workspace, run_id: str, path: str, request: Request, service: Service):
+    try:
+        run = service.get_run_snapshot(workspace, run_id)
+    except Exception as exc:
+        raise _http_error(exc) from exc
+    root = (request.app.state.root / '.runtime/executions' / workspace / run_id / 'repo').resolve()
+    relative = Path(path)
+    target = (root / relative).resolve()
+    if relative.is_absolute() or any(part.startswith('.') or part in {'node_modules', '__pycache__'} for part in relative.parts) or not target.is_relative_to(root):
+        raise HTTPException(400, '只提供本次独立工作目录中的普通源文件')
+    if target.suffix.lower() not in {'.md','.txt','.py','.ts','.js','.vue','.css','.html','.json','.yaml','.yml','.toml','.sql','.sh'}:
+        raise HTTPException(400, '此类型不支持在浏览器阅读')
+    if run.get('state') not in {'succeeded','failed','cancelled','paused'} or not target.is_file():
+        raise HTTPException(404, '本机没有此轮运行的源文件，运行可能尚未结束或在另一台机器上')
+    if target.stat().st_size > 1_000_000:
+        raise HTTPException(413, '文件超过 1 MB，请使用本地编辑器')
+    try:
+        return Response(target.read_text(), media_type='text/plain; charset=utf-8', headers={'X-Content-Type-Options':'nosniff'})
+    except (OSError,UnicodeError) as exc:
+        raise HTTPException(400, '文件无法作为文本读取') from exc
 
 
 @router.get("/runs/{run_id}/events", response_model=RunEventListOut)

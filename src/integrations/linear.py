@@ -14,9 +14,13 @@ class LinearConnection:
   if credential_file:
    path=Path(credential_file).expanduser()
    if path.is_symlink() or not path.is_file() or stat.S_IMODE(path.stat().st_mode)&0o077:raise ValueError('凭证文件须为仅当前用户可读的普通文件（权限 600）')
+  candidate=token.strip() or Path(credential_file).expanduser().read_text().strip()
+  viewer=self.query('{ viewer { id name } organization { name } }',authorization=candidate)
   self.file.parent.mkdir(parents=True,exist_ok=True)
   fd=os.open(self.file,os.O_WRONLY|os.O_CREAT|os.O_TRUNC,0o600)
   with os.fdopen(fd,'w') as handle:json.dump({'token':token.strip(),'credentialFile':credential_file.strip()},handle)
+  os.chmod(self.file,0o600)
+  return viewer
  def token(self):
   config=json.loads(self.file.read_text()) if self.file.exists() else {}
   token=os.environ.get('LINEAR_API_KEY') or config.get('token')
@@ -27,9 +31,9 @@ class LinearConnection:
    token=path.read_text().strip()
   if not token:raise ValueError('尚未连接 Linear，请在设置中配置')
   return token
- def query(self,query,variables=None):
+ def query(self,query,variables=None,authorization=None):
   try:
-   with httpx.Client(timeout=25) as client:response=client.post('https://api.linear.app/graphql',headers={'Authorization':self.token()},json={'query':query,'variables':variables or {}})
+   with httpx.Client(timeout=25) as client:response=client.post('https://api.linear.app/graphql',headers={'Authorization':authorization or self.token()},json={'query':query,'variables':variables or {}})
    if response.status_code==401:raise ValueError('Linear 凭证无效，请重新连接')
    if response.status_code==429:raise ValueError('Linear 请求暂时过多，请稍后重试')
    if response.status_code>=400:raise ValueError(f'Linear 暂不可用（HTTP {response.status_code}）')

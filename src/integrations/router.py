@@ -20,8 +20,7 @@ def settings(request:Request,workspace:WorkspaceKey):
  return {'executors':health,'linearConfigured':request.app.state.linear.connection.configured(),'existingCredentialAvailable':(Path.home()/'.config/omni-brain/linear-api-key').is_file(),'identityMode':'本机单用户','workspace':workspace}
 @router.post('/connections/linear')
 def connect(request:Request,workspace:WorkspaceKey,body:ConnectionInput):
- call(request.app.state.linear.connection.save,body.token,body.credentialFile)
- return call(request.app.state.linear.connection.viewer)
+ return call(request.app.state.linear.connection.save,body.token,body.credentialFile)
 @router.get('/connections/linear')
 def connection(request:Request,workspace:WorkspaceKey):return call(request.app.state.linear.connection.viewer)
 @router.get('/linear/issues')

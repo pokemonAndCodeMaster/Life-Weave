@@ -78,9 +78,9 @@ function normalizeWorkspace(raw: WorkspaceState, workspace: WorkspaceKind): Work
         by: proposal.createdBy ?? '协作者', source: proposal.provenance?.[0]?.source ?? '本次讨论', state: proposal.status, createdAt: proposal.createdAt,
       }))
       const evidence = (rawItem.evidence ?? payload.evidence ?? []).map((entry: any) => ({
-        ...entry, id: entry.id, name: entry.name ?? entry.artifactRef ?? '验证证据', purpose: entry.purpose ?? entry.summary ?? '证明本轮结果',
+        ...entry, id: entry.id, name: entry.name ?? entry.payload?.title ?? (entry.runId ? 'AI 委托交付结果' : '验证证据'), purpose: entry.purpose ?? entry.summary ?? '证明本轮结果',
         result: entry.result ?? (entry.status === 'accepted' ? '已证明' : entry.status === 'rejected' ? '未通过' : '未验证'),
-        source: entry.source ?? `${entry.artifactRef ?? '产物'} · ${entry.artifactVersion ?? '版本未提供'}`,
+        source: entry.source ?? `审阅固定版本 · ${String(entry.artifactVersion??'未提供').replace('sha256:','').slice(0,12)}`,
         version: entry.artifactVersion, accepted: entry.status === 'accepted',
       }))
       const artifacts = [...(payload.artifacts ?? []), ...relatedEntities('artifact').map(normalizeEntity)].map((entry: any) => ({ ...entry, name: entry.name ?? entry.title ?? entry.ref ?? '运行产物' }))
