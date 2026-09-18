@@ -1,0 +1,17 @@
+app:
+  name: 共作工作台
+logging:
+  level: ${GONGZUO_LOG_LEVEL:INFO}
+database:
+  default: primary
+  connections:
+    primary:
+      driver: postgresql
+      host: ${GONGZUO_DB_HOST:.runtime/postgres/socket}
+      port: ${GONGZUO_DB_PORT:55440}
+      database: ${GONGZUO_DB_NAME:gongzuo}
+      user: ${GONGZUO_DB_USER:gongzuo}
+      password: ${GONGZUO_DB_PASSWORD:}
+      schema: workbench
+      min_size: 1
+      max_size: 8
