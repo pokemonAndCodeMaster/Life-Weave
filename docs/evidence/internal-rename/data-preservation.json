@@ -1,0 +1,168 @@
+{
+  "tables": [
+    {
+      "oldTable": "document_revision",
+      "newTable": "document_revision",
+      "rows": 2,
+      "sha256": "df1419cc0784f1a9afee304f75f6c858100defc764e96ad38585c0f88454c2d2",
+      "identical": true
+    },
+    {
+      "oldTable": "library_source",
+      "newTable": "library_source",
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical": true
+    },
+    {
+      "oldTable": "linear_binding",
+      "newTable": "linear_binding",
+      "rows": 1,
+      "sha256": "70e816523081cbf581b1917411b0d0b8761ebfccb78cca97fcbd8822e56a6f6c",
+      "identical": true
+    },
+    {
+      "oldTable": "linear_publication",
+      "newTable": "linear_publication",
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_activity",
+      "newTable": "t_lifeweave_activity",
+      "rows": 8,
+      "sha256": "ec7daee8fdd5277dd29969a3e4900bba1942890cbe21c4a3ce6d59e1fbe9f39e",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_capability",
+      "newTable": "t_lifeweave_capability",
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_capability_verification",
+      "newTable": "t_lifeweave_capability_verification",
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_context",
+      "newTable": "t_lifeweave_context",
+      "rows": 3,
+      "sha256": "c17099332b8acea7de18cf45ec35c54a6c0395e68d7e0252a0eec8cbcabb3127",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_context_proposal",
+      "newTable": "t_lifeweave_context_proposal",
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_context_version",
+      "newTable": "t_lifeweave_context_version",
+      "rows": 3,
+      "sha256": "2a99354a9d2a560e7e89b1f068613aa9b388c16e102cfd993c9e0281f650cb65",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_discussion",
+      "newTable": "t_lifeweave_discussion",
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_entity",
+      "newTable": "t_lifeweave_entity",
+      "rows": 1,
+      "sha256": "b1c88a698d212cf13f7d304d58a516418c6b650a200d145459f0b12e0dc35dd9",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_evidence",
+      "newTable": "t_lifeweave_evidence",
+      "rows": 5,
+      "sha256": "1de701af089f205c43d5401506c2c2e4335ef092f4d5643f9a7cdb82a8e46ea3",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_item",
+      "newTable": "t_lifeweave_item",
+      "rows": 3,
+      "sha256": "36786207d06ffcd9f445abcfe9fd314c45e11419acb19273f626e9c375e82adc",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_machine",
+      "newTable": "t_lifeweave_machine",
+      "rows": 2,
+      "sha256": "7fc1990a036268ae292c7255875a3cab8590f693068c6b31f1c8b571c0e23b77",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_meeting",
+      "newTable": "t_lifeweave_meeting",
+      "rows": 2,
+      "sha256": "8b6bc6850b8dd99ec1a7d756eb7235621114c54cf56e6aa2a49b9ae13950b12e",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_meeting_note",
+      "newTable": "t_lifeweave_meeting_note",
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_meeting_snapshot",
+      "newTable": "t_lifeweave_meeting_snapshot",
+      "rows": 3,
+      "sha256": "22227a566806a130703591b054d8c0ea75bcccc01fbc4c0ad4097fb01e26e124",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_preference",
+      "newTable": "t_lifeweave_preference",
+      "rows": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_relation",
+      "newTable": "t_lifeweave_relation",
+      "rows": 1,
+      "sha256": "e2b0673f4b37c95507cf0466ad525f95578351e744f842865d5751ae94a5b00b",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_run",
+      "newTable": "t_lifeweave_run",
+      "rows": 4,
+      "sha256": "84c76c9f061a2dff55b313650c8405f05f1f99749315457d22c648736262c336",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_run_event",
+      "newTable": "t_lifeweave_run_event",
+      "rows": 39,
+      "sha256": "3fb676d19f85c84fa433ab72f62459365ba64c4c8816a03a335e816da868e6e3",
+      "identical": true
+    },
+    {
+      "oldTable": "t_gongzuo_workspace",
+      "newTable": "t_lifeweave_workspace",
+      "rows": 2,
+      "sha256": "cea55b7f2536a1b92fd80e0e94125d8001b15990ead2bf6b0bfb7a940a2faf1e",
+      "identical": true
+    }
+  ],
+  "knowledgeFiles": 2,
+  "knowledgeUnchanged": true,
+  "legacyDatabaseObjects": []
+}

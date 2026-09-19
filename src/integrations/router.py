@@ -1,7 +1,7 @@
 from pathlib import Path
 from fastapi import APIRouter,Request,HTTPException
 from pydantic import BaseModel,Field
-from src.gongzuo.models import WorkspaceKey
+from src.lifeweave.models import WorkspaceKey
 router=APIRouter(prefix='/api/lifeweave/{workspace}',tags=['connections'])
 class ConnectionInput(BaseModel):
  token:str=''
@@ -38,6 +38,9 @@ class MethodsInput(BaseModel):
  root:str=Field(min_length=1,max_length=4096)
 @router.get('/methods')
 def methods(request:Request,workspace:WorkspaceKey):return call(request.app.state.task_sources.catalog,workspace)
+@router.get('/methods/{method_id}')
+def read_method(request:Request,workspace:WorkspaceKey,method_id:str):
+ return call(request.app.state.task_sources.snapshot,workspace,method_id,[])[0]
 @router.post('/methods/roots')
 def methods_root(request:Request,workspace:WorkspaceKey,body:MethodsInput):return call(request.app.state.task_sources.add_root,workspace,body.root)
 

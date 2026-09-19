@@ -1,4 +1,4 @@
 <script setup lang="ts">
-import GongzuoShell from './features/gongzuo/components/GongzuoShell.vue'
+import LifeWeaveShell from './features/lifeweave/components/LifeWeaveShell.vue'
 </script>
-<template><GongzuoShell /></template>
+<template><LifeWeaveShell /></template>

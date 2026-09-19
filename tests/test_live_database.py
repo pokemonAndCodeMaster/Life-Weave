@@ -17,8 +17,8 @@ def client(tmp_path_factory):
     from src.api.app import create_app
     from src.cli import migrate
     root = tmp_path_factory.mktemp('live-app')
-    name = 'test_gongzuo_' + uuid4().hex[:12]
-    connection = psycopg.connect(host=str(ROOT/'.runtime/postgres/socket'), port=55440, user='gongzuo', dbname='postgres', autocommit=True)
+    name = 'test_lifeweave_' + uuid4().hex[:12]
+    connection = psycopg.connect(host=str(ROOT/'.runtime/postgres/socket'), port=55440, user='lifeweave', dbname='postgres', autocommit=True)
     connection.execute(sql.SQL('CREATE DATABASE {}').format(sql.Identifier(name)))
     with pytest.MonkeyPatch.context() as patch:
         patch.setenv('LIFEWEAVE_DB_NAME', name)
@@ -121,7 +121,7 @@ class FakeLinear:
 def test_linear_import_preserves_local_and_publish_readback_is_idempotent(client):
     from src.integrations.linear import LinearService
     fake = FakeLinear()
-    service = LinearService(client.app.state.database_manager.postgres(), fake, client.app.state.gongzuo_service)
+    service = LinearService(client.app.state.database_manager.postgres(), fake, client.app.state.lifeweave_service)
     imported = service.import_issue('personal','TEST-1')
     item = service.work.get_item('personal', imported['itemId'])
     service.work.update_item('personal', item['id'], version=item['version'], title='本地重新澄清', status=None, payload={'due':None,'priority':1}, actor_id='local-user')
@@ -152,7 +152,7 @@ def test_task_inputs_are_frozen_and_run_limits_are_enforced(client, tmp_path):
         refs.append('local:'+name)
     payload = {'itemId':item['id'],'instruction':'只分析指定依据','engine':'codex','methodId':method_id,'knowledgeRefs':refs}
     run = post(client,'/runs',payload,202)
-    snapshot = client.app.state.gongzuo_runtime_service.get_run_snapshot('personal',run['id'])
+    snapshot = client.app.state.lifeweave_runtime_service.get_run_snapshot('personal',run['id'])
     entries = snapshot['capability_snapshot']
     assert len(entries) == 11 and entries[0]['files']['references/example.md'] == '原方法依据'
     support.write_text('源方法后来变化')
@@ -162,7 +162,7 @@ def test_task_inputs_are_frozen_and_run_limits_are_enforced(client, tmp_path):
     cancelled = post(client,'/runs/'+run['id']+'/cancel',{},200)
     assert cancelled['state'] == 'cancelled'
     retry = post(client,'/runs/'+run['id']+'/retry',{'syncContext':True},202)
-    assert client.app.state.gongzuo_runtime_service.get_run_snapshot('personal',retry['id'])['capability_snapshot'][0]['files']['references/example.md'] == '原方法依据'
+    assert client.app.state.lifeweave_runtime_service.get_run_snapshot('personal',retry['id'])['capability_snapshot'][0]['files']['references/example.md'] == '原方法依据'
 
 
 def test_origin_boundary(client):
@@ -206,3 +206,62 @@ def test_team_local_worker_requires_explicit_account_choice(client):
     response=client.put('/api/lifeweave/team/settings/local-worker',json={'enabled':True,'useLocalAccount':False})
     assert response.status_code==409
     assert client.get('/api/lifeweave/team/settings').json()['localWorker']['enabled'] is False
+
+
+def test_continuation_feedback_is_idempotent_scoped_and_pinned_in_next_run(client):
+    item = post(client, '/items', {'itemType':'research','title':'维护噪声识别方法','initialContext':{'goal':'先讨论误报的适用范围，不做代码'}})
+    path = '/items/' + item['id']
+    payload = {'body':'重点是标注分歧，先不要比较训练速度','requestId':'feedback-once'}
+    first = post(client, path+'/feedback', payload)
+    again = post(client, path+'/feedback', payload)
+    assert first == again
+    assert client.post('/api/lifeweave/personal'+path+'/feedback',json={**payload,'body':'不同内容'}).status_code == 409
+    assert client.post('/api/lifeweave/team'+path+'/feedback',json=payload).status_code == 404
+    assert client.post('/api/lifeweave/personal'+path+'/feedback',json={**payload,'runId':'missing'}).status_code == 400
+    assert client.post('/api/lifeweave/personal'+path+'/feedback',json={**payload,'body':'  '}).status_code == 400
+    current = client.get('/api/lifeweave/personal'+path+'/continuation').json()
+    assert current['context']['content']['goal'] == '先讨论误报的适用范围，不做代码'
+    assert [f['id'] for f in current['feedback']] == [first['id']]
+    run = post(client, '/runs', {'itemId':item['id'],'instruction':'只讨论','engine':'codex'}, 202)
+    runtime = client.app.state.lifeweave_runtime_service
+    original = runtime.get_run_snapshot('personal',run['id'])['prompt_snapshot']
+    assert payload['body'] in original
+    second = post(client, path+'/feedback', {'body':'补充考虑漏检','requestId':'feedback-two','runId':run['id']})
+    post(client, '/runs/'+run['id']+'/cancel', {}, 200)
+    retried = post(client, '/runs/'+run['id']+'/retry', {'syncContext':False}, 202)
+    snapshot = runtime.get_run_snapshot('personal', retried['id'])
+    assert [f['id'] for f in snapshot['environment_snapshot']['feedbackSnapshot']] == [first['id'], second['id']]
+    assert '补充考虑漏检' in snapshot['prompt_snapshot']
+    assert runtime.get_run_snapshot('personal',run['id'])['prompt_snapshot'] == original
+    third = post(client, '/items', {'itemType':'personal','title':'另一项生活工作'})
+    assert client.post('/api/lifeweave/personal/items/'+third['id']+'/feedback',json={'body':'不属于这个事项','requestId':'wrong-run','runId':run['id']}).status_code == 400
+
+
+def test_discovery_and_recommendations_reuse_accepted_knowledge_without_a_paper_fixture(client, tmp_path):
+    idea = post(client, '/entities', {'entityType':'idea','title':'整理阳台植物','payload':{'body':'想了解采光，暂时只记录'}})
+    assert any(row['id'] == idea['id'] for row in client.get('/api/lifeweave/personal/work-discovery?query=阳台采光').json()['items'])
+    item = post(client, '/items', {'itemType':'personal','title':'阳台采光记录','initialContext':{'goal':'比较朝向对植物采光的影响'}})
+    draft = post(client, '/library/revisions', {'path':'生活/采光.md','content':'# 阳台采光\n植物朝向影响照射时长。','baseVersion':'new','reason':'已有领域知识'})
+    post(client, '/library/revisions/'+draft['id']+'/decision', {'accept':True}, 200)
+    method = tmp_path/'methods'/'lighting'; method.mkdir(parents=True)
+    (method/'SKILL.md').write_text('---\nname: lighting\ndescription: 比较植物采光的观察方法\n---\n\n保留朝向、时间与实际观察。')
+    post(client, '/methods/roots', {'root':str(method.parent)}, 200)
+    path = '/api/lifeweave/personal/items/'+item['id']+'/input-recommendations'
+    before = client.get(path).json()
+    assert 'local:生活/采光.md' in before['suggested']['knowledgeRefs']
+    assert before['methods'][0]['title'] == 'lighting'
+    full = client.get('/api/lifeweave/personal/methods/'+before['methods'][0]['id'])
+    assert full.status_code == 200 and '保留朝向' in full.json()['content']
+    assert full.json()['version'] == before['methods'][0]['version']
+    assert client.get('/api/lifeweave/team/methods/'+before['methods'][0]['id']).status_code == 409
+    assert before['methods'][0]['matchedTerms'] and before['documents'][0]['version']
+    version = next(d['version'] for d in before['documents'] if d['ref'] == 'local:生活/采光.md')
+    (client.app.state.library.roots['personal']/'生活/采光.md').write_text('# 阳台采光\n补充新观察')
+    run = post(client, '/runs', {'itemId':item['id'],'instruction':'观察植物采光','engine':'codex',**before['suggested']}, 202)
+    snapshot = client.app.state.lifeweave_runtime_service.get_run_snapshot('personal',run['id'])
+    doc = next(d for d in snapshot['capability_snapshot'] if d.get('sourcePath') == 'local:生活/采光.md')
+    assert doc['version'] != version and '补充新观察' in doc['content']
+    assert snapshot['environment_snapshot']['inputRecommendations']['strategy'] == 'lexical-v1'
+    assert client.get(path.replace('/personal/','/team/')).status_code == 404
+    assert client.get('/api/lifeweave/team/work-discovery?query=阳台').json()['items'] == []
+    assert client.get('/api/lifeweave/personal/work-discovery?query=zyxwuniqueunmatched').json()['items'] == []

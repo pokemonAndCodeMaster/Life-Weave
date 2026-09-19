@@ -11,24 +11,26 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
-from src.gongzuo_knowledge.library import Library
-from src.gongzuo_knowledge.library_router import router as library_router
+from src.lifeweave_knowledge.library import Library
+from src.lifeweave_knowledge.library_router import router as library_router
 from src.integrations.task_sources import TaskSources
 from src.integrations.linear import LinearConnection, LinearService
 from src.integrations.router import router as integrations_router
 from src.config import ConfigManager
 from src.database import DatabaseManager
 from src.agent_runtime import CodexExecutor, OpenCodeExecutor
-from src.gongzuo import GongzuoRepository, GongzuoService
-from src.gongzuo.manual_results import router as results_router
-from src.gongzuo.router import router as work_router
-from src.gongzuo_knowledge import GongzuoKnowledgeRepository, GongzuoKnowledgeService
-from src.gongzuo_knowledge.router import router as knowledge_router
-from src.gongzuo_runtime.repository import GongzuoRuntimeRepository
-from src.gongzuo_runtime.service import GongzuoRuntimeService
-from src.gongzuo_runtime.router import router as runtime_router
-from src.gongzuo_runtime.models import RunOut
-from src.gongzuo_runtime.local_workers import LocalWorkers
+from src.lifeweave import LifeWeaveRepository, LifeWeaveService
+from src.lifeweave.manual_results import router as results_router
+from src.lifeweave.router import router as work_router
+from src.lifeweave.continuation import WorkContinuation
+from src.lifeweave.continuation_router import router as continuation_router
+from src.lifeweave_knowledge import LifeWeaveKnowledgeRepository, LifeWeaveKnowledgeService
+from src.lifeweave_knowledge.router import router as knowledge_router
+from src.lifeweave_runtime.repository import LifeWeaveRuntimeRepository
+from src.lifeweave_runtime.service import LifeWeaveRuntimeService
+from src.lifeweave_runtime.router import router as runtime_router
+from src.lifeweave_runtime.models import RunOut
+from src.lifeweave_runtime.local_workers import LocalWorkers
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -38,14 +40,14 @@ def create_app() -> FastAPI:
     (ROOT / '.runtime').chmod(0o700)
     config = ConfigManager(project_root=ROOT)
     manager = DatabaseManager(config)
-    work = GongzuoService(GongzuoRepository(manager.postgres()))
+    work = LifeWeaveService(LifeWeaveRepository(manager.postgres()))
     roots = {key: Path(get_env(f'LIFEWEAVE_{key.upper()}_KNOWLEDGE_ROOT', str(ROOT / '.runtime/knowledge' / key))).expanduser().resolve() for key in ('personal', 'team')}
     for root in roots.values():
         root.mkdir(parents=True, exist_ok=True)
-    knowledge = GongzuoKnowledgeService(GongzuoKnowledgeRepository(manager.postgres()), roots=roots, gongzuo_service=work)
+    knowledge = LifeWeaveKnowledgeService(LifeWeaveKnowledgeRepository(manager.postgres()), roots=roots, lifeweave_service=work)
     engines = {'codex': CodexExecutor(command=os.environ.get('CODEX_COMMAND', 'codex')), 'opencode': OpenCodeExecutor(command=os.environ.get('OPENCODE_COMMAND', 'opencode'))}
     registration = {key: secrets.token_urlsafe(32) for key in roots}
-    runtime = GongzuoRuntimeService(repository=GongzuoRuntimeRepository(manager.postgres()), gongzuo_service=work, executors=engines, runtime_root=ROOT / '.runtime/runs', repository_root=None, registration_tokens=registration, capability_provider=knowledge.published_context)
+    runtime = LifeWeaveRuntimeService(repository=LifeWeaveRuntimeRepository(manager.postgres()), lifeweave_service=work, executors=engines, runtime_root=ROOT / '.runtime/runs', repository_root=None, registration_tokens=registration, capability_provider=knowledge.published_context)
     knowledge.run_reader = lambda workspace, run_id: RunOut.model_validate(runtime.get_run(workspace, run_id)).model_dump(by_alias=True, mode='json')
 
     local_workers = LocalWorkers(ROOT, runtime, engines, registration)
@@ -64,9 +66,9 @@ def create_app() -> FastAPI:
     app = FastAPI(title='LifeWeave · 经纬', version='0.1.0', lifespan=lifespan)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver'])
     app.state.database_manager = manager
-    app.state.gongzuo_service = work
-    app.state.gongzuo_knowledge_service = knowledge
-    app.state.gongzuo_runtime_service = runtime
+    app.state.lifeweave_service = work
+    app.state.lifeweave_knowledge_service = knowledge
+    app.state.lifeweave_runtime_service = runtime
     app.state.executors = engines
     app.state.local_workers = local_workers
     app.state.root = ROOT
@@ -74,12 +76,13 @@ def create_app() -> FastAPI:
     app.state.library = Library(manager.postgres(), roots)
     app.state.task_sources = TaskSources(ROOT, app.state.library)
     runtime.task_sources = app.state.task_sources
+    app.state.work_continuation = WorkContinuation(work, runtime)
 
     @app.middleware('http')
     async def local_boundary(request: Request, call_next):
         if request.method not in {'GET', 'HEAD', 'OPTIONS'}:
             origin = request.headers.get('origin')
-            if origin and origin not in {'http://127.0.0.1:8010', 'http://localhost:8010', 'http://127.0.0.1:5180', 'http://localhost:5180'}:
+            if origin and origin not in {str(request.base_url).rstrip('/'), 'http://127.0.0.1:8010', 'http://localhost:8010', 'http://127.0.0.1:5180', 'http://localhost:5180'}:
                 return JSONResponse({'detail': '请从本机工作台页面发起操作'}, status_code=403)
         if request.url.path == '/api/gongzuo' or request.url.path.startswith('/api/gongzuo/'):
             target = '/api/lifeweave' + request.url.path[len('/api/gongzuo'):]
@@ -91,6 +94,7 @@ def create_app() -> FastAPI:
         return await call_next(request)
 
     app.include_router(work_router)
+    app.include_router(continuation_router)
     app.include_router(results_router)
     app.include_router(integrations_router)
     app.include_router(library_router)

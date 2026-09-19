@@ -4,6 +4,7 @@ import hashlib
 import json
 import os
 import yaml
+from src.lifeweave.discovery import match
 
 
 class TaskSources:
@@ -34,19 +35,60 @@ class TaskSources:
         return self.catalog(workspace)
 
     def catalog(self, workspace):
-        rows = []
+        rows = []; unavailable = []
         for root in self.roots(workspace):
+            if not Path(root).is_dir():
+                unavailable.append({'path': root, 'reason': '方法目录不可用'})
+                continue
             for file in sorted(Path(root).glob('*/SKILL.md')):
                 try:
                     content = file.read_text()
                     metadata = yaml.safe_load(content.split('---', 2)[1]) if content.startswith('---') else {}
                     metadata = metadata if isinstance(metadata, dict) else {}
-                except (OSError, UnicodeError, yaml.YAMLError, IndexError):
+                except (OSError, UnicodeError, yaml.YAMLError, IndexError) as exc:
+                    unavailable.append({'path': str(file), 'reason': str(exc)})
                     continue
                 identity = 'method-' + hashlib.sha256(str(file.resolve()).encode()).hexdigest()[:20]
                 if not any(row['id'] == identity for row in rows):
                     rows.append({'id': identity, 'title': str(metadata.get('name') or file.parent.name), 'description': str(metadata.get('description') or ''), 'path': str(file.resolve())})
-        return {'roots': self.roots(workspace), 'items': rows}
+        return {'roots': self.roots(workspace), 'items': rows, 'unavailable': unavailable}
+
+    def recommend(self, workspace, item, context, query=''):
+        text = ' '.join([item['title'], json.dumps(context.get('content', {}), ensure_ascii=False),
+                         json.dumps(context.get('focus', {}), ensure_ascii=False), query])
+        methods = []; documents = []; unavailable = []
+        catalog = self.catalog(workspace)
+        unavailable.extend(catalog['unavailable'])
+        for row in catalog['items']:
+            ranking = match(text, row['title'], row['description'])
+            if not ranking['score']:
+                continue
+            try:
+                pinned = self.snapshot(workspace, row['id'], [])[0]
+            except (ValueError, OSError, UnicodeError) as exc:
+                unavailable.append({'path': row['path'], 'reason': str(exc)})
+                continue
+            methods.append({**row, **ranking, 'version': pinned['version']})
+        library = self.library.catalog(workspace)
+        unavailable.extend({'path': value, 'reason': '知识目录不可用'} for value in library['unavailableSources'])
+        unavailable.extend(library.get('unavailableDocuments', []))
+        for row in library['items']:
+            try:
+                doc = self.library.document(workspace, row['sourceId'], row['path'])
+            except (ValueError, KeyError, OSError, UnicodeError) as exc:
+                unavailable.append({'path': row['path'], 'reason': str(exc)})
+                continue
+            ranking = match(text, doc['title'], doc['content'])
+            if ranking['score']:
+                documents.append({**row, **ranking, 'version': doc['version'], 'ref': row['sourceId'] + ':' + row['path']})
+        methods.sort(key=lambda row: (-row['score'], row['id']))
+        documents.sort(key=lambda row: (-row['score'], row['ref']))
+        return {'strategy': 'lexical-v1', 'contextVersionId': context['versionId'],
+                'methods': methods, 'documents': documents, 'unavailable': unavailable,
+                'suggested': {'methodId': methods[0]['id'] if methods else None,
+                              'knowledgeRefs': [row['ref'] for row in documents[:10]]},
+                'limits': {'methodsPerRun': 1, 'documentsPerRun': 10},
+                'boundary': '按当前目标文本匹配初筛，允许调整；不证明方法适用或实际执行。入队时读取来源并固定实际版本。'}
 
     def snapshot(self, workspace, method_id, knowledge_refs):
         entries = []

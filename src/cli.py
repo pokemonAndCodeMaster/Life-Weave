@@ -8,18 +8,28 @@ def migrate():
     manager = DatabaseManager(ConfigManager(project_root=root))
     try:
         with manager.postgres().transaction() as connection:
-            connection.execute('CREATE TABLE IF NOT EXISTS public.gongzuo_migrations (name text primary key, digest text not null, applied_at timestamptz not null default now())')
             connection.execute('SELECT pg_advisory_xact_lock(71820918)')
+            # Upgrade the migration ledger itself without rewriting applied SQL.
+            connection.execute("""DO $$ BEGIN
+                IF to_regclass('public.gongzuo_migrations') IS NOT NULL THEN
+                    IF to_regclass('public.lifeweave_migrations') IS NOT NULL THEN
+                        RAISE EXCEPTION 'Both migration ledgers exist; reconcile before migration';
+                    END IF;
+                    ALTER TABLE public.gongzuo_migrations RENAME TO lifeweave_migrations;
+                    ALTER TABLE public.lifeweave_migrations RENAME CONSTRAINT gongzuo_migrations_pkey TO lifeweave_migrations_pkey;
+                END IF;
+            END $$""")
+            connection.execute('CREATE TABLE IF NOT EXISTS public.lifeweave_migrations (name text primary key, digest text not null, applied_at timestamptz not null default now())')
             for file in sorted((root / 'migrations').glob('*.sql')):
                 content = file.read_text()
                 digest = hashlib.sha256(content.encode()).hexdigest()
-                existing = connection.execute('SELECT digest FROM public.gongzuo_migrations WHERE name=%s', (file.name,)).fetchone()
+                existing = connection.execute('SELECT digest FROM public.lifeweave_migrations WHERE name=%s', (file.name,)).fetchone()
                 if existing:
                     if existing['digest'] != digest:
                         raise RuntimeError(f'已应用迁移被修改：{file.name}。请新增迁移。')
                     continue
                 connection.execute(content)
-                connection.execute('INSERT INTO public.gongzuo_migrations(name,digest) VALUES (%s,%s)', (file.name,digest))
+                connection.execute('INSERT INTO public.lifeweave_migrations(name,digest) VALUES (%s,%s)', (file.name,digest))
                 print('已应用', file.name)
     finally:
         manager.close()

@@ -19,8 +19,8 @@ python scripts/workbench.py status
 
 先读 [产品设计](product.md) 与 [架构](architecture.md)，再从一个操作开始：
 
-1. 事项编辑：`ItemDetailPage.vue` / `WorkPlanEditor.vue` → API 客户端 → `src/gongzuo/router.py` → Service / Repository。
-2. 委托：`GongzuoModalHost.vue` → `src/gongzuo_runtime/service.py` → `worker.py` → `src/agent_runtime/`。
+1. 事项编辑：`ItemDetailPage.vue` / `WorkPlanEditor.vue` → API 客户端 → `src/lifeweave/router.py` → Service / Repository。
+2. 委托：`LifeWeaveModalHost.vue` → `src/lifeweave_runtime/service.py` → `worker.py` → `src/agent_runtime/`。
 3. 知识修订：`KnowledgePage.vue` → `library_router.py` → `library.py` → 文件与修订记录。
 4. 回顾：`MeetingPage.vue` → 工作服务的投影/冻结/导出方法。
 
@@ -36,7 +36,7 @@ Vue 使用 TypeScript 和 Composition API；前后端输入字段主要通过模
 | --- | --- |
 | `LIFEWEAVE_DB_HOST` | `.runtime/postgres/socket`，相对工程根解析 |
 | `LIFEWEAVE_DB_PORT` | `55440` |
-| `LIFEWEAVE_DB_NAME` / `LIFEWEAVE_DB_USER` | 都为 `gongzuo`，保留现有安装的数据身份 |
+| `LIFEWEAVE_DB_NAME` / `LIFEWEAVE_DB_USER` | 都为 `lifeweave`；本机既有数据库与角色已原位迁移 |
 | `LIFEWEAVE_DB_PASSWORD` | 默认空；本机 socket 受私有目录约束 |
 | `LIFEWEAVE_PG_BIN` | `/usr/lib/postgresql/16/bin` |
 | `LIFEWEAVE_LOG_LEVEL` | `INFO` |
@@ -45,7 +45,7 @@ Vue 使用 TypeScript 和 Composition API；前后端输入字段主要通过模
 | `CODEX_COMMAND` / `OPENCODE_COMMAND` | 本机 CLI 命令，可指定路径 |
 | `LINEAR_API_KEY` / `LINEAR_API_KEY_FILE` | 可选；也可在页面登记权限为 600 的凭证文件 |
 
-远程执行节点另外支持 `LIFEWEAVE_WORKER_TOKEN`、`LIFEWEAVE_TEAM_ENV_ALLOWLIST`、`LIFEWEAVE_TEAM_CODEX_HOME` 和 `LIFEWEAVE_TEAM_OPENCODE_*`。精确参数见 `python -m src.gongzuo_runtime.worker --help`；存在这些参数不代表已经完成远程部署测试。普通本机使用应通过设置启用节点，不需要手工抄令牌。
+远程执行节点另外支持 `LIFEWEAVE_WORKER_TOKEN`、`LIFEWEAVE_TEAM_ENV_ALLOWLIST`、`LIFEWEAVE_TEAM_CODEX_HOME` 和 `LIFEWEAVE_TEAM_OPENCODE_*`。精确参数见 `python -m src.lifeweave_runtime.worker --help`；存在这些参数不代表已经完成远程部署测试。普通本机使用应通过设置启用节点，不需要手工抄令牌。
 
 `.runtime/` 为私有运行目录：Linear 配置、本机节点身份和 CLI 账号副本不得入 Git。原有 Skills 目录和外部知识登记是来源引用，不能假定换一台电脑仍存在这些绝对路径。
 
@@ -93,8 +93,20 @@ python scripts/workbench.py start
 
 ## 改名后的维护原则
 
-当前目录、包名、对外路由和文案统一为 LifeWeave。数据库、内部模块和历史记录的旧标识是兼容层；不要执行全仓替换去“清理”它们。旧路径符号链接承接已有 venv、Git worktree 与运行记录，删除它之前必须逐类迁移和验证。
+当前目录、包名、对外路由和文案统一为 LifeWeave。当前数据库、内部模块和组件已使用新名。只有历史记录、旧路由/环境变量/请求头以及旧迁移是兼容层，不对用户原文与不可变运行输入做全仓替换。旧路径符号链接承接已有 venv、Git worktree 与运行记录，删除它之前必须逐类迁移和验证。
 
 本轮迁移前创建了数据库/知识备份与内容指纹。产品代码可按 Git 版本回退；若要把目录退回旧名，必须先停应用和 PostgreSQL，确认新路径无占用，移除兼容链接后再移动同一目录。不要运行 `git reset --hard` 或覆盖用户数据来完成回退。
 
 文档维护分工：行为与理由进入 `product.md` / `architecture.md`；新结果和未完成项进入 `status.md`；命令配置进入本页；真实日志和截图进入证据目录。历史证据保留版本，不在旧截图说明中伪造新的验证时间。
+
+## 从首版安装迁移内部名称
+
+本机已完成迁移。另一个仍使用默认旧数据库的安装，应先在旧代码版本停止应用、备份数据库与知识，再更新代码，运行：
+
+```bash
+.venv/bin/python scripts/migrate_storage_names.py --apply
+.venv/bin/python -m src.cli
+python scripts/workbench.py start
+```
+
+脚本只处理本工程私有 socket 上默认旧数据库/角色，检查没有业务连接后原位重命名；重复运行无变化。自定义数据库继续由环境配置指定，SQL 005 仍迁移其内部表名。旧 `.env` 中若显式指定默认旧数据库或角色，需更新为 `LIFEWEAVE_DB_NAME=lifeweave`、`LIFEWEAVE_DB_USER=lifeweave`。回退时先停服务，将备份恢复到独立数据库，用迁移前代码验证后再切换；不能仅回退代码连接已改名的表。

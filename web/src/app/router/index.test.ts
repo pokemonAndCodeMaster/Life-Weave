@@ -10,7 +10,7 @@ describe('LifeWeave entry compatibility', () => {
     await router.push('/gongzuo/team/items/saved-item/outputs?view=all#result')
     expect(router.currentRoute.value.fullPath).toBe('/lifeweave/team/items/saved-item/outputs?view=all#result')
     expect(router.currentRoute.value.params.itemId).toBe('saved-item')
-    await router.push('/gongzuo')
+    await router.push('/lifeweave')
     expect(router.currentRoute.value.path).toBe('/lifeweave/personal/home')
   })
 })

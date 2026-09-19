@@ -3,7 +3,7 @@
 
 这是一份可连续阅读的完整汇编：前半部分是当前产品、架构、状态和使用维护说明，后半部分是历史授权、交付与验证文字附录。
 
-范围为项目根 README 与 docs/ 下全部 13 份 Markdown 来源（不含本汇编自身），共 14 份。所有来源正文、表格、代码块、Mermaid 图及历史说明完整保留；重复内容也保留，不做摘要或删节。只调整标题层级、链接位置和文内导航。
+范围为项目根 README 与 docs/ 下全部 14 份 Markdown 来源（不含本汇编自身），共 15 份。所有来源正文、表格、代码块、Mermaid 图及历史说明完整保留；重复内容也保留，不做摘要或删节。只调整标题层级、链接位置和文内导航。
 
 源码、截图、JSON 运行记录和 API 文档保留可访问的引用，不把它们误作本次需要合并的说明正文。历史附录中的旧名称、当时状态和旧测试数量按原文保留；当前能力请以“当前完成情况”为准。
 
@@ -13,20 +13,21 @@
 
 | 部分 | 章节 | 来源 | 原文 SHA-256 |
 | --- | --- | --- | --- |
-| 当前说明 | [LifeWeave · 经纬](#doc-01) | `README.md` | `8afddb05d9a5fc1272221837609fdbc003ccd2b490a5e4f790bd2a0b6e7e0891` |
+| 当前说明 | [LifeWeave · 经纬](#doc-01) | `README.md` | `25df3d4656aa41bcaea134fed6dd20ad5d25112dbeb6a6133a14e5a47ee0a358` |
 | 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `9a980e1aa472573d53f5e567c363ba68aa512f0434007544e8e9d35d93da2a23` |
-| 当前说明 | [LifeWeave · 经纬：名称与适配](#doc-03) | `docs/naming.md` | `e824bb081cbc26dda626029560b698021c37ae5b27363747fee39ba81cc3e944` |
+| 当前说明 | [LifeWeave · 经纬：名称与适配](#doc-03) | `docs/naming.md` | `99c6b7caa819790699b1debf2ce9ccdad0d797728941f96a380a4571d8b4612d` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-04) | `docs/product.md` | `d434d91ad9b890849a467d0b2467829a1249774191abbec9f3968b2128a28dab` |
-| 当前说明 | [架构与关键实现](#doc-05) | `docs/architecture.md` | `b65aaac52dee5412fa74b79fa950fe0280dff25dafd8d6da9feb6b80b4e6780f` |
-| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `e1e644bbab9ef7ecea282b235860d79b049ced856e41e1b3fea7ab573e222d05` |
-| 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `2d57966dba3b1d25181b56b70b1fec842450cec21b3e9044f44625d564de6b08` |
+| 当前说明 | [架构与关键实现](#doc-05) | `docs/architecture.md` | `1a018b8d67e6b76f3e15d026bcaf9e7f2fe8606d4629220a070580ce5cb62bee` |
+| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `29492c185e327d9a0bf14e82b96496bd49b5b9318d1882a21bce363f0d218b62` |
+| 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `f915f2307f3caa171133ca289b3f7d4364173b40106b3d8b532874b6f48f50eb` |
 | 历史与验证附录 | [原始任务与实施授权](#doc-08) | `docs/brief.md` | `b80241cd5fa2db062b7c79c6d8a7594869d89abb6d9034f3a69803984922406f` |
 | 历史与验证附录 | [名称与项目文档：任务依据](#doc-09) | `docs/rename-request.md` | `7296b62ad25bd47110f9b2ce99ef799e4b67f5a5c7e383ff5308c894971849bc` |
 | 历史与验证附录 | [共作独立工作台：实施与交付](#doc-10) | `docs/delivery.md` | `829e39f4cd1a2fef73fdb99801be0e91221f4477b762f954bc2cd4f8dd3af967` |
 | 历史与验证附录 | [本机工作台交付证据](#doc-11) | `docs/evidence/README.md` | `55c01f63440165b78c60ab4811d14734b5694362514f13f2ba8ea02e82ff90e8` |
-| 历史与验证附录 | [LifeWeave 改名与文档验证](#doc-12) | `docs/evidence/rename/README.md` | `5f1179f23e012ab60dae12c3aee02ea50d37849b0c0a7b83aa22bd69fac343a9` |
-| 历史与验证附录 | [LifeWeave 改名独立复核](#doc-13) | `docs/evidence/rename/independent-review.md` | `aa4d1cecb3ba48d6f36d027e26bde5dc0ee085be9278cfec209c1140dfa9977c` |
-| 历史与验证附录 | [我的周回顾](#doc-14) | `docs/evidence/weekly-review.md` | `b44e1b34eef120a755815ec38869ca16fb235a1f8d03832d3e108488b50aaf7b` |
+| 历史与验证附录 | [内部命名与工作接续验证](#doc-12) | `docs/evidence/internal-rename/README.md` | `0df8afa4672394191ced0668a7d6e230a46d578a311bac2054d5f50f27c2eb14` |
+| 历史与验证附录 | [LifeWeave 改名与文档验证](#doc-13) | `docs/evidence/rename/README.md` | `5f1179f23e012ab60dae12c3aee02ea50d37849b0c0a7b83aa22bd69fac343a9` |
+| 历史与验证附录 | [LifeWeave 改名独立复核](#doc-14) | `docs/evidence/rename/independent-review.md` | `aa4d1cecb3ba48d6f36d027e26bde5dc0ee085be9278cfec209c1140dfa9977c` |
+| 历史与验证附录 | [我的周回顾](#doc-15) | `docs/evidence/weekly-review.md` | `b44e1b34eef120a755815ec38869ca16fb235a1f8d03832d3e108488b50aaf7b` |
 
 ---
 
@@ -107,7 +108,7 @@ python scripts/workbench.py start
 
 恢复时先停止应用，将 dump 用 `pg_restore` 恢复到一个**新的数据库**，将知识包解压到新的知识目录，再用 `LIFEWEAVE_DB_NAME` 和 `LIFEWEAVE_PERSONAL_KNOWLEDGE_ROOT` / `LIFEWEAVE_TEAM_KNOWLEDGE_ROOT` 指向它们。先检查恢复结果，再切换日常使用环境；不覆盖现用数据库。
 
-数据库仅监听本项目私有 Unix socket，目录 `.runtime/postgres/`，端口参数 `55440`，默认数据库和角色均为 `gongzuo`。服务日志为 `.runtime/server.log`；AI 的隔离目录、私有账号副本与产物位于 `.runtime/executions/`，运行记录保存在数据库。不要在 AI 正在执行时停止服务。
+数据库仅监听本项目私有 Unix socket，目录 `.runtime/postgres/`，端口参数 `55440`，默认数据库和角色均为 `lifeweave`。服务日志为 `.runtime/server.log`；AI 的隔离目录、私有账号副本与产物位于 `.runtime/executions/`，运行记录保存在数据库。不要在 AI 正在执行时停止服务。
 
 本机服务只监听 `127.0.0.1:8010`。当前身份是本机单用户，个人/团队是内容空间，**没有多人登录与成员权限系统**。不应直接暴露到公网。团队执行机和 Docker 协议保留，但默认启动个人空间的本机 worker；团队空间可以在设置中明确选择使用本机账号启用执行。远程执行需要另行部署与验证。
 
@@ -129,6 +130,30 @@ npm run build
 数据库集成测试在本项目 PostgreSQL 中创建随机命名的临时数据库，完成后删除；不会清空使用中的工作台数据库。实际浏览器与 AI 验证记录见 [交付记录](#doc-10)。
 
 API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`，页面前缀 `/lifeweave/`。旧页面仍会跳转；旧 API 客户端须跟随 308，或改用新前缀。配置读取范围见 [运行维护](#doc-07-line-29)。数据库变更新增到 `migrations/`，启动时按摘要校验并只应用新版本。
+
+<a id="doc-01-line-87"></a>
+
+### 在新的本机 Agent 会话接续
+
+当前支持本机 Codex/OpenCode 等可运行命令的会话，使用同一工作台 API；不依赖开发者聊天记录。先让 Agent 阅读本节或运行帮助：
+
+```bash
+python scripts/lifeweave.py --help
+python scripts/lifeweave.py discover '想继续的目标'
+python scripts/lifeweave.py continue item-实际编号
+python scripts/lifeweave.py recommend item-实际编号
+python scripts/lifeweave.py read-knowledge 'local:知识路径.md'
+python scripts/lifeweave.py read-method method-实际编号
+python scripts/lifeweave.py runs
+python scripts/lifeweave.py capture '先记一个生活想法，暂时不推进'
+python scripts/lifeweave.py feedback item-实际编号 '重点理解错了，先讨论适用范围'
+```
+
+`capture`、`create`、`discuss`、`feedback` 只保存，不启动 AI。`run` 是显式委托，会采用文本匹配推荐的输入；先查看 `recommend` 的依据，无匹配时不捏造方法，复杂适用性仍由 Agent 判断。网页的“委托 AI”也会预选推荐，可手动调整。推荐、实际输入快照与执行步骤是不同证据。
+
+事项概览的“接着推进”可查看当前记录、下载接续 JSON、保存针对事项或具体运行的纠偏。新的运行/重试会自动固定这些反馈，已有运行保持原输入；反馈不会自动改变已接受目标。重复发送相同反馈可使用同一 `--request-id`；其他创建动作遇到超时须先读取确认，不自动重发。
+
+命令读取本机服务，失败返回非零；`--workspace team` 切换空间。ChatGPT 远程连接、自然语言自动排程、自动发布方法改进尚未完成。完整研发方案见 [下一阶段产品方案](../workspaces/reviews/lifeweave-next-stage/review.md)。
 <!-- source-end: README.md -->
 
 ---
@@ -201,9 +226,11 @@ LifeWeave（经纬）希望帮助个人与协作中的人，把工作、学习�
 
 `GONGZUO_*` 环境变量作为安装兼容别名仍可读取；同一来源同时提供新旧变量时，新变量优先。数据库与日志的 ConfigManager 支持 `.env`，且进程环境优先；知识根、执行器与生命周期脚本只读取进程环境，详见 [配置说明](#doc-07-line-29)。
 
-内部 Python/Vue 模块、CSS 类、数据库 `gongzuo` 名称与角色、`t_gongzuo_*` 表、`gzrun-*` 稳定 ID、`.gongzuo` 任务材料目录暂时保留。它们是实现与存储兼容标识，不是对外品牌。已有 SQL 迁移按摘要校验，不为显示名称改写历史迁移。
+现行 Python 模块为 `src/lifeweave`、`src/lifeweave_runtime`、`src/lifeweave_knowledge`；Vue 位于 `features/lifeweave`，组件和类型使用 `LifeWeave`，CSS 使用 `lw-`。数据库和角色均为 `lifeweave`，业务表为 `t_lifeweave_*`，迁移总账为 `lifeweave_migrations`；新运行材料写入 `.lifeweave`，执行节点使用 `X-LifeWeave-*` 请求头。旧请求头仍作为兼容输入接受。
 
-用户已保存的事项标题、Markdown、导出快照、AI 结果、首次交付文档和截图保留原文。搜索这些内容看到“共作”是历史来源，不应批量替换。新开发的对外入口使用 LifeWeave 命名，未来若迁移存储标识，应另做有回滚能力的数据迁移。
+本机 23 张表通过原位重命名迁移，逐行内容哈希与迁移前一致，2 篇知识原文字节未变；见 [内部命名迁移证据](#doc-12)。既有 `gzrun-*` 等稳定 ID 和旧运行的 `.gongzuo` 路径仍指向原成果，不修改不可变运行输入。已应用 SQL 迁移 001–004 保留原内容，005 承担新名称迁移。
+
+用户已保存的事项标题、Markdown、导出快照、AI 结果、首次交付文档和截图保留原文。搜索这些内容看到“共作”是历史来源，不应批量替换。新开发的目录、符号和存储标识都使用 LifeWeave；旧名称只用于历史材料及明确的迁移/兼容入口。
 <!-- source-end: docs/naming.md -->
 
 ---
@@ -337,16 +364,16 @@ flowchart TD
 
 程序集成入口在 [src/api/app.py](../src/api/app.py)。它创建数据库连接、工作服务、知识服务、执行器和外部连接；启动时恢复过期租约并启动已启用的本机节点，退出时关闭节点和连接池。生产构建的 Vue 静态文件也由这个进程提供。
 
-当前实现沿用 `gongzuo` 内部模块名，原因见 [命名兼容](#doc-03)。下面所有目录均属于当前 LifeWeave 仓库。
+当前 Python、Vue、数据库与执行材料统一使用 LifeWeave 命名；历史入口兼容见 [命名说明](#doc-03)。
 
 | 职责 | 主要代码入口 |
 | --- | --- |
-| 页面路由与整体导航 | [router/index.ts](../web/src/app/router/index.ts)、[GongzuoShell.vue](../web/src/features/gongzuo/components/GongzuoShell.vue) |
-| 跨页面工作状态和操作 | [useGongzuoWorkspace.ts](../web/src/features/gongzuo/composables/useGongzuoWorkspace.ts)、[API 客户端](../web/src/features/gongzuo/api/gongzuo.ts) |
-| 工作规则与数据库读写 | [工作服务](../src/gongzuo/service.py)、[工作 Repository](../src/gongzuo/repository.py)、[请求模型](../src/gongzuo/models.py) |
-| 知识全文与候选修改 | [library.py](../src/gongzuo_knowledge/library.py)、[KnowledgePage.vue](../web/src/features/gongzuo/pages/KnowledgePage.vue) |
-| 委托创建、重试和记录 | [运行服务](../src/gongzuo_runtime/service.py)、[运行 Repository](../src/gongzuo_runtime/repository.py) |
-| 本机节点与 CLI 执行 | [local_workers.py](../src/gongzuo_runtime/local_workers.py)、[worker.py](../src/gongzuo_runtime/worker.py)、[执行器接口](../src/agent_runtime/executor.py) |
+| 页面路由与整体导航 | [router/index.ts](../web/src/app/router/index.ts)、[LifeWeaveShell.vue](../web/src/features/lifeweave/components/LifeWeaveShell.vue) |
+| 跨页面工作状态和操作 | [useLifeWeaveWorkspace.ts](../web/src/features/lifeweave/composables/useLifeWeaveWorkspace.ts)、[API 客户端](../web/src/features/lifeweave/api/lifeweave.ts) |
+| 工作规则与数据库读写 | [工作服务](../src/lifeweave/service.py)、[工作 Repository](../src/lifeweave/repository.py)、[请求模型](../src/lifeweave/models.py) |
+| 知识全文与候选修改 | [library.py](../src/lifeweave_knowledge/library.py)、[KnowledgePage.vue](../web/src/features/lifeweave/pages/KnowledgePage.vue) |
+| 委托创建、重试和记录 | [运行服务](../src/lifeweave_runtime/service.py)、[运行 Repository](../src/lifeweave_runtime/repository.py) |
+| 本机节点与 CLI 执行 | [local_workers.py](../src/lifeweave_runtime/local_workers.py)、[worker.py](../src/lifeweave_runtime/worker.py)、[执行器接口](../src/agent_runtime/executor.py) |
 | 方法材料与 Linear | [task_sources.py](../src/integrations/task_sources.py)、[linear.py](../src/integrations/linear.py) |
 
 <a id="doc-05-line-39"></a>
@@ -378,7 +405,7 @@ PostgreSQL 的 `workbench` schema 保存以下对象。完整字段以 [migratio
 
 背景修订另有提案流程。接受提案时更新版本和当前指针，之后列表、详情及实时回顾加载已接受内容。列表不能只读取事项初始 `payload`，否则新目标只在详情显示；这曾是实际发现并修复的问题。回顾会把当前目标、范围等放入阅读投影，冻结则保存当次投影。
 
-子事项的委托背景从 [current_context_snapshot](../src/gongzuo/service.py) 组装，包含共享背景与本次局部目标。修改这个方法时，必须检查根事项和子事项，防止 AI 只得到父目标或只得到孤立的子标题。
+子事项的委托背景从 [current_context_snapshot](../src/lifeweave/service.py) 组装，包含共享背景与本次局部目标。修改这个方法时，必须检查根事项和子事项，防止 AI 只得到父目标或只得到孤立的子标题。
 
 <a id="doc-05-line-66"></a>
 
@@ -401,7 +428,7 @@ sequenceDiagram
     U->>A: 阅读正文、审阅证据、接受事项
 ```
 
-创建委托时，[运行服务](../src/gongzuo_runtime/service.py) 读取事项的当前背景，把输入固定到运行记录。不指定工程时使用空白任务目录；指定工程时读取 Git 提交身份，执行节点创建独立 worktree，未提交修改不会自动进入。改动产物也不会自动合并回原仓。
+创建委托时，[运行服务](../src/lifeweave_runtime/service.py) 读取事项的当前背景，把输入固定到运行记录。不指定工程时使用空白任务目录；指定工程时读取 Git 提交身份，执行节点创建独立 worktree，未提交修改不会自动进入。改动产物也不会自动合并回原仓。
 
 一次可显式选择一项 Skill 和最多 10 篇知识。`TaskSources` 固定正文、来源指纹和方法支持文件；重试时保留这些已选输入。方法及支持文件合计最多 100 个文件、1 MB，选定材料主正文（含 Skill 主文件）合计最多 2 MB；具体限制和失败提示见 [snapshot 实现](../src/integrations/task_sources.py)。这与维护中心的能力发布机制是两个来源入口，运行时共同形成材料快照。
 
@@ -413,7 +440,7 @@ sequenceDiagram
 
 ### 知识修改为什么不会静默替换正文
 
-[Library](../src/gongzuo_knowledge/library.py) 每次读取实际文件并计算指纹。提出修改时保存基准指纹、原文、候选正文和原因，页面显示差异；接受时锁定修订记录，重新核对文件指纹，再替换文件并更新状态。若用户已在编辑器里修改了源文件，接受会报冲突。
+[Library](../src/lifeweave_knowledge/library.py) 每次读取实际文件并计算指纹。提出修改时保存基准指纹、原文、候选正文和原因，页面显示差异；接受时锁定修订记录，重新核对文件指纹，再替换文件并更新状态。若用户已在编辑器里修改了源文件，接受会报冲突。
 
 本机受管原文使用临时文件和原子替换；数据库操作发生 Python 异常时尝试恢复原文。文件系统与数据库不是同一个事务，进程或机器恰在两者之间崩溃的恢复仍有限，不能宣称分布式原子提交。外部来源的修订可以下载，但不能通过该入口覆盖原仓。
 
@@ -434,6 +461,18 @@ sequenceDiagram
 接口按空间检查数据，应用校验本机 Host 和写入 Origin，凭证不回传到页面；这不构成多人身份认证。默认只监听本机。CLI 的权限模式与隔离目录也不等于已经验证的多租户安全沙箱。
 
 这种结构优先让单机使用和调试简单，并保留未来拆出执行节点的接口。真正引入多用户、远程访问或高并发前，需要增加相应身份、权限、调度、存储和故障验证，不能仅把监听地址改成公网。
+
+<a id="doc-05-line-113"></a>
+
+### 新会话接续、材料推荐与纠偏
+
+`src/lifeweave/continuation.py` 从事项、已接受背景、待审提案、讨论、证据和所有分页运行记录生成当前接续输出；不把输出保存成另一份规范正文。`scripts/lifeweave.py` 是正式本机客户端，网页与它共用业务 API；宿主 Agent 理解自然表达，产品保存和读取事实。
+
+`TaskSources.recommend` 使用可解释文本匹配返回候选、命中理由和版本。网页预选最多一个方法、十篇知识并允许调整；CLI 提供推荐、全文阅读与显式委托。创建运行时再次计算当前推荐，记录在 `environment_snapshot.inputRecommendations`，实际选择保存在 `selectedInputs`，实际内容以 `capability_snapshot` 为准。重试固定原材料和原推荐，并标明来自旧运行；不把来源更新后的推荐版本冒充原材料版本。worker 的 `materializedCapabilities` 证明材料写入，实际步骤仍需执行事件支持。
+
+纠偏复用 discussion，明确保存类型、原文、上下文版本与可选 run/内容位置。请求身份去重，错用同一身份提交不同内容报 409。新建或重试从同一事项读取纠偏，并固定到 prompt 与 `environment_snapshot.feedbackSnapshot`；已有输入不变。普通讨论不自动成为纠偏，纠偏也不自动采纳为新目标；旧历史讨论保持原分类。
+
+源码与默认数据库都已使用 LifeWeave 命名。SQL 005 只原位改标识，外键和数据身份保持；迁移总账在应用迁移前由 `src.cli` 改名。安装级数据库/角色通过私有集群专用脚本原位迁移，命令与回退边界见开发说明。
 <!-- source-end: docs/architecture.md -->
 
 ---
@@ -457,11 +496,11 @@ sequenceDiagram
 | 人工与 AI 成果 | 正文可读、下载、证据审阅及事项接受分开 | 实际人工记录与 Codex 结果留在工作台；接受操作由实施者在验证中执行，不代表用户验收整个产品 |
 | Codex | 本机个人与团队委托，过程、会话、结果保存；源码引用可打开 | 两次真实 Codex 成功，分别在个人和团队空间；见 [首次交付](#doc-10) |
 | 知识 | 全文阅读/搜索、本机 Markdown 候选与差异、接受更新；外部来源只读 | 两篇本机笔记实际创建和采纳；中文链接、来源冲突、拒绝、越界有独立页面或接口检查 |
-| 材料选择 | 登记 Skills 目录，选择一项方法和最多 10 篇知识，保存输入快照 | 7 项方法已登记；一次真实运行附带知识；临时库测试覆盖最大知识数量与支持文件快照 |
+| 材料选择 | 登记 Skills 目录，按当前目标文本匹配预选一项方法和最多 10 篇知识，可调整并保存输入快照 | 7 项方法已登记；一次真实运行附带知识；临时库测试覆盖最大知识数量与支持文件快照 |
 | 回顾 | 实时内容、关注配置、冻结当次、讨论和 Markdown 导出 | 实际导出包含目标、完成状态与快照身份；独立复核当前与冻结内容 |
 | Linear 读取 | 配置连接、读取分配给当前账号的事项、引入及刷新来源快照 | 真实账号读取和 YYH-11 本地引入、重复刷新；没有远端写入 |
 | 本机运维 | 独立安装、启动、停止、数据库与知识备份 | 已恢复到新临时数据库，检查表和实际正文；迁移只应用新文件 |
-| LifeWeave 名称 | 新目录、包名、界面、图标、页面/API 和配置前缀；旧入口兼容 | 本轮类型检查、构建、路由兼容和真实数据库测试；迁移记录见 [本轮验证](#doc-12) |
+| LifeWeave 名称 | 新目录、包名、界面、图标、页面/API 和配置前缀；旧入口兼容 | 本轮类型检查、构建、路由兼容和真实数据库测试；迁移记录见 [本轮验证](#doc-13) |
 
 首轮真实场景和截图在 [证据索引](#doc-11)。该批截图仍显示当时的旧名；本轮改名截图与指纹记录另存，不改写旧证据。
 
@@ -490,18 +529,26 @@ sequenceDiagram
 
 首轮产品有 45 项 Python 测试、12 项前端测试，并完成真实浏览器、Codex、恢复检查和两次独立审查。首轮审查发现的背景不一致、团队执行入口缺失、中文资料和源码链接问题已修复并复核。
 
-本轮在其基础上新增旧入口保留方法/请求体/参数，以及环境变量别名、页面深链接兼容回归，当前 47 项 Python 测试与 13 项前端测试通过。测试总数不是功能完整度百分比；每次结果只支持实际被验证的行为。新命名不增加业务功能，也不把先前的成功调用算作本轮重新调用。
+本轮在其基础上新增旧入口保留方法/请求体/参数，以及环境变量别名、页面深链接兼容回归，当前 49 项 Python 测试与 13 项前端测试通过。测试总数不是功能完整度百分比；每次结果只支持实际被验证的行为。新命名不增加业务功能，也不把先前的成功调用算作本轮重新调用。
 
 <a id="doc-06-line-43"></a>
 
-### 下一步优先级
+### 本轮新增与后续建设
 
-1. 用真实工作、学习和爱好事项连续使用，记录找不到背景、无法继续、成果难读等具体问题。
-2. 定位 OpenCode 调用失败，完成第二执行器实际结果验证。
-3. 在有真实多人使用需求时明确身份、共享内容、权限和账号边界，再实现团队部署。
-4. 根据实际生活安排决定是否需要日历、提醒或周期事项，避免先按愿景铺满空模块。
+本轮内部命名统一到 Python、Vue、CSS、默认数据库/角色、表/索引和新运行材料。数据库 23 张表在静止状态逐行内容哈希一致，2 篇知识字节一致；历史迁移、旧入口兼容和已有运行原文保留。见 [内部迁移与接续证据](#doc-12)。
 
-以上是当前建议，不是用户已经批准的详细实施承诺。
+本机新会话可通过正式 CLI 查找事项、读取当前背景/候选/讨论/成果，查看推荐并读取知识与方法全文，保存记录和纠偏。事项页新增“接着推进”；委托按目标预选材料，两个反馈入口保存的纠偏自动进入新建/重试的固定输入。推荐是文本匹配初筛，没有语义理解或方法适用性保证；正式 Agent 负责自然语言理解，网页不是已经完成的聊天助手。反馈固定输入不证明模型实际按反馈正确改进。
+
+本轮只验证本机使用、临时真实数据库与浏览器入队，未新增真实模型执行成功证据。ChatGPT 远程连接仍未接通，知识候选自动生成、跨领域时间块安排、能力改进对照仍未完成。
+
+建设顺序在 [同一产品方案](../workspaces/reviews/lifeweave-next-stage/review.md) 维护：
+
+1. 完善正式自然入口与知识候选关联，用不同任务验证知识再次使用。
+2. 在现有计划页加入人的投入、真实空闲、休息与可调整时间块；AI 时间单独表达。
+3. 把反馈与实际加载/执行证据关联，形成有对照的能力改进、发布和回退。
+4. 远程 ChatGPT 和多人使用按实际身份、共享范围与部署授权接入；不把本机 CLI 冒充云端已连接。
+
+这些是同一完整工作台的后续建设，当前第一批能力不代表原始完整愿景已交付。
 <!-- source-end: docs/status.md -->
 
 ---
@@ -535,8 +582,8 @@ python scripts/workbench.py status
 
 先读 [产品设计](#doc-04) 与 [架构](#doc-05)，再从一个操作开始：
 
-1. 事项编辑：`ItemDetailPage.vue` / `WorkPlanEditor.vue` → API 客户端 → `src/gongzuo/router.py` → Service / Repository。
-2. 委托：`GongzuoModalHost.vue` → `src/gongzuo_runtime/service.py` → `worker.py` → `src/agent_runtime/`。
+1. 事项编辑：`ItemDetailPage.vue` / `WorkPlanEditor.vue` → API 客户端 → `src/lifeweave/router.py` → Service / Repository。
+2. 委托：`LifeWeaveModalHost.vue` → `src/lifeweave_runtime/service.py` → `worker.py` → `src/agent_runtime/`。
 3. 知识修订：`KnowledgePage.vue` → `library_router.py` → `library.py` → 文件与修订记录。
 4. 回顾：`MeetingPage.vue` → 工作服务的投影/冻结/导出方法。
 
@@ -554,7 +601,7 @@ Vue 使用 TypeScript 和 Composition API；前后端输入字段主要通过模
 | --- | --- |
 | `LIFEWEAVE_DB_HOST` | `.runtime/postgres/socket`，相对工程根解析 |
 | `LIFEWEAVE_DB_PORT` | `55440` |
-| `LIFEWEAVE_DB_NAME` / `LIFEWEAVE_DB_USER` | 都为 `gongzuo`，保留现有安装的数据身份 |
+| `LIFEWEAVE_DB_NAME` / `LIFEWEAVE_DB_USER` | 都为 `lifeweave`；本机既有数据库与角色已原位迁移 |
 | `LIFEWEAVE_DB_PASSWORD` | 默认空；本机 socket 受私有目录约束 |
 | `LIFEWEAVE_PG_BIN` | `/usr/lib/postgresql/16/bin` |
 | `LIFEWEAVE_LOG_LEVEL` | `INFO` |
@@ -563,7 +610,7 @@ Vue 使用 TypeScript 和 Composition API；前后端输入字段主要通过模
 | `CODEX_COMMAND` / `OPENCODE_COMMAND` | 本机 CLI 命令，可指定路径 |
 | `LINEAR_API_KEY` / `LINEAR_API_KEY_FILE` | 可选；也可在页面登记权限为 600 的凭证文件 |
 
-远程执行节点另外支持 `LIFEWEAVE_WORKER_TOKEN`、`LIFEWEAVE_TEAM_ENV_ALLOWLIST`、`LIFEWEAVE_TEAM_CODEX_HOME` 和 `LIFEWEAVE_TEAM_OPENCODE_*`。精确参数见 `python -m src.gongzuo_runtime.worker --help`；存在这些参数不代表已经完成远程部署测试。普通本机使用应通过设置启用节点，不需要手工抄令牌。
+远程执行节点另外支持 `LIFEWEAVE_WORKER_TOKEN`、`LIFEWEAVE_TEAM_ENV_ALLOWLIST`、`LIFEWEAVE_TEAM_CODEX_HOME` 和 `LIFEWEAVE_TEAM_OPENCODE_*`。精确参数见 `python -m src.lifeweave_runtime.worker --help`；存在这些参数不代表已经完成远程部署测试。普通本机使用应通过设置启用节点，不需要手工抄令牌。
 
 `.runtime/` 为私有运行目录：Linear 配置、本机节点身份和 CLI 账号副本不得入 Git。原有 Skills 目录和外部知识登记是来源引用，不能假定换一台电脑仍存在这些绝对路径。
 
@@ -619,11 +666,25 @@ python scripts/workbench.py start
 
 ### 改名后的维护原则
 
-当前目录、包名、对外路由和文案统一为 LifeWeave。数据库、内部模块和历史记录的旧标识是兼容层；不要执行全仓替换去“清理”它们。旧路径符号链接承接已有 venv、Git worktree 与运行记录，删除它之前必须逐类迁移和验证。
+当前目录、包名、对外路由和文案统一为 LifeWeave。当前数据库、内部模块和组件已使用新名。只有历史记录、旧路由/环境变量/请求头以及旧迁移是兼容层，不对用户原文与不可变运行输入做全仓替换。旧路径符号链接承接已有 venv、Git worktree 与运行记录，删除它之前必须逐类迁移和验证。
 
 本轮迁移前创建了数据库/知识备份与内容指纹。产品代码可按 Git 版本回退；若要把目录退回旧名，必须先停应用和 PostgreSQL，确认新路径无占用，移除兼容链接后再移动同一目录。不要运行 `git reset --hard` 或覆盖用户数据来完成回退。
 
 文档维护分工：行为与理由进入 `product.md` / `architecture.md`；新结果和未完成项进入 `status.md`；命令配置进入本页；真实日志和截图进入证据目录。历史证据保留版本，不在旧截图说明中伪造新的验证时间。
+
+<a id="doc-07-line-102"></a>
+
+### 从首版安装迁移内部名称
+
+本机已完成迁移。另一个仍使用默认旧数据库的安装，应先在旧代码版本停止应用、备份数据库与知识，再更新代码，运行：
+
+```bash
+.venv/bin/python scripts/migrate_storage_names.py --apply
+.venv/bin/python -m src.cli
+python scripts/workbench.py start
+```
+
+脚本只处理本工程私有 socket 上默认旧数据库/角色，检查没有业务连接后原位重命名；重复运行无变化。自定义数据库继续由环境配置指定，SQL 005 仍迁移其内部表名。旧 `.env` 中若显式指定默认旧数据库或角色，需更新为 `LIFEWEAVE_DB_NAME=lifeweave`、`LIFEWEAVE_DB_USER=lifeweave`。回退时先停服务，将备份恢复到独立数据库，用迁移前代码验证后再切换；不能仅回退代码连接已改名的表。
 <!-- source-end: docs/development.md -->
 
 ---
@@ -782,7 +843,7 @@ npm --prefix web audit                # 0 vulnerabilities
 - [个人真实 Codex 结果](evidence/personal-ai-result.png)：委托完成后的可读正文。
 - [团队真实 Codex 结果](evidence/team-ai-result.png)：团队空间内的独立结果。
 - [知识正文与审阅入口](evidence/knowledge.png)。
-- [实际冻结回顾](evidence/weekly-review.png) 与 [导出 Markdown](#doc-14)。
+- [实际冻结回顾](evidence/weekly-review.png) 与 [导出 Markdown](#doc-15)。
 - [390px 页面](evidence/mobile-home.png)：窄屏实际浏览器截图。
 - [独立复核记录](evidence/independent-recheck.json)：真实临时数据库、浏览器操作；团队调用使用合成执行器，不冒充真实模型验证。
 - [日常服务只读复核](evidence/live-readonly.json)。
@@ -795,8 +856,41 @@ npm --prefix web audit                # 0 vulnerabilities
 ---
 
 <a id="doc-12"></a>
-<!-- source-begin: docs/evidence/rename/README.md -->
+<!-- source-begin: docs/evidence/internal-rename/README.md -->
 <a id="doc-12-line-1"></a>
+
+## 内部命名与工作接续验证
+
+2026-09-19。本轮继续建设可复用产品能力，并按用户追加反馈统一内部命名。
+
+<a id="doc-12-line-5"></a>
+
+### 数据迁移
+
+实际工程 `/home/yyh/project/lifeweave`。确认两个空间没有活动委托，停止本工程服务，使用正式备份命令保存数据库和默认知识。数据库/角色从旧名原位改为 `lifeweave`，角色 OID 与所有权保持；SQL 005 原位改业务表、约束、索引和序列；迁移总账改为 `lifeweave_migrations`，旧 SQL 摘要不变。
+
+[数据指纹](evidence/internal-rename/data-preservation.json) 包含迁移前后 23 张表的行数和逐行 JSON 内容哈希，全部相等；2 篇知识原文件字节一致。比对发生在服务停止时，启动后的机器心跳属于正常变化。本机数据库对象名已无旧拼音，旧迁移正文仍保留历史。
+
+代码同时统一 Python 包/类、Vue 功能目录/组件/类型/导入、CSS 前缀、新材料目录和 worker 请求头。旧路由、旧环境变量、旧请求头仍可兼容；用户原文、稳定 ID、旧运行路径与历史证据不重写。
+
+<a id="doc-12-line-13"></a>
+
+### 当前验证
+
+- `LIFEWEAVE_TEST_DB=1 .venv/bin/python -m pytest -q`：49 项通过，使用随机临时真实数据库；覆盖旧入口、空间边界、材料上限、原文冲突、反馈去重/错误运行引用、固定输入和新材料版本。
+- 前端类型检查、13 项既有测试和构建通过。
+- 正式默认数据库迁移后再次运行迁移器无新迁移；安装级改名重复运行无变化。
+- 浏览器使用独立服务 `127.0.0.1:8011`、临时数据库/知识与方法目录，初始资料明确标为验收测试材料，不写日常数据库。没有使用真实执行器或外部写入。
+- [浏览器记录](evidence/internal-rename/browser.json)、[委托预选截图](evidence/internal-rename/delegate.png)、[事项接续截图](evidence/internal-rename/continuation.png)：纠偏保存后刷新可读，委托预选方法/知识，排队运行的固定输入包含反馈。截图内容是测试事项，不表示用户真实事项完成。
+
+新会话验收、修复和独立复核结果在取得后追加到本页。当前证据只支持本机接续和输入链路，不证明 ChatGPT 已连接、模型实际遵循方法/反馈、自动排程或完整产品已完成。
+<!-- source-end: docs/evidence/internal-rename/README.md -->
+
+---
+
+<a id="doc-13"></a>
+<!-- source-begin: docs/evidence/rename/README.md -->
+<a id="doc-13-line-1"></a>
 
 ## LifeWeave 改名与文档验证
 
@@ -809,7 +903,7 @@ npm --prefix web audit                # 0 vulnerabilities
 - [实际浏览器记录](evidence/rename/browser.json)：新首页、旧事项深链接参数/片段、历史 AI 源码原文、中文知识链接、团队设置与页面异常检查。
 - [数据保留记录](evidence/rename/data-preservation.json)：22 张业务表的整行内容指纹一致，2 篇知识正文指纹一致；执行节点表发生预期心跳更新。没有改写历史事项、原文、结果或迁移。
 - [桌面](evidence/rename/desktop.png)、[390px 首页](evidence/rename/mobile.png)、[窄屏导航](evidence/rename/mobile-navigation.png)：实际页面截图。
-- [独立复核](#doc-13)：实际新旧页面、历史结果和源码读取；发现并修正 `.env` 范围与 308 客户端说明。报告中的原始探针和截图位于本机 `.runtime/rename-independent/`，不把其中的私人工作正文复制到文档仓。
+- [独立复核](#doc-14)：实际新旧页面、历史结果和源码读取；发现并修正 `.env` 范围与 308 客户端说明。报告中的原始探针和截图位于本机 `.runtime/rename-independent/`，不把其中的私人工作正文复制到文档仓。
 
 当前文档中的相对文件链接经过检查；产品设计与源码职责定向核对。开发说明明确保留内部旧标识，首次交付文档保留历史名称并增加当前入口。
 
@@ -822,15 +916,15 @@ npm --prefix web audit                # 0 vulnerabilities
 
 ---
 
-<a id="doc-13"></a>
+<a id="doc-14"></a>
 <!-- source-begin: docs/evidence/rename/independent-review.md -->
-<a id="doc-13-line-1"></a>
+<a id="doc-14-line-1"></a>
 
 ## LifeWeave 改名独立复核
 
 审查对象：`d70552afa275a72c3bddd4124896bbfaa16ed25a`，基线 `a119cba`。实际服务 `http://127.0.0.1:8010`。先独立读取 `git show a119cba:docs/rename-request.md`；未读取开发者 `docs/evidence/rename/` 作为通过依据。
 
-<a id="doc-13-line-5"></a>
+<a id="doc-14-line-5"></a>
 
 ### 初始裁决
 
@@ -839,7 +933,7 @@ npm --prefix web audit                # 0 vulnerabilities
 1. `docs/naming.md` 的 API 兼容说明未写客户端需要支持 308。真实 Python 3.10 urllib GET/POST 都直接返回 HTTPError 308；需写明不跟随 308 的客户端改用 `/api/lifeweave/`，并避免承诺所有旧 SDK 无感兼容。
 2. `docs/development.md` 的配置来源总述把 `.env` 与下表所有变量连在一起。实际 ConfigManager 读取 `.env` 中数据库/日志配置；知识根和节点通过 `get_env` 只读进程环境，生命周期脚本也不加载 `.env`。需说明差异，避免读者配置了 `.env` 却仍使用默认目录/节点。
 
-<a id="doc-13-line-12"></a>
+<a id="doc-14-line-12"></a>
 
 ### 实际动作与通过证据
 
@@ -853,13 +947,13 @@ npm --prefix web audit                # 0 vulnerabilities
 - 7 份当前入口说明的本地 Markdown 链接全部存在。产品理由、架构、存储、执行、知识修订、完成状态与维护入口可读；明确多人权限、专门生活模块、OpenCode 成功和真实 Linear 写入尚未验证/完成。抽查快照数量与大小、版本冲突、原文指纹和启动代码符合核心说明。
 - `git diff a119cba d70552a -- migrations` 为空；已有历史标题、来源和结果保留旧名，与原始要求一致。
 
-<a id="doc-13-line-24"></a>
+<a id="doc-14-line-24"></a>
 
 ### 证据边界
 
 本次是只读命名与文档复核，未启动真实 AI，未向 Linear 发请求，未改日常业务数据，也未停止主 Agent 服务。未重跑与改名无关的完整业务测试。已证明代表历史记录读取与成果指纹一致；没有独立的改名前全库快照，因此不宣称已独立证明全库每行均无变化（not_proven）。
 
-<a id="doc-13-line-28"></a>
+<a id="doc-14-line-28"></a>
 
 ### 修订后的最终裁决
 
@@ -872,9 +966,9 @@ npm --prefix web audit                # 0 vulnerabilities
 
 ---
 
-<a id="doc-14"></a>
+<a id="doc-15"></a>
 <!-- source-begin: docs/evidence/weekly-review.md -->
-<a id="doc-14-line-1"></a>
+<a id="doc-15-line-1"></a>
 
 ## 我的周回顾
 
@@ -882,19 +976,19 @@ npm --prefix web audit                # 0 vulnerabilities
 
 > 冻结快照：meeting-snapshot-9a757b378f504e75
 
-<a id="doc-14-line-7"></a>
+<a id="doc-15-line-7"></a>
 
 ### 需要决定的事
 
-<a id="doc-14-line-9"></a>
+<a id="doc-15-line-9"></a>
 
 ### 专题目标与缺口
 
-<a id="doc-14-line-11"></a>
+<a id="doc-15-line-11"></a>
 
 ### 近期交付与变化
 
-<a id="doc-14-line-13"></a>
+<a id="doc-15-line-13"></a>
 
 #### 共作首次交付检查
 

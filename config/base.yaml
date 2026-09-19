@@ -9,8 +9,8 @@ database:
       driver: postgresql
       host: ${LIFEWEAVE_DB_HOST:.runtime/postgres/socket}
       port: ${LIFEWEAVE_DB_PORT:55440}
-      database: ${LIFEWEAVE_DB_NAME:gongzuo}
-      user: ${LIFEWEAVE_DB_USER:gongzuo}
+      database: ${LIFEWEAVE_DB_NAME:lifeweave}
+      user: ${LIFEWEAVE_DB_USER:lifeweave}
       password: ${LIFEWEAVE_DB_PASSWORD:}
       schema: workbench
       min_size: 1
