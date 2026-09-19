@@ -7,6 +7,7 @@ import markedKatex from 'marked-katex-extension'
 import 'katex/dist/katex.min.css'
 import type { ReferenceMap } from '../api/library'
 const props=defineProps<{content:string;sourceBase?:string;assetBase?:string;references?:ReferenceMap|null}>()
+function decoded(value:string){try{return decodeURIComponent(value)}catch{return value}}
 const html=computed(()=>{
  const formulas=new Map<string,{text:string;displayMode:boolean}>()
  const placeholder=(token:Tokens.Generic)=>{
@@ -26,11 +27,11 @@ const html=computed(()=>{
  }],walkTokens(token){
   if(token.type!=='link')return
   const href=String(token.href??'')
-  const mapped=props.references?.links[href]
+  const mapped=props.references?.links[decoded(href)]
   if(mapped&&/^\/api\/lifeweave\/(personal|team)\/runs\/[^/]+\/source\?path=/.test(mapped)){token.href=mapped;return}
   if(!props.sourceBase)return
   if(!/^[a-z]+:/i.test(href)&&!href.startsWith('#')&&!href.startsWith('/')){
-   const path=href.split('#')[0]!.replace(/:\d+(?:-\d+)?$/,'')
+   const path=decoded(href.split('#')[0]!).replace(/:\d+(?:-\d+)?$/,'')
    token.href=props.sourceBase+'?path='+encodeURIComponent(path)
   }
  }})
@@ -40,13 +41,14 @@ const html=computed(()=>{
  const document=new DOMParser().parseFromString(clean,'text/html')
  for(const img of document.querySelectorAll('img')){
   const src=img.getAttribute('src')??''
+  const path=decoded(src)
   const alt=img.getAttribute('alt')||'图片'
-  const mapped=props.references?.images[src]
+  const mapped=props.references?.images[path]
   const local=props.assetBase && /^\/api\/lifeweave\/(personal|team)\/runs\/[^/]+\/assets$/.test(props.assetBase)
   if(mapped&&/^\/api\/lifeweave\/(personal|team)\/runs\/[^/]+\/assets\?path=/.test(mapped)){
    img.setAttribute('src',mapped);img.setAttribute('loading','lazy');img.setAttribute('referrerpolicy','no-referrer')
-  }else if(local && src && !/^[a-z][a-z0-9+.-]*:/i.test(src) && !src.startsWith('/') && !src.split('/').some(p=>p==='..'||p.startsWith('.'))){
-   img.setAttribute('src',props.assetBase+'?path='+encodeURIComponent(src))
+  }else if(local && path && !/^[a-z][a-z0-9+.-]*:/i.test(path) && !path.startsWith('/') && !path.split('/').some(p=>p==='..'||p.startsWith('.'))){
+   img.setAttribute('src',props.assetBase+'?path='+encodeURIComponent(path))
    img.setAttribute('loading','lazy');img.setAttribute('referrerpolicy','no-referrer')
   }else{
    const note=document.createElement('span'); note.className='lw-image-unavailable'

@@ -149,8 +149,8 @@ def test_knowledge_reference_projection_preserves_raw_versions_and_conflicts(out
     candidate=post(c,route,request)
     mapping=candidate['references']
     assert 'research/source.md' in mapping['links'] and 'other.md' not in mapping['links'] and 'private.md' not in mapping['links']
-    assert 'research/fig%20one.png' in mapping['images']
-    assert '/'+run['id']+'/assets?' in mapping['images']['research/fig%20one.png']
+    assert 'research/fig one.png' in mapping['images']
+    assert '/'+run['id']+'/assets?' in mapping['images']['research/fig one.png']
     post(c,'/library/revisions/'+candidate['id']+'/decision',{'accept':True},200)
     doc=c.app.state.library.document('personal','local',request['path'])
     assert doc['content']==candidate['content'] and doc['references']==mapping
@@ -166,3 +166,13 @@ def test_knowledge_reference_projection_preserves_raw_versions_and_conflicts(out
     assert merged['references']['warnings'] and 'research/source.md' not in merged['references']['links']
     assert c.app.state.library.document('personal','local',request['path'])['version']==original_version
     assert c.app.state.library.document('personal','local',request['path'])['references']==mapping
+
+
+def test_reference_semantics_decode_once_preserve_percent_names_and_strip_lines():
+    from src.lifeweave.research_references import references
+    result=references('[中文](research/来源.md) [空格](<research/source one.md>) [行号](research/source.md:2) [根行号](README.md:7) ![图](<research/fig one.png>) ![百分号](research/100%25.png)','personal','run-one')
+    assert result['links']['research/来源.md'].endswith('research%2F%E6%9D%A5%E6%BA%90.md')
+    assert result['links']['research/source one.md'].endswith('research%2Fsource%20one.md')
+    assert result['links']['research/source.md:2'].endswith('research%2Fsource.md')
+    assert result['links']['README.md:7'].endswith('README.md')
+    assert result['images']['research/100%.png'].endswith('research%2F100%25.png')

@@ -1,5 +1,6 @@
 """Derive run-relative reference identity without rewriting Markdown originals."""
 from urllib.parse import quote, unquote, urlsplit
+import re
 import mistune
 
 
@@ -11,10 +12,12 @@ def references(content, workspace, run_id):
         for token in tokens:
             if token['type'] in {'link','image'}:
                 href = token.get('attrs',{}).get('url','')
-                parsed = urlsplit(href)
+                key = unquote(href)
+                local = re.sub(r':\d+(?:-\d+)?(?=(?:#.*)?$)','',key) if token['type']=='link' else key
+                parsed = urlsplit(local)
                 if href and not parsed.scheme and not parsed.netloc and parsed.path and not href.startswith(('/','#')):
                     kind = 'images' if token['type']=='image' else 'links'
-                    result[kind][href] = base+('/assets' if kind=='images' else '/source')+'?path='+quote(unquote(parsed.path),safe='')
+                    result[kind][key] = base+('/assets' if kind=='images' else '/source')+'?path='+quote(parsed.path,safe='')
             walk(token.get('children',[]))
     walk(parser(content))
     return result

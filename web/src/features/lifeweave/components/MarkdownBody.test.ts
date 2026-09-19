@@ -51,3 +51,16 @@ it('keeps run source and image identity in knowledge while leaving code and ordi
  expect(wrapper.container.querySelectorAll('a')[1]!.getAttribute('href')).toBe('other.md')
  expect(wrapper.container.querySelector('code')!.textContent).toContain('[例](research/source.md)')
 })
+
+it('decodes URI paths once for source and knowledge consumers including spaces, Unicode and percent names',()=>{
+ const base='/api/lifeweave/personal/runs/r'
+ const content='[中文](research/来源.md) [空格](<research/source one.md>) [行号](research/source.md:2)\n\n![图](<research/fig one.png>) ![中](research/图.png) ![百分号](research/100%25.png) ![引用图][fig]\n\n[fig]: research/fig%20one.png'
+ const run=render(MarkdownBody,{props:{content,sourceBase:base+'/source',assetBase:base+'/assets'}})
+ const urls=Array.from(run.container.querySelectorAll('a')).map(a=>new URL(a.href).searchParams.get('path'))
+ expect(urls).toEqual(['research/来源.md','research/source one.md','research/source.md'])
+ expect(Array.from(run.container.querySelectorAll('img')).map(a=>new URL(a.src).searchParams.get('path'))).toEqual(['research/fig one.png','research/图.png','research/100%.png','research/fig one.png'])
+ cleanup()
+ const refs={links:{'research/来源.md':base+'/source?path=research%2F%E6%9D%A5%E6%BA%90.md','research/source one.md':base+'/source?path=research%2Fsource%20one.md','research/source.md:2':base+'/source?path=research%2Fsource.md'},images:{},warnings:[]}
+ const knowledge=render(MarkdownBody,{props:{content,references:refs}})
+ expect(Array.from(knowledge.container.querySelectorAll('a')).map(a=>new URL(a.href).searchParams.get('path'))).toEqual(urls)
+})
