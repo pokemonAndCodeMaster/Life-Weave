@@ -15,6 +15,8 @@ def wire(row):
     if 'request' in row:
         result['inputContext'] = {key:row['request'].get(key) for key in ('itemId','runId','anchor')}
         result['inputContext']['itemId'] = result['inputContext']['itemId'] or row['item_id']
+        if row['request'].get('researchItemIds'):
+            result['inputContext']['researchItemIds'] = row['request']['researchItemIds']
     return result
 
 
@@ -64,7 +66,7 @@ class ConversationRepository:
                 raise KeyError('对话不存在')
             prior = conn.execute('SELECT * FROM workbench.lifeweave_turn WHERE workspace=%s AND id=%s',(workspace,tid)).fetchone()
             if prior:
-                if prior['request'] != request:
+                if {**prior['request'],'researchItemIds':prior['request'].get('researchItemIds',[])} != request:
                     raise ConcurrentUpdateError('同一请求标识对应不同内容；请读取已保存消息后再发新消息')
                 return prior
             if conn.execute("SELECT 1 FROM workbench.lifeweave_turn WHERE conversation_id=%s AND status IN ('queued','processing')",(cid,)).fetchone():

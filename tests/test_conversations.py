@@ -120,6 +120,32 @@ def test_feedback_profile_and_previous_output_reach_next_run(web):
     assert c.app.state.lifeweave_runtime_service.get_run_snapshot('personal',prior['id'])['result']=='# 旧成果\n需要解释训练数据。'
 
 
+def test_discussion_reads_current_plus_five_selected_research_with_sources(web):
+    c,m=web
+    items=[]
+    for i in range(6):
+        item=post(c,'/items',{'itemType':'research','title':f'研究{i}'})
+        run=post(c,'/runs',{'itemId':item['id'],'engine':'codex','instruction':'受控引用验证'},202)
+        c.app.state.database_manager.postgres().execute("UPDATE workbench.t_lifeweave_run SET state='succeeded',result=%s,finished_at=now() WHERE id=%s",(f'# 全文{i}\n独特证据{i}',run['id']))
+        items.append(item['id'])
+    cid=post(c,'/conversations',{'requestId':'cross-research','itemId':items[0]})['id']
+    m.decision=decision('discuss');m.decision['itemId']=items[0]
+    row=turn(c,cid,'比较这些研究','discuss',researchItemIds=items[1:])
+    assert row['status']=='completed' and row['runId'] is None
+    loaded=m.contexts[-1]['researchOutputs']
+    assert len(loaded)==6 and all(f'独特证据{i}' in loaded[i]['content'] for i in range(6))
+    assert len([s for s in row['sources'] if s.get('kind')=='research'])==6
+    assert row['inputContext']['researchItemIds']==items[1:]
+    c.app.state.database_manager.postgres().execute("UPDATE workbench.t_lifeweave_run SET result=repeat('大',70000) WHERE item_id=ANY(%s)",(items,))
+    large=turn(c,cid,'比较长报告','discuss',researchItemIds=items[1:])
+    assert large['status']=='completed'
+    excerpts=m.contexts[-1]['researchOutputs']
+    assert len(excerpts)==6 and all(x['content'] and x['excerpt'] for x in excerpts)
+    assert sum(len(x['content']) for x in excerpts)==120000
+    assert c.post(f'/api/lifeweave/personal/conversations/{cid}/turns',json={'body':'太多','requestId':'too-many','researchItemIds':items}).status_code==422
+    assert c.post(f'/api/lifeweave/personal/conversations/{cid}/turns',json={'body':'不存在','requestId':'missing','researchItemIds':['forged']}).status_code==404
+
+
 def test_cancel_and_recovery_do_not_replay_business_actions(web):
     c,m=web
     cid=post(c,'/conversations',{'requestId':'cancel'})['id']

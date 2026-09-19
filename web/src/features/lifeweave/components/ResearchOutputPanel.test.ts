@@ -7,6 +7,7 @@ import * as research from '../api/research'
 import * as library from '../api/library'
 vi.mock('../api/research',()=>({getResearchOutput:vi.fn(),getKnowledgeCandidates:vi.fn(),saveOutputFeedback:vi.fn(),proposeKnowledge:vi.fn()}))
 vi.mock('../api/library',()=>({document:vi.fn(),decide:vi.fn()}))
+vi.mock('@/shared/api/http',()=>({http:{get:vi.fn().mockResolvedValue({data:{}})}}))
 const output:research.ResearchOutput={id:'run-1',kind:'run',runId:'run-1',title:'成果',content:'# 成果\n\n正文',version:'v1',state:'succeeded',createdAt:'2026-09-19T00:00:00Z',sourceBase:null,assetBase:null,downloadUrl:null}
 const candidate:research.KnowledgeCandidate={id:'revision-1',itemId:'item-1',runId:'run-1',runVersion:'v1',sourceUrl:'/source',source_id:'local',path:'note.md',content:'建议',before_content:'旧文',diff:'-旧文\n+建议',reason:'说明',status:'draft',created_at:'2026-09-19',base_version:'base1'}
 beforeEach(()=>{vi.resetAllMocks();vi.mocked(research.getResearchOutput).mockResolvedValue({current:output,versions:[output]});vi.mocked(research.getKnowledgeCandidates).mockResolvedValue([candidate]);vi.mocked(library.document).mockResolvedValue({sourceId:'local',sourceTitle:'本地',path:'note.md',title:'正文',content:'原文',version:'base2',writable:true})})

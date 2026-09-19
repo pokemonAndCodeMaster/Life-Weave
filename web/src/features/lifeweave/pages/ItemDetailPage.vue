@@ -69,7 +69,8 @@ watch(() => itemRuns.value.map(run => `${run.id}:${run.state}`).join('|'), (valu
     <PageHeader :title="item.title" :subtitle="item.goal" :eyebrow="`${item.id} / ${item.kind}`">
       <RouterLink class="lw-btn primary" :to="{ path: `/lifeweave/${activeWorkspace}/conversation`, query: { itemId } }"><LifeWeaveIcon name="message" />与经纬继续这件事</RouterLink>
       <button class="lw-btn primary" type="button" @click="delegateCurrentItem"><LifeWeaveIcon :name="rootItem.context.established ? 'spark' : 'layers'" />{{ rootItem.context.established ? '委托 AI' : '先建立上下文' }}</button>
-      <button class="lw-btn" type="button" @click="openModal('discussion', { item: rootItem })"><LifeWeaveIcon name="message" />就地讨论</button>
+      <RouterLink class="lw-btn" :to="{ path: `/lifeweave/${activeWorkspace}/conversation`, query: { itemId, mode: 'discuss' } }"><LifeWeaveIcon name="message" />就地讨论</RouterLink>
+      <button class="lw-btn" type="button" @click="openModal('discussion', { item: rootItem })">记录讨论笔记</button>
     </PageHeader>
     <div class="lw-detail-meta"><StatusBadge :value="item.state" /><span class="lw-owner"><span class="lw-avatar" :class="{ me: item.owner === '我' }">{{ item.owner.slice(-1) }}</span>{{ item.owner }}</span><span>责任人</span><span>·</span><span>目标 {{ item.due || '未安排' }}</span><StatusBadge v-for="domain in item.domains" :key="domain" :value="domain" /><StatusBadge :value="`上下文 v${rootItem.context.revision}`" tone="blue" /><StatusBadge v-if="item.parentId" :value="`继承 ${rootItem.id} 的共同背景`" tone="purple" /><span class="lw-spacer"></span><button class="lw-btn ghost sm" type="button" @click="openModal('relations', { item })">编辑关系</button></div>
     <div class="lw-tabs">

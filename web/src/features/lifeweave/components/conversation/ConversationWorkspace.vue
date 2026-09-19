@@ -6,41 +6,52 @@ import type { ConversationInputContext, ConversationMode, ConversationTurn } fro
 import type { WorkspaceKind } from '../../types'
 import ConversationComposer from './ConversationComposer.vue'
 import ConversationTurnList from './ConversationTurnList.vue'
+import ResearchContextPicker from './ResearchContextPicker.vue'
 import PersonalModelEditor from '../PersonalModelEditor.vue'
-const props = defineProps<{ workspace: WorkspaceKind; conversationId: string; itemId: string; quote?: { text: string; runId: string | null; anchor: string } }>()
+const props = defineProps<{ workspace: WorkspaceKind; conversationId: string; itemId: string; initialMode?: ConversationMode; quote?: { text: string; runId: string | null; anchor: string } }>()
 const emit = defineEmits<{ clearQuote: [] }>()
 const router = useRouter()
-function select(id: string) { void router.replace({ path: `/lifeweave/${props.workspace}/conversation/${encodeURIComponent(id)}`, query: props.itemId ? { itemId: props.itemId } : {} }) }
+function select(id: string) {
+  try {
+    const key=`lifeweave:draft:${props.workspace}:${id}`
+    localStorage.setItem(`${key}:research`,JSON.stringify(researchItemIds.value))
+    localStorage.setItem(`${key}:mode`,mode.value)
+  } catch { /* The submitted sources remain recorded on the server. */ }
+  void router.replace({ path: `/lifeweave/${props.workspace}/conversation/${encodeURIComponent(id)}`, query: props.itemId ? { itemId: props.itemId } : {} })
+}
 const { current, history, error, loading, sending, pending, busy, refresh, submit, cancel } = useConversation({ workspace: () => props.workspace, conversationId: () => props.conversationId, itemId: () => props.itemId, selected: select })
+const researchItemIds = shallowRef<string[]>([])
 const body = shallowRef(''); const mode = shallowRef<ConversationMode>('auto')
 const retryContext = shallowRef<ConversationInputContext | null>(null)
 const scopeItemId = computed(() => current.value?.itemId || props.itemId)
 const draftKey = computed(() => `lifeweave:draft:${props.workspace}:${props.conversationId || props.itemId || 'new'}`)
-watch(draftKey, () => {
-  retryContext.value = null; mode.value = 'auto'
+watch(() => [draftKey.value, props.initialMode], () => {
+  retryContext.value = null; mode.value = props.initialMode || 'auto'; researchItemIds.value = []
   try {
     body.value = localStorage.getItem(draftKey.value) || ''
+    researchItemIds.value = JSON.parse(localStorage.getItem(`${draftKey.value}:research`) || '[]')
     const context = localStorage.getItem(`${draftKey.value}:context`); if (context) retryContext.value = JSON.parse(context)
     const savedMode = localStorage.getItem(`${draftKey.value}:mode`)
-    if (savedMode && ['auto', 'record', 'discuss', 'execute'].includes(savedMode)) mode.value = savedMode as ConversationMode
+    if (!props.initialMode && savedMode && ['auto', 'record', 'discuss', 'execute'].includes(savedMode)) mode.value = savedMode as ConversationMode
   }
   catch { body.value = '' }
 }, { immediate: true })
+watch(researchItemIds, value => { try { localStorage.setItem(`${draftKey.value}:research`,JSON.stringify(value)) } catch { /* Keep current selection in memory. */ } })
 watch(mode, value => { try { localStorage.setItem(`${draftKey.value}:mode`, value) } catch { /* Mode remains in this form. */ } })
 watch(retryContext, value => { try { if (value) localStorage.setItem(`${draftKey.value}:context`, JSON.stringify(value)); else localStorage.removeItem(`${draftKey.value}:context`) } catch { /* Context remains in this form when browser storage is unavailable. */ } })
 watch(body, value => { try { if (value) localStorage.setItem(draftKey.value, value); else localStorage.removeItem(draftKey.value) } catch { /* Draft remains editable without browser storage. */ } })
-watch(pending, value => { if (value) { body.value = value.input.body; mode.value = value.input.mode } }, { immediate: true })
+watch(pending, value => { if (value) { body.value = value.input.body; mode.value = value.input.mode; researchItemIds.value = value.input.researchItemIds || [] } }, { immediate: true })
 watch(() => props.quote, quote => { if (quote && !pending.value) { body.value = quote.text; retryContext.value = null } }, { immediate: true })
 async function send() {
   if (!body.value.trim()) return
   const oldDraftKey = draftKey.value; const workspace = props.workspace
   const inputContext = retryContext.value ?? { itemId: scopeItemId.value || undefined, runId: props.quote?.runId || undefined, anchor: props.quote?.anchor?.slice(0, 2000) }
-  const accepted = await submit({ body: body.value, mode: mode.value, ...inputContext })
-  if (accepted && workspace === props.workspace) { body.value = ''; retryContext.value = null; emit('clearQuote'); try { localStorage.removeItem(oldDraftKey); localStorage.removeItem(`${oldDraftKey}:context`); localStorage.removeItem(`${oldDraftKey}:mode`) } catch { /* Saved server history is authoritative. */ } }
+  const accepted = await submit({ body: body.value, mode: mode.value, ...inputContext, researchItemIds: researchItemIds.value })
+  if (accepted && workspace === props.workspace) { body.value = ''; retryContext.value = null; emit('clearQuote'); try { localStorage.removeItem(oldDraftKey); localStorage.removeItem(`${oldDraftKey}:context`) } catch { /* Saved server history is authoritative. */ } }
 }
 function retry(turn: ConversationTurn) {
   if (!pending.value && !sending.value) {
-    body.value = turn.body; mode.value = turn.mode
+    body.value = turn.body; mode.value = turn.mode; researchItemIds.value = turn.inputContext?.researchItemIds || []
     retryContext.value = turn.inputContext ? { ...turn.inputContext } : { itemId: turn.itemId, runId: turn.runId, anchor: null }
   }
 }
@@ -65,6 +76,7 @@ function clearQuote() {
       <ConversationTurnList v-if="current?.turns.length" :turns="current.turns" :workspace="workspace" :sending="sending || !!pending" @cancel="cancel" @retry="retry" />
       <div v-else-if="!loading" class="conversation-empty"><h3>把背景和想做的事告诉我</h3><p>“先帮我理解这篇论文的问题和动机。”<br />“只记一下这个想法，暂时不用展开。”<br />“请继续修订这份报告，补上训练数据的来源。”</p></div>
       <p v-if="busy" class="lw-small lw-muted" role="status">正在处理已保存的消息，运行状态会自动更新。</p>
+      <ResearchContextPicker v-model="researchItemIds" :workspace="workspace" :item-id="scopeItemId||undefined" :disabled="sending||!!pending||busy" />
       <ConversationComposer v-model="body" v-model:mode="mode" :sending="sending" :uncertain="!!pending" :processing="busy" :disabled="loading || (!!conversationId && !current)" :anchor="(pending?.input.anchor ?? (retryContext ? retryContext.anchor : quote?.anchor)) || undefined" @send="send" @clear-quote="clearQuote" />
     </section>
   </div>

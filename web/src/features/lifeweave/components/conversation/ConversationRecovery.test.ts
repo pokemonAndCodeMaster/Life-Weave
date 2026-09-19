@@ -5,6 +5,7 @@ const api = vi.hoisted(() => ({ listConversations: vi.fn(), getConversation: vi.
 vi.mock('../../api/conversations', () => api)
 vi.mock('../../api/lifeweave', () => ({ ...api, apiError: (error: unknown) => ({ message: String(error), status: 0 }) }))
 vi.mock('vue-router', () => ({ useRouter: () => ({ replace: api.replace, push: api.push }) }))
+vi.mock('@/shared/api/http',()=>({http:{get:vi.fn().mockResolvedValue({data:{items:[]}})}}))
 import ConversationWorkspace from './ConversationWorkspace.vue'
 import ConversationRunReceipt from './ConversationRunReceipt.vue'
 
@@ -28,6 +29,20 @@ beforeEach(() => {
 afterEach(() => { wrappers.forEach(wrapper => wrapper.unmount()); wrappers.length = 0 })
 
 describe('失败消息接续与成果阅读', () => {
+  it('明确就地讨论入口优先于旧委托草稿，同组件重进也恢复讨论范围', async () => {
+    localStorage.setItem('lifeweave:draft:personal:conversation-1:mode', 'execute')
+    const wrapper = workspace(); await flushPromises()
+    expect((wrapper.get('select.mode-select').element as HTMLSelectElement).value).toBe('execute')
+    await wrapper.setProps({ initialMode: 'discuss' }); await flushPromises()
+    expect((wrapper.get('select.mode-select').element as HTMLSelectElement).value).toBe('discuss')
+    await wrapper.get('textarea').setValue('继续解释，不执行')
+    await wrapper.get('form').trigger('submit'); await flushPromises()
+    expect(api.sendConversationTurn.mock.lastCall?.[2].mode).toBe('discuss')
+    // An existing conversation replaces the same URL without mode=discuss.
+    await wrapper.setProps({ initialMode: undefined }); await flushPromises()
+    expect((wrapper.get('select.mode-select').element as HTMLSelectElement).value).toBe('discuss')
+    expect(localStorage.getItem('lifeweave:draft:personal:conversation-1:mode')).toBe('discuss')
+  })
   it('失败原文带回后，发送保留原始事项、运行和引用定位', async () => {
     const wrapper = workspace(); await flushPromises()
     await wrapper.findAll('button').find(button => button.text() === '将原文带回输入框')!.trigger('click')

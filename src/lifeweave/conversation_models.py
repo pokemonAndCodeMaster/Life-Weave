@@ -19,6 +19,14 @@ class TurnCreate(Input):
     itemId: str | None = Field(default=None, max_length=64)
     runId: str | None = Field(default=None, max_length=64)
     anchor: str | None = Field(default=None, max_length=2000)
+    researchItemIds: list[str] = Field(default_factory=list, max_length=5)
+
+    @field_validator('researchItemIds')
+    @classmethod
+    def valid_research_ids(cls, value):
+        if len(set(value)) != len(value) or any(not v or len(v)>64 for v in value):
+            raise ValueError('请选择不重复的研究事项，最多5篇')
+        return value
 
     @field_validator('body')
     @classmethod
@@ -51,4 +59,3 @@ class Decision(Input):
     feedback: str | None
     proposedGoal: str | None
     knowledge: KnowledgeDraft | None
-

@@ -3,7 +3,7 @@
 
 这是一份可连续阅读的完整汇编：前半部分是当前产品、架构、状态和使用维护说明，后半部分是历史授权、交付与验证文字附录。
 
-范围为项目根 README、产品定义 v1.0 原文、docs/ 下全部 Markdown（不含本汇编自身），以及当前建设方案，共 40 份来源。所有来源正文、表格、代码块、Mermaid 图及历史说明完整保留；重复内容也保留，不做摘要或删节。只调整标题层级、链接位置和文内导航。
+范围为项目根 README、产品定义 v1.0 原文、docs/ 下全部 Markdown（不含本汇编自身），以及当前建设方案，共 43 份来源。所有来源正文、表格、代码块、Mermaid 图及历史说明完整保留；重复内容也保留，不做摘要或删节。只调整标题层级、链接位置和文内导航。
 
 源码、截图、JSON 运行记录和 API 文档保留可访问的引用，不把它们误作本次需要合并的说明正文。历史附录中的旧名称、当时状态和旧测试数量按原文保留；当前能力请以“当前完成情况”为准。
 
@@ -13,13 +13,13 @@
 
 | 部分 | 章节 | 来源 | 原文 SHA-256 |
 | --- | --- | --- | --- |
-| 当前说明 | [LifeWeave · 经纬](#doc-01) | `README.md` | `79a5e179110810cf0b084c3c00a725918a1875ca7aa08a8f98700c06d4cbb708` |
-| 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `dc8181375b04a32dc79c01c4586f48c91e92451fd3a9da4cdb09e6f6ba3fdf00` |
+| 当前说明 | [LifeWeave · 经纬](#doc-01) | `README.md` | `1a8f44e8b080374294a88dd2b5750202843132bad10d7f40d7de9bb6ced92913` |
+| 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `d2500b4afcd1cd5450598a1841e6fe5b4f2bf856d906b4afc28e634f33baa860` |
 | 当前说明 | [LifeWeave · 经纬：名称与适配](#doc-03) | `docs/naming.md` | `99c6b7caa819790699b1debf2ce9ccdad0d797728941f96a380a4571d8b4612d` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-04) | `docs/product.md` | `de862a0ac18104f29ac81dd36155041b1350caabd907157d9af4e6cb0a2ed2b9` |
-| 当前说明 | [架构与关键实现](#doc-05) | `docs/architecture.md` | `f3172cbb5dc7e70386d000526ec9bc3d65627df7f8a92e16328388fed1b4e0d6` |
-| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `3502e2977b8e67e9b573860831c298e7b51978f24fa95c28df8714a2e8be263a` |
-| 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `b1bc2a6d508529bc8bb2ae9f4f0da329b9c3e2660b535b861ce86e8c46893930` |
+| 当前说明 | [架构与关键实现](#doc-05) | `docs/architecture.md` | `1b53ad06ba802ae45510787843d5ab009d9fa7d1ecdcfe0ae42ba31c01eb7db5` |
+| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `3fc8909e1b4f861b8a735abb8b9703ba1ad18833bffad3a97dfc685e5ddbba0a` |
+| 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `72ee5f297bfda7f9d97bc98b90ac55649ba1d3eb54e009bb977ecf8a03f637e8` |
 | 当前说明 | [LifeWeave · 经纬](#doc-08) | `LifeWeave_产品定义与首版迭代计划_v1.0_2026-09-19.md` | `7b39f74096b5fb75c02263b5ac4f560e62fec06475d155f9c5c049423890cc19` |
 | 建设方案（含未实现范围） | [LifeWeave：可以跨任务持续使用的工作台](#doc-09) | `workspaces/reviews/lifeweave-next-stage/review.md` | `2b75e430372192a4e18aa41b7019345ced7467a598e086f4fe695b2fdb545f88` |
 | 历史与验证附录 | [原始任务与实施授权](#doc-10) | `docs/brief.md` | `b80241cd5fa2db062b7c79c6d8a7594869d89abb6d9034f3a69803984922406f` |
@@ -29,30 +29,33 @@
 | 历史与验证附录 | [内部命名与工作接续验证](#doc-14) | `docs/evidence/internal-rename/README.md` | `8e6e4ad8eb1bb2fe651af3fa578f4e9ef2cca8cd59468b08f20b22919370c1a7` |
 | 历史与验证附录 | [LifeWeave 改名与文档验证](#doc-15) | `docs/evidence/rename/README.md` | `5f1179f23e012ab60dae12c3aee02ea50d37849b0c0a7b83aa22bd69fac343a9` |
 | 历史与验证附录 | [LifeWeave 改名独立复核](#doc-16) | `docs/evidence/rename/independent-review.md` | `aa4d1cecb3ba48d6f36d027e26bde5dc0ee085be9278cfec209c1140dfa9977c` |
-| 历史与验证附录 | [网页研究可用版验证记录](#doc-17) | `docs/evidence/web-research/README.md` | `07d541cf52cdb5b17b8d48b521226edd9ace6a4a012329225d1e57c18cc9b9df` |
-| 历史与验证附录 | [受控引用反例](#doc-18) | `docs/evidence/web-research/encoding-final-controlled-original.md` | `5d8ea69327ace72ec9c6c6f2236acf7e72deee05420b7bb6c7d56fbdc058272f` |
-| 历史与验证附录 | [encoding-final-real-original](#doc-19) | `docs/evidence/web-research/encoding-final-real-original.md` | `5de064f9225d0e4fba0aace4fcf5e113188f326444637e66edc7c9f471533615` |
-| 历史与验证附录 | [来源编码修复独立复核：032a029](#doc-20) | `docs/evidence/web-research/encoding-final-review.md` | `79dc236ce7ddb89c6420697f2cc32236f0cb2341dd9f8f058a0aa6cd463f22d8` |
-| 历史与验证附录 | [G1 独立最终复核：d69b257](#doc-21) | `docs/evidence/web-research/final-recheck.md` | `557c99ee86586a47aa1f795a2aef03634b47d6552468dd4b645e56c8368dc48e` |
-| 历史与验证附录 | [网页研究可用版独立交付复核](#doc-22) | `docs/evidence/web-research/independent-review.md` | `90d886d7a199cfcc8f2230fdad88e963c625961fa0da29631bbce390ce16073a` |
-| 历史与验证附录 | [普通知识样本](#doc-23) | `docs/evidence/web-research/knowledge-notice-final-image-normal-accepted.md` | `ed033a8ef2ee5493cdae741d2d7a7c740cf912f91347d125b93b5506ce8ff259` |
-| 历史与验证附录 | [PDF提取样本](#doc-24) | `docs/evidence/web-research/knowledge-notice-final-image-nul-accepted.md` | `88bec12ff9aa89827dbc9f0ee61c5ae3fe9b5e847411372437102c9d278650a0` |
-| 历史与验证附录 | [PDF提取样本](#doc-25) | `docs/evidence/web-research/knowledge-notice-final-image-overlap-accepted.md` | `812447860eec238a2131cee94d4392620e455744445cf65379bd25df800735ac` |
-| 历史与验证附录 | [PDF提取样本](#doc-26) | `docs/evidence/web-research/knowledge-notice-final-image-readable.md` | `242da7ef9252041e3febfba6e6c043f35da0111875c6f8741dac14ed13817970` |
-| 历史与验证附录 | [普通知识样本](#doc-27) | `docs/evidence/web-research/knowledge-notice-final-normal-accepted.md` | `4b9d07952633ce1b369309b4e63de89b6ffee34d0c82d180ff902ee77150753d` |
-| 历史与验证附录 | [PDF提取样本](#doc-28) | `docs/evidence/web-research/knowledge-notice-final-nul-accepted.md` | `64de78171e5385777791fd672435fe97403c77e481adb3e3bd7dc2232d3c49dc` |
-| 历史与验证附录 | [PDF提取样本](#doc-29) | `docs/evidence/web-research/knowledge-notice-final-overlap-accepted.md` | `d619ba3edddfb2d1dfa18863954b7fab26dba2e2e10933ea2a3feff829f97a30` |
-| 历史与验证附录 | [PDF提取样本](#doc-30) | `docs/evidence/web-research/knowledge-notice-final-readable.md` | `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc` |
-| 历史与验证附录 | [知识阅读提示独立交付复核](#doc-31) | `docs/evidence/web-research/knowledge-notice-final-review.md` | `308e75a6aeee6bcb4548f100312a666d8009e9517c210e72b223acbc4f7d4d02` |
-| 历史与验证附录 | [成果与知识纵切：受控验证](#doc-32) | `docs/evidence/web-research/outputs-verification.md` | `47485b16fee009ccf96bbfa57b26bf4584f62402d4cc835861e9cbb35529bb53` |
-| 历史与验证附录 | [独立 PDF 阅读夹具](#doc-33) | `docs/evidence/web-research/pdf-artifact-final-accepted.md` | `6f860704445b8eb8259de78f2777e7bad04e61bbccfba4ffb185911cb62f1df9` |
-| 历史与验证附录 | [PDF 字符存储与原始成果下载：独立交付复核](#doc-34) | `docs/evidence/web-research/pdf-artifact-final-review.md` | `7f9430a62512bc1a443a0e18180c6e206b6aed5de119d7eb32ef563760b4825c` |
-| 历史与验证附录 | [PDF 字符存储修复独立交付复核](#doc-35) | `docs/evidence/web-research/pdf-storage-review.md` | `ba2430dafb322f4bd088640ed0f5a946a8eee566b8991271aeafced4f1dcf043` |
-| 历史与验证附录 | [Qwen-Drive 首轮研究产物（未经用户接受）](#doc-36) | `docs/evidence/web-research/qwen-drive-report.md` | `6d4854793cf9fd33a2f041aa3c5f1f203efc80328149c70133999eb82595b705` |
-| 历史与验证附录 | [受控引用反例](#doc-37) | `docs/evidence/web-research/reference-fresh-controlled-original.md` | `e7f849e0cb4bd41ad47bdbb6e2291334cd8c47573822c3b9d8505eceed98f6b0` |
-| 历史与验证附录 | [reference-fresh-real-original](#doc-38) | `docs/evidence/web-research/reference-fresh-real-original.md` | `5de064f9225d0e4fba0aace4fcf5e113188f326444637e66edc7c9f471533615` |
-| 历史与验证附录 | [G1 来源保真独立复核：cd8c709](#doc-39) | `docs/evidence/web-research/reference-fresh-review.md` | `0dafec7f93a4d2830a702bd52776deae8651d5571e6b49aa280d4ef716c83f87` |
-| 历史与验证附录 | [我的周回顾](#doc-40) | `docs/evidence/weekly-review.md` | `b44e1b34eef120a755815ec38869ca16fb235a1f8d03832d3e108488b50aaf7b` |
+| 历史与验证附录 | [研究归档与跨文章讨论验证（2026-09-19）](#doc-17) | `docs/evidence/research-archive/README.md` | `9fc3be1f25d19f1ce3cc4eb7fa65b54c599fdfe9d139d2b7434aa5dbcb1b8faa` |
+| 历史与验证附录 | [独立交付复核记录](#doc-18) | `docs/evidence/research-archive/independent-review.md` | `c44711a2e562e062ddf3b699a835da69224eaed03136203296c93c0b3e5f8b14` |
+| 历史与验证附录 | [网页研究可用版验证记录](#doc-19) | `docs/evidence/web-research/README.md` | `07d541cf52cdb5b17b8d48b521226edd9ace6a4a012329225d1e57c18cc9b9df` |
+| 历史与验证附录 | [受控引用反例](#doc-20) | `docs/evidence/web-research/encoding-final-controlled-original.md` | `5d8ea69327ace72ec9c6c6f2236acf7e72deee05420b7bb6c7d56fbdc058272f` |
+| 历史与验证附录 | [encoding-final-real-original](#doc-21) | `docs/evidence/web-research/encoding-final-real-original.md` | `5de064f9225d0e4fba0aace4fcf5e113188f326444637e66edc7c9f471533615` |
+| 历史与验证附录 | [来源编码修复独立复核：032a029](#doc-22) | `docs/evidence/web-research/encoding-final-review.md` | `79dc236ce7ddb89c6420697f2cc32236f0cb2341dd9f8f058a0aa6cd463f22d8` |
+| 历史与验证附录 | [G1 独立最终复核：d69b257](#doc-23) | `docs/evidence/web-research/final-recheck.md` | `557c99ee86586a47aa1f795a2aef03634b47d6552468dd4b645e56c8368dc48e` |
+| 历史与验证附录 | [网页研究可用版独立交付复核](#doc-24) | `docs/evidence/web-research/independent-review.md` | `90d886d7a199cfcc8f2230fdad88e963c625961fa0da29631bbce390ce16073a` |
+| 历史与验证附录 | [普通知识样本](#doc-25) | `docs/evidence/web-research/knowledge-notice-final-image-normal-accepted.md` | `ed033a8ef2ee5493cdae741d2d7a7c740cf912f91347d125b93b5506ce8ff259` |
+| 历史与验证附录 | [PDF提取样本](#doc-26) | `docs/evidence/web-research/knowledge-notice-final-image-nul-accepted.md` | `88bec12ff9aa89827dbc9f0ee61c5ae3fe9b5e847411372437102c9d278650a0` |
+| 历史与验证附录 | [PDF提取样本](#doc-27) | `docs/evidence/web-research/knowledge-notice-final-image-overlap-accepted.md` | `812447860eec238a2131cee94d4392620e455744445cf65379bd25df800735ac` |
+| 历史与验证附录 | [PDF提取样本](#doc-28) | `docs/evidence/web-research/knowledge-notice-final-image-readable.md` | `242da7ef9252041e3febfba6e6c043f35da0111875c6f8741dac14ed13817970` |
+| 历史与验证附录 | [普通知识样本](#doc-29) | `docs/evidence/web-research/knowledge-notice-final-normal-accepted.md` | `4b9d07952633ce1b369309b4e63de89b6ffee34d0c82d180ff902ee77150753d` |
+| 历史与验证附录 | [PDF提取样本](#doc-30) | `docs/evidence/web-research/knowledge-notice-final-nul-accepted.md` | `64de78171e5385777791fd672435fe97403c77e481adb3e3bd7dc2232d3c49dc` |
+| 历史与验证附录 | [PDF提取样本](#doc-31) | `docs/evidence/web-research/knowledge-notice-final-overlap-accepted.md` | `d619ba3edddfb2d1dfa18863954b7fab26dba2e2e10933ea2a3feff829f97a30` |
+| 历史与验证附录 | [PDF提取样本](#doc-32) | `docs/evidence/web-research/knowledge-notice-final-readable.md` | `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc` |
+| 历史与验证附录 | [知识阅读提示独立交付复核](#doc-33) | `docs/evidence/web-research/knowledge-notice-final-review.md` | `308e75a6aeee6bcb4548f100312a666d8009e9517c210e72b223acbc4f7d4d02` |
+| 历史与验证附录 | [成果与知识纵切：受控验证](#doc-34) | `docs/evidence/web-research/outputs-verification.md` | `47485b16fee009ccf96bbfa57b26bf4584f62402d4cc835861e9cbb35529bb53` |
+| 历史与验证附录 | [独立 PDF 阅读夹具](#doc-35) | `docs/evidence/web-research/pdf-artifact-final-accepted.md` | `6f860704445b8eb8259de78f2777e7bad04e61bbccfba4ffb185911cb62f1df9` |
+| 历史与验证附录 | [PDF 字符存储与原始成果下载：独立交付复核](#doc-36) | `docs/evidence/web-research/pdf-artifact-final-review.md` | `7f9430a62512bc1a443a0e18180c6e206b6aed5de119d7eb32ef563760b4825c` |
+| 历史与验证附录 | [PDF 字符存储修复独立交付复核](#doc-37) | `docs/evidence/web-research/pdf-storage-review.md` | `ba2430dafb322f4bd088640ed0f5a946a8eee566b8991271aeafced4f1dcf043` |
+| 历史与验证附录 | [Qwen-Drive 首轮研究产物（未经用户接受）](#doc-38) | `docs/evidence/web-research/qwen-drive-report.md` | `6d4854793cf9fd33a2f041aa3c5f1f203efc80328149c70133999eb82595b705` |
+| 历史与验证附录 | [受控引用反例](#doc-39) | `docs/evidence/web-research/reference-fresh-controlled-original.md` | `e7f849e0cb4bd41ad47bdbb6e2291334cd8c47573822c3b9d8505eceed98f6b0` |
+| 历史与验证附录 | [reference-fresh-real-original](#doc-40) | `docs/evidence/web-research/reference-fresh-real-original.md` | `5de064f9225d0e4fba0aace4fcf5e113188f326444637e66edc7c9f471533615` |
+| 历史与验证附录 | [G1 来源保真独立复核：cd8c709](#doc-41) | `docs/evidence/web-research/reference-fresh-review.md` | `0dafec7f93a4d2830a702bd52776deae8651d5571e6b49aa280d4ef716c83f87` |
+| 历史与验证附录 | [我的周回顾](#doc-42) | `docs/evidence/weekly-review.md` | `b44e1b34eef120a755815ec38869ca16fb235a1f8d03832d3e108488b50aaf7b` |
+| 历史与验证附录 | [研究成果归档、离线阅读与跨文章讨论](#doc-43) | `docs/research-archive.md` | `1bea339c10ca2ad5a5746312080da2a0ab6821da0693e8ad2ed0bddb31b00a3b` |
 
 ---
 
@@ -100,15 +103,19 @@ python scripts/workbench.py start
 1. 默认打开“对话”。直接提问、说出研究委托，或选“只记录”保存想法；历史对话可刷新后继续。左侧可保存明确的方向与偏好。
 2. 在“计划”中安排优先级、日期和阶段。事项详情保存背景、讨论、关联材料与修改提案。
 3. 点“委托 AI”，写清这次希望得到什么。可选择执行器、项目目录、工作方法与知识。不选项目时使用空白任务目录；选 Git 项目时使用固定提交的独立 worktree，未提交修改不会自动带入。
-4. 在对话和事项页阅读完整成果，查看公式与本轮图片，选择历史版本或下载正文。选中段落可保存定位反馈，再让对话继续修订。运行成功不会自动完成事项。
+4. 在对话和事项页阅读完整成果，查看公式与本轮图片，选择历史版本、下载纯正文，或点“下载完整包（含图片）”取得可离线阅读的 ZIP。选中段落可保存定位反馈，再让对话继续修订。运行成功不会自动完成事项。
 5. 从成果提出知识候选，或在“知识与材料”写笔记。阅读差异后接受或拒绝；当前原文变化会阻止覆盖。已接受知识可供后续对话和研究读取。
 6. 在“周回顾 / 组会”配置关注内容、冻结当次内容、记录讨论并导出 Markdown。
+
+“就地讨论”会打开关联当前事项的 AI 对话；展开“附带其他研究成果”，可明确选入其他论文。已有知识另按问题匹配读取，实际来源及版本显示在回复下方。
+
+在“设置与连接 → 研究成果自动归档”启用后，新成功报告会自动写入 GitHub 的 `research-archive` 分支及 Linear 项目文档。失败保留本地并重试；以前的成果可点“立即归档 / 重试”。[当前两篇远端归档](https://github.com/pokemonAndCodeMaster/Life-Weave/tree/research-archive)在本机关机后仍能访问。代码在同仓 `main`；归档范围是成果与引用材料，不是整套运行数据库或自动采纳正式知识。详见 [归档与跨文章讨论](#doc-43)。
 
 本机首次交付已实际跑通 Codex。OpenCode 可建立会话，但当前配置下的真实调用连续返回执行器内部错误，暂建议选 Codex；具体记录见交付说明。重试是关联到原委托的新尝试，不是恢复原生 CLI 会话。
 
 本轮已通过工作台完成 [Qwen-Drive 第一轮研究](http://127.0.0.1:8010/lifeweave/personal/items/item-810217743bbb4be2/outputs)。该入口属于当前本机安装；新安装不会预置这份个人事项。研究可用版的证据、明确边界和后续日常 Alpha 计划见 [当前完成情况](#doc-06)。
 
-<a id="doc-01-line-45"></a>
+<a id="doc-01-line-49"></a>
 
 ### 连接已有积累
 
@@ -118,9 +125,9 @@ python scripts/workbench.py start
 - 委托时按需选择一套 Skill 和最多 10 篇知识，固定正文与方法支持文件。重试保留已选择资料的快照；要使用更新后的资料，创建新委托。Skills 需要适用于目标工程；引用原仓库专有脚本的方法仍可能需要调整。
 - Linear 使用个人 API Key 或本机权限为 `600` 的凭证文件。凭证保存在 `.runtime/linear.json`，不进入 Git，也不回传到页面。
 - Linear 页面分页读取分配给当前账号的事项。导入创建本地工作；再次导入更新远端快照，保留本地标题、目标、安排和进展。
-- 向 Linear 发成果前先准备固定正文预览，再点发送。系统回读评论核对；网络结果不确定时优先核对已有评论，不自动重复发送。本地事项与 Linear 状态独立维护。
+- 向 Linear 事项发送评论时，先准备固定正文预览，再点发送。系统回读评论核对；网络结果不确定时优先核对已有评论，不自动重复发送。本地事项与 Linear 状态独立维护。
 
-<a id="doc-01-line-55"></a>
+<a id="doc-01-line-59"></a>
 
 ### 数据与运行
 
@@ -139,7 +146,7 @@ python scripts/workbench.py start
 
 本机服务只监听 `127.0.0.1:8010`。当前身份是本机单用户，个人/团队是内容空间，**没有多人登录与成员权限系统**。不应直接暴露到公网。团队执行机和 Docker 协议保留，但默认启动个人空间的本机 worker；团队空间可以在设置中明确选择使用本机账号启用执行。远程执行需要另行部署与验证。
 
-<a id="doc-01-line-72"></a>
+<a id="doc-01-line-76"></a>
 
 ### 开发与验证
 
@@ -158,7 +165,7 @@ npm run build
 
 API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`，页面前缀 `/lifeweave/`。旧页面仍会跳转；旧 API 客户端须跟随 308，或改用新前缀。配置读取范围见 [运行维护](#doc-07-line-29)。数据库变更新增到 `migrations/`，启动时按摘要校验并只应用新版本。
 
-<a id="doc-01-line-89"></a>
+<a id="doc-01-line-93"></a>
 
 ### 在新的本机 Agent 会话接续
 
@@ -209,6 +216,8 @@ LifeWeave（经纬）希望帮助个人与协作中的人，把工作、学习�
 当前说明以本仓源码、迁移和运行结果为依据。修改功能时，应同步受影响的产品说明、实现说明或状态；精确字段仍以源码和运行中的 [API 文档](http://127.0.0.1:8010/docs) 为准，不在文档里维护逐函数副本。
 
 历史材料单独保留：[初始授权](#doc-10)、[首次交付](#doc-12)、[首轮证据](#doc-13)、[此次改名要求](#doc-11)。其中旧名称、旧路径、截图、运行 ID 和原始输入应按当时事实理解，不能因为改名而重写成新的验证证据。
+
+[研究归档与跨文章讨论](#doc-43)：云端入口、ZIP 使用、自动触发及恢复范围。
 <!-- source-end: docs/README.md -->
 
 ---
@@ -534,9 +543,9 @@ sequenceDiagram
 
 SQL 006 增加对话、消息与明确方向/偏好；SQL 007 增加成果来源与知识候选关联。所有已有表和原始产物保留。对话动作与本轮回执在同一 PostgreSQL 事务提交；请求身份复用不会重复建事项或委托。每个对话只允许一轮未完成处理。停止解释、解释失败和启动后发现中断都会保留原话及状态，不自动重放动作；网络结果不确定时页面使用同一请求身份核对。
 
-语义解释读取当前事项、最多20个相关候选、最近20轮历史、5次运行摘要、最多10篇知识（共80000字，单篇20000字）及当前偏好；记录实际版本与截断情况。这是有界上下文，不是全量记忆或语义检索。研究运行额外固定完整的前轮当前成果、明确方向/偏好和反馈；worker 后续报告不能改写这些输入。模型解释期间当前背景版本变更会拒绝旧的执行/目标/知识建议。
+语义解释读取当前事项、最多20个相关候选、最近20轮历史、5次运行摘要、最多10篇知识（共40000字符，单篇20000字符）及当前偏好；记录实际版本与截断情况。这是有界上下文，不是全量记忆或语义检索。解释器另外读取当前成果及最多5篇显式选择的研究：当前最多60000字符，其他每篇最多20000字符，总预算120000字符，并为每篇选择保留额度、记录截断。运行摘要每条2000字符，对话最近20轮的提问/回复各1500字符；解释器最终还有240000字符输入上限，过量报错并保留原话。研究运行额外固定完整的前轮当前成果、明确方向/偏好和反馈，以及本轮选入的其他研究快照；worker 后续报告不能改写这些输入。模型解释期间当前背景版本变更会拒绝旧的执行/目标/知识建议。
 
-`ResearchOutputs` 把所有运行版本及人工成果作为阅读投影，不复制一份独立可编辑报告正文。当前成果优先取最新成功运行；失败的部分结果保留在版本列表。后续修订产生新成功运行，旧版本不变。阅读组件使用 Marked、DOMPurify 和 KaTeX；本轮 PNG/JPEG/GIF/WebP 通过限定运行目录的资产接口读取并校验内容与大小。外部图保留原图入口，失效图片明确显示缺口。下载保存完整 Markdown。
+`ResearchOutputs` 把所有运行版本及人工成果作为阅读投影，不复制一份独立可编辑报告正文。当前成果优先取最新成功运行；失败的部分结果保留在版本列表。后续修订产生新成功运行，旧版本不变。阅读组件使用 Marked、DOMPurify 和 KaTeX；本轮 PNG/JPEG/GIF/WebP 通过限定运行目录的资产接口读取并校验内容与大小。外部图保留原图入口，失效图片明确显示缺口。纯文本下载保存完整 Markdown；`research_bundle.py` 通过 Markdown AST 收集本轮安全路径下的图片与引用，生成含原文、便携正文、资产及哈希清单的 ZIP。
 
 选段反馈保存成果运行、内容位置、原话与当前背景版本；下一轮沿同一事项读取。`ResearchOutputs.propose_from_run` 校验成功成果与事项归属，在同一事务保存知识修订及来源关联；接受、拒绝和版本冲突仍由现有 Library 负责。候选不是当前知识，后续消费者只读取已接受文件。内置 `methods/paper-research/SKILL.md` 是一套可独立加载的研究方法，和用户登记的方法一起参加现有文本匹配推荐；它要求核对论文身份、保存一手来源、解释数据与实验、交付完整正文并按反馈修订。
 
@@ -551,6 +560,14 @@ SQL 006 增加对话、消息与明确方向/偏好；SQL 007 增加成果来源
 
 
 论文还可能用普通 Markdown 文字链接引用本轮图片。`/source` 对 PNG/JPEG/GIF/WebP 委托既有 `ResearchOutputs.asset` 校验并返回正确媒体类型，因此报告、知识映射与 HTML 阅读版共享同一读取行为；不为修链接改写原成果，也不扩大到任意二进制文件。
+
+<a id="doc-05-line-157"></a>
+
+### 成果的异地归档
+
+`research_archive.py` 复用同一个便携包。每空间设置及逐运行归档状态保存在 `.runtime/research-archives`，进程间文件锁串行保护归档 checkout；后台每20秒扫描已启用空间，新成功正文进入归档，失败5分钟后重试。GitHub 用独立 checkout 写 `research-archive`，Linear 上传图片、引用材料和 ZIP，再创建关联项目的完整版本文档。每目标独立确认与重试，固定运行和正文身份避免重复创建，远端冲突不覆盖。
+
+GitHub 以分支提交回读确认；Linear 附件校验字节 SHA-256，正文按完整解析结构核对（允许排版规范化，保留文字、代码、链接、图片、表格顺序）。Linear 不按工作台的 KaTeX 方式解释数学：发布投影将公式转为 LaTeX 代码，防止矩阵中的等号/减号被误认标题；原 Markdown 不变。确认是当次快照证明，并非持续监测人对远端的后续修改。细节、设置和恢复边界见 [归档与跨文章讨论](#doc-43)。
 <!-- source-end: docs/architecture.md -->
 
 ---
@@ -576,7 +593,7 @@ SQL 006 增加对话、消息与明确方向/偏好；SQL 007 增加成果来源
 | 知识 | 全文阅读/搜索、本机 Markdown 候选与差异、接受更新；外部来源只读 | 两篇本机笔记实际创建和采纳；中文链接、来源冲突、拒绝、越界有独立页面或接口检查 |
 | 材料选择 | 登记 Skills 目录，按当前目标文本匹配预选一项方法和最多 10 篇知识，可调整并保存输入快照 | 7 项方法已登记；一次真实运行附带知识；临时库测试覆盖最大知识数量与支持文件快照 |
 | 回顾 | 实时内容、关注配置、冻结当次、讨论和 Markdown 导出 | 实际导出包含目标、完成状态与快照身份；独立复核当前与冻结内容 |
-| Linear 读取 | 配置连接、读取分配给当前账号的事项、引入及刷新来源快照 | 真实账号读取和 YYH-11 本地引入、重复刷新；没有远端写入 |
+| Linear 读取与成果归档 | 读取事项、刷新来源快照；显式启用后自动发布研究文档与附件 | YYH-11 引入及刷新；两篇真实论文的全文与图片 ZIP 已远端回读。旧的事项评论发送仍未实测 |
 | 本机运维 | 独立安装、启动、停止、数据库与知识备份 | 已恢复到新临时数据库，检查表和实际正文；迁移只应用新文件 |
 | LifeWeave 名称 | 新目录、包名、界面、图标、页面/API 和配置前缀；旧入口兼容 | 本轮类型检查、构建、路由兼容和真实数据库测试；迁移记录见 [本轮验证](#doc-15) |
 
@@ -589,7 +606,7 @@ SQL 006 增加对话、消息与明确方向/偏好；SQL 007 增加成果来源
 - **OpenCode**：CLI 能建立会话，真实模型调用连续返回内部错误，尚未取得成功结果。暂用 Codex；错误原因未确认为平台、CLI 或上游服务中的哪一层。
 - **取消、重试、租约恢复**：有实现及受控测试；重试是新尝试，不是原生会话续跑。长时间断电、网络分区和跨机器恢复尚未验证。
 - **远程节点与 Docker**：保留协议和适配代码，没有完成真实远程部署验收。
-- **Linear 发送**：预览、固定评论身份、回读与不确定状态处理经过模拟测试；真实发送未执行，双向状态同步未实现。
+- **Linear 事项评论发送**：预览、固定评论身份、回读与不确定状态处理经过模拟测试；真实发送未执行，双向状态同步未实现。
 - **知识与方法治理**：维护中心保留候选、验证与发布入口；尚未证明所有旧 Skills 在新工程可直接执行，也没有完成整个知识库的自动摄入与发布。
 - **搜索与目录规模**：当前适合本机有限规模资料；没有语义搜索或海量目录容量验证。事项详情的运行列表当前取该事项最多 100 条，完整运行页提供分页。
 
@@ -636,9 +653,21 @@ SQL 006 增加对话、消息与明确方向/偏好；SQL 007 增加成果来源
 
 代码已接通持久对话、问题/记录/讨论/委托分流、同事项反馈与前轮完整成果、明确方向/偏好、下次讨论时间、完整 Markdown/公式/本轮图片、知识候选来源及显式审阅。语义解释使用真实 Codex；记录模式不调用模型；不会自动接受目标或知识。两轮真实网页研究、选段反馈修订、目标采纳、新会话知识再用已经成功；来源编码独立复核已完成：实际图片显示、来源点击、知识和下载页面均验证。首篇真实 Qwen-Drive 研究已经从日常网页完成：8378字正文、2张实际解码的插图、14处公式与9条本地来源已在浏览器核查，原对话可读取当前成果。第一次PDF日志保存失败、网页重试和后续来源修复均保留证据。字符存储及知识说明已经新的独立复核；普通图片来源链接的相邻复核也已通过。论文为第一轮研究结果，未复现实验，也未替用户接受知识或宣布已经理解。
 
-本轮完整回归在5993005为66项Python（含真实临时数据库）与29项前端通过，类型检查、构建通过；后续知识提示变更21项、图片来源变更7项相关回归通过，前端生产依赖审计无漏洞。图片、公式与知识操作的受控页面证据见 [本轮验证与发现](#doc-17)；受控夹具与真实模型分别记录。
+本轮完整回归在5993005为66项Python（含真实临时数据库）与29项前端通过，类型检查、构建通过；后续知识提示变更21项、图片来源变更7项相关回归通过，前端生产依赖审计无漏洞。图片、公式与知识操作的受控页面证据见 [本轮验证与发现](#doc-19)；受控夹具与真实模型分别记录。
 
 G2 的可用时段/休息约束/未来时间块、受控机会发现、方法修订对照回归尚未实现。当前偏好由用户明确编辑，不自动推断永久偏好；下次讨论时间不会发提醒或占用日历。远程 ChatGPT、多人身份和双向 Linear 同步仍未接通。GSSM 身份已由用户确认，第二篇真实研究也已通过日常网页完成：主读 arXiv 2505.13556v5，复用内置论文研究方法，保存14052字符完整正文、固定源码版本、公式小算例和官方函数合成检查。实际浏览器验证1张嵌入图、87处公式及14条本地来源，下载与保存版本一致，原对话可接续。本轮未训练模型、未复现论文完整实验、未接受正式知识。见 [GSSM网页与方法复用证据](evidence/web-research/gssm-reading-verified.json)。
+
+<a id="doc-06-line-70"></a>
+
+### 研究归档与跨文章接续（2026-09-19）
+
+用户已启用“每次成功生成报告后自动归档”，指定仓库 `pokemonAndCodeMaster/Life-Weave`。两篇现有报告已补归档到该仓的 `research-archive` 分支和原 Linear 项目的独立文档；主代码在 `main`。Qwen 包含11个本地引用文件、GSSM 包含28个，完整 ZIP 同时留在两端。页面下载 ZIP 后解压断网检查，正文与嵌入图片可读；GitHub 新 clone 的各文件哈希与 ZIP 一致，Linear 全文按解析结构回读及带认证下载的图片、ZIP 字节核对。Linear 已登录网页的实际显示未在本轮独立验收，公式明确以 LaTeX 代码保存；没有把 HTTP 成功当作页面显示成功。
+
+“就地讨论”现在进入 AI 对话，自动读取当前成果；选择 Qwen-Drive 后，GSSM 讨论实测读取两份全文及存量知识，返回有来源的比较，未启动新委托或接受知识。选择和本次模式在当前浏览器的对话草稿中保留；另一个浏览器可看服务器保存的来源记录，但需重新选择下一轮附带材料。最多当前加5篇，6个附带 ID 拒绝；长文本按额度截断并明确标记。
+
+自动归档只在服务运行、有网络与认证时推进，停机后不能产生新报告或上传；已确认的远端版本独立可读。研究快照并非正式知识，也不含所有事项状态、历史对话、凭证或数据库；双向状态同步仍未实现。详见 [使用与维护](#doc-43)、[本轮验证](#doc-17)。
+
+本轮归档与讨论改动：75项后端（含真实临时数据库）、30项前端回归通过，类型检查与构建通过，前端生产依赖审计0漏洞；远端与离线阅读另有真实验证，不由模拟测试代替。
 <!-- source-end: docs/status.md -->
 
 ---
@@ -788,6 +817,14 @@ python scripts/workbench.py start
 
 
 若 PDF 工具输出触发 `\u0000 cannot be converted to text`，旧失败尝试会保留。升级到带 `storage_text.py` 的版本后，从运行页“按当前背景再试”建立新尝试。事件或运行环境中的 `_lifeweaveTextStorage.originalJsonBase64` 可按 base64 → JSON 还原受影响原数据；页面中的 `␀` 是存储投影。不要用批量删除源文控制字符或手改运行状态掩盖失败。
+
+<a id="doc-07-line-125"></a>
+
+### 自动归档维护
+
+在设置页配置 GitHub HTTPS 仓地址、Linear 项目 UUID 并启用；实际 Git 传输使用本机已有 SSH 认证，须事先能非交互访问对应仓。Linear 复用现有连接。状态、上传断点与归档 checkout 在 `.runtime/research-archives/{space}`，均应随私有运行配置备份，不提交凭证。`LIFEWEAVE_ARCHIVE_WORKER=0` 可关闭后台扫描；默认跟随本机 worker 启用。停止服务会等待当前归档请求结束，先看归档状态再维护。
+
+失败在成果页按目标显示，5分钟后自动重试或点立即归档。更换 GitHub 目标后，已有 checkout 不会自动改 remote，页面明确报错；停止服务并将该空间的 `git/` 目录移到备份位置，再启服务重试，服务会为新目标建立 checkout。不要删除逐运行的 `bundle/` 与 `state.json`。首次启用前的旧成果不批量回填，用户逐项触发；曾失败的记录启动后恢复扫描。详见 [归档与跨文章讨论](#doc-43)。
 <!-- source-end: docs/development.md -->
 
 ---
@@ -1612,7 +1649,7 @@ CLI 是正式产品客户端，提供 discover、continue、recommend、read-kno
 | A08 恢复 | 普通刷新/新浏览器接续；独立服务正在解释时强制停止后重启，原话与历史成果可读、未自动重发 |
 | A09 失败与不确定 | 初次实际解释配置失败可见；受控取消、业务失败回滚、断响应重试、跨空间草稿保护；无外部写入盲重试；真实论文发现PDF NUL保存失败，已修复并从网页重试成功；原文下载与知识说明经新独立复核，报告未被自动接受 |
 
-[本轮证据总入口](#doc-17) 保留每次失败与修复，不以旧pass覆盖后来发现的反例。本轮66项Python/29项前端完整回归及后续21项/7项影响范围回归、真实模型、人工模拟与独立浏览器分别解释，不按用例数量计算完成百分比。所有数据夹具使用独立临时库；日常升级前备份，23张既有业务表与2篇知识原文哈希保留。Qwen-Drive属于真实业务事项，不是测试夹具，后续成果与反馈留在日常库。
+[本轮证据总入口](#doc-19) 保留每次失败与修复，不以旧pass覆盖后来发现的反例。本轮66项Python/29项前端完整回归及后续21项/7项影响范围回归、真实模型、人工模拟与独立浏览器分别解释，不按用例数量计算完成百分比。所有数据夹具使用独立临时库；日常升级前备份，23张既有业务表与2篇知识原文哈希保留。Qwen-Drive属于真实业务事项，不是测试夹具，后续成果与反馈留在日常库。
 
 G2尚未关闭：可用时间/休息约束/时间块、受控机会发现、方法迭代对照与回退。现有明确偏好由人编辑，单次要求不自动固化；下次审阅时间不等于自动提醒。远程ChatGPT、多用户、远程节点和双向Linear同步维持原验证边界。GSSM身份仍待用户补标题/作者/链接，只影响第二篇研究。
 
@@ -1778,7 +1815,7 @@ npm --prefix web audit                # 0 vulnerabilities
 - [个人真实 Codex 结果](evidence/personal-ai-result.png)：委托完成后的可读正文。
 - [团队真实 Codex 结果](evidence/team-ai-result.png)：团队空间内的独立结果。
 - [知识正文与审阅入口](evidence/knowledge.png)。
-- [实际冻结回顾](evidence/weekly-review.png) 与 [导出 Markdown](#doc-40)。
+- [实际冻结回顾](evidence/weekly-review.png) 与 [导出 Markdown](#doc-42)。
 - [390px 页面](evidence/mobile-home.png)：窄屏实际浏览器截图。
 - [独立复核记录](evidence/independent-recheck.json)：真实临时数据库、浏览器操作；团队调用使用合成执行器，不冒充真实模型验证。
 - [日常服务只读复核](evidence/live-readonly.json)。
@@ -1922,14 +1959,117 @@ npm --prefix web audit                # 0 vulnerabilities
 ---
 
 <a id="doc-17"></a>
-<!-- source-begin: docs/evidence/web-research/README.md -->
+<!-- source-begin: docs/evidence/research-archive/README.md -->
 <a id="doc-17-line-1"></a>
+
+## 研究归档与跨文章讨论验证（2026-09-19）
+
+<a id="doc-17-line-3"></a>
+
+### 用户要求与施工身份
+
+用户要求两篇既有论文成果能在本机关机后从 GitHub 与 Linear 找回；下载提供包含图片的 ZIP；就地讨论能用当前文章、已有知识及另一篇论文。用户明确确认每次成功生成报告后自动归档，提供仓库 `https://github.com/pokemonAndCodeMaster/Life-Weave.git`。沿用该授权，没有重新要求确认或用外部论文工作替代产品实现。
+
+实施仓 `/home/yyh/project/lifeweave`，基线 `be0af89aab9253e7a6db5a1a92621d1ba929ceb3`。当前任务是增量开发，有效依据为用户会话中的明确范围；无需新产品定义。现有产品规范与源码是当前事实源，Omni-Brain 仅提供工作方法，不把两个项目的实现混为同一事实。
+
+升级前备份在私有 `.runtime/backups/lifeweave-20260919-221515.dump` 与 `knowledge-20260919-221515.tar.gz`。既有两篇正文版本和两份知识原文指纹见 [保留检查](evidence/research-archive/preserved.json)；验证中新添两次有明确范围的产品讨论，没有启动研究委托或接受知识。
+
+<a id="doc-17-line-11"></a>
+
+### 用户动作与证据
+
+| 动作 | 实际后果 | 证据 |
+| --- | --- | --- |
+| 浏览器设置页启用自动归档并保存两个目标 | 个人空间保存 enabled=true；两目标独立状态 | [设置截图](evidence/research-archive/archive-settings.png)、[归档回执](evidence/research-archive/archive-verified.json) |
+| 两篇成果页点击下载完整包 | ZIP 可由正常 zipfile 消费，原文版本、各文件哈希与 manifest 一致，无缺失警告 | [归档及文件清单](evidence/research-archive/archive-verified.json) |
+| 解压后关闭浏览器网络、从 file:// 阅读 | Qwen 两张内嵌图、GSSM 一张内嵌图实际解码，文字可读 | [离线验证](evidence/research-archive/offline-verified.json)、[Qwen 截图](evidence/research-archive/qwen-offline.png)、[GSSM 截图](evidence/research-archive/gssm-offline.png) |
+| 成果页点立即归档及失败重试 | 同版本分别确认 GitHub 与 Linear；失败保留本机和上传断点，未重复创建文档 | [Qwen 状态](evidence/research-archive/qwen-archive.png)、[GSSM 状态](evidence/research-archive/gssm-archive.png) |
+| 从 GitHub 全新 clone 研究分支 | Qwen 11、GSSM 28 个引用文件及 ZIP 与本机逐字节核对 | [GitHub 远端证据](evidence/research-archive/github-verified.json) |
+| Linear 读取全文、带认证下载 ZIP 与图片 | 完整结构核对通过，ZIP 哈希一致，Qwen 7张/GSSM 8张图片资产（含文字链接引用的图片）逐字节一致 | [Linear 远端证据](evidence/research-archive/linear-verified.json) |
+| 从 GSSM 就地讨论选择 Qwen、发送比较问题 | 当前 GSSM 14052字符与 Qwen 8378字符全文进入真实解释器；两份存量知识一起进入，四条来源与版本可读；runId=null，仅 discussion 回执 | [真实讨论记录](evidence/research-archive/live-discussion.json)、[页面](evidence/research-archive/cross-paper-discussion.png) |
+
+远端证据来自 API 全文和附件内容回读、Git 重新拉取；没有在已登录 Linear 网页中验收实际排版。Linear 的公式用 LaTeX 代码显示，ZIP 保留原 Markdown。GitHub 归档分支 HEAD 在两篇补归档后为 `79422ef53faa9af12b99fb19ad4ef33c70434481`；每篇固定提交链接在归档回执中。
+
+<a id="doc-17-line-25"></a>
+
+### 最大组合与失败边界
+
+当前成果1篇 + 用户附带5篇，按事项去重最多6篇；真实临时数据库/API 测试覆盖全组合，6个附带 ID 返回422，伪造事项返回404。每篇70000字符时，合计120000字符预算被分配给六篇，所有超限正文都有 excerpt 标记且没有零字引用。知识仍至多10篇，总40000字符；历史20轮、5次运行摘要有界，解释器超过最终上限明确报错。
+
+包内引用最多128个（另加 report/original/README/manifest 四份生成文件）；128成功、129拒绝。普通缺失引用明示清单，嵌入图片缺失/越界软链接拒绝，Markdown 代码示例不被当成文件引用，嵌套来源可读。自动扫描仅纳入已成功且有正文的运行；首次开启前旧成果不自动批量发布。
+
+临时数据库测试验证了后台扫描触发、分目标失败后只重试未确认目标、重复请求不重复创建、远端内容变化拒绝覆盖。独立复核还通过临时 bare Git 远端，实际制造人工改动，确认重试被拒且远端内容与提交保持原样。两篇真实归档包含网络上传失败、参数验证失败后的恢复；新报告完成后的自动入口由受控成功运行验证，本轮没有为证明触发而额外生成第三篇论文。
+
+<a id="doc-17-line-33"></a>
+
+### 发现与修复
+
+- Linear 不接受最初的 UUIDv5 文档标识，改用稳定内容身份派生的 UUIDv4 格式；丢失响应后仍能找回同一文档。
+- Linear 会规范化链接和表格排版，字符串相等不足以判断内容。改为完整 Markdown 结构核对，保留文本、代码、图片、链接、表格及顺序；样式规范化可接受。
+- Linear 对多行矩阵的等号、减号误解析为标题。发布投影将公式变成 LaTeX 代码；正文原件未变。两份本轮创建的远端文档在确认未被他人修改后作一次修复，再通过产品重新核对。
+- 首次独立复核发现旧 execute 草稿能覆盖“就地讨论”。改为明确入口优先，并监听入口变化；普通对话仍恢复原草稿。对应回归检查实际发送参数。新的复核又发现已有对话发送后清掉模式，已停止删除模式草稿，补充发送后移除 URL mode 参数时仍保持 discuss 的检查。
+
+<a id="doc-17-line-40"></a>
+
+### 独立复核
+
+两次独立检查找到讨论模式边界，修复后由第三个全新上下文验证连续两轮、刷新和请求参数；归档远端与离线另经第一位复核者亲自执行。[完整复核记录](#doc-18)保留失败与修复后证据，不以开发者自检替代。
+
+<a id="doc-17-line-44"></a>
+
+### 验证范围与长期维护
+
+本次完整后端回归75项通过，前端30项通过，类型检查、构建通过，前端生产依赖审计0漏洞。后端仅报告现有 TestClient 弃用警告。受控测试不替代真实上传/讨论，实际远端证据也不等于完整 Alpha 通过。自动归档是单向成果快照；原正式知识、任务状态、数据库、凭证及全部历史对话不在此同步范围。
+
+实现事实维护在本仓 [架构](#doc-05)、[使用说明](#doc-43)、[状态](#doc-06)，整合文档重新生成收录全部来源。本轮未修改其他仓的正式知识。
+<!-- source-end: docs/evidence/research-archive/README.md -->
+
+---
+
+<a id="doc-18"></a>
+<!-- source-begin: docs/evidence/research-archive/independent-review.md -->
+<a id="doc-18-line-1"></a>
+
+## 独立交付复核记录
+
+实施依据为用户本轮会话授权，差异基线 `be0af89aab9253e7a6db5a1a92621d1ba929ceb3`，候选为本轮工作树。按 develop-with-knowledge 的复杂交付要求，使用没有施工上下文的独立 Agent 只读检查；不得修改源码、远端或日常数据。
+
+<a id="doc-18-line-5"></a>
+
+### 第一轮：归档与讨论全范围
+
+`archive_delivery_review` 返回 fail，原因是旧 execute 草稿覆盖明确的就地讨论入口。其余关闭条件 pass：亲自从 GitHub 临时 clone 读取两篇所有文件，从 Linear 查询完整正文、下载 ZIP 和内嵌图片，检查字节一致；下载 ZIP 到独立临时目录经浏览器 file:// 阅读，图片解码成功；只读日常数据库核对真实对话两份全文及四条来源，没有新运行或知识回执；临时 bare Git 仓人为修改远端后归档被拒，远端提交和内容保持原样。执行14项相关后端回归。
+
+明确入口优先旧草稿的修复由新的上下文复核，没有让原复核者为自己的建议作最后验收。
+
+<a id="doc-18-line-11"></a>
+
+### 第二轮：讨论入口与续接
+
+`discussion_entry_recheck` 返回 fail：明确入口、刷新与实际 payload 已通过，但已有对话发送成功后清除了 :mode 草稿，URL 同时移除 mode 参数，表单退回 auto。复核使用隔离浏览器，所有 POST 被拦截，不写用户数据库。8项相关前端回归及类型检查通过，但不能覆盖该真实续接缺陷。
+
+修复为发送成功只清除正文和引用草稿，不删除选定模式；补回归检查已有对话移除显式 mode 后仍保持 discuss。第三次用全新上下文复核。
+
+<a id="doc-18-line-17"></a>
+
+### 第三轮：连续讨论的全新上下文复核
+
+`discussion_continuity_final` 亲自浏览器验证8项：旧 execute 草稿进入真实 GSSM 就地讨论被明确 discuss 覆盖；新对话提交和刷新；已有对话 mode=discuss 覆盖旧草稿；已有对话连续两轮发送后 URL 去掉 mode 参数仍保持 discuss 与 Qwen 选择；刷新保持；普通无显式入口恢复 record。三次实际 POST 均在浏览器拦截，payload 为 discuss、GSSM 当前事项和 Qwen 附带研究，无日常数据库写入、无模型启动。页面和 HTTP 错误均为0。
+
+[逐步动作、URL、localStorage 与请求参数](evidence/research-archive/final-discussion-review.json)记录复核源码哈希。结合第一轮未受后续修改影响的归档/离线/真实上下文验证，本轮范围通过；已登录 Linear 页面实际显示与完整 G2 仍不在此通过声明内。
+<!-- source-end: docs/evidence/research-archive/independent-review.md -->
+
+---
+
+<a id="doc-19"></a>
+<!-- source-begin: docs/evidence/web-research/README.md -->
+<a id="doc-19-line-1"></a>
 
 ## 网页研究可用版验证记录
 
 2026-09-19。批准输入是提交 `10d326d` 中的产品定义 v1.0 与同一建设方案；首批代码 `0e574e4`，路由测试更新 `71f00f8`，真实引用修复 `d69b257`。本记录区分真实模型、受控协议与日常环境升级，不把技术执行成功等同于用户接受论文结论。
 
-<a id="doc-17-line-5"></a>
+<a id="doc-19-line-5"></a>
 
 ### 已完成的真实网页路径
 
@@ -1950,7 +2090,7 @@ npm --prefix web audit                # 0 vulnerabilities
 
 `conversation-revised.png` 在刷新后未等待正文请求完成，画面仍为加载前空状态，不能单独证明修订全文显示。完整修订内容与版本以 `real-browser.json` 和后续知识接受、来源阅读的实际页面证据为准；保留这张原始截图，不补写成已经显示的截图。
 
-<a id="doc-17-line-24"></a>
+<a id="doc-19-line-24"></a>
 
 ### 实际发现并修复的问题
 
@@ -1959,15 +2099,15 @@ npm --prefix web audit                # 0 vulnerabilities
 - 新主题可能误沿旧事项；改为模型明确返回的空事项代表新主题。失败重发保留原引用身份和位置；解释期间背景变化时拒绝旧的执行/目标/知识建议。
 - 真实报告的来源清单写到本轮 `repo/.runtime/research/`，被来源读取接口一律隐藏路径规则拦截。修复仅允许这条研究产物子目录，仍拒绝其他隐藏目录、越界和符号链接指向隐藏文件；未来内置方法要求写入 `research/`。真实旧报告未手工修改，两条引用均已通过正式 API 回读：[来源回读](evidence/web-research/source-readback.json)。隔离服务同时修正自身 `app.state.root`，使来源入口指向实际隔离运行目录。
 
-<a id="doc-17-line-31"></a>
+<a id="doc-19-line-31"></a>
 
 ### 受控验证的范围
 
-[成果与知识验证](#doc-32) 包括真实浏览器图片解码、复杂公式、缺图提示、选段反馈、候选接受，以及数据库中的拒绝/冲突/原子回滚。该批终止成果由显式测试夹具生成，不能当真实 AI 研究结果。真实研究本轮没有需要图片，图片能力由独立的实际 PNG 页面操作验证。
+[成果与知识验证](#doc-34) 包括真实浏览器图片解码、复杂公式、缺图提示、选段反馈、候选接受，以及数据库中的拒绝/冲突/原子回滚。该批终止成果由显式测试夹具生成，不能当真实 AI 研究结果。真实研究本轮没有需要图片，图片能力由独立的实际 PNG 页面操作验证。
 
 数据库/HTTP对话测试使用受控语义解释，覆盖请求重试去重、讨论不执行、动作失败整体回滚、跨空间隔离、当前偏好与旧成果固定、取消/恢复、新主题及过时背景拒绝。浏览器组件测试覆盖结果不确定时保留身份及跨空间响应保护。前端生产依赖审计为0漏洞；源码/构建/测试记录由交付状态统一说明。
 
-<a id="doc-17-line-37"></a>
+<a id="doc-19-line-37"></a>
 
 ### 日常环境升级
 
@@ -1975,24 +2115,24 @@ npm --prefix web audit                # 0 vulnerabilities
 
 研究可用版不代表完整日常Alpha。时间块/可用时间/休息编排、受控长期发现、方法版本回归与回退、远程ChatGPT及多人身份尚未完成。两篇真实论文的质量与学习效果另行判断，不能由上述植物场景推定。
 
-<a id="doc-17-line-43"></a>
+<a id="doc-19-line-43"></a>
 
 ### 知识下游引用的第二次修复
 
-首轮来源接口修复后，独立复核追到知识消费者，发现同一成果接受为知识后，相对链接被解释为知识目录路径，再次断路。初始失败完整保留于 [首次独立复核](#doc-22) 与 [另一新上下文复核](#doc-21)。
+首轮来源接口修复后，独立复核追到知识消费者，发现同一成果接受为知识后，相对链接被解释为知识目录路径，再次断路。初始失败完整保留于 [首次独立复核](#doc-24) 与 [另一新上下文复核](#doc-23)。
 
 `cd8c709` 增加由既有来源关联派生的 `references` 映射，使用 Mistune AST 识别真实 Markdown 引用，未重新实现解析语法；旧知识原文和版本不变。候选/正式正文使用同一 owner，后续研究固定同一映射。多运行同名引用明确提示歧义，不把旧段指向新运行。新增 HTML 阅读版保留解析后的来源，原 Markdown 下载仍是字节不变的正式原文。图像和外部阅读依赖本机工作台持续可访问。
 
 普通问题与可见失败记录另存 [问答与错误](evidence/web-research/question-and-error.json)；自然模式“只记陶艺想法”的真实解释器分流在 [自然只记录](evidence/web-research/record-auto.json)，它与明确选择只记录模式的无模型路径分开验证。
 
 
-<a id="doc-17-line-52"></a>
+<a id="doc-19-line-52"></a>
 
 ### 编码与文件名独立复核
 
-`032a029` 统一按语义路径解码一次、去除来源行号、按查询参数编码一次，覆盖空格、中文、百分号、字面 `%20`、括号和引用式链接。此前 `cd8c709` 的复杂名称反例仍保留在 [编码问题首次复核](#doc-39)。[新的独立复核](#doc-20) 在源成果、知识候选、已接受知识、历史修订与下载 HTML 中实际加载45个图片实例，35次受控点击读取到正确运行正文；后续快照、prompt、manifest 来源映射一致。该结论不取代其他未重跑的模型、冲突或恢复证据。
+`032a029` 统一按语义路径解码一次、去除来源行号、按查询参数编码一次，覆盖空格、中文、百分号、字面 `%20`、括号和引用式链接。此前 `cd8c709` 的复杂名称反例仍保留在 [编码问题首次复核](#doc-41)。[新的独立复核](#doc-22) 在源成果、知识候选、已接受知识、历史修订与下载 HTML 中实际加载45个图片实例，35次受控点击读取到正确运行正文；后续快照、prompt、manifest 来源映射一致。该结论不取代其他未重跑的模型、冲突或恢复证据。
 
-<a id="doc-17-line-56"></a>
+<a id="doc-19-line-56"></a>
 
 ### 首篇真实论文与新的失败反例
 
@@ -2003,33 +2143,33 @@ npm --prefix web audit                # 0 vulnerabilities
 修复部署后从日常网页“按当前背景再试”创建 `gzrun-20260919-095844-49f47906`，保留失败尝试和原事项，没有手工把论文材料或报告塞回数据库：[网页重试](evidence/web-research/qwen-drive-retry-start.json)。重试已成功，8378字第一轮正文由执行器保存，未由开发者手工编写或写回数据库。
 
 
-字符存储的新鲜独立复核发现 `7ee164b` 虽然能完成运行，但原始产物下载返回阅读投影、其版本仍声明原始字节哈希，而且正常成果页没有替换说明：[失败报告](#doc-35)。候选 `5993005` 已分别保留原始执行文本和阅读正文的下载与版本，将说明送达成果及知识阅读；另一个新上下文正在复核，不覆盖前次失败证据。
+字符存储的新鲜独立复核发现 `7ee164b` 虽然能完成运行，但原始产物下载返回阅读投影、其版本仍声明原始字节哈希，而且正常成果页没有替换说明：[失败报告](#doc-37)。候选 `5993005` 已分别保留原始执行文本和阅读正文的下载与版本，将说明送达成果及知识阅读；另一个新上下文正在复核，不覆盖前次失败证据。
 
 已完成主隔离库的归档与回收：[清理记录](evidence/web-research/main-cleanup.json)。随机库已删除、自有8011服务已停止，认证副本和临时执行树已清理；私有数据库/知识归档在本机备份目录。操作脚本记录保留于 `main-harness/`，不包含凭证；它们依赖原隔离环境，需重建该环境，不能直接对日常库执行。日常8010与真实论文数据保留。
 
 
-[5993005 的新上下文复核](#doc-34) 验证了本机/HTTP Worker、原始下载哈希及成果页说明，但发现候选和接受后的知识页丢失说明，因而仍判 fail。`464306a` 修复同一来源合并 owner 对输入警告的保留，并在两条传输的真实数据库回归中断言候选和接受后的提示。该次影响范围21项回归通过；独立浏览器关闭结果另记，不追改失败报告。[回归身份与命令](evidence/web-research/validation.json)。
+[5993005 的新上下文复核](#doc-36) 验证了本机/HTTP Worker、原始下载哈希及成果页说明，但发现候选和接受后的知识页丢失说明，因而仍判 fail。`464306a` 修复同一来源合并 owner 对输入警告的保留，并在两条传输的真实数据库回归中断言候选和接受后的提示。该次影响范围21项回归通过；独立浏览器关闭结果另记，不追改失败报告。[回归身份与命令](evidence/web-research/validation.json)。
 
 
-<a id="doc-17-line-73"></a>
+<a id="doc-19-line-73"></a>
 
 ### 真实论文最终页面回读
 
-[第一轮报告原文](#doc-36)保留执行器实际交付正文与“未经用户接受”边界；[正式运行及输入/事件](evidence/web-research/qwen-drive-retry-result.json)包含失败尝试的关联。报告记录了原文版本、固定代码版本、实际阅读与未复现范围，没有宣称用户已经理解、知识已经接受或实车实验已经完成。
+[第一轮报告原文](#doc-38)保留执行器实际交付正文与“未经用户接受”边界；[正式运行及输入/事件](evidence/web-research/qwen-drive-retry-result.json)包含失败尝试的关联。报告记录了原文版本、固定代码版本、实际阅读与未复现范围，没有宣称用户已经理解、知识已经接受或实车实验已经完成。
 
 页面验收发现，报告把5张图片作为普通文字来源链接引用时，`/source` 拒绝图片格式，虽然2张嵌入式插图可以显示：[失败回读](evidence/web-research/qwen-image-link-failure.json)。`45dfcce` 让这些来源委托既有资产 owner 读取，沿用空间、真实文件类型、大小和路径边界；不更改报告原文、知识或来源映射。`69ba22f` 同步测试里的既有409错误口径。
 
 部署后重新打开事项与原对话，实际解码2张插图，渲染14处公式且无公式错误；9条本地来源逐条点击，其中5条以图片新标签实际解码，其余正文可读。原始产物与正文下载均为 `dd86d4311d9ac09001d3867f0e63c2ab8ef368ca0a309fa9fe619b9fb995712d`，未改动执行结果。[结构化页面证据](evidence/web-research/qwen-drive-reading-verified.json)、[成果截图](evidence/web-research/qwen-drive-reading-verified.png)、[原对话读取当前成果](evidence/web-research/qwen-drive-conversation-verified.png)。这证明页面与留存材料可用，不能替代论文实验复现或用户学习效果。
 
-NUL知识说明的关闭见[新的独立复核](#doc-31)：实际网页候选、接受后知识、HTML阅读版、原始文本、无NUL对照及多运行歧义均有本次证据。原失败报告保留，独立复核不等于用户接受产品或论文。
+NUL知识说明的关闭见[新的独立复核](#doc-33)：实际网页候选、接受后知识、HTML阅读版、原始文本、无NUL对照及多运行歧义均有本次证据。原失败报告保留，独立复核不等于用户接受产品或论文。
 
 
-最终相邻复核在69ba22f独立进程完成，实际点击四类消费者的普通图片链接，字节、版本及错误边界均正确，详细范围和清理结果见上述[独立复核报告](#doc-31)的追加章节。日常8010目前运行69ba22f，模型任务已结束；保留真实论文与原始材料，测试环境没有混入日常数据。
+最终相邻复核在69ba22f独立进程完成，实际点击四类消费者的普通图片链接，字节、版本及错误边界均正确，详细范围和清理结果见上述[独立复核报告](#doc-33)的追加章节。日常8010目前运行69ba22f，模型任务已结束；保留真实论文与原始材料，测试环境没有混入日常数据。
 
 原 Linear 项目 Overview 已精确更新并回读，原历史正文保持，状态仍为 In Progress；没有创建评论、通知或把本机文件冒充已上传附件：[线上回读](evidence/web-research/linear-readback.json)。本轮按 `personal-workbench` 的“有实质变化时更新同一份当前正文”执行，记录当前实现、真实论文结果与G2边界，产品定义文档和竞品图片问题未覆盖。
 
 
-<a id="doc-17-line-89"></a>
+<a id="doc-19-line-89"></a>
 
 ### 第二篇真实研究：GSSM（2026-09-19）
 
@@ -2046,9 +2186,9 @@ NUL知识说明的关闭见[新的独立复核](#doc-31)：实际网页候选、
 
 ---
 
-<a id="doc-18"></a>
+<a id="doc-20"></a>
 <!-- source-begin: docs/evidence/web-research/encoding-final-controlled-original.md -->
-<a id="doc-18-line-1"></a>
+<a id="doc-20-line-1"></a>
 
 ## 受控引用反例
 
@@ -2093,7 +2233,7 @@ NUL知识说明的关闭见[新的独立复核](#doc-31)：实际网页候选、
 
 ---
 
-<a id="doc-19"></a>
+<a id="doc-21"></a>
 <!-- source-begin: docs/evidence/web-research/encoding-final-real-original.md -->
 **现有差异不足以说明采光造成了新叶数量差异。** A比B多4片新叶，与采光影响生长的假说相容，但也与浇水、原始长势等其他解释相容；不能反向断言采光没有影响。
 
@@ -2230,9 +2370,9 @@ $$
 
 ---
 
-<a id="doc-20"></a>
+<a id="doc-22"></a>
 <!-- source-begin: docs/evidence/web-research/encoding-final-review.md -->
-<a id="doc-20-line-1"></a>
+<a id="doc-22-line-1"></a>
 
 ## 来源编码修复独立复核：032a029
 
@@ -2240,7 +2380,7 @@ $$
 
 复核者未参与施工。批准身份为 `10d326d` 中根目录《LifeWeave_产品定义与首版迭代计划_v1.0_2026-09-19.md》第 13.1 节 A01—A09，以及同提交 `workspaces/reviews/lifeweave-next-stage/review.md` 末尾施工方案。候选为 `032a02971078efeb5bffce22018fd49ee345fcd9`，Diff 基线 `10d326d`。开始时存在 README、文档和 review.md 的未提交编辑，本复核未修改它们、产品实现或批准方案。
 
-<a id="doc-20-line-7"></a>
+<a id="doc-22-line-7"></a>
 
 ### 本次亲自取得的结果
 
@@ -2251,14 +2391,14 @@ $$
 | A04：原成果复杂图片显示 | pass | 新 Chromium 打开事项成果，滚动使全部图片加载 | 九张图全部 `complete=true`、`naturalWidth=1`，没有加载失败提示；空格、中文、`%20` 和引用式原失败均消失。[DOM与尺寸](evidence/web-research/encoding-final-review.json) `candidate_browser`；[页面](evidence/web-research/encoding-final-candidate.png) | 无 |
 | A04/A06：文本来源编码与行号 | pass | 在原成果、候选、正式知识、修订历史和下载 HTML 分别实际点击来源；共 35 次受控点击 | 每次弹页正文包含正确 run 身份与 `Independent review content.`；`:2` 请求目标为 `research/source.md`。空格/中文不再落入知识相对路径；`100%25.md` 对应 `100%.md`，`literal%2520.md` 对应字面文件名 `literal%20.md`。[点击结果](evidence/web-research/encoding-final-review.json) `candidate_actual_clicks`、`actual_clicks`、`revision_actual_clicks`、`download_actual_clicks` | 无；锚点/行号用于找到文件，未宣称浏览器定位到具体行 |
 | A06：候选、正式知识、修订阅读保持来源和图片 | pass | 事项候选展开后页面接受；打开正式知识；从“修订与历史”重新展开已接受修订 | 三个知识消费者各九图实际可见，来源回到相同固定 run；代码块保持 Markdown 字面量。来源映射由 `ResearchOutputs.document_references` 生成，经 Library 传给页面共同的 MarkdownBody。[正式知识](evidence/web-research/encoding-final-accepted.png)、[各消费者记录](evidence/web-research/encoding-final-review.json) | 无 |
-| A04/A06：下载内容可读且原文不变 | pass | 下载原文与 HTML，从 `file://` 打开 HTML，加载图并点击来源 | 原文逐字等于候选与正式正文；HTML 九图真正显示，复杂来源点击读到正确正文，依赖原工作台可访问的说明可见。[下载HTML](evidence/web-research/encoding-final-controlled-reading.html)、[原文](#doc-18)、JSON `raw_unchanged` | 不是离线资产包；受控服务回收后其临时来源不可访问，证据采于回收前 |
+| A04/A06：下载内容可读且原文不变 | pass | 下载原文与 HTML，从 `file://` 打开 HTML，加载图并点击来源 | 原文逐字等于候选与正式正文；HTML 九图真正显示，复杂来源点击读到正确正文，依赖原工作台可访问的说明可见。[下载HTML](evidence/web-research/encoding-final-controlled-reading.html)、[原文](#doc-20)、JSON `raw_unchanged` | 不是离线资产包；受控服务回收后其临时来源不可访问，证据采于回收前 |
 | A04/A06：已经采纳的真实旧知识无需重写 | pass | 8011 只读打开 `研究/阳台采光因果解释.md`，实际点击“来源记录”；下载后再从 HTML 点击 | 两次均读到 `gzrun-20260919-091738-82581407` 的真实来源、材料版本和范围；正式版本仍为 `5de064f9225d0e4fba0aace4fcf5e113188f326444637e66edc7c9f471533615`，原文下载相等。[真实页面](evidence/web-research/encoding-final-real-knowledge.png)、JSON `real_accepted_source`、`real_html_source` | 无 |
 | A07：新任务拿到相同当前版本与来源 | pass（准备与传递） | 新建第二个研究事项，推荐找到已采纳知识；正式 `/runs` 入队，读取固定输入及 prompt；调用正式 worker 材料写入方法 | 推荐、固定输入、材料 manifest 的映射相等，版本与正式知识相等，prompt 包含全部引用目标。行号映射不再错误传下去。[快照与manifest](evidence/web-research/encoding-final-review.json) `downstream*`、`checks` | 本次不调用模型；模型是否正确采用复杂来源仍为 not_proven，既有真实内容复用证据见下表 |
 | 多 run 同名引用不误归属 | pass | 第二 run 提交包含两轮正文的合并候选，页面展开 | 冲突链接/图片映射为空，页面显示“多个来源使用相同相对引用”；待审候选未改变正式旧文及其引用。[歧义结果](evidence/web-research/encoding-final-review.json) `ambiguous`、`ambiguity_visible`、`stable_formal_after_draft` | 用户仍需从各自成果查看歧义来源，不宣称自动消歧 |
 | 普通知识链接、代码与外链保持语义 | pass | 点击新增 `other.md`；检查各 Markdown 消费者 DOM | 到达 `研究/other.md` 并出现“普通知识目标”；代码示例不变，未生成代码图；外链仍指 `https://example.org/`，未访问外站。[记录](evidence/web-research/encoding-final-review.json) `ordinary_knowledge_target`、`checks.code_literal_preserved` | 无 |
 | 隐藏文件、跨 run/空间、绝对路径保护 | pass（所列反例） | 请求 `.env`、隐藏 research 子文件、`..`、绝对路径、跨 run 与 team 下 personal run | 来源非法路径 400，资产非法路径 409，跨空间 404；明确允许的 `.runtime/research/allowed.md` 返回 200。没有通过放开私密目录解决编码。[HTTP结果](evidence/web-research/encoding-final-review.json) `path_guards`、`cross_workspace` | 无 |
 
-<a id="doc-20-line-23"></a>
+<a id="doc-22-line-23"></a>
 
 ### 其余批准条件与既有证据边界
 
@@ -2275,7 +2415,7 @@ $$
 | A08：新会话与重启接续 | pass（新浏览器亲测；重启沿用受控证据） | 本次新 Chromium 打开持久知识/复用会话；核对独立重启记录中处理中 turn 明确失败、旧事项与反馈仍在 | [重启记录](evidence/web-research/independent-follow-checks.json) | 本次未重启 8011 |
 | A09：取消、失败与不确定结果 | pass（已有受控边界） | 核对取消保留原话、解释失败、响应丢失刷新、跨空间切换与同请求重试只有一个 turn | [原独立动作](evidence/web-research/independent-checks.json)、[不确定结果记录](evidence/web-research/independent-edge-checks.json) | 非真实外部写入的网络故障验收；本次未新增外部写入 |
 
-<a id="doc-20-line-38"></a>
+<a id="doc-22-line-38"></a>
 
 ### 身份、执行与副作用
 
@@ -2287,14 +2427,14 @@ $$
 - 自有 uvicorn 已正常停止，8014 端口可重新绑定，临时根已不存在；数据库已 DROP 并通过 `pg_database` 只读查询确认不存在。没有使用 `pkill` 或停止他人进程。
 - 亲自执行 `web/` 中 `npm audit --omit=dev --json`，生产依赖已知漏洞零。[结果](evidence/web-research/encoding-final-dependency-audit.json)。未执行 Python 全依赖审计；未以已报告的 64 Python / 29 前端测试及构建结果作为本报告的业务证明。
 
-此前 [reference-fresh-review.md](#doc-39) 保留为 `cd8c709` 的失败事实，本报告仅针对上述候选关闭其三个编码阻断。没有待开发者处理的新增阻断。
+此前 [reference-fresh-review.md](#doc-41) 保留为 `cd8c709` 的失败事实，本报告仅针对上述候选关闭其三个编码阻断。没有待开发者处理的新增阻断。
 <!-- source-end: docs/evidence/web-research/encoding-final-review.md -->
 
 ---
 
-<a id="doc-21"></a>
+<a id="doc-23"></a>
 <!-- source-begin: docs/evidence/web-research/final-recheck.md -->
-<a id="doc-21-line-1"></a>
+<a id="doc-23-line-1"></a>
 
 ## G1 独立最终复核：d69b257
 
@@ -2302,7 +2442,7 @@ $$
 
 本复核员未参与实现。批准依据为 Git `10d326d` 中根目录《LifeWeave_产品定义与首版迭代计划_v1.0_2026-09-19.md》第 13.1 节 A01—A09，以及 `workspaces/reviews/lifeweave-next-stage/review.md` 最后施工方案；候选为 `d69b2577cbc4ca95008ce116f8dd94da8586c383`，Diff 基线为 `10d326d`。工作树已有文档改动未修改。本次只新增独立证据。
 
-<a id="doc-21-line-7"></a>
+<a id="doc-23-line-7"></a>
 
 ### 会改变接受结论的失败
 
@@ -2315,7 +2455,7 @@ $$
 
 证据：[失败截图](evidence/web-research/final-recheck-knowledge-failure.png)、[真实 HTTP 409](evidence/web-research/final-recheck-knowledge-http.json)、[知识正文与链接](evidence/web-research/final-recheck-knowledge.json)。
 
-<a id="doc-21-line-18"></a>
+<a id="doc-23-line-18"></a>
 
 ### A01—A09 对照
 
@@ -2331,7 +2471,7 @@ $$
 | A08 新会话/重启接续 | pass（新浏览器接续） | 全新浏览器直接进入持久会话，能读目标关联、两轮当前/历史成果、反馈修订和下一步目标提案；只读 continuation 当前目标与运行一致。受控恢复测试通过。 | 本次未停止/重启主代理 8011，不冒称亲自重启 |
 | A09 取消/失败/不确定结果 | pass（受控边界） | 临时数据库测试亲自重跑：取消后重复请求不重新执行，解释失败无业务回执，启动恢复把未完成轮次标中断；新成果失败保留历史成果。 | 非真实外部网络写入验收；该路径未新增外部写入 |
 
-<a id="doc-21-line-32"></a>
+<a id="doc-23-line-32"></a>
 
 ### 本次执行与边界
 
@@ -2347,9 +2487,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-22"></a>
+<a id="doc-24"></a>
 <!-- source-begin: docs/evidence/web-research/independent-review.md -->
-<a id="doc-22-line-1"></a>
+<a id="doc-24-line-1"></a>
 
 ## 网页研究可用版独立交付复核
 
@@ -2389,9 +2529,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-23"></a>
+<a id="doc-25"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-image-normal-accepted.md -->
-<a id="doc-23-line-1"></a>
+<a id="doc-25-line-1"></a>
 
 ## 普通知识样本
 
@@ -2410,9 +2550,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-24"></a>
+<a id="doc-26"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-image-nul-accepted.md -->
-<a id="doc-24-line-1"></a>
+<a id="doc-26-line-1"></a>
 
 ## PDF提取样本
 
@@ -2431,9 +2571,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-25"></a>
+<a id="doc-27"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-image-overlap-accepted.md -->
-<a id="doc-25-line-1"></a>
+<a id="doc-27-line-1"></a>
 
 ## PDF提取样本
 
@@ -2450,7 +2590,7 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101650-c1aa9fb3/research-output/download) · 事项 `item-3a0fd82739604202` · 运行 `gzrun-20260919-101650-c1aa9fb3` · 版本 `242da7ef9252041e3febfba6e6c043f35da0111875c6f8741dac14ed13817970`
 
 
-<a id="doc-25-line-16"></a>
+<a id="doc-27-line-16"></a>
 
 ## 普通知识样本
 
@@ -2469,9 +2609,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-26"></a>
+<a id="doc-28"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-image-readable.md -->
-<a id="doc-26-line-1"></a>
+<a id="doc-28-line-1"></a>
 
 ## PDF提取样本
 
@@ -2486,9 +2626,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-27"></a>
+<a id="doc-29"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-normal-accepted.md -->
-<a id="doc-27-line-1"></a>
+<a id="doc-29-line-1"></a>
 
 ## 普通知识样本
 
@@ -2505,9 +2645,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-28"></a>
+<a id="doc-30"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-nul-accepted.md -->
-<a id="doc-28-line-1"></a>
+<a id="doc-30-line-1"></a>
 
 ## PDF提取样本
 
@@ -2524,9 +2664,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-29"></a>
+<a id="doc-31"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-overlap-accepted.md -->
-<a id="doc-29-line-1"></a>
+<a id="doc-31-line-1"></a>
 
 ## PDF提取样本
 
@@ -2541,7 +2681,7 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download) · 事项 `item-67e225a2f9004909` · 运行 `gzrun-20260919-101350-c168e351` · 版本 `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc`
 
 
-<a id="doc-29-line-14"></a>
+<a id="doc-31-line-14"></a>
 
 ## 普通知识样本
 
@@ -2558,9 +2698,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-30"></a>
+<a id="doc-32"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-readable.md -->
-<a id="doc-30-line-1"></a>
+<a id="doc-32-line-1"></a>
 
 ## PDF提取样本
 
@@ -2573,9 +2713,9 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 
 ---
 
-<a id="doc-31"></a>
+<a id="doc-33"></a>
 <!-- source-begin: docs/evidence/web-research/knowledge-notice-final-review.md -->
-<a id="doc-31-line-1"></a>
+<a id="doc-33-line-1"></a>
 
 ## 知识阅读提示独立交付复核
 
@@ -2586,8 +2726,8 @@ G2 的时间块、持续发现、方法对照，多人权限和远程 ChatGPT �
 | 关闭条件 | 结果 | 亲自执行的动作与观察 | 证据与处理 |
 | --- | --- | --- | --- |
 | 提示贯穿成果、候选、正式阅读和 HTML | pass | 真实 HTTP worker 写入含 `A\u0000B` 的报告；浏览器从事项成果提出候选、展开建议全文、接受、打开正式知识、下载阅读版并在 Chromium 打开该 HTML。四个位置均有原始 NUL、可读投影与原文保留的解释。 | [事项截图](evidence/web-research/knowledge-notice-final-output.png)、[候选截图](evidence/web-research/knowledge-notice-final-nul-candidate.png)、[正式阅读截图](evidence/web-research/knowledge-notice-final-nul-accepted.png)、[导出截图](evidence/web-research/knowledge-notice-final-nul-exported.png)、[实际下载 HTML](evidence/web-research/knowledge-notice-final-nul-reading.html)。无需处理。 |
-| 原始执行文本仍为原始字节且 hash 一致 | pass | 浏览器点击“下载原始执行文本”，下载字节与执行器输入完全相等；包含真实 NUL。实际下载 SHA-256 为 `20e12e4e04b3b492c50831b0f87caf5d7343e5290bd9512010a968c8605796e6`，与 HTTP `X-Artifact-Version`、ETag 一致。另点“下载正文”，哈希与成果版本一致。 | [原始字节文件](evidence/web-research/knowledge-notice-final-browser-original.txt)、[可读正文](#doc-30)、[观察及响应头](evidence/web-research/knowledge-notice-final-observations.json)。无需处理。 |
-| 原文与版本没有额外静默改写 | pass | 提交前读取网页建议正文；候选仅增加已明确展示的来源段。接受前文件不存在；接受后文件、候选和 API 正文逐字一致。原文下载与正式版本 SHA-256 一致；阅读和导出后重读文件、正文与版本均不变。合并第二来源时也逐项验证。 | [首份知识候选及正式正文](evidence/web-research/knowledge-notice-final-nul-knowledge.json)、[实际原文下载](#doc-28)、[合并后知识](evidence/web-research/knowledge-notice-final-overlap-knowledge.json)。无需处理。 |
+| 原始执行文本仍为原始字节且 hash 一致 | pass | 浏览器点击“下载原始执行文本”，下载字节与执行器输入完全相等；包含真实 NUL。实际下载 SHA-256 为 `20e12e4e04b3b492c50831b0f87caf5d7343e5290bd9512010a968c8605796e6`，与 HTTP `X-Artifact-Version`、ETag 一致。另点“下载正文”，哈希与成果版本一致。 | [原始字节文件](evidence/web-research/knowledge-notice-final-browser-original.txt)、[可读正文](#doc-32)、[观察及响应头](evidence/web-research/knowledge-notice-final-observations.json)。无需处理。 |
+| 原文与版本没有额外静默改写 | pass | 提交前读取网页建议正文；候选仅增加已明确展示的来源段。接受前文件不存在；接受后文件、候选和 API 正文逐字一致。原文下载与正式版本 SHA-256 一致；阅读和导出后重读文件、正文与版本均不变。合并第二来源时也逐项验证。 | [首份知识候选及正式正文](evidence/web-research/knowledge-notice-final-nul-knowledge.json)、[实际原文下载](#doc-30)、[合并后知识](evidence/web-research/knowledge-notice-final-overlap-knowledge.json)。无需处理。 |
 | 来源链接、图片映射不丢 | pass | 含 NUL 与普通两份知识的候选/正式映射一致，链接和图片都指向正确 run。正式页面及下载 HTML 中实际点击来源链接，在新标签读到各自固定来源内容；两处图片均真正解码，`naturalWidth=1`，映射未丢。图片是明确的 1×1 固定夹具，不以图像外观替代映射验证。 | [浏览器点击与下载轨迹](evidence/web-research/knowledge-notice-final-browser-trace.zip)、[详细检查](evidence/web-research/knowledge-notice-final-observations.json)。无需处理。 |
 | 多运行歧义提示与 NUL 提示同时保留 | pass | 第二个无 NUL 成果通过网页“读取已有知识并准备合并”加入第一份知识，两个运行均引用 `source.md` 和 `figure.png`。候选、正式知识、下载 HTML 保留一条 NUL 说明及两条歧义说明；冲突映射为空，没有悄悄选择某个 run。 | [合并候选](evidence/web-research/knowledge-notice-final-overlap-candidate.png)、[合并正式阅读](evidence/web-research/knowledge-notice-final-overlap-accepted.png)、[合并 HTML 实际打开](evidence/web-research/knowledge-notice-final-overlap-exported.png)。无需处理。 |
 | 无 NUL 普通知识没有伪警告 | pass | 第二个真实 worker 结果只有普通字符、字面 `\u0000` 与可见 `␀`。单独走网页候选、接受、阅读及 HTML 下载，warnings 为空，没有 NUL 解释；原文与映射仍正确。 | [普通候选与正式正文](evidence/web-research/knowledge-notice-final-normal-knowledge.json)、[普通 HTML](evidence/web-research/knowledge-notice-final-normal-reading.html)、[截图](evidence/web-research/knowledge-notice-final-normal-exported.png)。无需处理。 |
@@ -2611,7 +2751,7 @@ npm --prefix web audit --omit=dev --json > docs/evidence/web-research/knowledge-
 
 证据边界：输入是受控 PDF 提取字符夹具，不是本次新解析真实 PDF 或验证论文语义；真实执行的是 worker HTTP 协议、数据库、浏览器操作和下载。网页接受由审查代理在测试空间点击，不代表用户接受正式研究内容。HTML 阅读版中的来源、图片和样式仍依赖原工作台在线，并非自包含离线包；本次打开及点击时服务在线，归档后已按要求清理测试服务和数据库。
 
-<a id="doc-31-line-35"></a>
+<a id="doc-33-line-35"></a>
 
 ### 追加范围：普通文字链接指向 PNG
 
@@ -2631,9 +2771,9 @@ npm --prefix web audit --omit=dev --json > docs/evidence/web-research/knowledge-
 
 ---
 
-<a id="doc-32"></a>
+<a id="doc-34"></a>
 <!-- source-begin: docs/evidence/web-research/outputs-verification.md -->
-<a id="doc-32-line-1"></a>
+<a id="doc-34-line-1"></a>
 
 ## 成果与知识纵切：受控验证
 
@@ -2666,9 +2806,9 @@ npm --prefix web run type-check
 
 ---
 
-<a id="doc-33"></a>
+<a id="doc-35"></a>
 <!-- source-begin: docs/evidence/web-research/pdf-artifact-final-accepted.md -->
-<a id="doc-33-line-1"></a>
+<a id="doc-35-line-1"></a>
 
 ## 独立 PDF 阅读夹具
 
@@ -2684,9 +2824,9 @@ npm --prefix web run type-check
 
 ---
 
-<a id="doc-34"></a>
+<a id="doc-36"></a>
 <!-- source-begin: docs/evidence/web-research/pdf-artifact-final-review.md -->
-<a id="doc-34-line-1"></a>
+<a id="doc-36-line-1"></a>
 
 ## PDF 字符存储与原始成果下载：独立交付复核
 
@@ -2727,9 +2867,9 @@ npm audit --omit=dev --json > ../docs/evidence/web-research/pdf-artifact-final-d
 
 ---
 
-<a id="doc-35"></a>
+<a id="doc-37"></a>
 <!-- source-begin: docs/evidence/web-research/pdf-storage-review.md -->
-<a id="doc-35-line-1"></a>
+<a id="doc-37-line-1"></a>
 
 ## PDF 字符存储修复独立交付复核
 
@@ -2749,7 +2889,7 @@ npm audit --omit=dev --json > ../docs/evidence/web-research/pdf-artifact-final-d
 
 两个阻断均是存储修复的直接下游问题，并非论文内容质量判断。事件存储改善是真实的，但不足以关闭全部交付条件。
 
-<a id="doc-35-line-19"></a>
+<a id="doc-37-line-19"></a>
 
 ### 实际执行与证据
 
@@ -2764,9 +2904,9 @@ npm audit --omit=dev --json > ../docs/evidence/web-research/pdf-artifact-final-d
 
 ---
 
-<a id="doc-36"></a>
+<a id="doc-38"></a>
 <!-- source-begin: docs/evidence/web-research/qwen-drive-report.md -->
-<a id="doc-36-line-1"></a>
+<a id="doc-38-line-1"></a>
 
 ## Qwen-Drive 首轮研究产物（未经用户接受）
 
@@ -2923,9 +3063,9 @@ $$
 
 ---
 
-<a id="doc-37"></a>
+<a id="doc-39"></a>
 <!-- source-begin: docs/evidence/web-research/reference-fresh-controlled-original.md -->
-<a id="doc-37-line-1"></a>
+<a id="doc-39-line-1"></a>
 
 ## 受控引用反例
 
@@ -2959,7 +3099,7 @@ $$
 
 ---
 
-<a id="doc-38"></a>
+<a id="doc-40"></a>
 <!-- source-begin: docs/evidence/web-research/reference-fresh-real-original.md -->
 **现有差异不足以说明采光造成了新叶数量差异。** A比B多4片新叶，与采光影响生长的假说相容，但也与浇水、原始长势等其他解释相容；不能反向断言采光没有影响。
 
@@ -3096,9 +3236,9 @@ $$
 
 ---
 
-<a id="doc-39"></a>
+<a id="doc-41"></a>
 <!-- source-begin: docs/evidence/web-research/reference-fresh-review.md -->
-<a id="doc-39-line-1"></a>
+<a id="doc-41-line-1"></a>
 
 ## G1 来源保真独立复核：cd8c709
 
@@ -3106,7 +3246,7 @@ $$
 
 本复核由未参与施工的新上下文完成，先读取批准身份 `10d326d` 的根目录《LifeWeave_产品定义与首版迭代计划_v1.0_2026-09-19.md》A01—A09 与 `workspaces/reviews/lifeweave-next-stage/review.md` 最后施工方案，再核对候选 `cd8c709742de4e22e88de41a0463566d4af2fae2`。Diff 基线为 `10d326d`。本报告只冻结该候选的失败，不为后续修复背书。
 
-<a id="doc-39-line-7"></a>
+<a id="doc-41-line-7"></a>
 
 ### 影响接受的三个反例
 
@@ -3116,7 +3256,7 @@ $$
 
 修复应统一前后端引用键及目标路径的编码规则，并保留原成果已经支持的行号语义；以这三项实际用户路径和隐藏路径反例重做独立复核。不要改知识原文或放宽资产目录来掩盖解析问题。
 
-<a id="doc-39-line-15"></a>
+<a id="doc-41-line-15"></a>
 
 ### 逐条件结果
 
@@ -3133,7 +3273,7 @@ $$
 | 隐藏文件、跨 run、跨空间与绝对路径保护 | pass（所列反例） | `.env`、`.runtime/research/.hidden.md`、父级穿越、跨 run、绝对路径：来源 400，资产 409；跨空间 run 404。允许的 `.runtime/research/allowed.md` 200。 | JSON `path_guards`、`cross_workspace`；没有放宽私密路径白名单。 |
 | A01/A02/A03/A05/A08/A09 的完整重新验收 | not_proven（本轮未重跑） | 只读真实知识问答会话看到此前内容复用；没有再次发起模型、改变目标或执行恢复/取消。 | 沿用其他独立证据的范围，不用本次来源复核替代完整验收。 |
 
-<a id="doc-39-line-30"></a>
+<a id="doc-41-line-30"></a>
 
 ### 运行、依赖与副作用
 
@@ -3147,9 +3287,9 @@ $$
 
 ---
 
-<a id="doc-40"></a>
+<a id="doc-42"></a>
 <!-- source-begin: docs/evidence/weekly-review.md -->
-<a id="doc-40-line-1"></a>
+<a id="doc-42-line-1"></a>
 
 ## 我的周回顾
 
@@ -3157,19 +3297,19 @@ $$
 
 > 冻结快照：meeting-snapshot-9a757b378f504e75
 
-<a id="doc-40-line-7"></a>
+<a id="doc-42-line-7"></a>
 
 ### 需要决定的事
 
-<a id="doc-40-line-9"></a>
+<a id="doc-42-line-9"></a>
 
 ### 专题目标与缺口
 
-<a id="doc-40-line-11"></a>
+<a id="doc-42-line-11"></a>
 
 ### 近期交付与变化
 
-<a id="doc-40-line-13"></a>
+<a id="doc-42-line-13"></a>
 
 #### 共作首次交付检查
 
@@ -3187,6 +3327,80 @@ $$
 
 最新变化：已建立独立应用，正在检查真实工作链。
 <!-- source-end: docs/evidence/weekly-review.md -->
+
+---
+
+<a id="doc-43"></a>
+<!-- source-begin: docs/research-archive.md -->
+<a id="doc-43-line-1"></a>
+
+## 研究成果归档、离线阅读与跨文章讨论
+
+本轮解决的是：报告只留在家中电脑时无法随时找回，单独下载 Markdown 会丢本机图片，以及讨论另一篇文章时需要明确带入已有成果。用户已明确选择“每次成功生成报告后自动归档”，目标仓为 `pokemonAndCodeMaster/Life-Weave`。
+
+<a id="doc-43-line-5"></a>
+
+### 现在从哪里找两篇论文
+
+| 内容 | GitHub | Linear |
+| --- | --- | --- |
+| 所有研究版本 | [归档首页](https://github.com/pokemonAndCodeMaster/Life-Weave/tree/research-archive) | [原工作台项目](https://linear.app/yyhpokemonmaster/project/个人工作台日常使用与持续推进-a2184ae8c325)的文档资源 |
+| Qwen-Drive 1.0 首轮 | [正文与同目录 ZIP](https://github.com/pokemonAndCodeMaster/Life-Weave/blob/research-archive/research/personal/item-810217743bbb4be2/gzrun-20260919-095844-49f47906/report.md) | [完整报告及 ZIP](https://linear.app/yyhpokemonmaster/document/e904a16678bf) |
+| GSSM v5 首轮 | [正文与同目录 ZIP](https://github.com/pokemonAndCodeMaster/Life-Weave/blob/research-archive/research/personal/item-de7785d0790445d8/gzrun-20260919-130600-2cabbf3e/report.md) | [完整报告及 ZIP](https://linear.app/yyhpokemonmaster/document/3815a1caa1d2) |
+| 产品代码与说明 | [main 分支](https://github.com/pokemonAndCodeMaster/Life-Weave) | 项目 Overview 提供入口 |
+
+本机事项仍是工作事实的维护位置；归档保存成功运行的版本快照，包含事项身份、标题、正文版本、图片和引用文件，不等于整个事项数据库的镜像，也不替代“接受知识”。两篇报告没有因归档而成为已接受的正式知识。
+
+远端已上传的版本在本机关机后仍可访问；新的研究、讨论和自动上传需要工作台服务运行。仓库或 Linear 工作区若限制访问，另一台设备仍须登录有权访问的账号。本轮验证的是 GitHub 重新 clone 后的完整文件，以及 Linear 正文和附件回读；未完成已登录 Linear 页面实际显示验收。Linear 公式显示为 LaTeX 代码原文，避免其编辑器将矩阵等号误解析为标题；ZIP 内原 Markdown 与工作台的公式版本保持一致。
+
+<a id="doc-43-line-18"></a>
+
+### 自动和手动怎样配合
+
+进入“设置与连接 → 研究成果自动归档”，保存仓地址、Linear 项目 ID，勾选自动归档。当前个人空间已配置并开启，团队空间保持单独设置。后台约20秒检查一次成功成果；归档耗时取决于文件数量与网络，报告显示成功不表示两个远端已同时完成上传。
+
+成果下方显示本机完整包、GitHub、Linear 各自的状态和远端链接。一个目标成功、另一个失败时分别显示；失败约5分钟后重试，也可点“立即归档 / 重试”。已经确认的目标不会每次重复上传。配置关闭会暂停后台处理，手动按钮仍可使用。首次开启前的旧成果需逐项点击归档；本轮两篇已完成补归档。开启后遗漏的成功运行会在服务恢复时重新扫描。
+
+每次成功运行产生独立版本文档和 Git 路径。正文或引用文件若在同一运行身份下被修改，归档拒绝覆盖原版本；应通过新运行修订。Git 分支发生不能快进的冲突会显示失败；Linear 创建后丢失响应会按稳定 ID 找回，并全文核对，避免重复文档。已经确认的状态是当次回读证据，不是远端持续监控，也不会把用户在远端的修改自动反写进本机。
+
+Git 使用本机 SSH 认证，归档在私有独立 checkout 中提交 `research-archive` 分支。自动归档不提交开发者当前工作区里的代码、账号文件或数据库。Linear 复用已有连接，附件上传后逐字节回读校验，正文以完整 Markdown 解析结构核对；仅排版规范化被允许，丢文字、表格内容、链接、图片或公式代码会失败。
+
+<a id="doc-43-line-28"></a>
+
+### 下载后怎样保留图片
+
+在任一运行成果处点击“下载完整包（含图片）”。解压后保持文件结构，用支持 Markdown 的阅读器打开 `report.md`：
+
+- `report.md`：相对链接已改写，图片与引用指向包内文件。
+- `original.md`：没有改动的成果原文。
+- `files/`：正文引用的本轮图片、文本及嵌套 Markdown 材料。
+- `manifest.json`：本轮事项、运行、正文版本、各文件哈希和未收录清单。
+- `README.md`：阅读说明。远端归档目录还包含同内容的 `research.zip`。
+
+“仅下载 Markdown”仍提供原正文，适合只要文本时使用。外部网页、外部远程图片不自动抓取，仍可能需要网络。当前支持本轮目录内的 PNG/JPEG/GIF/WebP 和有限文本格式；嵌入的本地图片取不到时下载失败，普通缺失引用进入清单并在归档状态显示提醒。每包最多128个引用文件、总引用内容64 MB，单图片受既有10 MB接口限制、单文本1 MB，越界、隐藏文件和越界软链接拒绝。
+
+实际两篇包没有缺失警告。Qwen 收录11个引用文件，GSSM 收录28个；断网打开解压正文时，Qwen 的两张内嵌图与 GSSM 的一张内嵌图均实际解码显示。被文字链接引用的其他图片也在包内。
+
+<a id="doc-43-line-42"></a>
+
+### 怎样讨论当前文章并引用另一篇
+
+在 GSSM 成果页点“就地讨论”，进入关联该事项、范围为“仅讨论”的 AI 对话。当前成果自动作为材料，选段时还会保留原运行与定位。展开“附带其他研究成果”，选择 Qwen-Drive，然后直接问两者的关系。最多另外选5篇；按事项去重，不跨个人/团队空间读材料。
+
+已有知识仍通过现有文本匹配推荐读取，最多10篇、总40000字符；并非自动搜索所有未登记资料。报告与正式知识分开显示，回复下方“本次参考来源”记录实际版本。当前报告最多60000字符、其他每篇最多20000字符，总预算120000字符；长报告均保留有标记的摘录，不能把摘录当作全文已读。已成功运行的两篇现有论文小于上限，实际讨论用了完整正文。
+
+所选文章和模式保存在当前浏览器的该对话草稿中，发送后切换到新对话地址及刷新仍保留；服务器每轮也保存实际引用。换浏览器能读历史来源，但下一轮需重新选择附带文章。“就地讨论”的明确入口优先于旧草稿的委托模式；只有用户主动改变范围才会发起新委托。旧的“记录讨论笔记”仍是手工记录入口，和 AI 对话有明确区分。
+
+[本轮真实跨文章讨论](http://127.0.0.1:8010/lifeweave/personal/conversation/conversation-6214d5172fb425f7ce4e34642a954be9?itemId=item-de7785d0790445d8)比较两篇的学习目标、训练信号与风险含义，并区分报告事实和组合建议。该轮只保存讨论，没有新执行、知识接受或目标采纳。
+
+<a id="doc-43-line-52"></a>
+
+### 后续维护责任
+
+源码入口是 `research_bundle.py`、`research_archive.py`、`Conversations.prepare` 与对应 Vue 组件；运行配置见[维护文档](#doc-07)。本次新事实的长期维护位置是本仓 [架构](#doc-05)、本页与[当前状态](#doc-06)。Omni-Brain 的知识体系和本产品并非同一个来源身份，本轮没有把这里的实现直接写成其正式知识；未来如需登记，建议新增 `knowledge/lifeweave/research-archive.md` 来源页并经原库治理接受。
+
+自动成果归档没有完成双向 Linear 状态同步、已接受知识的单独自动发布、全库备份或完整个人日常 Alpha。[验证记录](#doc-17)区分了实际远端、本机网页和受控回归的覆盖范围。
+<!-- source-end: docs/research-archive.md -->
 
 ## 历史产物引用的验证边界
 

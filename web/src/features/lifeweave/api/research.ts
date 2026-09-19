@@ -4,6 +4,7 @@ export interface ResearchOutput {
  id:string;kind:'run'|'manual';title:string;content:string;version:string;runId:string|null
  state:string;createdAt:string;sourceBase:string|null;assetBase:string|null;downloadUrl:string|null
  storageNote?:string|null;rawDownloadUrl?:string|null
+ bundleUrl?:string|null
 }
 export interface ResearchOutputs {current:ResearchOutput|null;versions:ResearchOutput[]}
 export interface KnowledgeCandidate extends Revision {itemId:string;runId:string;runVersion:string;sourceUrl:string;base_version:string}

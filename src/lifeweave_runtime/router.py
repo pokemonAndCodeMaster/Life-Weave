@@ -122,19 +122,11 @@ def run_source(workspace: Workspace, run_id: str, path: str, request: Request, s
         run = service.get_run_snapshot(workspace, run_id)
     except Exception as exc:
         raise _http_error(exc) from exc
-    run_root = (request.app.state.root / '.runtime/executions').resolve() / workspace / run_id
-    root = (run_root / 'repo').resolve()
-    relative = Path(path)
-    target = (root / relative).resolve()
-    # Earlier research runs used this dedicated output folder. It is the only
-    # addressable hidden prefix; account/home and other hidden files stay closed.
-    def allowed_parts(parts):
-        visible = parts[2:] if parts[:2] == ('.runtime','research') else parts
-        return not any(part.startswith('.') or part in {'node_modules','__pycache__'} for part in visible)
-    if (not root.is_relative_to(run_root) or relative.is_absolute() or
-            not allowed_parts(relative.parts) or not target.is_relative_to(root) or
-            not allowed_parts(target.relative_to(root).parts)):
-        raise HTTPException(400, '只提供本次独立工作目录中的普通源文件')
+    from src.lifeweave.research_bundle import source_path
+    try:
+        target = source_path(request.app.state.root,workspace,run_id,path)
+    except ValueError as exc:
+        raise HTTPException(400,str(exc)) from exc
     # Markdown can cite an image as a normal link, not just an embedded image.
     # Reuse the asset owner for its byte/type/size checks in every reader.
     if target.suffix.lower() in {'.png', '.jpg', '.jpeg', '.gif', '.webp'}:

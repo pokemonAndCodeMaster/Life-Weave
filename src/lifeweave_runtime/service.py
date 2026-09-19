@@ -225,6 +225,7 @@ class LifeWeaveRuntimeService:
         capability_candidate_id: str | None = None,
         method_id: str | None = None,
         knowledge_refs: list[str] | None = None,
+        related_research: list[dict[str, Any]] | None = None,
         actor_id: str = "admin",
     ) -> dict[str, Any]:
         workspace = self._workspace(workspace)
@@ -258,6 +259,8 @@ class LifeWeaveRuntimeService:
         capabilities = self._json_snapshot(capabilities)
         feedback = self._json_snapshot(self.lifeweave_service.execution_feedback(workspace, item_id))
         support = self._json_snapshot(self.support_provider(workspace,item_id)) if self.support_provider else {}
+        if related_research:
+            support['relatedResearch'] = self._json_snapshot(related_research)
         attempt = self.repository.next_attempt(workspace, item_id)
         source = Path(directory).expanduser() if directory else self.repository_root
         repository_path: str | None = None
@@ -358,6 +361,8 @@ class LifeWeaveRuntimeService:
         capabilities = self._json_snapshot(capabilities)
         feedback = self._json_snapshot(self.lifeweave_service.execution_feedback(workspace, str(old['item_id'])))
         support = self._json_snapshot(self.support_provider(workspace,str(old['item_id']))) if self.support_provider else {}
+        if (old.get('environment_snapshot') or {}).get('researchSupport',{}).get('relatedResearch'):
+            support['relatedResearch'] = self._json_snapshot(old['environment_snapshot']['researchSupport']['relatedResearch'])
         new_instruction = instruction or str(old["instruction"])
         attempt = self.repository.next_attempt(workspace, str(old["item_id"]))
         new_id = f"gzrun-{datetime.now(timezone.utc):%Y%m%d-%H%M%S}-{uuid4().hex[:8]}"

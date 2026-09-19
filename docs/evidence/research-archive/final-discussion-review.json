@@ -1,0 +1,196 @@
+{
+  "time": "2026-09-19T14:40:39.832624+00:00",
+  "approval": "Parent supplied current-session authorization: discuss current article and attach other research; no independent approval file",
+  "baseline": "be0af89",
+  "checks": [
+    {
+      "name": "real item entry explicit discuss overrides execute draft",
+      "result": "pass",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/conversation?itemId=item-de7785d0790445d8&mode=discuss",
+      "mode": "discuss",
+      "researchItemIds": [],
+      "storage": {
+        "lifeweave:draft:personal:item-de7785d0790445d8": "旧委托草稿",
+        "lifeweave:draft:personal:item-de7785d0790445d8:mode": "execute",
+        "lifeweave:draft:personal:independent-existing-discussion:mode": "execute",
+        "lifeweave:draft:personal:independent-existing-discussion:research": "[\"item-810217743bbb4be2\"]"
+      }
+    },
+    {
+      "name": "new conversation after first send and automatic URL mode removal",
+      "result": "pass",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/conversation/independent-new-discussion?itemId=item-de7785d0790445d8",
+      "mode": "discuss",
+      "researchItemIds": [
+        "item-810217743bbb4be2"
+      ],
+      "storage": {
+        "lifeweave:draft:personal:independent-existing-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-new-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:item-de7785d0790445d8:mode": "execute",
+        "lifeweave:draft:personal:item-de7785d0790445d8:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-existing-discussion:mode": "execute",
+        "lifeweave:draft:personal:independent-new-discussion:mode": "discuss"
+      }
+    },
+    {
+      "name": "new conversation refreshed",
+      "result": "pass",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/conversation/independent-new-discussion?itemId=item-de7785d0790445d8",
+      "mode": "discuss",
+      "researchItemIds": [
+        "item-810217743bbb4be2"
+      ],
+      "storage": {
+        "lifeweave:draft:personal:independent-existing-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-new-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:item-de7785d0790445d8:mode": "execute",
+        "lifeweave:draft:personal:item-de7785d0790445d8:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-existing-discussion:mode": "execute",
+        "lifeweave:draft:personal:independent-new-discussion:mode": "discuss"
+      }
+    },
+    {
+      "name": "existing conversation explicit discuss overrides execute draft",
+      "result": "pass",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/conversation/independent-existing-discussion?itemId=item-de7785d0790445d8&mode=discuss",
+      "mode": "discuss",
+      "researchItemIds": [
+        "item-810217743bbb4be2"
+      ],
+      "storage": {
+        "lifeweave:draft:personal:independent-existing-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-new-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:item-de7785d0790445d8:mode": "execute",
+        "lifeweave:draft:personal:item-de7785d0790445d8:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-existing-discussion:mode": "execute",
+        "lifeweave:draft:personal:independent-new-discussion:mode": "discuss"
+      }
+    },
+    {
+      "name": "existing conversation first send and automatic URL mode removal",
+      "result": "pass",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/conversation/independent-existing-discussion?itemId=item-de7785d0790445d8",
+      "mode": "discuss",
+      "researchItemIds": [
+        "item-810217743bbb4be2"
+      ],
+      "storage": {
+        "lifeweave:draft:personal:independent-existing-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-new-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:item-de7785d0790445d8:mode": "execute",
+        "lifeweave:draft:personal:item-de7785d0790445d8:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-existing-discussion:mode": "discuss",
+        "lifeweave:draft:personal:independent-new-discussion:mode": "discuss"
+      }
+    },
+    {
+      "name": "existing conversation consecutive second send",
+      "result": "pass",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/conversation/independent-existing-discussion?itemId=item-de7785d0790445d8",
+      "mode": "discuss",
+      "researchItemIds": [
+        "item-810217743bbb4be2"
+      ],
+      "storage": {
+        "lifeweave:draft:personal:independent-existing-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-new-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:item-de7785d0790445d8:mode": "execute",
+        "lifeweave:draft:personal:item-de7785d0790445d8:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-existing-discussion:mode": "discuss",
+        "lifeweave:draft:personal:independent-new-discussion:mode": "discuss"
+      }
+    },
+    {
+      "name": "existing conversation refreshed after two sends",
+      "result": "pass",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/conversation/independent-existing-discussion?itemId=item-de7785d0790445d8",
+      "mode": "discuss",
+      "researchItemIds": [
+        "item-810217743bbb4be2"
+      ],
+      "storage": {
+        "lifeweave:draft:personal:independent-existing-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-new-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:item-de7785d0790445d8:mode": "execute",
+        "lifeweave:draft:personal:item-de7785d0790445d8:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-existing-discussion:mode": "discuss",
+        "lifeweave:draft:personal:independent-new-discussion:mode": "discuss"
+      }
+    },
+    {
+      "name": "no explicit mode restores saved record mode",
+      "result": "pass",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/conversation?itemId=item-de7785d0790445d8",
+      "mode": "record",
+      "researchItemIds": [
+        "item-810217743bbb4be2"
+      ],
+      "storage": {
+        "lifeweave:draft:personal:independent-existing-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-new-discussion:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:item-de7785d0790445d8:mode": "record",
+        "lifeweave:draft:personal:item-de7785d0790445d8:research": "[\"item-810217743bbb4be2\"]",
+        "lifeweave:draft:personal:independent-existing-discussion:mode": "discuss",
+        "lifeweave:draft:personal:independent-new-discussion:mode": "discuss"
+      }
+    }
+  ],
+  "posts": [
+    {
+      "path": "/api/lifeweave/personal/conversations",
+      "payload": {
+        "requestId": "3990ee85-2fd2-49b8-bd2f-22d9f0357b12",
+        "title": "仅讨论 GSSM，并参考已选 Qwen 研究。",
+        "itemId": "item-de7785d0790445d8"
+      }
+    },
+    {
+      "path": "/api/lifeweave/personal/conversations/independent-new-discussion/turns",
+      "payload": {
+        "body": "仅讨论 GSSM，并参考已选 Qwen 研究。",
+        "mode": "discuss",
+        "itemId": "item-de7785d0790445d8",
+        "researchItemIds": [
+          "item-810217743bbb4be2"
+        ],
+        "requestId": "dbfd19b8-3ed0-46a2-8746-9a3ada45390a"
+      }
+    },
+    {
+      "path": "/api/lifeweave/personal/conversations/independent-existing-discussion/turns",
+      "payload": {
+        "body": "已有对话第一问：两篇文章的假设有何区别？",
+        "mode": "discuss",
+        "itemId": "item-de7785d0790445d8",
+        "researchItemIds": [
+          "item-810217743bbb4be2"
+        ],
+        "requestId": "46f6db8f-ea88-4ee4-80f4-fdcc83ca2cb0"
+      }
+    },
+    {
+      "path": "/api/lifeweave/personal/conversations/independent-existing-discussion/turns",
+      "payload": {
+        "body": "已有对话第二问：继续对照刚才两篇文章解释。",
+        "mode": "discuss",
+        "itemId": "item-de7785d0790445d8",
+        "researchItemIds": [
+          "item-810217743bbb4be2"
+        ],
+        "requestId": "215d37ba-f92d-4d11-be8d-fe2891878692"
+      }
+    }
+  ],
+  "unexpectedWrites": [],
+  "pageErrors": [],
+  "httpErrors": [],
+  "controlledBackend": true,
+  "result": "pass",
+  "head": "be0af89aab9253e7a6db5a1a92621d1ba929ceb3",
+  "sourceHashes": {
+    "web/src/features/lifeweave/components/conversation/ConversationWorkspace.vue": "6a86c356e00358ca5a24a1c8e33d0952fbddfeea4e5d86fa722c214388cef293",
+    "web/src/features/lifeweave/pages/ConversationPage.vue": "d82da30b23a4f238e8aa4c6020c802bd7339a8b4ec5aff527d0f7921daf51a0a",
+    "web/src/features/lifeweave/composables/useConversation.ts": "b4bc1086ed6fa6bd15b7d1d0d5757780de0b6a279c2971c46700764ca6a1b990"
+  }
+}

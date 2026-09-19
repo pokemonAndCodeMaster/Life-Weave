@@ -1,0 +1,16 @@
+[
+  {
+    "runId": "gzrun-20260919-130600-2cabbf3e",
+    "version": "2c3510f3a67d50acd49eced4c2ef3467cffb2c6d5bb5c2c4df3b6985cecae480",
+    "files": 28,
+    "zipSha256": "fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520",
+    "checkedFrom": "fresh GitHub clone"
+  },
+  {
+    "runId": "gzrun-20260919-095844-49f47906",
+    "version": "dd86d4311d9ac09001d3867f0e63c2ab8ef368ca0a309fa9fe619b9fb995712d",
+    "files": 11,
+    "zipSha256": "10543aef488edead63af876a1de5238638084fe15a77502ba9614b58ee6b0278",
+    "checkedFrom": "fresh GitHub clone"
+  }
+]

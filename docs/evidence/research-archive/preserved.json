@@ -1,0 +1,14 @@
+{
+  "knowledgeUnchanged": [
+    ".runtime/knowledge/personal/开始使用.md",
+    ".runtime/knowledge/personal/知识导航.md"
+  ],
+  "originalVersionsUnchanged": [
+    "dd86d4311d9ac09001d3867f0e63c2ab8ef368ca0a309fa9fe619b9fb995712d",
+    "2c3510f3a67d50acd49eced4c2ef3467cffb2c6d5bb5c2c4df3b6985cecae480"
+  ],
+  "liveApiReportHashes": {
+    "gzrun-20260919-095844-49f47906": "dd86d4311d9ac09001d3867f0e63c2ab8ef368ca0a309fa9fe619b9fb995712d",
+    "gzrun-20260919-130600-2cabbf3e": "2c3510f3a67d50acd49eced4c2ef3467cffb2c6d5bb5c2c4df3b6985cecae480"
+  }
+}

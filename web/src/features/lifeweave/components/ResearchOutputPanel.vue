@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import ResearchArchiveStatus from './ResearchArchiveStatus.vue'
 import { computed, reactive, shallowRef, watch } from 'vue'
 import MarkdownBody from './MarkdownBody.vue'
 import * as research from '../api/research'
@@ -73,7 +74,8 @@ async function sendFeedback(){await action(async(current)=>{
   <p v-if="error" role="alert" class="lw-notice warning">{{ error }}</p><p v-if="message" role="status" class="lw-notice">{{ message }}</p>
   <template v-if="selected">
    <p v-if="selected.storageNote" class="lw-notice warning">{{ selected.storageNote }} <a v-if="selected.rawDownloadUrl" :href="selected.rawDownloadUrl" download="原始执行文本.txt">下载原始执行文本</a></p>
-   <div class="lw-between"><span class="lw-small lw-muted">{{ selected.kind==='manual'?'人工提交':'运行成果' }} · 版本 {{ selected.version.slice(0,12) }}<template v-if="selected.state!=='succeeded'&&selected.kind==='run'"> · {{ selected.state }}，保留的部分结果</template></span><button class="lw-btn sm" @click="downloadText(selected!.content,'研究成果.md','text/markdown;charset=utf-8')">下载正文</button></div>
+   <div class="lw-between"><span class="lw-small lw-muted">{{ selected.kind==='manual'?'人工提交':'运行成果' }} · 版本 {{ selected.version.slice(0,12) }}<template v-if="selected.state!=='succeeded'&&selected.kind==='run'"> · {{ selected.state }}，保留的部分结果</template></span><button class="lw-btn sm" @click="downloadText(selected!.content,'研究成果.md','text/markdown;charset=utf-8')">仅下载 Markdown</button><a v-if="selected.bundleUrl&&selected.state==='succeeded'" class="lw-btn sm" :href="selected.bundleUrl" download>下载完整包（含图片）</a></div>
+   <ResearchArchiveStatus v-if="selected.runId&&selected.state==='succeeded'" :workspace="workspace" :run-id="selected.runId" />
    <article @mouseup="capture" @keyup="capture"><MarkdownBody :content="selected.content" :source-base="selected.sourceBase??undefined" :asset-base="selected.assetBase??undefined"/></article>
    <div class="lw-stack research-feedback"><p class="lw-small lw-muted">选中正文中的一段文字，留下定位反馈或引用到讨论。</p><blockquote v-if="quote">{{ quote }}</blockquote>
     <button v-if="quote" class="lw-btn sm" @click="emit('quote',{text:quote,runId:selected.runId,anchor})">引用到讨论</button>

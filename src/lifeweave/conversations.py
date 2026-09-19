@@ -46,6 +46,10 @@ class Conversations:
             run = self.runtime.get_run(workspace,body.runId)
             if run['item_id'] != item_id:
                 raise ValueError('所引用成果不属于本次事项')
+        for research_id in body.researchItemIds:
+            self.work.get_item(workspace,research_id)
+            if not self.outputs or not self.outputs.read(workspace,research_id)['current']:
+                raise ValueError('附带的研究事项还没有可读成果')
         row = self.repository.enqueue(workspace,cid,body)
         if row['status'] == 'queued' and row['id'] not in self.tasks:
             task = asyncio.create_task(self.process(workspace,cid,row['id']))
@@ -62,7 +66,7 @@ class Conversations:
         recommendations = self.sources.recommend(workspace,current or {'title':turn['body']},current_context,turn['body'])
         docs = recommendations['documents'][:10]
         documents = []
-        remaining = 80000
+        remaining = 40000
         for doc in docs:
             full = self.sources.library.document(workspace,doc['sourceId'],doc['path'])
             excerpt = full['content'][:min(remaining,20000)]
@@ -74,21 +78,40 @@ class Conversations:
         previous = []
         for run in runs:
             result = str((run.get('result_payload') or {}).get('report') or run.get('result') or '')
-            previous.append({'id':run['id'],'state':run['state'],'result':result[:30000],
-                             'excerpt':len(result)>30000,'error':run.get('error')})
+            previous.append({'id':run['id'],'state':run['state'],'result':result[:2000],
+                             'excerpt':len(result)>2000,'error':run.get('error')})
+        research = []
+        research_ids = list(dict.fromkeys(([current['id']] if current else []) + turn['request'].get('researchItemIds',[])))
+        remaining_research = 120000
+        for index,item_id in enumerate(research_ids):
+            output = self.outputs.read(workspace,item_id)['current'] if self.outputs else None
+            if not output:
+                continue
+            if item_id == (current or {}).get('id') and turn['run_id']:
+                versions=self.outputs.read(workspace,item_id)['versions']
+                output=next((o for o in versions if o['runId']==turn['run_id']),output)
+            # Reserve a fair excerpt for every explicitly selected paper, even
+            # when the current report consumes its entire 60k allowance.
+            limit=min(remaining_research,60000) if item_id==(current or {}).get('id') else min(20000,remaining_research//(len(research_ids)-index))
+            content=output['content'][:limit]
+            remaining_research-=len(content)
+            research.append({'kind':'research','itemId':item_id,'runId':output['runId'],'title':output['title'],
+                'version':output['version'],'content':content,'excerpt':len(content)<len(output['content']),
+                'url':f'/lifeweave/{workspace}/items/{item_id}/outputs','acceptedKnowledge':False})
         context = {'workspace':workspace,'user':turn['body'],'mode':turn['mode'],
                    'anchor':turn['request'].get('anchor'),'runId':turn['run_id'],
                    'currentItem':current,'currentContext':current_context,
                    'profile':self.repository.profile(workspace),'candidates':candidates,
                    'candidateTotal':discovery['total'], 'documents':documents,
                    'documentCandidateTotal':len(recommendations['documents']),
+                   'researchOutputs':research,
                    'methods':recommendations['methods'][:10], 'runs':previous,
                    'feedback':self.work.execution_feedback(workspace,current['id']) if current else [],
-                   'history':[{'body':h['body'],'reply':h['reply'],'status':h['status'],
+                   'history':[{'body':h['body'][:1500],'reply':(h['reply'] or '')[:1500],'status':h['status'],
                                'itemId':h['item_id'],'receipts':h['receipts']}
                               for h in history if h['id']!=turn['id']][-20:],
                    'historyTotal':len(history)-1,
-                   'limits':'相关事项最多20；已读知识最多10篇/80000字；最近20轮对话及5次运行摘要，不代表全部历史。'}
+                   'limits':'相关事项最多20；知识最多10篇/40000字符；当前成果加5篇指定研究共120000字符，截断标记excerpt；最近20轮对话与5次运行摘要，不代表全部历史。'}
         return snapshot(context)
 
     async def process(self, workspace, cid, tid):
@@ -105,7 +128,9 @@ class Conversations:
                 context = self.prepare(workspace,cid,claimed)
                 self.db.execute('UPDATE workbench.lifeweave_turn SET context_snapshot=%s,sources=%s WHERE id=%s',
                                 (Jsonb(context),Jsonb([{'title':d['title'],'sourceId':d['sourceId'],'path':d['path'],
-                                                      'version':d['version'],'excerpt':d['excerpt']} for d in context['documents']]),tid))
+                                                      'version':d['version'],'excerpt':d['excerpt']} for d in context['documents']]+[
+                                                      {k:r[k] for k in ('kind','itemId','runId','title','version','excerpt','url','acceptedKnowledge')}
+                                                      for r in context['researchOutputs']]),tid))
                 async def event(_event):
                     # Raw execution diagnostics may contain account paths. They
                     # remain in the protected executor directory, not user chat.
@@ -187,6 +212,7 @@ class Conversations:
                     run = self.runtime.create_run(workspace,item_id=item_id,
                         instruction=decision.instruction or turn['body'],engine='codex',
                         permission='workspace-write',method_id=suggested['methodId'],
+                        related_research=context.get('researchOutputs',[]),
                         knowledge_refs=suggested['knowledgeRefs'],actor_id=actor)
                     run_id = run['id']
                     receipts.append({'kind':'run','id':run_id,'runId':run_id,'itemId':item_id,'title':'委托已排队，结果以运行状态为准'})

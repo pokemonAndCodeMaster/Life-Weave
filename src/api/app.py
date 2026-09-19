@@ -28,6 +28,7 @@ from src.lifeweave.conversations import Conversations, research_support
 from src.lifeweave.conversation_interpreter import ConversationInterpreter
 from src.lifeweave.conversation_router import router as conversation_router
 from src.lifeweave.research_outputs import ResearchOutputs, router as research_outputs_router
+from src.lifeweave.research_archive import ResearchArchive, router as research_archive_router
 from src.lifeweave_knowledge import LifeWeaveKnowledgeRepository, LifeWeaveKnowledgeService
 from src.lifeweave_knowledge.router import router as knowledge_router
 from src.lifeweave_runtime.repository import LifeWeaveRuntimeRepository
@@ -63,8 +64,11 @@ def create_app() -> FastAPI:
         conversations.recover()
         try:
             await local_workers.initialize()
+            if os.environ.get('LIFEWEAVE_ARCHIVE_WORKER','1') == '1' and get_env('LIFEWEAVE_LOCAL_WORKER','1') != '0':
+                await app.state.research_archive.start()
             yield
         finally:
+            await app.state.research_archive.close()
             await conversations.close()
             await local_workers.close()
             manager.close()
@@ -84,6 +88,7 @@ def create_app() -> FastAPI:
     runtime.task_sources = app.state.task_sources
     app.state.work_continuation = WorkContinuation(work, runtime)
     app.state.research_outputs = ResearchOutputs(work, runtime, app.state.library, ROOT)
+    app.state.research_archive = ResearchArchive(ROOT, app.state.research_outputs, app.state.linear.connection)
     app.state.library.reference_provider = app.state.research_outputs.document_references
     conversations = Conversations(manager.postgres(), work, runtime, app.state.work_continuation,
                                  app.state.task_sources, ConversationInterpreter(ROOT, local_workers))
@@ -110,6 +115,7 @@ def create_app() -> FastAPI:
     app.include_router(continuation_router)
     app.include_router(conversation_router)
     app.include_router(research_outputs_router)
+    app.include_router(research_archive_router)
     app.include_router(results_router)
     app.include_router(integrations_router)
     app.include_router(library_router)

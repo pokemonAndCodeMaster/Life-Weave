@@ -1,0 +1,411 @@
+{
+  "pageErrors": [],
+  "papers": [
+    {
+      "name": "qwen",
+      "itemId": "item-810217743bbb4be2",
+      "runId": "gzrun-20260919-095844-49f47906",
+      "zipSha256": "10543aef488edead63af876a1de5238638084fe15a77502ba9614b58ee6b0278",
+      "manifest": {
+        "workspace": "personal",
+        "itemId": "item-810217743bbb4be2",
+        "runId": "gzrun-20260919-095844-49f47906",
+        "title": "Qwen-Drive-1.0 原文核验与持续论文研究",
+        "version": "dd86d4311d9ac09001d3867f0e63c2ab8ef368ca0a309fa9fe619b9fb995712d",
+        "files": [
+          {
+            "path": "research/identity.txt",
+            "file": "files/d8ca532ecb33953f-identity.txt",
+            "mime": "text/plain",
+            "sourceSha256": "9d1f02814f3e1bae31c9bf2c282cda555479cf133171801022191c51c3541327",
+            "sha256": "9d1f02814f3e1bae31c9bf2c282cda555479cf133171801022191c51c3541327",
+            "bytes": 4943
+          },
+          {
+            "path": "research/figures/pdf-page-01.png",
+            "file": "files/9838f7acf715cf33-pdf-page-01.png",
+            "mime": "image/png",
+            "sourceSha256": "58906047cb1599f46b142b5bb4ba5112282471bcdcf6a4cafaf5f2ec9618b912",
+            "sha256": "58906047cb1599f46b142b5bb4ba5112282471bcdcf6a4cafaf5f2ec9618b912",
+            "bytes": 202833
+          },
+          {
+            "path": "research/figures/pdf-page-25.png",
+            "file": "files/5ff212ed1f777239-pdf-page-25.png",
+            "mime": "image/png",
+            "sourceSha256": "f4814f0bc7d996e2ef5441e1f344eb752e7549e481f304146c5806958281c12e",
+            "sha256": "f4814f0bc7d996e2ef5441e1f344eb752e7549e481f304146c5806958281c12e",
+            "bytes": 85885
+          },
+          {
+            "path": "research/figures/head.png",
+            "file": "files/3466e239245ce4a2-head.png",
+            "mime": "image/png",
+            "sourceSha256": "beb438c442644f8a7ce9bd927c8167c5a9f1b6dad9a3c00b55802cc109ec45bb",
+            "sha256": "beb438c442644f8a7ce9bd927c8167c5a9f1b6dad9a3c00b55802cc109ec45bb",
+            "bytes": 217845
+          },
+          {
+            "path": "research/figures/qwendrive_overview.png",
+            "file": "files/0d59dba4918feebf-qwendrive_overview.png",
+            "mime": "image/png",
+            "sourceSha256": "39401487312746913156281e4ed8b8cad5494aa576547fe627103e5a5fa6a096",
+            "sha256": "39401487312746913156281e4ed8b8cad5494aa576547fe627103e5a5fa6a096",
+            "bytes": 1160055
+          },
+          {
+            "path": "research/figures/training_recipe.png",
+            "file": "files/03124ae233ff0ab0-training_recipe.png",
+            "mime": "image/png",
+            "sourceSha256": "27e7aa91cd6fb030bca4ab372faf116978b8d3cbfbd9f91c9d52d73139615697",
+            "sha256": "27e7aa91cd6fb030bca4ab372faf116978b8d3cbfbd9f91c9d52d73139615697",
+            "bytes": 250211
+          },
+          {
+            "path": "research/figures/data_analysis.png",
+            "file": "files/2392474204428bf5-data_analysis.png",
+            "mime": "image/png",
+            "sourceSha256": "b0816a6d4f98258c1db3d51111dbcb94669f1f6ce727fb8409af238b2fb814fe",
+            "sha256": "b0816a6d4f98258c1db3d51111dbcb94669f1f6ce727fb8409af238b2fb814fe",
+            "bytes": 650361
+          },
+          {
+            "path": "research/figures/pdf-page-20.png",
+            "file": "files/a82bb0c0207a384a-pdf-page-20.png",
+            "mime": "image/png",
+            "sourceSha256": "81052309f91097050ece2e1c1274eeb29c0db2fe3f9ca1a8903e5934e447731a",
+            "sha256": "81052309f91097050ece2e1c1274eeb29c0db2fe3f9ca1a8903e5934e447731a",
+            "bytes": 324092
+          },
+          {
+            "path": "research/sources.json",
+            "file": "files/e186239f7db7d25f-sources.json",
+            "mime": "text/plain",
+            "sourceSha256": "fee1d06d0191507fb3b3c7b9ebe981a0b5637192127c3368756d37b80f7361ea",
+            "sha256": "fee1d06d0191507fb3b3c7b9ebe981a0b5637192127c3368756d37b80f7361ea",
+            "bytes": 10310
+          },
+          {
+            "path": "research/verification.md",
+            "file": "files/e612227a6d3420bf-verification.md",
+            "mime": "text/plain",
+            "sourceSha256": "65c726255b082132461ab10460183e74ab03ddcb09452aaa62c3f23ea3eae633",
+            "sha256": "8fa787fe1c92e5cf781a2c397dd97e3feaf88191246783976ae97601d508016c",
+            "bytes": 5843
+          },
+          {
+            "path": "research/pdf-fulltext.txt",
+            "file": "files/d3fe76311af51007-pdf-fulltext.txt",
+            "mime": "text/plain",
+            "sourceSha256": "7e9d7abfe1708695ddb4119d535022254aa1dc9d56d37868c3bdb1f8f563c722",
+            "sha256": "7e9d7abfe1708695ddb4119d535022254aa1dc9d56d37868c3bdb1f8f563c722",
+            "bytes": 157372
+          }
+        ],
+        "warnings": [],
+        "boundary": "研究成果归档，不代表已接受的正式知识。外部网址仍需联网。"
+      },
+      "archive": {
+        "runId": "gzrun-20260919-095844-49f47906",
+        "local": {
+          "status": "confirmed",
+          "path": ".runtime/research-archives/personal/gzrun-20260919-095844-49f47906/bundle",
+          "zipSha256": "10543aef488edead63af876a1de5238638084fe15a77502ba9614b58ee6b0278",
+          "warnings": []
+        },
+        "github": {
+          "status": "confirmed",
+          "target": "https://github.com/pokemonAndCodeMaster/Life-Weave",
+          "commit": "71dba3979df3f524eb841f699ee0c209a8f3efca",
+          "url": "https://github.com/pokemonAndCodeMaster/Life-Weave/blob/71dba3979df3f524eb841f699ee0c209a8f3efca/research/personal/item-810217743bbb4be2/gzrun-20260919-095844-49f47906/report.md",
+          "confirmedAt": "2026-09-19T14:16:42.941834+00:00"
+        },
+        "linear": {
+          "status": "confirmed",
+          "target": "0e1cfdbe-a7a3-4f60-8cb6-504595f8e2c1",
+          "documentId": "b8f7a4fb-8886-4a54-8b34-cde647dfa09d",
+          "submittedBodyHash": "53523b119e094211f8c3b5a667fcbb5728c8dc6b3f22063bfccc31f0edb98997",
+          "url": "https://linear.app/yyhpokemonmaster/document/qwen-drive-10-原文核验与持续论文研究-gzrun-20260919-095844-49f47906-e904a16678bf",
+          "zipUrl": "https://uploads.linear.app/c01b7bf2-19f3-4990-9398-86e1c0ee7561/e648fe51-504b-492a-a317-861f3557aef0/cded472e-5b5c-4273-a3eb-34755f962eec",
+          "confirmedAt": "2026-09-19T14:30:05.698422+00:00",
+          "readbackHash": "fb321d567bb8ee2bbadc7b039cd9f42d9ba303cc2e4cc2672dc69c7732380171"
+        },
+        "itemId": "item-810217743bbb4be2",
+        "version": "dd86d4311d9ac09001d3867f0e63c2ab8ef368ca0a309fa9fe619b9fb995712d",
+        "updatedAt": "2026-09-19T14:30:03.579046+00:00",
+        "retryAfter": 1789828505.699096
+      }
+    },
+    {
+      "name": "gssm",
+      "itemId": "item-de7785d0790445d8",
+      "runId": "gzrun-20260919-130600-2cabbf3e",
+      "zipSha256": "fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520",
+      "manifest": {
+        "workspace": "personal",
+        "itemId": "item-de7785d0790445d8",
+        "runId": "gzrun-20260919-130600-2cabbf3e",
+        "title": "GSSM v5 原文与代码核验及持续论文研究",
+        "version": "2c3510f3a67d50acd49eced4c2ef3467cffb2c6d5bb5c2c4df3b6985cecae480",
+        "files": [
+          {
+            "path": "research/checks/formula-results.json",
+            "file": "files/cd39d4722f7407ac-formula-results.json",
+            "mime": "text/plain",
+            "sourceSha256": "a0400e4d353630c7784edd0b3f1679958f3aadac74b989cc2948048d9910c9a2",
+            "sha256": "a0400e4d353630c7784edd0b3f1679958f3aadac74b989cc2948048d9910c9a2",
+            "bytes": 1664
+          },
+          {
+            "path": "research/code-audit.md",
+            "file": "files/ef430b0468a0cff6-code-audit.md",
+            "mime": "text/plain",
+            "sourceSha256": "7eef7f54e364caf1077d6194a30f1537bf724cfa69e00a7a1290368c6657b818",
+            "sha256": "1c825147665c3b89b1c3c22de856eaaaa8a5a87c6c4c415e5aa6875bc7373f65",
+            "bytes": 5990
+          },
+          {
+            "path": "research/reporting-summary-notes.md",
+            "file": "files/6dfc8e50cd47b6c2-reporting-summary-notes.md",
+            "mime": "text/plain",
+            "sourceSha256": "b35e73137a90151751670bb59559272114d20d5834a3ea3ea981a4fdbb4c4b4b",
+            "sha256": "b35e73137a90151751670bb59559272114d20d5834a3ea3ea981a4fdbb4c4b4b",
+            "bytes": 1276
+          },
+          {
+            "path": "research/figures/shrp2-event-counts-original.png",
+            "file": "files/c51274814ea909e5-shrp2-event-counts-original.png",
+            "mime": "image/png",
+            "sourceSha256": "478ead3e8f7775a735a00fafe7872e81c503e82bdf39045bd07c2e1b93c8c079",
+            "sha256": "478ead3e8f7775a735a00fafe7872e81c503e82bdf39045bd07c2e1b93c8c079",
+            "bytes": 74285
+          },
+          {
+            "path": "research/figures/v5-page-12.png",
+            "file": "files/a043a14ff8a7ed75-v5-page-12.png",
+            "mime": "image/png",
+            "sourceSha256": "0b9badc60cfe77b439d275f0710c1d2a2130a85a0ba17aa9975f224c5fde8cc0",
+            "sha256": "0b9badc60cfe77b439d275f0710c1d2a2130a85a0ba17aa9975f224c5fde8cc0",
+            "bytes": 232432
+          },
+          {
+            "path": "research/checks/official-function-results.json",
+            "file": "files/4525255b64906766-official-function-results.json",
+            "mime": "text/plain",
+            "sourceSha256": "88fd8317871fa5fff7f267bb4e0a559db82dc7a8e5d22a7a3ceccf4f3ae1d6e8",
+            "sha256": "88fd8317871fa5fff7f267bb4e0a559db82dc7a8e5d22a7a3ceccf4f3ae1d6e8",
+            "bytes": 669
+          },
+          {
+            "path": "research/figures/v5-page-15.png",
+            "file": "files/7568b6afa98eaf2e-v5-page-15.png",
+            "mime": "image/png",
+            "sourceSha256": "7aa757cfb14c2d840f9a87c93e8aff09dc628771e2bac7bc601ef24366d8ef88",
+            "sha256": "7aa757cfb14c2d840f9a87c93e8aff09dc628771e2bac7bc601ef24366d8ef88",
+            "bytes": 295466
+          },
+          {
+            "path": "research/figures/v5-page-16.png",
+            "file": "files/3f97dde8aa52ca8f-v5-page-16.png",
+            "mime": "image/png",
+            "sourceSha256": "25f29fbd522c6d50f663fc8d909ad28263c6411dfb52859e6f82c0ebc41b2193",
+            "sha256": "25f29fbd522c6d50f663fc8d909ad28263c6411dfb52859e6f82c0ebc41b2193",
+            "bytes": 294479
+          },
+          {
+            "path": "research/figures/v5-page-26.png",
+            "file": "files/aac3b59cc0ab73f5-v5-page-26.png",
+            "mime": "image/png",
+            "sourceSha256": "22e5ae0fb2a8da419019d84fee12485c21e6e5489da44ad1d7c7a155b2b65edf",
+            "sha256": "22e5ae0fb2a8da419019d84fee12485c21e6e5489da44ad1d7c7a155b2b65edf",
+            "bytes": 197631
+          },
+          {
+            "path": "research/figures/v5-page-18.png",
+            "file": "files/f514292658c95a46-v5-page-18.png",
+            "mime": "image/png",
+            "sourceSha256": "73ae7a5040e12b9131f2ca81118e5043fbadb0b5f6eb9e3cbad88dd385d802c3",
+            "sha256": "73ae7a5040e12b9131f2ca81118e5043fbadb0b5f6eb9e3cbad88dd385d802c3",
+            "bytes": 288899
+          },
+          {
+            "path": "research/sources/arxiv-abs.html",
+            "file": "files/599d52ec0d53c95d-arxiv-abs.html",
+            "mime": "text/plain",
+            "sourceSha256": "49016031e1c0d60f6c51576976f319f13b773fc790c4c02f1af1a6422d8bde35",
+            "sha256": "49016031e1c0d60f6c51576976f319f13b773fc790c4c02f1af1a6422d8bde35",
+            "bytes": 44541
+          },
+          {
+            "path": "research/sources/arxiv-v5-readable.txt",
+            "file": "files/0b356f57b693e283-arxiv-v5-readable.txt",
+            "mime": "text/plain",
+            "sourceSha256": "45f906a42b7ee77b1d7abde9be7af4fccee8ffce4b6dd41f0096c7e056412d0d",
+            "sha256": "45f906a42b7ee77b1d7abde9be7af4fccee8ffce4b6dd41f0096c7e056412d0d",
+            "bytes": 86061
+          },
+          {
+            "path": "research/sources/arxiv-v5-tables-equations.txt",
+            "file": "files/fd0be08dfef35019-arxiv-v5-tables-equations.txt",
+            "mime": "text/plain",
+            "sourceSha256": "cec34691ecd9c9762291b0801f3b59fd218a3511231d6986f646a93eadc0eaeb",
+            "sha256": "cec34691ecd9c9762291b0801f3b59fd218a3511231d6986f646a93eadc0eaeb",
+            "bytes": 22095
+          },
+          {
+            "path": "research/sources/arxiv-v5-pdf.txt",
+            "file": "files/7fea638991121a0b-arxiv-v5-pdf.txt",
+            "mime": "text/plain",
+            "sourceSha256": "d78218cbc5124b4c4cae952f7c8c80e4ac9ae51f53760a8e0049e57de710b41a",
+            "sha256": "d78218cbc5124b4c4cae952f7c8c80e4ac9ae51f53760a8e0049e57de710b41a",
+            "bytes": 119273
+          },
+          {
+            "path": "research/sources/arxiv-v3-tables-equations.txt",
+            "file": "files/c94d9d35e11143e3-arxiv-v3-tables-equations.txt",
+            "mime": "text/plain",
+            "sourceSha256": "84175e090547592f1b7121dad08f2ea728dda0ca26346f339e309f0f5ec19f2b",
+            "sha256": "84175e090547592f1b7121dad08f2ea728dda0ca26346f339e309f0f5ec19f2b",
+            "bytes": 20234
+          },
+          {
+            "path": "research/sources/nature-readable.txt",
+            "file": "files/ce4960e4b4259eed-nature-readable.txt",
+            "mime": "text/plain",
+            "sourceSha256": "b1a109ed5e96b79c1debc3afb407cc6452fac84c3dcc7e2d00adc1624705e624",
+            "sha256": "b1a109ed5e96b79c1debc3afb407cc6452fac84c3dcc7e2d00adc1624705e624",
+            "bytes": 23792
+          },
+          {
+            "path": "research/sources/nature-supplement-pdf.txt",
+            "file": "files/6c499678b4295400-nature-supplement-pdf.txt",
+            "mime": "text/plain",
+            "sourceSha256": "c526249c997827e5137a48dde9c746d02d4ee36ca947b4a03bb38d4b1b669b54",
+            "sha256": "c526249c997827e5137a48dde9c746d02d4ee36ca947b4a03bb38d4b1b669b54",
+            "bytes": 28299
+          },
+          {
+            "path": "research/figures/reporting-page-3.png",
+            "file": "files/87fbe6c27fe561c9-reporting-page-3.png",
+            "mime": "image/png",
+            "sourceSha256": "48ce10cf6cee0de8f9ebff925a95fb122403e2c3147b94bf05d393581ba8f56b",
+            "sha256": "48ce10cf6cee0de8f9ebff925a95fb122403e2c3147b94bf05d393581ba8f56b",
+            "bytes": 381936
+          },
+          {
+            "path": "research/sources/code-evidence.txt",
+            "file": "files/1a1efb53fc9582b6-code-evidence.txt",
+            "mime": "text/plain",
+            "sourceSha256": "468b6e751ee5f192354688b10664295849c08db99c77a6582aab44b94c44e906",
+            "sha256": "468b6e751ee5f192354688b10664295849c08db99c77a6582aab44b94c44e906",
+            "bytes": 71599
+          },
+          {
+            "path": "research/sources/correction-commit.json",
+            "file": "files/e391fdab8a06ddbb-correction-commit.json",
+            "mime": "text/plain",
+            "sourceSha256": "aebce0640976bf966c5c8314ff3267d0e1cb24e6547cc19795134427d58be641",
+            "sha256": "aebce0640976bf966c5c8314ff3267d0e1cb24e6547cc19795134427d58be641",
+            "bytes": 5887
+          },
+          {
+            "path": "research/sources/github-tags.json",
+            "file": "files/fc663af108ebedde-github-tags.json",
+            "mime": "text/plain",
+            "sourceSha256": "0ea4ca0147265d0afd044531eb67891ad99b96356b53ff1f5ecdafb2f643a793",
+            "sha256": "0ea4ca0147265d0afd044531eb67891ad99b96356b53ff1f5ecdafb2f643a793",
+            "bytes": 412
+          },
+          {
+            "path": "research/figures/v5-page-24.png",
+            "file": "files/655d180627d26ec9-v5-page-24.png",
+            "mime": "image/png",
+            "sourceSha256": "bf88931e18b2eac59869a766902176be482fbd1268d96c774dcf3ef66df1f585",
+            "sha256": "bf88931e18b2eac59869a766902176be482fbd1268d96c774dcf3ef66df1f585",
+            "bytes": 237950
+          },
+          {
+            "path": "research/sources/manifest.json",
+            "file": "files/327253126bfd694d-manifest.json",
+            "mime": "text/plain",
+            "sourceSha256": "d41d2e52a6dff96800fafde578dfbeb7bd651ff111bca5c7c62f9a0197b18a2f",
+            "sha256": "d41d2e52a6dff96800fafde578dfbeb7bd651ff111bca5c7c62f9a0197b18a2f",
+            "bytes": 31642
+          },
+          {
+            "path": "research/reading-log.md",
+            "file": "files/e6936a19fd7d70ae-reading-log.md",
+            "mime": "text/plain",
+            "sourceSha256": "24d8ce23de1dcbd35507cc7f3f97ec73ac7b4e3f73eb2a09da35fdb6458c99ad",
+            "sha256": "24d8ce23de1dcbd35507cc7f3f97ec73ac7b4e3f73eb2a09da35fdb6458c99ad",
+            "bytes": 2637
+          },
+          {
+            "path": "research/sources.md",
+            "file": "files/cf1b66cf57572f1c-sources.md",
+            "mime": "text/plain",
+            "sourceSha256": "e81e66f424cf5c7f82045500ba51d0b8d98504b59403be48642e45eff57ba30b",
+            "sha256": "dbd7f258a19d9c6f0b29e784ee13b813b3e6cd33afbfcc131350ca2935ebac38",
+            "bytes": 3902
+          },
+          {
+            "path": "research/checks/formula_checks.py",
+            "file": "files/dddbe3a253f0024e-formula_checks.py",
+            "mime": "text/plain",
+            "sourceSha256": "ef720b2df196efffe1f7e4491a3ea4a9fd91e98a41cb2a46edcc16b5d708c6d9",
+            "sha256": "ef720b2df196efffe1f7e4491a3ea4a9fd91e98a41cb2a46edcc16b5d708c6d9",
+            "bytes": 1894
+          },
+          {
+            "path": "research/checks/official_function_checks.py",
+            "file": "files/87bd5dc044307727-official_function_checks.py",
+            "mime": "text/plain",
+            "sourceSha256": "33b7f66f77b600681155c7c281b3e18320b76b5e50dd609cddff4b794d83dc94",
+            "sha256": "33b7f66f77b600681155c7c281b3e18320b76b5e50dd609cddff4b794d83dc94",
+            "bytes": 1821
+          },
+          {
+            "path": "research/report.md",
+            "file": "files/207180693283282f-report.md",
+            "mime": "text/plain",
+            "sourceSha256": "8bbf874bddacd8f31e78e1408167eb9bc560d11ea21cbf434c31a7133af40633",
+            "sha256": "0723c716eb47ee1c2313f111b3dfb2d5bdb53fa9be7e0a2894e1945925d3d84a",
+            "bytes": 27289
+          }
+        ],
+        "warnings": [],
+        "boundary": "研究成果归档，不代表已接受的正式知识。外部网址仍需联网。"
+      },
+      "archive": {
+        "runId": "gzrun-20260919-130600-2cabbf3e",
+        "local": {
+          "status": "confirmed",
+          "path": ".runtime/research-archives/personal/gzrun-20260919-130600-2cabbf3e/bundle",
+          "zipSha256": "fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520",
+          "warnings": []
+        },
+        "github": {
+          "status": "confirmed",
+          "target": "https://github.com/pokemonAndCodeMaster/Life-Weave",
+          "commit": "79422ef53faa9af12b99fb19ad4ef33c70434481",
+          "url": "https://github.com/pokemonAndCodeMaster/Life-Weave/blob/79422ef53faa9af12b99fb19ad4ef33c70434481/research/personal/item-de7785d0790445d8/gzrun-20260919-130600-2cabbf3e/report.md",
+          "confirmedAt": "2026-09-19T14:18:02.316504+00:00"
+        },
+        "linear": {
+          "status": "confirmed",
+          "target": "0e1cfdbe-a7a3-4f60-8cb6-504595f8e2c1",
+          "documentId": "d6eff000-7ec2-455b-957b-90f1b379930b",
+          "submittedBodyHash": "487f36ea3ed1d1a597c9d80d38cbe494c8c3d86ca5fbf33f4ebd27d3d97cbbe1",
+          "url": "https://linear.app/yyhpokemonmaster/document/gssm-v5-原文与代码核验及持续论文研究-gzrun-20260919-130600-2cabbf3e-3815a1caa1d2",
+          "readbackHash": "8b8b6052f5f0decc86051f50e0500b8dd938e90a4610b1304e7beec0e5398fd4",
+          "zipUrl": "https://uploads.linear.app/c01b7bf2-19f3-4990-9398-86e1c0ee7561/14282d4e-8d4c-469a-a2eb-0555c30b9cd6/af8fa260-6058-436e-be82-8c80e12f6670",
+          "confirmedAt": "2026-09-19T14:30:08.418056+00:00"
+        },
+        "itemId": "item-de7785d0790445d8",
+        "version": "2c3510f3a67d50acd49eced4c2ef3467cffb2c6d5bb5c2c4df3b6985cecae480",
+        "updatedAt": "2026-09-19T14:30:07.436561+00:00",
+        "retryAfter": 1789828508.4188943
+      }
+    }
+  ]
+}

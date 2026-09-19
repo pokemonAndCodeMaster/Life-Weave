@@ -1,0 +1,101 @@
+[
+  {
+    "name": "qwen",
+    "runId": "gzrun-20260919-095844-49f47906",
+    "documentId": "b8f7a4fb-8886-4a54-8b34-cde647dfa09d",
+    "url": "https://linear.app/yyhpokemonmaster/document/qwen-drive-10-原文核验与持续论文研究-gzrun-20260919-095844-49f47906-e904a16678bf",
+    "projectId": "0e1cfdbe-a7a3-4f60-8cb6-504595f8e2c1",
+    "fullContentEquivalent": true,
+    "zipSha256": "10543aef488edead63af876a1de5238638084fe15a77502ba9614b58ee6b0278",
+    "remoteImages": [
+      {
+        "file": "files/9838f7acf715cf33-pdf-page-01.png",
+        "sha256": "58906047cb1599f46b142b5bb4ba5112282471bcdcf6a4cafaf5f2ec9618b912",
+        "bytes": 202833
+      },
+      {
+        "file": "files/5ff212ed1f777239-pdf-page-25.png",
+        "sha256": "f4814f0bc7d996e2ef5441e1f344eb752e7549e481f304146c5806958281c12e",
+        "bytes": 85885
+      },
+      {
+        "file": "files/3466e239245ce4a2-head.png",
+        "sha256": "beb438c442644f8a7ce9bd927c8167c5a9f1b6dad9a3c00b55802cc109ec45bb",
+        "bytes": 217845
+      },
+      {
+        "file": "files/0d59dba4918feebf-qwendrive_overview.png",
+        "sha256": "39401487312746913156281e4ed8b8cad5494aa576547fe627103e5a5fa6a096",
+        "bytes": 1160055
+      },
+      {
+        "file": "files/03124ae233ff0ab0-training_recipe.png",
+        "sha256": "27e7aa91cd6fb030bca4ab372faf116978b8d3cbfbd9f91c9d52d73139615697",
+        "bytes": 250211
+      },
+      {
+        "file": "files/2392474204428bf5-data_analysis.png",
+        "sha256": "b0816a6d4f98258c1db3d51111dbcb94669f1f6ce727fb8409af238b2fb814fe",
+        "bytes": 650361
+      },
+      {
+        "file": "files/a82bb0c0207a384a-pdf-page-20.png",
+        "sha256": "81052309f91097050ece2e1c1274eeb29c0db2fe3f9ca1a8903e5934e447731a",
+        "bytes": 324092
+      }
+    ],
+    "verification": "GraphQL full-body semantic readback; authenticated asset bytes. Logged-in Linear UI not inspected."
+  },
+  {
+    "name": "gssm",
+    "runId": "gzrun-20260919-130600-2cabbf3e",
+    "documentId": "d6eff000-7ec2-455b-957b-90f1b379930b",
+    "url": "https://linear.app/yyhpokemonmaster/document/gssm-v5-原文与代码核验及持续论文研究-gzrun-20260919-130600-2cabbf3e-3815a1caa1d2",
+    "projectId": "0e1cfdbe-a7a3-4f60-8cb6-504595f8e2c1",
+    "fullContentEquivalent": true,
+    "zipSha256": "fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520",
+    "remoteImages": [
+      {
+        "file": "files/c51274814ea909e5-shrp2-event-counts-original.png",
+        "sha256": "478ead3e8f7775a735a00fafe7872e81c503e82bdf39045bd07c2e1b93c8c079",
+        "bytes": 74285
+      },
+      {
+        "file": "files/a043a14ff8a7ed75-v5-page-12.png",
+        "sha256": "0b9badc60cfe77b439d275f0710c1d2a2130a85a0ba17aa9975f224c5fde8cc0",
+        "bytes": 232432
+      },
+      {
+        "file": "files/7568b6afa98eaf2e-v5-page-15.png",
+        "sha256": "7aa757cfb14c2d840f9a87c93e8aff09dc628771e2bac7bc601ef24366d8ef88",
+        "bytes": 295466
+      },
+      {
+        "file": "files/3f97dde8aa52ca8f-v5-page-16.png",
+        "sha256": "25f29fbd522c6d50f663fc8d909ad28263c6411dfb52859e6f82c0ebc41b2193",
+        "bytes": 294479
+      },
+      {
+        "file": "files/aac3b59cc0ab73f5-v5-page-26.png",
+        "sha256": "22e5ae0fb2a8da419019d84fee12485c21e6e5489da44ad1d7c7a155b2b65edf",
+        "bytes": 197631
+      },
+      {
+        "file": "files/f514292658c95a46-v5-page-18.png",
+        "sha256": "73ae7a5040e12b9131f2ca81118e5043fbadb0b5f6eb9e3cbad88dd385d802c3",
+        "bytes": 288899
+      },
+      {
+        "file": "files/87fbe6c27fe561c9-reporting-page-3.png",
+        "sha256": "48ce10cf6cee0de8f9ebff925a95fb122403e2c3147b94bf05d393581ba8f56b",
+        "bytes": 381936
+      },
+      {
+        "file": "files/655d180627d26ec9-v5-page-24.png",
+        "sha256": "bf88931e18b2eac59869a766902176be482fbd1268d96c774dcf3ef66df1f585",
+        "bytes": 237950
+      }
+    ],
+    "verification": "GraphQL full-body semantic readback; authenticated asset bytes. Logged-in Linear UI not inspected."
+  }
+]

@@ -12,6 +12,7 @@ from src.lifeweave.models import WireModel, WorkspaceKey
 from src.lifeweave_knowledge.library import fingerprint
 from src.lifeweave_runtime.storage_text import result_text_storage
 from .research_references import references, merge_references
+from .research_bundle import build_bundle
 
 
 class ResearchOutputs:
@@ -52,6 +53,7 @@ class ResearchOutputs:
                     'state':run['state'], 'createdAt':run.get('finished_at') or run['created_at'],
                     'sourceBase':base+'/source', 'assetBase':base+'/assets',
                     'downloadUrl':base+'/research-output/download',
+                    'bundleUrl':base+'/research-output/bundle',
                     'storageNote':storage_note,
                     'rawDownloadUrl':base+'/artifacts/result' if storage_note and run.get('result') is not None else None})
             offset += len(runs)
@@ -209,6 +211,18 @@ def read(request: Request, workspace: WorkspaceKey, item_id: str):
     return _call(request,'read',workspace,item_id)
 
 
+@router.get('/research-catalog')
+def catalog(request: Request, workspace: WorkspaceKey):
+    service=request.app.state.research_outputs
+    items,_=service.work.list_items(workspace,limit=None)
+    results=[]
+    for item in items:
+        current=service.read(workspace,item['id'])['current']
+        if current:
+            results.append({k:current[k] for k in ('title','runId','version','createdAt')} | {'itemId':item['id']})
+    return {'items':results}
+
+
 @router.get('/items/{item_id}/knowledge-candidates')
 def candidates(request: Request, workspace: WorkspaceKey, item_id: str):
     return _call(request,'candidates',workspace,item_id)
@@ -238,3 +252,16 @@ def download(request: Request, workspace: WorkspaceKey, run_id: str):
     return Response(content,media_type='text/markdown; charset=utf-8',headers={
         'X-Content-Type-Options':'nosniff','Content-Disposition':'attachment; filename="research-output.md"',
         'ETag':'"'+fingerprint(content)+'"'})
+
+
+@router.get('/runs/{run_id}/research-output/bundle')
+def bundle(request: Request, workspace: WorkspaceKey, run_id: str):
+    try:
+        _, manifest, data = build_bundle(request.app.state.research_outputs, workspace, run_id)
+    except KeyError as exc:
+        raise HTTPException(404,str(exc)) from exc
+    except (ValueError,OSError) as exc:
+        raise HTTPException(409,str(exc)) from exc
+    return Response(data, media_type='application/zip', headers={
+        'Content-Disposition':f'attachment; filename="research-{run_id}.zip"',
+        'ETag':'"'+manifest['version']+'"', 'X-Content-Type-Options':'nosniff'})

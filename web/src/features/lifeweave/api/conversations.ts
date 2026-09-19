@@ -2,7 +2,7 @@ import { http } from '@/shared/api/http'
 import type { WorkspaceKind } from '../types'
 
 export type ConversationMode = 'auto' | 'record' | 'discuss' | 'execute'
-export interface ConversationInputContext { itemId: string | null; runId: string | null; anchor: string | null }
+export interface ConversationInputContext { itemId: string | null; runId: string | null; anchor: string | null; researchItemIds?: string[] }
 export interface ConversationReceipt { kind: string; id: string; title: string; itemId?: string; runId?: string }
 export interface ConversationTurn {
   id: string; body: string; mode: ConversationMode
@@ -14,7 +14,7 @@ export interface ConversationTurn {
 }
 export interface ConversationSummary { id: string; title: string; itemId: string | null; createdAt: string; updatedAt: string }
 export interface Conversation extends ConversationSummary { turns: ConversationTurn[] }
-export interface TurnInput { requestId: string; body: string; mode: ConversationMode; itemId?: string | null; runId?: string | null; anchor?: string | null }
+export interface TurnInput { requestId: string; body: string; mode: ConversationMode; itemId?: string | null; runId?: string | null; anchor?: string | null; researchItemIds?: string[] }
 export interface PersonalModel { version: number; goals: string; preferences: string; updatedAt: string | null }
 const root = (workspace: WorkspaceKind) => `/lifeweave/${workspace}`
 const path = (workspace: WorkspaceKind, id: string) => `${root(workspace)}/conversations/${encodeURIComponent(id)}`

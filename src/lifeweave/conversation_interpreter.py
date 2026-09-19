@@ -76,6 +76,8 @@ feedback 仅当用户纠正某段成果或方法时填写原意；临时偏好�
 proposedGoal 仅目标修改时填写；knowledge仅知识候选意图时填写path/content/reason，否则null。
 知识内容区分原文事实、来源与推断；不能把未读论文说成已精读，不能宣称用户已经理解。
 若引用已提供知识，使用 [标题](/lifeweave/SPACE/knowledge?source=SOURCE&path=ENCODED_PATH)，或保留资料原URL。
+researchOutputs 是本轮已读取的研究成果，包含当前文章及用户明确附带的其他文章；可用于比较和接续，引用其url和标题。
+研究成果不等于已接受的正式知识。excerpt=true表示仅有节选，不得声称已读全文；未提供的其他研究不能假称已读取。
 目标与长期偏好仅在适用场景使用，本轮临时要求优先；个人信息不用于别的空间。
 所有可为空字段仍须返回null；其他必需字段返回有效值。
 '''
