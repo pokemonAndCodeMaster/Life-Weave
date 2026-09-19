@@ -1,0 +1,2653 @@
+[PAGE 1]
+Learning collision risk proactively from naturalistic driving data at scale ∗
+Yiru Jiao1,3, Simeon C. Calvert1,3, Sander van Cranenburgh2,3, Hans van Lint1
+1 Department of Transport & Planning,
+2 Department of Engineering Systems and Services,
+3 CityAI lab,
+Delft University of Technology, Delft, the Netherlands
+ABSTRACT
+Accurately and proactively alerting drivers or automated systems to emerging collisions is crucial for
+road safety, particularly in highly interactive and complex urban environments. Existing methods
+either require labour-intensive annotation of sparse risk, struggle to consider varying contextual
+factors, or are tailored to limited scenarios. Here we present the Generalised Surrogate Safety
+Measure (GSSM), a data-driven approach that learns collision risk from naturalistic driving without
+the need for crash or risk labels. Trained over multiple datasets and evaluated on 2,591 real-world
+crashes and near-crashes, a basic GSSM using only instantaneous motion kinematics achieves an
+area under the precision-recall curve of 0.9, and secures a median time advance of 2.6 seconds
+to prevent potential collisions. Incorporating additional interaction patterns and contextual factors
+provides further performance gains. Across interaction scenarios such as rear-end, merging, and
+turning, GSSM consistently outperforms existing baselines in accuracy and timeliness. These
+results establish GSSM as a scalable, context-aware, and generalisable foundation to identify risky
+interactions before they become unavoidable, supporting proactive safety in autonomous driving
+systems and traffic incident management. Code and experiment data are openly accessible at
+https://github.com/Yiru-Jiao/GSSM.
+Keywords Road safety · collision risk · risk quantification · trajectory reconstruction · naturalistic driving data
+∗Officially published in Nature Machine Intelligence, accessible at https://doi.org/10.1038/s42256-026-01189-w
+arXiv:2505.13556v5  [cs.RO]  22 Mar 2026
+
+
+[PAGE 2]
+1
+Introduction
+Road traffic safety remains a critical global concern. Over one million fatalities were recorded on roads due to traffic
+accidents worldwide every year, as well as ten times as many injuries [1]. With advancements in vehicle safety
+technologies and policy improvements, a significant number of fatalities have been reduced since 2010. However, this
+reduction has plateaued in recent years, as evidenced by Figure 1(a). Notably, fewer than 6% of all traffic accidents
+occur on high-speed motorways, as displayed in Figure 1(b). Instead, the majority of crashes occur on urban roads,
+where the traffic situation is more complex due to various types of road users and their multi-directional interactions.
+Given that 60% of the global population is expected to reside in urban areas by 2030 [2], improving traffic safety in
+highly interactive urban environments has become both urgent and globally relevant.
+2001
+2006
+2011
+2016
+2021
+1.0
+1.2
+in millions
+(a) Global deaths in road crashes over years
+Estimated global deaths
+95% uncertainty intervals
+2001
+2006
+2011
+2016
+2021
+0
+0.5
+1.0
+1.5
+Number of accidents
+in millions
+(b) Accidents by location in UNECE countries
+4%
+5%
+6%
+Motorway percentage
+Outside built-up areas
+Inside built-up areas
+Motorways
+Figure 1. Statistics of traffic accidents. (a) Estimated numbers of fatalities due to road traffic accidents per year by the Institute for
+Health Metrics and Evaluation [3]. (b) Distribution of traffic accidents that occurred in different locations from 2001 to 2021 in
+27 countries where complete data are accessible. The data is sourced from the United Nations Economic Commission for Europe
+(UNECE) Statistical Database [4].
+A core challenge lies in accurately quantifying collision risk in real time to allow for prevention before crashes happen.
+Traffic safety research is traditionally grouped into two categories, reactive and proactive, based on whether the focus is
+on ex post analysis or ex ante prevention. Reactive research identifies risk factors from real-world crashes to derive
+improvements in road topology design and infrastructure safety monitoring [5] (see [6, 7] for relevant literature reviews).
+Relying on historical crash data, such improvements are inevitably delayed after injuries and damage have occurred.
+In contrast, proactive research anticipates potential collisions to enable timely interventions [8, 9]. This means being
+alert to the precursors to collisions, such as near misses, hazardous interactions, and evolving traffic conflicts, which
+potentially lead to crashes if not mitigated.
+To address this challenge of proactive collision risk quantification, several methodologies have been explored in different
+fields. The earliest established methodology is surrogate safety measures (SSM), also referred to as surrogate measures
+of safety (SMoS) or criticality metrics within autonomous driving research [10–12]. Developed over decades since
+the 1970s [13–15], SSMs estimate the likelihood or severity of potential collisions through physics-based indicators
+designed for specific road user behaviour such as car-following and lane-changing. The underlying assumption is
+that crash risk arises when the current situation will result in a collision unless immediate evasive actions are taken.
+Well-known examples include Time-to-Collision (TTC), deceleration rate to avoid collision (DRAC), artificial potential
+fields (e.g., safety field [16] and risk field [17, 18]), and other varying spatiotemporal measures. Although these
+indicators are intuitive, traffic collisions are not the result of a certain type of road user behaviour, but involve various
+types of interactions in diverse and dynamic traffic environments [19]. Therefore, the specifically designed SSMs lack
+adequate context-awareness [20] to consider heterogeneous interactions, different types of road users, and broader
+environment factors. This lack also limits the generalisability of SSMs beyond their designed conditions.
+A methodology widely used in robotics and the control domain quantifies collision risk based on motion prediction
+under uncertainty [21, 22]. It predicts the future positions or reachable sets of road users, propagates uncertainty
+through these predictions, and assesses probabilistic violations of safety constraints (e.g., [23–25]). Risk quantification
+in this methodology implicitly assumes that the uncertainties of road user behaviour can be sufficiently captured by
+a stochastic model, which remains valid in safety-critical situations. In practice, this assumption is often violated by
+aggressive, inattentive, or other anomalous behaviour that typically precedes crashes. To accommodate such more
+complex uncertainties, recent studies have increasingly integrated data-driven prediction models [26, 27]. While these
+models enhance context-awareness as traffic environments are incorporated, the challenge of model generalisability
+persists in intensely interactive and safety-critical scenarios that are under-represented in normal training data. When
+encountering such scenarios, the accuracy and reliability of risk quantification may degrade significantly.
+2
+
+
+[PAGE 3]
+Facilitated by the rapid development of computer vision, a video-data-driven methodology has emerged since 2018
+known as Traffic Accident Anticipation (TAA, see dedicated literature reviews such as [28, 29]). Its objective is to
+provide early predictions of impending collisions by modelling the visual patterns across sequential video frames.
+This is commonly achieved through supervised learning with real-world accidents serving as labels. The fundamental
+assumption is the existence of representative visual cues before accidents happen, so that deep neural networks
+can identify these cues. For example, vehicles deviating from their lanes may signal loss of control or evasive
+manoeuvres [30], while motorcycles at high speed can indicate risk in urban areas [31]. Heavily driven by annotated
+crash data, TAA faces a practical challenge of scalability. The infrequency and variety of traffic accidents, of which
+the videos are inherently difficult to acquire, impede effective and reliable training [32]. Similar to the previous
+methodologies, TAA models also struggle with generalisability to new contexts that differ, even slightly, from training
+patterns.
+In summary, to proactively quantify collision risk, existing methodologies share 3 limitations in
+• scalability, leveraging large-scale everyday observations instead of relying on factual crashes;
+• context-awareness, accounting for any information that can be used to characterise interaction [20] in addition
+to road user behaviour, such as weather, lighting, and road conditions; and
+• generalisability, covering a wide variety of traffic interactions from on motorways to at urban intersections,
+and handling new contexts not seen in training data.
+In this paper, we propose the generalised surrogate safety measure (GSSM), a novel approach to proactive risk
+quantification of potential traffic collisions. GSSM evaluates how extreme a given traffic interaction deviates from
+typical safe behaviour towards an unsafe state in the interaction context, outputting a continuous risk level and the
+corresponding likelihood of a potential collision. This consideration of extreme interaction makes it possible to naturally
+generalise from normal interactions to safety-critical situations. GSSM utilises neural networks to enable context-
+awareness, incorporating various relevant contextual information (e.g., motion states of road users, weather, and road
+conditions) and thus adapting to diverse scenarios from vehicle-vehicle encounters on highways to pedestrian-vehicle
+interactions in urban streets. Furthermore, GSSM learns interaction patterns from naturalistic data, i.e., real-world
+and unconstrained driving behaviour collected under everyday conditions with minimal interference, and does not
+require any crash records or manually labelled risk. This makes the training of GSSM scalable. In summary, GSSM
+offers a new paradigm for proactive collision risk quantification. It promises a contribution to advancing proactive
+safety research, to improve, e.g., autonomous driving systems, infrastructure design and operations, as well as traffic
+management policies.
+In the rest of this paper, Section 2 first defines the problem of proactive collision risk quantification and then introduces
+GSSM. Its learning is explained in Section 3. In Section 4, we present a real-world dataset of crashes and near-crashes
+for validating GSSM. Our experiment design is described in Section 5, followed by Section 6 where the characteristics of
+GSSM are demonstrated. Finally, Section 7 concludes this paper and envisions future research. To improve readability,
+we place details that do not hinder understanding in appendices.
+2
+Generalised surrogate safety measure
+In this section, we introduce the generalised surrogate safety measure (GSSM). We first formulate the general problem
+of proactive collision risk quantification, and then outline the theoretical basis for GSSM. Our design of GSSM inherits
+the fundamental knowledge developed over decades of research on surrogate safety measures (SSMs), where potential
+collisions are also called traffic conflicts. This distinguishes GSSM from existing self-supervised (and unsupervised)
+approaches, which are tailored for computer vision and primarily based on anomaly detection. Despite that, GSSM is
+adequately flexible to incorporate vision context.
+2.1
+Problem formulation
+Although the consequences of traffic accidents vary, this paper considers that every collision should be avoided and
+thus focuses on the likelihood of potential collisions. Within this scope, we define the proactive risk quantification of
+potential collisions as a function Q : S 7→L, where S represents a scenario of traffic interaction and Q(S) estimates
+the likelihood L of an impending collision in this scenario. L is typically expressed as a probability p ∈(0, 1), or as a
+numerical or categorical level M that can be monotonically mapped to p.
+The primary objective of Q is to accurately and timely foresee a potential collision. Inaccurate and ill-timed anticipation,
+e.g., road users acting too quickly or, on the contrary, failing to act, are the most common factors of road crashes
+(as surveyed in [33], 51% of car drivers, 42% of motorcyclists, 68% of pedestrians, and 46% of cyclists). To alert
+to a potential collision, L is usually converted into a binary outcome using a threshold. When annotated data of
+(near-)crashes are available, assessing the accuracy of Q then compares these binary classification results with ground
+truth annotations, while timeliness is assessed by the time between the threshold-based alerts and the occurrence of a
+crash or near-crash event. In the absence of annotations, surrogates such as close distance and hard braking are used to
+create near-crash labels (e.g., [34–36]).
+3
+
+
+[PAGE 4]
+As reviewed in Section 1, Q can be predefined in closed-form expressions or based on uncertainty-aware prediction,
+and can also be learnt in a supervised manner with annotated crash videos. A particular challenge in collision risk
+quantification is that crash and near-crash data are expensive to collect and inherently rare, despite causing numerous
+fatalities and injuries. Consequently, there is a growing interest in unsupervised and self-supervised learning approaches
+that do not rely on annotated crash data, to name a few, see [37–40].
+2.2
+Operational definition
+Every collision evolves, often rapidly, from a previously safe interaction. This evolution was first articulated by
+Hydén [41] as the safety pyramid. In Figure 2 we depict the conceptual relations in the safety pyramid, which also
+reflects the interaction behaviours of road users [42]. For two or more approaching road users, a potential collision
+emerges when they are too close to safely interact. The perceived risk of a potential collision then triggers the road
+users to take evasive actions. In case of successful evasion, the potential collision will end in a near-crash; otherwise, a
+crash will occur.
+Crashes
+Near-crashes
+Potential collisions
+(Conflicts)
+Interactions
+Undisturbed passages
+Unsuccessful 
+or no evasion
+Collision risk 
+perception
+Successful
+evasion
+Independent
+driving
+Interactive
+driving
+Spatial-temporal gap
+Behaviour
+Events
+Approaching
+Figure 2. The safety pyramid conceptualises the evolution from safe interactions to unsafe interactions up to crashes.
+Building on the safety pyramid, GSSM considers the spatial-temporal gap between road users as a proxy that can
+reflect collision risk across varying interaction contexts. Intuitively, a smaller gap implies less physical space and time
+available to react and prevent a potential collision. Empirical evidence also shows that people perceive increased risk
+when other moving objects approach [43, 44]; and motivated by the perceived risk, maintain acceptable separation from
+each other [45]. In this paper, we let GSSM use the spatial gap, hereafter referred to as spacing. GSSM quantifies
+collision risk by the extent to which a spacing is too close for safe interaction in its interaction context. To enable
+cross-context risk quantification, we establish two key assumptions:
+Assumption 1 Potential collisions are precursors to collisions as well as continuation of previously safe interactions.
+Assumption 2 In the same interaction context, reduced spacing monotonically indicates increased risk of collision.
+Formally, we consider repeated observations in the same interaction context and define the extent of proximity as the
+number of times a given spacing is the minimum among all observed spacings. Following the problem formulation,
+we factorise an interaction scenario S into (s, X), where s ≥0 is the spacing between two or more road users and X
+denotes all other contextual observables, e.g., motion states, weather, lighting, and road surface conditions. Accordingly,
+GSSM : (s, X) 7→M, where M is a risk level. For n ∈N>0 observations with varying spacings in context X, the
+extreme value theory calculates p(s, n|X) = (Pr(S > s|X))n as the probability that s is the minimal spacing in n
+repeated observations. The smaller s is, over the more observations s remains minimal, and the larger n is.
+We interpret the extent of spacing proximity n as conflict intensity. Accordingly, p(s, n|X) can be understood as the
+probability that an interaction scenario (s, X) is a conflict at intensity n. Then we define the critical intensity of an
+interaction as the smallest n for which the probability of conflict exceeds the probability of no conflict, i.e., n satisfies
+p(s, n|X) > 1 −p(s, n|X). Solving the inequality yields n > ln 0.5/ ln(Pr(S > s|X)), and we use this critical point
+to define GSSM.
+To summarise, GSSM is operationally defined as the critical conflict intensity ˆn of an interaction scenario (s, X). From
+the view of extreme value theory, the spacing s has a probability of 0.5 to be the minimum in ˆn observations in the same
+interaction context X; from a more intuitive view, if the interaction involves a conflict, its intensity is at least ˆn. The
+value of ˆn may be very large, e.g., 1, 000 or 10, 000, in high-risk interactions. For convenience, we take the base-10
+logarithm of ˆn, yielding representative scores of 3 and 4, respectively. Equation (1) presents the complete definition
+of GSSM with the following properties. Let M be the risk level given by GSSM, M ∈R. When s is larger than the
+4
+
+
+[PAGE 5]
+median spacing in context X, Pr(S > s|X) < 0.5 and M ≤0, which implies safety. In contrast, smaller s corresponds
+to larger M and a higher risk of potential collision. Particularly, when s = 0, M is infinite and indicates a factual
+collision. In addition, M can be naturally mapped to a probability p ∈(0, 1) by p(s, X, M) = Pr(S > s|X)10M .
+GSSM(s, X) = log10
+
+ln 0.5
+ln(Pr(S > s|X))
+
+(1)
+In theory, GSSM can be reduced to any SSM that is based on the spatial-temporal gap between road users, by specifying
+appropriate contextual observables. For example, Time-to-Collision (TTC) and deceleration rate to avoid collision
+(DRAC) account for the relative speed between two vehicles following one another; Proportion of Stopping Distance
+(PSD) considers the squared speed of a vehicle following another. For more details on such reduction and additional
+theoretical derivation, please refer to our previous work [46].
+2.3
+Multi-directional spacing
+Spacing serves as a risk proxy in GSSM and reflects the physical and psychological reaction margin to prevent a
+potential collision. As mentioned in Section 1 and displayed in Figure 1(b), traffic collisions in urban traffic significantly
+outnumber those on highways. Urban traffic involves multi-directional movements beyond longitudinal dynamics.
+These not only include car-following and lane-changing, but also two-dimensional (2D) interactions such as path
+crossing and conflict negotiation, especially at intersections.
+We adapt the method developed in our previous work [47] to quantify multi-directional spacing in 2D interactions.
+Consider two road users, i and j. A relative coordinate system is introduced with its origin at the position of i and the
+y-axis oriented along the direction of the relative velocity vij = vi −vj. If i and j have identical velocities, the y-axis
+is instead aligned with the heading direction of i, denoted by hi. We transform the position of j, given by (xj, yj), into
+the relative coordinate system and get (xij, yij). Then the multi-directional spacing between i and j at each time step is
+represented by (xij, yij, |vij|). This coordinate transformation is explicitly defined in equation (2).
+
+xij
+yij
+
+=
+1
+p
+x2
+axis + y2
+axis
+
+yaxis
+−xaxis
+xaxis
+yaxis
+
++
+
+xj
+yj
+
+−
+
+xi
+yi
+
+;
+(xaxis, yaxis) =
+(xvi −xvj, yvi −yvj),
+if vi̸ = vj,
+(xhi, yhi),
+otherwise.
+(2)
+To facilitate subsequent model training, we convert the positional components (xij, yij) in multi-directional spacing
+into polar coordinates. We define the polar coordinate system with its pole at the origin of the relative coordinate system
+and its polar axis aligned with the x-axis of the relative coordinate system. This conversion yields (ρij, sij, |vij|) as the
+polar representation of multi-directional spacing, where ρij is the angular coordinate and sij is the radial coordinate.
+Respectively, ρij represents the direction of spacing and sij represents the distance of spacing. We then incorporate ρij
+and relative speed |vij| in the context X, and use sij as the spacing variable s.
+2.4
+Parameterised GSSM
+We now introduce a parametric form of GSSM. Notice that Pr(S > s|X) in equation (1) equals to 1 −Pr(S ≤s|X).
+Consider the conditional distribution of spacing s in context X, Pr(S ≤s|X) is the cumulative probability distribution
+of p(s|X). We thus parameterise Pr(S ≤s|X) by FS(s; ϕ(X)), where ϕ(X) denotes the conditional parameters
+depending on X. To specify FS(s; ϕ(X)), we can learn ϕ(X) using standard statistical and machine-learning techniques,
+thereby making GSSM more tractable for training.
+Many studies demonstrate that the spatial gaps between road users are effectively characterised by the lognormal
+distribution [48–50]. We thus assume the context-conditioned spacing distribution p(s|X) follows a lognormal
+distribution with two parameters µ and σ. For numerical stability in training, we learn (µ, log(σ2)) instead of (µ, σ).
+But considering the convenience of notation, we write the estimated parameters ˆϕ(X) = (ˆµ(X), ˆσ2(X)) in this paper.
+Then equation (3) presents the corresponding probability density function, and a parameterised GSSM is defined in
+equation (4), where erf(z) = 2
+R z
+0 e−x2dx/√π is the Gaussian error function within domain (−1, 1).
+fS(s; ϕ(X)) =
+1
+s
+p
+2πˆσ2(X)
+exp
+
+−(ln s −ˆµ(X))2
+2ˆσ2(X)
+
+(3)
+GSSM(s, X) = log10
+
+ln 0.5
+ln(1 −FS(s; ϕ(X))
+
+= log10
+
+
+ln 0.5
+ln 1
+2
+
+1 −erf
+
+ln s−ˆµ(X)
+√
+2ˆσ2(X)
+
+
+
+(4)
+5
+
+
+[PAGE 6]
+3
+GSSM learning
+For self-supervised risk quantification using GSSM, the primary learning task aims to estimate the conditional parameters
+of context-conditioned spacing distributions. Notably, learning a GSSM does not require crash or near-crash data; it
+leverages normal interactions, of which the available data is far more abundant. In addition to this primary task, we
+introduce two auxiliary tasks. One is context representation learning to incorporate a wider range of data for training;
+the other is feature attribution to identify contributing factors to potential collision risk.
+3.1
+Inference of conditional parameters
+We use a neural network gW to estimate the conditional parameters ϕ(X), where W denotes the network’s learnable
+weights. Therefore, gW (X) outputs parameter estimates ˆϕ(X) and it needs to make fS(s; ˆϕ(X)) approximate the spac-
+ing distribution p(s|X) as closely as possible. A closer approximation can be indicated by a smaller Kullback–Leibler
+divergence DKL [p(s|X)||fS(s; gW (X))]. Minimising this divergence is equivalent to maximising expected log-
+likelihood Es∼p(s|X) [ln fS(s; gW (X))] given real-world observations of road user interaction. More conveniently,
+we minimise the negative log-likelihood (NLL) loss defined in equation (5), where (si, Xi) represents a sample of
+interaction scenario described by spacing si and contextual observables Xi. This guides gW (X) to accurately fit the
+spacing distributions conditioned on various interaction contexts.
+LNLL = −ln
+N
+Y
+i=1
+f(si; gW (Xi)) = 1
+N
+N
+X
+i=1
+ℓNLL(si, Xi),
+ℓNLL(si, Xi) = 1
+2
+
+ln 2π + ln ˆσ2(Xi) + (ln si −ˆµ(Xi))2
+ˆσ2(Xi)
+
++ ln si
+(5)
+To avoid abrupt changes in risk quantification for continuous interactions, we introduce a smoothness regularisation
+term that penalises sharp differences in the distribution approximations for similar interaction contexts. Specifically, for
+each Xi, we generate a perturbed X′
+i by adding a small Gaussian noise to each continuous variable in the original Xi.
+As shown in equation (6), then a Jensen-Shannon divergence (DJS) between the estimated distributions in context X
+and a similar context X′ is weighted by β = 5 and added to LNLL. Thereby, W = arg minW LSmoothNLL.
+LSmoothNLL = 1
+N
+N
+X
+i=1
+ℓSmoothNLL(si, Xi, X′
+i, β),
+ℓSmoothNLL(si, Xi, X′
+i, β) = ℓNLL(si, Xi) + βDJS[fS(s; gW (Xi))||fS(s; gW (X′
+i))]
+(6)
+3.2
+Context representation learning
+In this paper, we categorise the contextual observables X describing an interaction scenario into three feature groups.
+Current features (denoted by XC) represent the instantaneous states of interacting road users, including, e.g., their
+individual speeds and relative velocity. Environment features (XE) describe external conditions during the interaction,
+such as weather, lighting, and road surface quality. Historical kinematic features (XT ) include time-series data of the
+interacting road users’ speeds and yaw rates within the past 2.5 seconds. To avoid leakage of spacing information as
+suggested in [46], random values in XT are dropped out (set as zero). A comprehensive list of these contextual features
+is provided in Appendix Table A.1.
+Each feature group is processed by a dedicated encoder, yielding encoded representation groups θC = gC
+WC(XC),
+θE = gE
+WE(XE), and θT = gT
+WT (XT ). These groups are then concatenated and passed to a decoder gD
+WD, which
+estimates conditional parameters as illustrated in Equation (7). Details of these modules’ architecture are provided in
+Appendix Section A.3.
+ϕ(X) = gD
+WD([θC; θE; θT ])
+(7)
+The learning of encoded representation is implicitly achieved when training a gW (X) as a whole. In practice, the
+encoders can also be pretrained by separate representation learning. For instance, contrastive learning is well aligned
+with GSSM training, which essentially aims to capture spacing patterns in similar conditions and distinguish those
+in dissimilar conditions. To focus on presenting GSSM, we do not perform separate representation learning in the
+experiments in this paper, but future research is expected for more practical applications.
+3.3
+Attribution of feature importance
+In order to improve traffic safety, the features that strongly influence the estimated risk of potential collisions are worth
+identifying. GSSM learns interaction patterns from real-world data and varies its estimates of collision risk in different
+6
+
+
+[PAGE 7]
+contexts. To analyse these learnt patterns and attribute each feature’s effect on the estimated risk, we use an explainable
+artificial intelligence (XAI) method known as Expected Gradients (EG [51]).
+EG extends Integrated Gradients [52] by taking the expectation of gradients over integration path steps α ∼U(0, 1)
+and a set of reference points. For clearer interpretation, we compute attributions with respect to various pieces of latent
+representation θ (rather than raw inputs). The reference points are typically sampled from a uniform distribution over
+the entire training set [51]. Here, we apply k-means clustering to Θ, the representations encoded from all samples
+in the training set, and use cluster centres as representative references θ′. Equation (8) summarises our computation
+of EG. The computed attributions sum to the difference in estimated risk given θ relative to the averaged risk given
+the references. The positive attribution of a feature means it contributes to increasing the estimated risk, whereas the
+negative attribution implies a contribution to decreasing the risk. More details about the encoder design to ensure
+correct dependence of contextual features are referred to Appendix Section A.3.
+EG(θ) = Eθ′∼Θ,α∼U(0,1)
+(
+(θ −θ′) ∂
+∂θ log10
+"
+ln 0.5
+ln(1 −FS(s; gD
+WD(θ′ + α(θ −θ′)))
+#)
+(8)
+Note that these attributions do not establish causality. For example, a positive attribution of relative speed does not imply
+that a lower relative speed would have reduced the risk. In a posteriori manner, EG explains the features’ computational
+influence on the inference of a trained neural network. We recommend two strategies for interpretation. First, compare
+the attributions of all features at a specific time moment to assess their relative importance. Second, track how the
+attributions evolve over time. For instance, if the estimated collision risk rises along with an increasing attribution
+for a particular feature, that feature may have a relatively strong correlation with collision risk. Nonetheless, such an
+explanation alone cannot serve as evidence to justify an intervention, where future research is needed.
+4
+Data of potential collisions
+Despite that GSSM does not use real-world traffic accidents for training purposes, a relatively small-scale dataset
+of crashes and near-crashes is necessary for effectiveness assessment. Such a dataset needs to contain both safe and
+safety-critical road user interactions in various situations. In Table 1, we summarise existing datasets that each have
+over 500 crashes and/or near-crashes recorded.
+Table 1. Existing datasets of crashes (and near-crashes).
+Dataset a
+Year b
+Annotation c
+Crashes (and near-crashes)
+Number
+Time range
+Period before impact d
+DAD [53]
+2016
+T
+620
+5 s
+Designed to be 4.5 s
+CADP [54]
+2018
+T, S
+1,416 e
+Varying
+On average 3.7 s
+A3D [37]
+2019
+T, P
+1,500
+Varying
+Unrevealed
+CCD [55]
+2020
+T, P, W
+1,500
+5 s
+At least 3.0 s
+DADA [56, 57]
+2019, 2022
+T, S, C, P, W, L, A
+2,000
+Varying
+On average 5.2 s
+DoTA [39]
+2022
+T, S, C, P
+4,677
+Varying
+On average around 4.0 s
+SHRP2 NDS [58, 59]
+2010-2013
+T, S, C, P, W, L, etc.
+8,895 f
+Varying
+At least 20.0 s
+Reconstructed SHRP2
+This paper
+T, S, C, P, W, L, etc.
+6,664 g
+Varying
+On average 22.8 s
+aData sources: DAD, A3D, CCD, and DoTA were compiled from dashcam recordings posted on YouTube. DADA was compiled
+from dashcam recordings posted on YouTube, Youku, Bilibili, iQiyi, Tencent, etc. CADP was compiled from surveillance camera
+recordings posted on YouTube.
+bFor SHRP2 NDS, the listed years are actual data collection time. For the other datasets, the years are publication time, since
+these sets were sourced from the Internet and have no determinate collection time.
+cAnnotated information includes: event time (T), bounding box positions (S), crash type (C), participants (P), weather (W),
+lighting (L), driver’s attention map (A). The datasets derived from SHRP2 NDS include additional information such as traffic density
+and road surface quality.
+dImpact means physical contact in crashes; for near-crashes, the moment of closest proximity.
+eAmong these videos, 205 are annotated while the others are not.
+fThese include 1,942 crashes and 6,953 near-crashes.
+gThese include 1,402 crashes and 5,262 near-crashes.
+We select the database derived from the Second Strategic Highway Research Program’s (SHRP2) Naturalistic Driving
+Study (NDS), where we reconstruct bird’s eye view trajectories for easier use. The major shortcoming of the other
+datasets is the lack of safe baselines to test false positives, except for DAD providing 1,130 clips sampled from source
+videos. Another issue is that most of the datasets were originally designed for accident detection rather than risk
+7
+
+
+[PAGE 8]
+quantification, thus the time periods before crashes are not well preserved for assessing risk evolution. In the rest of this
+section, we first introduce SHRP2 NDS, then describe the trajectory reconstruction, and finally summarise the data we
+use in the following experiments.
+4.1
+SHRP2 Naturalistic Driving Study
+The SHRP2 NDS is a large-scale research initiative aimed at understanding driver behaviour and performance. From
+2010 to 2013, it collected extensive data using instrumented vehicles in six states in the United States. More than 3,300
+participant vehicles were equipped with data acquisition systems that recorded video footage, vehicle network data (e.g.,
+speed, brake, and accelerator positions), and signals from additional sensors such as forward radar and accelerometers.
+A significant strength of SHRP2 NDS is its comprehensive set of manually annotated traffic safety events, including
+crashes and near-crashes that are collectively termed “safety-critical events”, along with “safe baselines” selected
+through stratified random sampling. Table 2 outlines the operational definitions of these events as described in [60],
+where further details of the SHRP2 NDS are also referred to.
+Table 2. Operational definitions of traffic safety events in the SHRP2 NDS.
+Event
+Operational definition
+Crash
+“Any contact that the subject vehicle has with an object, either moving or fixed, at any
+speed in which kinetic energy is measurably transferred or dissipated is considered a
+crash. This also includes non-premeditated departures of the roadway where at least
+one tire leaves the paved or intended travel surface of the road, as well as instances
+where the subject vehicle strikes another vehicle, roadside barrier, pedestrian, cyclist,
+animal, or object on or off the roadway.”
+Near-crash
+“Any circumstance that requires a rapid evasive manoeuvrer by the subject vehicle,
+or any other vehicle, pedestrian, cyclist, or animal, to avoid a crash is considered a
+near-crash. A rapid evasive manoeuvrer is defined as steering, braking, accelerating,
+or any combination of control inputs.”
+Safe baseline (Non-conflict)
+“Normal driving behaviours and scenarios where the driver may react to situational
+conditions and events, but the reaction is not evasive and the situation does not place
+the subject or others at elevated risk.”
+4.2
+Trajectory reconstruction
+The accessible motion data from the SHRP2 NDS does not contain positional information of the subject (participant)
+vehicles to protect driver privacy. In addition, the other road users are detected by forward radars as surrounding objects
+in a subject-centric moving coordinate system. To align these data with the mainstream bird’s-eye-view datasets, we
+reconstruct the trajectories for both subject vehicles and surrounding objects using extended Kalman filters (EKFs).
+First, we linearly interpolate all time-series signals to a uniform frequency of 0.1 seconds. Next, we reassign the
+indices of surrounding objects when necessary. Due to detection limitations, an object may be temporarily lost and
+re-detected later with a new index. If a newly detected object is within a specified distance threshold of a previously
+tracked object, the new object is assigned the previous index. We define the distance threshold as the object’s position
+displacement relative to the subject over 0.3 seconds, constrained to a minimum of 0.5 m and a maximum of 2.5 m.
+Then we reconstruct trajectories for each event in two steps.
+Step 1: subject vehicle’s trajectory reconstruction. We apply an EKF assuming constant yaw rate and acceleration.
+The motion dynamics are updated according to equations (9) and (10), where (xi, yi) denotes the vehicle’s position, ψi
+the heading angle relative to the x-axis, vi the longitudinal speed, ωi the yaw rate, ai the longitudinal acceleration, and
+ϵ = 0.001 is a threshold to use longitudinal updates when near-zero yaw rates induce numerical instability. The update
+interval ∆t = 0.1 seconds. We place the subject vehicle initially at (xi, yi) = (0, 0) with its heading ψi = 0 along
+the x-axis, and set the initial states of speed, yaw rate, and acceleration from original data. The data of yaw rates and
+accelerations were stably recorded, but speed measurements were not always consistent. We thus consider two orders
+of time sequence depending on whether the earliest or latest 0.5-second speed states are missing. If the latest states are
+missing, we let the EKF propagate forward from the earliest available measurement; if the earliest states are missing,
+we let the EKF propagate backwards. When both earliest and latest speed states exist, we run two EKFs from both ends
+and then select the reconstructed trajectory that deviates less in speed and yaw rate from the original sensor data.
+
+
+xi
+yi
+ψi
+vi
+ωi
+ai
+
+
+t+∆t
+=
+
+
+xi
+yi
+ψi
+vi
+ωi
+ai
+
+
+t
++
+
+
+∆xi
+∆yi
+ωi∆t
+ai∆t
+0
+0
+
+
+, where
+(9)
+8
+
+
+[PAGE 9]
+∆xi =
+
+
+
+
+
+cos(ψi)(vi∆t + 1
+2ai∆t2),
+if |ωi| ≤ϵ,
+viωi[sin(ψi + ωi∆t) −sin(ψi)] + ai[cos(ψi + ωi∆t) −cos(ψi)] + aiωi sin(ψi + ωi∆t)∆t
+ω2
+i
+,
+otherwise;
+∆yi =
+
+
+
+
+
+sin(ψi)(vi∆t + 1
+2ai∆t2),
+if |ωi| ≤ϵ,
+viωi[cos(ψi) −cos(ψi + ωi∆t)] + ai[sin(ψi + ωi∆t) −sin(ψi)] −aiωi cos(ψi + ωi∆t)∆t
+ω2
+i
+,
+otherwise.
+(10)
+Step 2: surrounding objects’ trajectory reconstruction. We then reconstruct the trajectories of the surrounding
+objects. This reconstruction has the forward field of view only, as only forward radar data are available. During an event,
+the subject vehicle may detect multiple objects (e.g., vehicles, cyclists, pedestrians, or animals), of which the edge
+nearest to the subject vehicle is detected. For each object, we first convert its local radar coordinates into the subject
+vehicle’s reconstructed global coordinate system. Then we determine the object’s centroid based on its dimensions
+and whether the detected edge corresponds to its front or rear, inferred from its heading direction. Since only relative
+positions and speeds are available for these detected objects, we use an EKF under the assumption of constant heading
+and speed. The update equations are given in equation (11).
+
+
+xj
+yj
+ψj
+vj
+
+
+t+∆t
+=
+
+
+xj
+yj
+ψj
+vj
+
+
+t
++
+
+
+cos(ψj)vj∆t
+sin(ψj)vj∆t
+ψj
+vj
+
+
+(11)
+Due to limited access to the raw data of cameras and radars, from which the provided data in the SHRP2 NDS were
+extracted, our reconstruction intends to preserve the first-hand information (i.e., the provided data) as much as possible.
+Therefore, this study defines reconstruction errors as the deviations of reconstructed trajectories from the provided
+signals in the SHRP2 NDS. We optimise the EKF parameters of uncertainties and motion ranges by minimising the root
+mean squared reconstruction error in subject speed, subject yaw rate, subject acceleration, and object speed, as well as
+the mean displacement error of objects. The distributions of eventual reconstruction errors are presented in Appendix
+Figure A.1. Note that due to the absence of raw data, the very small errors we achieved do not indicate an accurate
+capture of reality, but of the original measurement. On average, the standard deviation is smallest for safe baselines and
+larger for near-crashes and crashes. But the difference is rather small, with 0.03-0.04 m/s in subject speed, 0.08-0.13
+m/s2 in subject acceleration, and 0.02-0.06 m/s in object speed.
+4.3
+Data used in this paper
+We use crashes and near-crashes derived from the SHRP2 NDS as our test set for GSSM demonstration. The safe
+baselines are used as part of our training data. Therefore, this paper utilises all reconstructed event trajectories, alongside
+additional information relevant to the safety-critical events.
+Not all 8,895 events in the original dataset could be reconstructed due to missing values, sensor inaccuracies, and the
+absence of ground-truth data. There are 6,664 events where the trajectories of both the subject vehicle and at least one
+surrounding object are reconstructed. From these, we extract a useful test set by excluding invalid events that meet any
+of the following criteria:
+• no object is detected for more than 5 seconds (too short to observe risk evolution),
+• the crash or near-crash is with an object behind the subject vehicle (given the lack of rearward radar data),
+• the crash or near-crash involves a “shapeless” obstacle (e.g., roadside pavement).
+Eventually, we obtain 4,875 safety-critical events in the test set. Figure 3(a) presents the numbers of originally recorded
+events in the SHRP2 NDS, the subset with both subject and object trajectories reconstructed, and the final filtered
+subset.
+The distributions of event types are further displayed in Figure 3(b), where the difference is primarily a result of the fact
+that rear-end events are more likely to be continuously detected by the forward radar. In Figures 3(c-e), we also show the
+numbers and percentages of events in different environmental conditions. More than 80% of the events occurred without
+adverse conditions, i.e., dry roads, not precipitation, and in daylight. However, considering that adverse conditions are
+less common by nature, they still play a role in causing traffic accidents.
+In addition to the reconstructed trajectories, we attach other information about the safety-critical events. To consider
+a broader range of factors leading to potential collisions, the environmental conditions, including weather, lighting,
+road surface, and traffic density, are incorporated. To evaluate whether and when a potential collision is successfully
+detected, the annotations of time when an event starts and ends, when the driver reacts (if applicable), and when the
+impact occurs (a physical contact for crashes or the closest proximity in near-crashes) are also included. Further, the
+specific type (e.g., with a leading object, during crossing or turning) of an event is included to evaluate the detection
+of potential collisions in different scenarios. Lastly, when necessary, each event’s narrative is referred to for further
+9
+
+
+[PAGE 10]
+(a) Event counts
+32509
+Crashes
+Near-crashes
+Safe interactions
+Number of events
+Recorded
+1942
+6953
+Reconstructed
+1402
+5262
+3893
+In test set
+282
+4593
+Number of events in total
+4875
+6664
+8895
+Recorded
+36.8%
+17.2%
+17.0%
+13.3%
+Reconstructed
+38.0%
+17.9%
+16.4%
+13.4%
+In test set
+51.2%
+24.2%
+13.6%
+(b) Event types
+Animal
+Pedestrian/cyclist
+Following
+Shapeless obstacle
+Parked
+Merging
+Oncoming
+Unknown
+Leading
+Adjacent lane
+Single
+Crossing/turning
+Dry
+Wet Snowy
+Icy
+Gravel
+     Unknown
+No Adverse
+Raining
+Mist/Light Rain
+Snowing
+Rain&Fog
+Snow/Sleet&Fog
+Fog
+Sleeting
+(c) Weather and road surface conditions
+0
+1
+2
+5
+7
+9
+11
+15
+16
+210
+224
+248
+4121
+Number of events
+81.3%
+11.8%
+2.3%
+1.4%
+3.2%
+(d) Lighting conditions
+Daylight
+Darkness(lighted)
+Darkness(not lighted)
+Dawn
+Dusk
+7.4%
+14.9%
+47.9%
+19.0%
+7.7%
+2.7%
+0.4%
+(e) Traffic conditions
+LOS A1
+LOS A2
+LOS B
+LOS C
+LOS D
+LOS E
+LOS F +
+Unknown
+Figure 3. Statistics of original and processed events in the SHRP2 NDS. (a) Numbers of crashes, near-crashes, and safe baselines
+that are recorded, reconstructed, and used in the test. (b) Distribution of event types that are recorded, reconstructed, and used in
+the test. (c) Distribution of weather and road surface conditions in the test events. (d) Distribution of lighting conditions in the
+test events. (e) Distribution of traffic conditions in the test events. LOS stands for level of service, details of which are referred to
+Appendix Table A.1.
+verification. These result in the largest to date trajectory dataset of traffic crashes and near-crashes. This dataset has
+been made accessible in [61].
+5
+Experiments
+We run all experiments with an NVIDIA A100 GPU (80GB RAM) as well as 5 to 50 Intel Xeon CPUs, depending
+on whether parallel computation is helpful. To ensure fair comparison across settings and methods, we control the
+following conditions: random seed, maximum training epochs, early stopping criteria, and evaluation sample sets.
+Hyperparameter choices are listed in Appendix Table A.2. We do not conduct an ablation experiment for neural network
+design, as our core focus in experiments is on validating the proposed GSSM.
+5.1
+Training datasets and experiment design
+Our training data consist of 3 datasets collected in different countries, involving different interaction scenarios, and
+with different equipment. These data significantly differ from the test set, and we deliberately exploit this difference to
+demonstrate the generalisability of GSSM. In addition, the diversity of these data mimics the heterogeneity in real-world
+traffic interactions.
+The first dataset is composed of the safe baselines derived from SHRP2 NDS as described in Section 4. We term this set
+as SafeBaseline, where the interactions were recorded both on highways and in urban traffic. Considering the detection
+limitation of forward radar, the majority of SafeBaseline may be on straight roads. To compensate for that, we introduce
+two more datasets. One is specifically focused on urban intersections. This dataset was collected in the U.S. in 2019 by
+a fleet of automated vehicles [62]. We use the set of interactions between human road users extracted by [63], and term
+this set as ArgoverseHV. From the other dataset known as highD, we extract lane-change interactions using the same
+methods in our previous work [46]. This dataset was collected by drones on German highways in 2018, with a position
+error typically less than 10 cm [64]. To make fair use, we draw approximately equal-sized (over 522 thousand) samples
+for each dataset, where 80% are used for training and 20% for model validation to monitor training progress.
+The experiments are designed as follows to demonstrate the effectiveness of GSSM and its useful characteristics targeted
+in this research.
+• Effectiveness. Effective risk quantification accurately identifies dangers and provides timely alerts to prevent
+potential collisions. Therefore, we compare GSSM with other existing methods on the accuracy in alerting
+10
+
+
+[PAGE 11]
+crashes and near-crashes as well as the timeliness of alerts. For comparability, the GSSM compared in this
+experiment is trained using only current features (XC).
+• Scalability. The training of GSSM and its effectiveness are expected to be scaled with increased interaction
+patterns. We combine SafeBaseline with varying proportions (random sampling 10%–100%) of ArgoverseHV
+or highD, train a series of GSSMs on the combined datasets, and then observe the variation in their effectiveness.
+• Context-awareness. GSSM is capable of considering varying contextual information, and additional con-
+textual features are expected to enhance risk quantification effectiveness. We train multiple GSSMs on
+SafeBaseline, which uniquely provides environment data. In addition to current features (XC), these GSSMs
+progressively incorporate more contextual information of subject acceleration (ai), environment features (XE),
+and historical kinematic features (XT ).
+• Generalisability. Our training of GSSM does not use any crashes or near-crashes as in the test set. Essentially,
+the effectiveness of all the GSSMs trained in this study is generalised from normal interactions, which vary in
+location and equipment during data collection. In addition to that, GSSM is designed to be generally applicable
+across interaction scenarios. We compare the effectiveness of GSSM against other methods for different types
+of safety-critical events, including rear-end scenarios, lateral interactions with other road users in adjacent
+lanes, crossing and turning conflicts, merging situations, and a small number of incidents involving vulnerable
+road users (e.g., pedestrians and cyclists).
+• Risk attribution. Lastly, we evaluate the dominant contributing factors to the change in collision risk based
+on feature attribution.
+Table 3 summarises the 29 GSSMs that are trained across these experiments. These variations depend on the training
+datasets (or their combinations) and the selected contextual observables.
+Table 3. Overview of GSSMs trained in the experiments and compared with existing methods.
+Acronym ab
+Training dataset(s) c
+Contextual
+observables
+Experiment(s)
+involved in
+d
+Number of
+parameters
+Training time
+per sample (s)
+Inference time
+per sample (s)
+TTC2D
+N/A
+[XC]
+E, G
+N/A
+N/A
+6.21E-7
+ACT
+3.93E-6
+TAdv
+4.78E-6
+EI
+5.05E-4
+S-C
+SafeBaseline
+S, C
+773,286
+4.43E-5
+1.37E-5
+h-C
+highD
+E, G
+773,286
+4.39E-5
+1.07E-5
+A-C
+ArgoverseHV
+G
+773,286
+4.40E-5
+1.34E-5
+SA-C
+SafeBaseline ∪ArgoverseHV{10%,20%,··· ,100%}e
+S
+773,286
+Not measured
+Not measured
+Sh-C
+SafeBaseline ∪highD{10%,20%,··· ,100%}
+S
+773,286
+SAh-C
+SafeBaseline ∪10%ArgoverseHV ∪100%highD
+S
+773,286
+4.53E-5
+1.19E-5
+S-Ca
+SafeBaseline
+[XC, ai]
+C
+775,336
+5.04E-5
+1.33E-5
+S-CE
+[XC, XE]
+C
+857,486
+6.42E-5
+1.78E-5
+S-CaE
+[XC, ai, XE]
+C
+859,536
+6.62E-5
+1.88E-5
+S-CET
+[XC, XE, XT ]
+C, R, G
+885,664
+7.48E-5
+2.21E-5
+S-CaET
+[XC, ai, XE, XT ]
+C
+887,714
+7.50E-5
+2.35E-5
+aThe two-dimensional surrogate safety measures (2D SSMs) have abbreviations TTC2D for Two-dimensional Time-to-
+Collision [65], TAdv for Time Advantage [42], ACT for Anticipated Collision Time [66], and EI for Emergency Index [67].
+bAcronyms for GSSMs follow the format <Datasets>-<Contextual observables>. For example, “S-C” is trained on
+SafeBaseline and uses current features XC
+cThe dataset names are abbreviated as “S” = SafeBaseline, “A” = ArgoverseHV, “h” = highD. If multiple datasets are used (e.g.,
+“SAh”), the GSSM is trained on their union.
+dThe experiments are abbreviated as “E”=Effectiveness, “S”=Scalability, “C”=Context-awareness, “G”=Generalisability,
+“R”=Risk attribution. A GSSM may be involved in multiple experiments.
+eThe data combined in addition to SafeBaseline are randomly sampled for 10%-100% from the whole dataset.
+Since we do not include video data yet as contextual information, the comparison in this paper’s experiments excludes
+the self-supervised methods based on computer vision or anomaly detection. Instead, we compare with surrogate
+safety measures (SSMs) tailored for two-dimensional (longitudinal and lateral) interactions as listed in Table 4. Their
+estimations are all based on the instantaneous states of interacting road users, i.e., the current features XC. For efficient
+large-scale evaluation, we implement TAdv, ACT, and TTC2D in a vectorised form, enabling parallel computation over
+thousands of interaction pairs.
+There also exist extensions that incorporate stochastic behaviour and/or extreme value theory (e.g., survival analysis),
+such as [68–70]. We do not compare with these methods because their implementations require specific modelling
+assumptions about uncertainty (for example, how to represent trajectory noise and behavioural variability), which makes
+a fair and consistent comparison difficult within our current framework. Nevertheless, we refer interested readers to this
+line of work as a complementary direction that combines SSMs and probabilistic modelling.
+11
+
+
+[PAGE 12]
+Table 4. Two-dimensional Surrogate Safety Measures (2D SSMs) used as baseline methods.
+Two-dimensional SSM
+Year
+Brief summary
+Time Advantage (TAdv) [42]
+2010
+Expected time gap between two road users passing a common spatial
+zone, assuming no behaviour change in the short future. This is also
+known as predicted Post-Encroachment-Time (PET).
+Anticipated Collision Time (ACT) [66]
+2022
+The shortest distance between two road users divided by their
+closing-in rate, assuming a constant closing-in rate in the short
+future.
+Two-dimensional Time-to-Collision
+(TTC2D) [65]
+2023
+Minimum of the longitudinal and lateral Time-to-Collision values,
+assuming no behaviour change in the short future.
+Emergency Index (EI) [67]
+2025
+Intensity of evasive action required to prevent a potential collision,
+based on the change rate in overlapping path.
+5.2
+Ground truth of safety-critical events
+The original SHRP2 NDS annotates the time moments of the start, impact, and end of each crash or near-crash. For
+crashes, impact time means physical contact time; for near-crashes, impact time is when the road users were at the
+closest proximity. The safety-critical events in the test set have at least 20 seconds before the impact time. This allows
+for separating the danger period and safe period in each event. Then we can create positive ground truth (i.e., potential
+collision) between the subject vehicle and a conflicting object in the danger period, and negative ground truth (i.e., safe
+interactions) between the subject vehicle and other surrounding objects in the safe period. As illustrated in Figure 4, we
+consider the danger period of an event from the start time, or 4.5 seconds before impact time if the annotated start time
+is less than 4.5 seconds until impact. This danger period is considered to finish at the end time, or in 0.5 seconds after
+impact time if the annotated end time is delayed. Meanwhile, we consider the safe period for each surrounding object
+as 2 to 5 seconds after the object is detected for 1.5 seconds and 3 seconds before the event start time. To be considered
+as in a safe period, the object should not have a hard braking (deceleration greater than 1.5 m/s2).
+Start time Impact time
+End time
+An unselected
+surrounding object
+Another
+surrounding object
+A surrounding object
+Subject vehicle
+At least 4.5 s
+1.5 s
+3 s
+1.5 s
+5 s
+Pre-danger period
+In-danger period
+Danger period
+Safe period
+Figure 4. Separation of time periods for each safety-critical event in the test set for evaluation.
+The specific “conflicting object” in an event is not explicitly annotated in the SHRP2 data, and it’s possible the
+conflicting object was not detected or recorded. We design a three-stage evaluation procedure to filter out those invalid
+cases, create useful ground truth, and then perform a reliable evaluation.
+• In the first stage, for each event, we use every method among the 2D SSMs and GSSMs (except for the ones
+used to test scalability only) to evaluate the collision risk between the subject vehicle and each of all detected
+surrounding objects, then determine a temporary conflicting object based on the evaluation. An event may
+have zero or a few candidate objects evaluated by different methods.
+• In the second stage, we let the methods vote for the most probable conflicting object. Considering that
+each method votes for a candidate object, an abstention occurs when a method determines that no temporary
+conflicting object exists. We select the object earning the most votes to be the eventual conflicting object. This
+voted object should earn over 1/3 of the total votes, and have less than 1/3 of the total votes against.
+• In the third stage, we apply the 2D SSMs and GSSMs to each event that has a voted conflicting object. True
+and false positives are assessed based on the potential collision between the subject vehicle and the voted
+conflicting object in the danger period. True and false negatives are assessed based on the safe interactions
+between the subject vehicle and other surrounding objects in their safe periods.
+12
+
+
+[PAGE 13]
+To determine a temporary conflicting object in the first stage, we assume that the conflicting object in an event is the
+most risky object in the danger period, and its collision risk is less in the pre-danger period than in-danger period. More
+specifically, the object with the highest average collision risk during in-danger period is first selected. If the selected
+object has no data before the danger period, further confirmation is not possible, so we skip the event to be conservative
+than misleading. If any data of this selected object is recorded before danger, the 25th, 50th, and 75th percentiles of the
+risk quantification in the pre-danger period should be less than those in the danger period; otherwise, this object is not
+the real conflicting object. Here we use the percentiles (rather than, e.g., minimum, mean, maximum) for a more robust
+comparison and to avoid any potential influence of outliers.
+5.3
+Evaluation metrics
+As mentioned in Section 2.1, the evaluation of proactive risk quantification includes two aspects of detection accuracy
+and alert timeliness. The following subsections detail the metrics used in this paper.
+5.3.1
+Detection accuracy
+Using a threshold, we convert the risk quantification of a potential collision into binary outcomes of “safe” or “unsafe”,
+then use the unsafe outcomes to issue alerts. Depending on whether the alerts correctly warn of a crash or near-crash
+and stay silent during safe interactions, each event has 4 possible counts. Targeting the conflicting object in the danger
+period, a True Positive (TP) issues alerts for at least 0.5 seconds; a False Negative (FN) issues no alerts. For all qualified
+objects other than the conflicting object in their safe periods, True negatives (TNs) issue no alerts; False positives
+(FPs) incorrectly issue alerts. Then counting for all test events, equation (12) defines false negative rate RFN and false
+positive rate RFP; equation (13) defines Precision, Recall, and a combined accuracy score F1.
+RFN =
+FN
+TP + FN,
+RFP =
+FPs
+FPs + TNs.
+(12)
+Precision =
+TP
+TP + FPs,
+Recall =
+TP
+TP + FN,
+F1 = 2Precision · Recall
+Precision + Recall.
+(13)
+5.3.2
+Alert timeliness
+We define Time to Impact (TTI) to measure how early a potential collision is recognised relative to impact time (timpact),
+the moment of physical contact in crashes or the moment of minimum proximity in near-crashes. As a posteriori
+quantity, TTI counts from the last time moment when risk quantification shifts from safe to unsafe until a (near-)crash
+in reality. This is formally defined in equation (14), where Mt is the estimated risk level of a potential collision at
+time t, M ∗is a threshold to distinguish safety. We let M−1 ≤M ∗in case all recorded time moments are estimated as
+unsafe. Without loss of generality, we assume that a larger M indicates a higher risk; the inequalities can be reversed if
+a smaller M indicates higher risk.
+TTI = timpact −max{t | Mt > M ∗, Mt−1 ≤M ∗, t ≤timpact}
+(14)
+For a collective evaluation over test events, we first use PTTI≥1.5, which indicates the percentage of events with
+TTI ≥1.5 s among correctly detected (near-)crashes. The threshold of 1.5 s is motivated by empirical findings that
+human drivers typically require 1 to 1.3 s to respond to an obstacle [71, 72]. As a second measure of alert timeliness,
+we use median time-to-impact across all correctly detected (near-)crashes, denoted by mTTI. Based on the definition
+in equation (14), TTI ≥0 and its maximal value depends on the time period recorded before impact. We thus restrain
+TTI < 10 s when calculating mTTI. To reflect the variation of TTI, we report mTTI [Q1, Q3]; 99%CI, where Q1
+and Q3 are the first and third quartiles, respectively, and 99%CI is the 99% confidence interval obtained via two-sided
+sign test for mTTI. Similar to the accuracy metrics, mTTI and PTTI≥1.5 vary at different alerting thresholds.
+5.3.3
+Performance curves
+Risk quantification must balance the trade-off between desired yet conflicting characteristics at different thresholds.
+For example, a threshold resulting in smaller RFP necessarily increases RFN. Such a threshold also entails higher
+Precision, but lower Recall. Likewise, earlier alerts (i.e., larger TTI) tend to be accompanied by more false positives
+and less accurate detection. Therefore, our evaluation uses three key performance curves to compare different methods
+on a common set of events in the test dataset. Each curve is obtained by varying the threshold that distinguishes risk
+from safety. As summarised in Table 5. Receiver operating characteristic curve (ROC) intuitively presents the trade-off
+between false detection rates; Precision-recall curve (PRC) comprehensively evaluates accuracy performance; and
+Accuracy-timeliness curve (ATC) evaluates timeliness performance under different accuracy levels.
+If a perfect model exists, ROC and PRC have their theoretical optimal points of zero false and all correct detection.
+ATC does not have a theoretical optimum, but we consider a practical optimal point to be the mTTI when F1 is the
+highest, defined as mTTI∗= arg maxTTI F1. Accordingly, we denote the PTTI≥1.5 at this point P ∗
+TTI≥1.5.
+13
+
+
+[PAGE 14]
+Table 5. Performance curves of risk quantification at varying thresholds.
+Performance curve
+Horizontal axis
+Vertical axis
+Optimal point
+Receiver operating characteristic curve (ROC)
+RFP ∈[0, 1]
+1 −RFN = RTP ∈[0, 1]
+In theory, (0, 1)
+Precision-recall curve (PRC)
+Recall ∈[0, 1]
+Precision ∈[0, 1]
+In theory, (1, 1)
+Accuracy-timeliness curve (ATC)
+mTTI ∈[0, 10]
+F1 ∈[0, 1]
+(max F1, mTTI∗)
+5.3.4
+Safety-focused evaluation metrics
+Based on the performance curves, we first use AUPRC, the area under PRC, as a comprehensive metric to assess
+detection accuracy. Here we do not consider the area under ROC, as a method that has a better-performed PRC (i.e., of
+larger AUPRC) necessarily has a larger area under ROC [73]. For timeliness evaluation, we use P ∗
+TTI≥1.5 and mTTI∗
+when F1 is at the highest point on ATC. The larger the values, the earlier the alerts under the optimal detection accuracy.
+Risk alerting of potential collisions is different from normal binary classification problems, as false negatives can cause
+significantly more severe consequences than false positives. To emphasise the high cost of false negatives, we define
+two safety-focused metrics based on ROC and PRC, respectively. The first is AROC
+R
+as defined in equation (15), the
+area under the ROC curve when 1 −RFN is larger than R (i.e., false negative rate is smaller than 1 −R). For easier
+comparison, we normalise the area relative to its maximum possible value 1 −R. The second is PrecisionPRC
+R
+defined
+in equation (16), the highest Precision on the PRC when Recall is larger than R. For both metrics, the larger the value,
+the more accurate a model is, given a necessarily low false negative rate.
+AROC
+R
+=
+1
+1 −R
+Z 1
+R
+(1 −RFP(r)) dr, with r = 1 −RFN
+(15)
+PrecisionPRC
+R
+= max(Precision | Recall ≥R)
+(16)
+To offer an overview, we use AUPRC, AROC
+80% , AROC
+90% , PrecisionPRC
+80% , and PrecisionPRC
+90% to evaluate detection accuracy,
+while P ∗
+TTI≥1.5 and mTTI∗are used for timeliness evaluation. We select the restriction rate R to be 80% and 90%
+to reinforce a focus on safety. Some methods, if they are not safe enough, can have zero area measured by AROC
+80% or
+AROC
+90% , or are not applicable (N/A) when measured by PrecisionPRC
+80% or PrecisionPRC
+90% . For all of the metrics, higher
+values indicate better performance in collision risk quantification.
+6
+Results
+The risk quantification of safety-critical interactions by GSSM is generalised from normal traffic interactions. The
+training of GSSM is on normal interaction data, of which the collection varies in locations and equipment. Then the
+test set contains thousands of crashes and near-crashes where at least 20 seconds are recorded before a safety-critical
+event happens, offering both positive and negative ground truth. In the experiment on Scalability, we use the first-
+stage evaluation results of the 4,875 safety-critical events in the test set, and determine a proportion of 10% to add
+ArgoverseHV data and 100% for highD (see Section 6.2 for the results), as already noted in Table 3. Then the settlement
+of ground truth excludes GSSMs trained on other proportions of data combinations. Out of the 4,875 test events,
+110 crashes and 2,481 near-crashes eventually have their conflicting objects determined. These 2,591 events form a
+reliable evaluation basis for the other experiments on Effectiveness (Section 6.1), Context-awareness (Section 6.3),
+Generalisability (Section 6.4), and Risk attribution (Section 6.5), where the third-stage evaluation results are presented.
+In the reliable set, each of the 2,591 events has a danger period as a positive sample, and 3,777 safe periods with
+different surrounding objects serve as negative samples. These events are considered distinct observations, and every
+method is applied to a single event only once.
+6.1
+Effective risk quantification
+We use Figure 5 and Table 6 to show the effectiveness of GSSM in detection accuracy and alert timeliness. Compared
+with other existing two dimensional surrogate safety measures (2D SSMs), GSSM achieves superior accuracy in
+detecting (near-)crashes, while maintaining relatively stable timeliness of alerts. As is shown by the ROC and PRC in
+Figure 5, the curves of GSSM enclose the curves of all the other methods. This means an absolutely higher accuracy,
+with fewer false positives and false negatives. Regarding alert timeliness, as is seen in Table 6, the percentage of
+early alerts issued 1.5 s in advance and the median time to impact at optimal accuracy (i.e., P ∗
+TTI≥1.5 and mTTI∗) of
+GSSM are slightly lower than those of ACT and TTC2D. But GSSM exhibits a narrower interquartile range and 99%
+confidence interval, indicating more stable performance across events. The accuracy-timeliness curves in Figure 5
+also show that GSSM consistently secures a longer time for collision prevention than the other methods at the same
+accuracy, as indicated by the F1 score, higher than 0.8.
+14
+
+
+[PAGE 15]
+0
+20
+40
+60
+80
+False positive rate (%)
+20
+40
+60
+80
+100
+True positive rate (%)
+Receiver operating characteristic
+curve (ROC)
+40
+60
+80
+100
+Recall (%)
+20
+40
+60
+80
+100
+Precision (%)
+Precision-recall curve
+(PRC)
+1
+2
+3
+4
+Median time to impact (s)
+0.5
+0.6
+0.7
+0.8
+0.9
+F1 score
+Accuracy-timeliness curve
+(ATC)
+Safety-critical
+GSSM
+ACT
+TTC2D
+TAdv
+EI
+Figure 5. Performance curves comparing GSSM and existing two-dimensional surrogate safety measures (2D SSMs). The
+GSSM under comparison is h-C which is trained on the highD data and uses current features. For the other 2D SSMs, TAdv is
+abbreviated for Time Advantage; ACT for Anticipated Collision Time; TTC2D for Two-dimensional Time-to-Collision; and EI for
+Emergency Index. Each method is tested on the same 2,591 safety-critical events, including 2,481 near-crashes and 110 crashes. In
+the ATC plot, the shaded bands represent 99% confidence intervals for median time to impact.
+Table 6. Numeric performance evaluation of GSSM and existing methods. Each method is tested on the same 2,591 safety-critical
+events, including 2,481 near-crashes and 110 crashes. The 99% confidence intervals (CI) of mTTI∗are obtained via two-sided sign
+test. For all of the metrics, higher values indicate better performance. The best value in each column is underlined and marked bold;
+the second-best value is marked bold.
+Method
+AUPRC
+AROC
+80%
+AROC
+90%
+PrecisionPRC
+80%
+PrecisionPRC
+90%
+P ∗
+TTI≥1.5
+mTTI∗[Q1, Q3]; 99%CI
+GSSM
+0.900
+0.817
+0.729
+0.887
+0.814
+0.819
+2.60 [1.80, 3.51]; 2.53–2.65
+ACT
+0.824
+0.721
+0.561
+0.850
+0.795
+0.769
+2.78 [1.63, 3.91]; 2.70–2.88
+TTC2D
+0.818
+0.493
+0.139
+0.865
+0.674
+0.860
+2.83 [1.97, 3.83]; 2.75–2.90
+TAdv
+0.700
+0.584
+0.414
+0.738
+0.640
+0.606
+1.73 [0.99, 2.50]; 1.68–1.78
+EI
+0.842
+0.426
+0.251
+0.706
+0.539
+0.747
+2.26 [1.47, 3.20]; 2.20–2.34
+6.2
+Scalable GSSM training
+Without requiring crashes or manual labels of near-crashes for training, GSSM leverages normal interactions, of which
+the available data is far more abundant. This not only means GSSM learns interaction patterns, but also implies
+effectiveness improvement by feeding more diverse patterns of traffic interactions. Figure 6 illustrates such scalability
+of GSSM in accurately alerting potential collisions. The GSSMs being compared are all trained with instantaneous
+states of road user movement. We use the GSSM trained on the SafeBaseline dataset as a benchmark, and increasingly
+include more data from the crossing interactions in the ArgoverseHV dataset and lane-changes in the highD dataset.
+0
+20
+40
+60
+80
+100
+Additional proportion (%)
+0.6
+0.7
+0.8
+Metric value
+(a) Increasing crossings in ArgoverseHV
+0
+20
+40
+60
+80
+100
+Additional proportion (%)
+0.6
+0.7
+0.8
+(b) Increasing lane changes in highD
+A ROC
+80%
+A ROC
+90%
+PrecisionPRC
+80%PrecisionPRC
+90% AUPRC
+0.6
+0.7
+0.8
+(c) Evaluation on lateral interactions
+S-C
+SA-C
+Sh-C
+SAh-C
+A ROC
+80%
+A ROC
+90%
+PrecisionPRC
+80%
+PrecisionPRC
+90%
+AUPRC
+Figure 6. Variation in risk quantification accuracy of GSSMs trained on different combinations of interaction patterns. (a) Accuracy
+changes when the training data of SafeBaseline are combined with different proportions of ArgoverseHV data, which majorly cover
+crossing and turning interactions at urban intersections. The accuracy evaluations are performed for event types of Crossing/turning
+and Pedestrian/cyclist. (b) Accuracy changes when the training data of SafeBaseline are combined with different proportions of
+highD data, which majorly cover lane-change interactions. The accuracy evaluations are performed for event types of Adjacent lane
+and Merging. (c) Accuracy evaluations with events involving lateral interactions. All the GSSMs being compared use current features.
+The compared models include S-C that is trained on SafeBaseline only, SA-C that combines SafeBaseline and 10% ArgoverseHV,
+Sh-C that combines SafeBaseline and 100% highD, and SAh-C that combines SafeBaseline, 10% ArgoverseHV, and 100% highD.
+Figure 6(a) shows the variation in alerting accuracy as increasing interactions of crossing and turning in ArgoverseHV
+are included; while Figure 6(b) shows a counterpart for gradually including lane-change interactions in highD. A clear
+15
+
+
+[PAGE 16]
+and consistent improvement is seen when more lane changes in highD serve training. As the proportion of ArgoverseHV
+data increases, however, the accuracy metrics are first enhanced and then drop. This is reasonable because crossing and
+turning interactions account for around 13.6% in the test set (see Figure 3). While these interactions are increasingly
+included, the training of GSSM gradually shifts its optimisation direction, which may undermine the patterns learnt
+from the SafeBaseline data.
+Based on Figure 6(a) and 6(b), we consider 10% as the best proportion to include additional data from ArgoverseHV
+and 100% from highD. Then Figure 6(c) compares the enhancement of risk quantification accuracy by including more
+training data in addition to SafeBaseline. It is clearly seen that, to different degrees, incorporating additional lateral
+interaction data improves the detection accuracy of crashes and near-crashes involving lateral interactions. This implies
+exciting future work to obtain more powerful GSSMs by training on larger-scale interaction data.
+6.3
+Context-aware GSSM
+Collision risk is conditioned on interaction context. For example, a usually safe interaction may become unsafe if it is
+raining. As another example, the same speed could be safe on highways while unsafe in urban traffic. Therefore, being
+aware of the context where an interaction happens is important, and GSSM allows for that. Figure 7 compares all the
+evaluation metrics of alerting accuracy and timeliness across GSSMs that consider different contextual information. In
+each plot specific to a metric, we separate two groups of GSSMs. One group does not consider the acceleration of the
+subject vehicle as a current feature, while the other group does. Within each group, we progressively include additional
+features of environmental conditions and historical kinematics.
+0
+0.2
+0.4
+0.6
+0.8
+AUPRC
+0
+0.2
+0.4
+0.6
+0.8
+A ROC
+80%
+0
+0.2
+0.4
+0.6
+0.8
+A ROC
+90%
+0
+0.2
+0.4
+0.6
+0.8
+PrecisionPRC
+80%
+0
+0.2
+0.4
+0.6
+0.8
+PrecisionPRC
+90%
+0
+0.2
+0.4
+0.6
+0.8
+P *
+TTI
+1.5
+0
+0.5
+1.5
+2.5
+mTTI *
+S-C
+S-CE
+S-CET
+S-Ca
+S-CaE
+S-CaET
+Upper and lower 99% confidence intervals (CI)
+Figure 7. Accuracy and timeliness comparison of GSSMs that consider varying contextual information. These GSSMs are all trained
+on SafeBaseline. S-C uses current features only; S-CE uses current and environment features; S-CET uses current, environment, and
+historical kinematic features. The other three, i.e., S-Ca, S-CaE, and S-CaET, additionally consider the instantaneous acceleration of
+the subject vehicle. The 99% confidence intervals (CI) of mTTI∗are obtained via two-sided sign test.
+The GSSMs using only instantaneous motion kinematics serve as baselines for comparisons within each group.
+Additionally using environmental conditions in general achieves better performance in terms of both detection accuracy
+and alert timeliness. This improvement is further enhanced when historical kinematic features are also used. Interestingly,
+including historical kinematics improves alert timeliness more significantly than detection accuracy. This suggests that
+historical kinematics are important to be considered for earlier risk alerts.
+Across groups, the GSSMs that exclude and include the subject vehicle’s instantaneous acceleration are contrasted. As
+is seen in Figure 7, including acceleration does not make improvements, except for AUPRC when historical kinematics
+are considered. This implies that the acceleration provides little additional benefit, probably because it is redundant
+with the historical kinematics, and is also affected by measurement noise and smoothing during trajectory processing.
+6.4
+One GSSM for all interactions
+Driven by naturalistic data, GSSM is expected to learn interaction patterns across scenarios and effectively alert to
+potential collisions in different types of interactions. The crashes and near-crashes we processed from SHRP2 NDS are
+distributed in various types of events, as previously shown in Figure 3. Accordingly, we compare the performance of
+GSSM and other 2D SSMs in these different safety-critical events. For better readability, we provide Table 7 showing
+evaluation metrics, while Appendix Figure A.2 presents the performance curves. Table 7 clearly shows that GSSM is
+significantly more effective in safety-focused detection accuracy across all interaction scenarios. This is particularly
+prominent for the conflicts beyond rear-end. Although the timeliness of GSSM is not always the best, it secures at least
+1.88 seconds to prevent potential collisions in more than 75% cases.
+An interesting observation from Table 7 is the superior performance of GSSM in rear-end and merging interactions.
+These two scenarios of interaction seem to be less challenging than other lateral interactions such as crossing and
+turning. Based on the performance, the most challenging scenarios are interactions with pedestrians, cyclists, and
+16
+
+
+[PAGE 17]
+Table 7. Comparison of detection accuracy and alert timeliness in separate types of safety-critical events. The GSSM under
+comparison is trained on the SafeBaseline dataset and uses contextual information of instantaneous motion kinematics, environmental
+conditions, and historical kinematics in the past 2.5 seconds. The 99% confidence intervals (CI) of mTTI∗are obtained via two-sided
+sign test. For each type of event, the best value in each column is underlined and marked bold; the second-best value is marked bold.
+Event
+Number
+of events
+Method
+AUPRC
+AROC
+80%
+AROC
+90%
+PrecisionPRC
+80%
+PrecisionPRC
+90%
+P ∗
+TTI≥1.5
+mTTI∗[Q1, Q3]; 99%CI
+Rear-end
+1787
+GSSM
+0.858
+0.926
+0.887
+0.952
+0.930
+0.877
+2.53 [1.92, 3.45]; 2.45–2.58
+ACT
+0.869
+0.852
+0.786
+0.881
+0.877
+0.719
+2.28 [1.30, 3.09]; 2.19–2.34
+TTC2D
+0.869
+0.702
+0.452
+0.932
+0.906
+0.856
+2.49 [1.85, 3.26]; 2.43–2.56
+TAdv
+0.726
+0.734
+0.636
+0.798
+0.749
+0.486
+1.44 [0.76, 2.04]; 1.39–1.50
+EI
+0.911
+0.745
+0.562
+0.930
+0.812
+0.730
+2.10 [1.45, 2.88]; 2.02–2.16
+Adjacent lane
+611
+GSSM
+0.771
+0.693
+0.608
+0.702
+0.658
+0.826
+3.38 [1.88, 5.15]; 3.19–3.61
+ACT
+0.685
+0.532
+0.334
+0.683
+0.608
+0.896
+4.67 [2.88, 6.14]; 4.40–4.94
+TTC2D
+0.698
+0.317
+0.000
+0.632
+N/A
+0.848
+3.68 [2.06, 5.38]; 3.36–3.85
+TAdv
+0.588
+0.381
+0.271
+0.512
+0.475
+0.751
+2.38 [1.45, 3.34]; 2.19–2.51
+EI
+0.636
+0.220
+0.042
+0.451
+0.451
+0.851
+3.48 [1.93, 5.50]; 3.33–3.74
+Crossing/turning
+93
+GSSM
+0.747
+0.599
+0.530
+0.755
+0.729
+0.967
+4.85 [3.63, 6.38]; 4.21–5.46
+ACT
+0.735
+0.350
+0.017
+0.792
+0.677
+0.933
+5.16 [3.48, 6.46]; 4.62–5.40
+TTC2D
+0.678
+0.000
+0.000
+N/A
+N/A
+0.950
+4.77 [3.21, 6.33]; 4.32–5.31
+TAdv
+0.714
+0.366
+0.182
+0.731
+0.649
+0.820
+2.90 [2.04, 4.07]; 2.39–3.29
+EI
+0.694
+0.000
+0.000
+N/A
+N/A
+0.934
+4.13 [2.66, 5.71]; 3.30–4.70
+Merging
+29
+GSSM
+0.865
+0.795
+0.719
+0.828
+0.771
+0.889
+5.11 [3.23, 7.30]; 3.58–5.60
+ACT
+0.705
+0.520
+0.225
+0.758
+0.659
+1.000
+5.17 [3.75, 6.80]; 4.52–6.49
+TTC2D
+0.786
+0.000
+0.000
+N/A
+N/A
+0.857
+3.83 [2.17, 4.85]; 2.66–4.23
+TAdv
+0.678
+0.251
+0.000
+0.522
+N/A
+0.727
+2.71 [1.32, 3.87]; 1.52–3.39
+EI
+0.777
+0.286
+0.000
+0.553
+N/A
+0.897
+3.21 [2.12, 4.85]; 2.52–4.43
+With pedestrian/
+cyclist/animal
+31
+GSSM
+0.851
+0.379
+0.313
+0.800
+0.800
+1.000
+5.94 [4.89, 7.16]; 4.89–7.16
+ACT
+0.706
+0.066
+0.000
+0.758
+N/A
+0.966
+5.38 [3.90, 6.54]; 4.20–6.09
+TTC2D
+0.697
+0.000
+0.000
+N/A
+N/A
+0.897
+4.51 [2.31, 5.57]; 2.82–5.14
+TAdv
+0.705
+0.090
+0.005
+0.714
+0.700
+0.806
+3.19 [1.76, 5.34]; 2.39–4.62
+EI
+0.733
+0.000
+0.000
+N/A
+N/A
+0.867
+3.78 [2.48, 5.55]; 2.55–5.36
+animals. This could be because of the less predictable behaviour of these active and flexible road users, but also could
+be because the interaction patterns with them are very limitedly covered in the training data used in this paper.
+6.5
+Attribution of collision risk
+Figure 8 presents the top-ranked factors in different situations when GSSM evaluates an interaction to be safe or not,
+which are respectively considered in safe periods and danger periods as defined in Figure 4. At each time moment in a
+considered period, we calculate the attributions of all features, compare the positive attributions if the considered period
+is safe or negative attributions otherwise, and record the 3 factors with the highest attributions. Then the ranking of the
+most contributing factors is obtained after comparing the features at all time moments. Note that because our feature
+attribution is performed based on the encoded representation rather than raw numbers of variables, the summarised
+attributions indicate relative importance without implying whether an increasing or decreasing value is associated with
+the quantified risk.
+Focusing on what leads to potential collisions in lateral interactions, the left half of Figure 8(a) shows that spacing
+direction, i.e., the angular coordinate of multi-direction spacing as defined in Section 2.3, contributes the most to
+dangers in the adjacent lane, while the historical kinematics in the past 1.5 seconds contribute the most to dangers during
+crossing and turning. Spacing direction is related to relative heading and the surrounding object’s lateral speed, which
+are also ranked high. With not much surprise, relative speed also contributes considerably to potential collision. In
+contrast, the right half of Figure 8(a) shows factors contributing to safe interactions. Relative speed and the surrounding
+object’s lateral speed are the most contributing ones. In addition to them, relatively longer historical kinematics are
+important. These results suggest that relative direction and speed are the main factors for accurate risk quantification.
+Notably, a short movement history of approximately 1.5 seconds is more influential in detecting danger, whereas a
+longer history of around 2.5 seconds provides greater context for perceiving safety in lateral interactions.
+Adverse environments such as precipitation, wet road surfaces, driving at night, or unstable traffic flow are relatively
+infrequent conditions, but may significantly increase the risk of collisions. In Figure 8(b), we present the factors
+contributing to dangers in different adverse environments. The top factors harming safety overlap with rain and when
+the road surface is wet. In both conditions, spacing direction and road surface are ranked as the most important. This
+implies that the collision risk in such situations is highly influenced by the directional control of the involved road users.
+Spacing direction remains highly ranked when considering interactions in the dark as well as in unstable traffic flow.
+The other factors in these two adverse environments resemble those in general interactions in Figure 8(a). Interestingly,
+the widths of interacting road users, i.e., half of the sum of the vehicle widths, play a role in collision risk when the
+traffic flow is unstable. This could be due to relatively restrained road space for safe interactions.
+17
+
+
+[PAGE 18]
+(a) Top factors in leading to and avoiding lateral conflicts
+0.00
+0.05
+0.10
+0.15
+Relative speed
+Squared surrounding object's speed
+Relative heading
+Widths of interacting road users
+Surrounding object's lateral speed
+Spacing direction
+Danger in adjacent lane
+0.00
+0.05
+0.10
+0.15
+Spacing direction
+Kinematics in the passed 2.5 s
+Kinematics in the passed 0.5 s
+Squared relative speed
+Surrounding object's lateral speed
+Relative speed
+Safe in adjacent lane
+0.00
+0.05
+0.10
+0.15
+Frequency of being top 3 factors
+Kinematics in the passed 2.0 s
+Relative speed
+Spacing direction
+Kinematics in the passed 1.5 s
+Kinematics in the passed 1.0 s
+Kinematics in the passed 0.5 s
+Danger during crossing/turning
+0.0
+0.1
+0.2
+Frequency of being top 3 factors
+Kinematics in the passed 0.5 s
+Kinematics in the passed 1.0 s
+Squared relative speed
+Surrounding object's lateral speed
+Relative speed
+Kinematics in the passed 2.5 s
+Safe during crossing/turning
+(b) Top factors in conflicts in adverse environments
+0.0
+0.1
+0.2
+Relative speed
+Weather
+Kinematics in the passed 1.0 s
+Kinematics in the passed 0.5 s
+Road surface
+Spacing direction
+Raining weather
+0.0
+0.1
+0.2
+Surrounding object's lateral speed
+Relative speed
+Kinematics in the passed 1.0 s
+Kinematics in the passed 0.5 s
+Spacing direction
+Road surface
+Not dry road
+0.0
+0.1
+0.2
+Frequency of being top 3 factors
+Relative heading
+Surrounding object's lateral speed
+Kinematics in the passed 1.0 s
+Relative speed
+Kinematics in the passed 0.5 s
+Spacing direction
+Not in daylight
+0.0
+0.1
+0.2
+Frequency of being top 3 factors
+Relative speed
+Widths of interacting road users
+Surrounding object's lateral speed
+Kinematics in the passed 1.0 s
+Kinematics in the passed 0.5 s
+Spacing direction
+Unstable traffic flow
+Figure 8. Top-ranked factors in risk quantification by GSSM. The GSSM used for feature attribution is S-CET, which is trained on
+SafeBaseline and uses current, environment, and historical kinematic features. The threshold used to distinguish danger and safety is
+2.52, which is optimised to achieve the highest Precision for Recall ≥0.85. This threshold means an interaction is considered
+unsafe if its spacing remains minimal for at least 102.52 ≈331 times of observations in the same interaction context. (a) Top-ranked
+factors in leading to and avoiding lateral crashes and near-crashes. (b) Top-ranked factors in crashes and near-crashes happened in
+adverse environments.
+7
+Conclusion and discussion
+We present the generalised surrogate safety measure (GSSM) to proactively quantify the risk of potential traffic collisions
+before they happen. GSSM intends to address the challenges of scalability, context-awareness, and generalisability,
+faced by existing approaches to proactive collision risk quantification. Below, we discuss the main findings.
+• Instead of relying on historical records of crashes or near-crashes, GSSM stably learns from the patterns of
+normal interactions and extrapolates them to safety-critical situations. This allows for scalable improvement
+with increasing amounts of data, as are being collected by automated vehicles, and our results show enhanced
+accuracy in risk quantification by additional lateral interaction patterns.
+• The fundamental assumption made by GSSM is that collision risk emerges if interactions become extreme,
+which is measured by the spacing between road users involved in a specific interaction context. GSSM utilises
+neural networks to approximate such context-conditioned distributions of multi-directional spacing and is
+data-driven. Its risk quantification is thus context-aware by incorporating any potentially helpful information
+as inputs, e.g., instantaneous motion states, weather, road surface condition, lighting, and historical kinematics,
+as we have illustrated.
+• Our results also demonstrate that GSSM is highly generalisable. It achieves superior accuracy and timeliness
+in alerting potential collisions across various interaction scenarios such as rear-end, merging, crossing, turning,
+etc. Impressively but reasonably, GSSM also generalises well from training data to unseen test data, even
+when the training data are collected in different countries and by different equipment. This implies that the
+interaction patterns in urgent conditions, such as crashes and near-crashes, are shared in human behaviour.
+• The attribution of collision risk shows that GSSM correctly utilises the information of weather and road surface
+conditions when it is rainy or when the road is not dry. Importantly, spacing direction has a dominant influence
+in lateral interactions, where short motion histories of around 1.5 seconds help recognise risk and longer
+motion histories of 2.5 seconds are more useful to confirm safety. These findings emphasise the necessity for
+context-aware collision risk quantification to consider diverse factors.
+GSSM is limited by our modelling choices and requires further development and targeted validation in the future.
+First of all, this study focuses on the probability of potential collisions while omitting to consider collision severity or
+time of occurrence, which are important aspects of collision risk. Driven by real-world data, GSSM’s robustness to
+sensor noise, missing values, and small perturbations in the input is not guaranteed, yet our training does not provide
+formal guarantees or certified bounds. The datasets used in this research are carefully processed. To verify GSSM’s
+stability and transferability, especially when extrapolating to extreme behaviours, a larger variety of interaction data
+with multi-source noise and from more different driving cultures will be essential. In addition, richer modalities such
+as vision and language can be incorporated to characterise more informative contexts. This motivates representation
+learning to encode complex context and enable large-scale training in industrial applications. To truly improve traffic
+safety, it is also important to investigate not only correlations but also causal mechanisms between contextual features
+and the estimated risk. We regard GSSM as a starting point toward foundation models for proactive risk quantification
+18
+
+
+[PAGE 19]
+of potential collisions. Before achieving that goal, more real-world training and verification are required to confirm its
+stable effectiveness, quantifiable scalability, explainable context-awareness, and controllable generalisability.
+The implications of such a methodology are broad for both ex ante prevention and ex post analysis of traffic collision
+risk. The most direct benefit is for autonomous driving systems (ADS), given that GSSM can compute for a thousand
+interactions per query within 25 milliseconds. Online, GSSM can provide a time-varying risk signal that serves as a
+safety cost or constraint in motion planning, or as a safety “shield” that warns of potentially unsafe behaviours before
+they are executed. Offline, it can be used to train and validate ADS in safety-critical situations, e.g., by filtering valuable
+training materials, generating or ranking validation scenarios at varying levels of collision risk, and supporting closed-
+loop testing in which high-risk interactions are selectively evaluated. Beyond ADS, GSSM enables civil engineering
+and traffic management use cases: it allows for proactive evaluation and thus data-driven improvement in the safety
+of road designs, operations, and policies. For example, GSSM can help traffic engineers and policy makers detect
+emerging hazards in road networks and mitigate potential accidents before they occur. Altogether, these applications
+contribute to a significant step toward the long-term vision of zero traffic fatalities, via a tool that quantifies and manages
+risk proactively, in any context, at any time.
+Data availability
+The raw data are sourced from two subsets of the SHRP2 Naturalistic Driving Study: “A Study on the Factors That
+Affect the Occurrence of Crashes and Near-Crashes” [58] and “Research of Driver Assistant System” [59]. They can be
+accessed following the instructions at https://github.com/Yiru-Jiao/GSSM. All resulting data in this study are openly
+accessible via 4TU.ResearchData at https://doi.org/10.4121/9caa1e6c-9abd-4e36-ae28-c9ea4542d940 [74].
+Code availability
+The code for this research is open-sourced at https://github.com/Yiru-Jiao/GSSM. A permanent record of the code
+repository by this publication is managed by Zenodo at https://doi.org/10.5281/zenodo.17099863 [75].
+Acknowledgments
+This work is supported by the TU Delft AI Labs programme. The authors acknowledge the use of computational
+resources of the DelftBlue supercomputer, provided by Delft High Performance Computing Centre (https://www.
+tudelft.nl/dhpc).
+We extend our sincere gratitude to the researchers and organisations who collected, created, cleaned, and curated the
+high-quality datasets for research use. We thank Dr. Guopeng Li for his knowledge in neural network training.
+The raw data were accessed under SHRP2 Data Use License SHRP2-DUL-A-5-24-746, issued by the Virginia Tech
+Transportation Institute (VTTI). The findings and conclusions presented here are those of the authors and do not
+necessarily represent the views of VTTI, the Transportation Research Board, the National Academies, or the Federal
+Highway Administration.
+Declaration of generative AI and AI-assisted technologies in the writing process
+During the preparation of this work, the authors used ChatGPT and DeepSeek in order to obtain suggestions for
+readability improvement. No sentence was entirely generated by the generative tools. After using the tools, the authors
+have reviewed and edited the content as needed and take full responsibility for the content of the publication.
+References
+[1]
+Safety and Mobility (SAM) and Social Determinants of Health (SDH). Global status report on road safety 2023.
+Geneva: World Health Organization, 2023.
+[2]
+Department of Economic and Social Affairs. Policies on spatial distribution and urbanization have broad
+impacts on sustainable development. Tech. rep. 2020/2. New York: United Nations, 2020.
+[3]
+Institute for Health Metrics and Evaluation (IHME). Global Burden of Disease Study 2021 (GBD 2021) Results.
+Tech. rep. Seattle, WA: IHME, 2022. URL: https://vizhub.healthdata.org/gbd-results/.
+[4]
+U. N. E. C. for Europe (UNECE). Road traffic fatalities, injuries and accidents involving injury by location.
+URL: https://w3.unece.org/PXWeb2015/pxweb/en/STAT/STAT__40-TRTRANS__01-TRACCIDENTS/
+02_en_TRAcclocation_r.px/ (visited on 03/22/2025).
+19
+
+
+[PAGE 20]
+[5]
+H. Saul, M. Junghans, M. Dotzauer, and K. Gimm. “Online risk estimation of critical and non-critical interactions
+between right-turning motorists and crossing cyclists by a decision tree”. In: Accident Analysis & Prevention
+163 (2021), p. 106449. DOI: 10.1016/j.aap.2021.106449.
+[6]
+E. Papadimitriou, A. Filtness, A. Theofilatos, A. Ziakopoulos, C. Quigley, and G. Yannis. “Review and ranking
+of crash risk factors related to the road infrastructure”. In: Accident Analysis & Prevention 125 (2019), pp. 85–97.
+DOI: 10.1016/j.aap.2019.01.002.
+[7]
+M. D. Jakobsen, K. Glies Vincents Seeberg, M. Møller, P. Kines, P. Jørgensen, L. Malchow-Møller, A. B.
+Andersen, and L. L. Andersen. “Influence of occupational risk factors for road traffic crashes among professional
+drivers: systematic review”. In: Transport Reviews 43.3 (2022), pp. 533–563. DOI: 10.1080/01441647.2022.
+2132314.
+[8]
+W. J. Horrey, M. F. Lesch, M. J. Dainoff, M. M. Robertson, and Y. I. Noy. “On-Board Safety Monitoring Systems
+for Driving: Review, Knowledge Gaps, and Framework”. In: Journal of Safety Research 43.1 (2012), pp. 49–58.
+DOI: 10.1016/j.jsr.2011.11.004.
+[9]
+A. Chang, N. Saunier, and A. Laureshyn. PROACTIVE METHODS FOR ROAD SAFETY ANALYSIS. Tech. rep.
+SAE, 2017. DOI: 10.4271/wp-0005.
+[10]
+A. Arun, M. M. Haque, S. Washington, T. Sayed, and F. Mannering. “A systematic review of traffic conflict-based
+safety measures with a focus on application context”. In: Analytic Methods in Accident Research 32 (2021),
+p. 100185. DOI: 10.1016/j.amar.2021.100185.
+[11]
+C. Wang, Y. Xie, H. Huang, and P. Liu. “A review of surrogate safety measures and their applications in
+connected and automated vehicles safety modeling”. In: Accident Analysis and Prevention 157 (2021), p. 106157.
+DOI: 10.1016/j.aap.2021.106157.
+[12]
+L. Westhofen, C. Neurohr, T. Koopmann, M. Butz, B. Schütt, F. Utesch, B. Neurohr, C. Gutenkunst, and E. Böde.
+“Criticality metrics for automated driving: A review and suitability analysis of the state of the art”. In: Archives
+of Computational Methods in Engineering 30.1 (2022), pp. 1–35. DOI: 10.1007/s11831-022-09788-7.
+[13]
+P. Cooper. “Reports from group discussions”. In: Proceedings of the first workshop on traffic conflicts. Oslo,
+Norway, Sept. 1977.
+[14]
+J. C. Hayward. “Near miss determination through use of a scale of danger”. In: 51st Annual Meeting of the
+Highway Research Board 384 (1972), pp. 24–34.
+[15]
+D. F. Cooper and N. Ferguson. “Traffic studies at T-junctions – A conflict simulation record”. In: Traffic
+Engineering and Control 17 (7 1976), pp. 306–309.
+[16]
+J. Wang, J. Wu, and Y. Li. “The Driving Safety Field Based on Driver–Vehicle–Road Interactions”. In: IEEE
+Transactions on Intelligent Transportation Systems 16.4 (2015), pp. 2203–2214. DOI: 10.1109/TITS.2015.
+2401837.
+[17]
+F. A. Mullakkal-Babu, M. Wang, X. He, B. van Arem, and R. Happee. “Probabilistic field approach for motorway
+driving risk assessment”. In: Transportation Research Part C: Emerging Technologies 118 (2020), p. 102716.
+DOI: 10.1016/j.trc.2020.102716.
+[18]
+S. Kolekar, J. de Winter, and D. Abbink. “Human-like driving behaviour emerges from a risk-based driver
+model”. In: Nature Communications 11.1 (2020), p. 4850. DOI: 10.1038/s41467-020-18353-4.
+[19]
+E. Papadimitriou. Road safety thematic report – Main factors causing fatal crashes. Tech. rep. Brussels:
+Directorate General for Transport, European Commission, 2024.
+[20]
+A. K. Dey. “Understanding and using context”. In: Personal and Ubiquitous Computing 5.1 (2001), pp. 4–7.
+DOI: 10.1007/s007790170019.
+[21]
+S. Lefèvre, D. Vasquez, and C. Laugier. “A survey on motion prediction and risk assessment for intelligent
+vehicles”. In: ROBOMECH Journal 1.1 (2014). DOI: 10.1186/s40648-014-0001-z.
+[22]
+J. Dahl, G. R. de Campos, C. Olsson, and J. Fredriksson. “Collision Avoidance: A Literature Review on
+Threat-Assessment Techniques”. In: IEEE Transactions on Intelligent Vehicles 4.1 (2019), pp. 101–113. DOI:
+10.1109/TIV.2018.2886682.
+[23]
+M. Althoff and J. M. Dolan. “Online Verification of Automated Road Vehicles Using Reachability Analysis”. In:
+IEEE Transactions on Robotics 30.4 (2014), pp. 903–918. DOI: 10.1109/TRO.2014.2312453.
+[24]
+J. Kim and D. Kum. “Collision Risk Assessment Algorithm via Lane-Based Probabilistic Motion Prediction of
+Surrounding Vehicles”. In: IEEE Transactions on Intelligent Transportation Systems 19.9 (2018), pp. 2965–2976.
+DOI: 10.1109/TITS.2017.2768318.
+20
+
+
+[PAGE 21]
+[25]
+F. B. Mathiesen, L. Romao, S. C. Calvert, L. Laurenti, and A. Abate. “A data-driven approach for safety
+quantification of non-linear stochastic systems with unknown additive noise distribution”. In: arXiv (2024),
+preprint at https://arxiv.org/abs/2410.06662.
+[26]
+R. McAllister, Y. Gal, A. Kendall, M. Van Der Wilk, A. Shah, R. Cipolla, and A. Weller. “Concrete problems for
+autonomous vehicle safety: advantages of Bayesian deep learning”. In: Proceedings of the 26th International
+Joint Conference on Artificial Intelligence. Melbourne, Australia, 2017, pp. 4745–4753.
+[27]
+D. Li, B. Liu, Z. Huang, Q. Hao, D. Zhao, and B. Tian. “Safe Motion Planning for Autonomous Vehicles
+by Quantifying Uncertainties of Deep Learning-Enabled Environment Perception”. In: IEEE Transactions on
+Intelligent Vehicles 9.1 (2024), pp. 2318–2332. DOI: 10.1109/TIV.2023.3297735.
+[28]
+H. Kataoka, T. Suzuki, S. Oikawa, Y. Matsui, and Y. Satoh. “Drive Video Analysis for the Detection of Traffic
+Near-Miss Incidents”. In: 2018 IEEE International Conference on Robotics and Automation (ICRA). 2018,
+pp. 3421–3428. DOI: 10.1109/ICRA.2018.8460812.
+[29]
+J. Fang, J. Qiao, J. Xue, and Z. Li. “Vision-Based Traffic Accident Detection and Anticipation: A Survey”. In:
+IEEE Transactions on Circuits and Systems for Video Technology 34.4 (2024), pp. 1983–1999. DOI: 10.1109/
+TCSVT.2023.3307655.
+[30]
+P. Patera, Y.-T. Chen, and W.-H. Fang. “A Multi-modal Architecture with Spatio-Temporal-Text Adaptation for
+Video-based Traffic Accident Anticipation”. In: IEEE Transactions on Circuits and Systems for Video Technology
+(2025). DOI: 10.1109/tcsvt.2025.3552895.
+[31]
+Y. Kumamoto, K. Ohtani, D. Suzuki, M. Yamataka, and K. Takeda. “AAT-DA: Accident Anticipation Transformer
+with Driver Attention”. In: Proceedings of the Winter Conference on Applications of Computer Vision (WACV)
+Workshops. Feb. 2025, pp. 1142–1151.
+[32]
+H. X. Liu and S. Feng. “Curse of rarity for autonomous vehicles”. In: Nature Communications 15.1 (2024),
+p. 4808. DOI: 10.1038/s41467-024-49194-0.
+[33]
+P. Thomas, A. Morris, R. Talbot, and H. Fagerlind. “Identifying the causes of road crashes in Europe”. In: AAAM
+57th Annual Conference. Vol. 57. Quebec City, 2013.
+[34]
+J. Wang, Y. Zheng, X. Li, C. Yu, K. Kodaka, and K. Li. “Driving risk assessment using near-crash database
+through data mining of tree-based model”. In: Accident Analysis & Prevention 84 (2015), pp. 54–64. DOI:
+10.1016/j.aap.2015.07.007.
+[35]
+R. Nahata, D. Omeiza, R. Howard, and L. Kunze. “Assessing and Explaining Collision Risk in Dynamic
+Environments for Autonomous Driving Safety”. In: 2021 IEEE International Intelligent Transportation Systems
+Conference (ITSC). 2021, pp. 223–230. DOI: 10.1109/ITSC48978.2021.9564966.
+[36]
+J. Chen, Q. Zhang, J. Chen, J. Wang, Z. Fang, Y. Liu, and G. Yin. “A Driving Risk Assessment Framework Con-
+sidering Driver’s Fatigue State and Distraction Behavior”. In: IEEE Transactions on Intelligent Transportation
+Systems 25.12 (2024), pp. 20120–20136. DOI: 10.1109/TITS.2024.3446832.
+[37]
+Y. Yao, M. Xu, Y. Wang, D. J. Crandall, and E. M. Atkins. “Unsupervised Traffic Accident Detection in First-
+Person Videos”. In: IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS). 2019. DOI:
+10.1109/IROS40897.2019.8967556.
+[38]
+J. Fang, J. Qiao, J. Bai, H. Yu, and J. Xue. “Traffic Accident Detection via Self-Supervised Consistency Learning
+in Driving Scenarios”. In: IEEE Transactions on Intelligent Transportation Systems 23.7 (2022), pp. 9601–9614.
+DOI: 10.1109/TITS.2022.3157254.
+[39]
+Y. Yao, X. Wang, M. Xu, Z. Pu, Y. Wang, E. Atkins, and D. Crandall. “DoTA: Unsupervised detection of traffic
+anomaly in driving videos”. In: IEEE transactions on pattern analysis and machine intelligence (2022). DOI:
+10.1109/TPAMI.2022.3150763.
+[40]
+C. Li, Y. Qian, C. Sun, W. Yan, C. Wang, and M. Yang. “TTC4MCP: Monocular Collision Prediction Based
+on Self-Supervised TTC Estimation”. In: 2023 IEEE/RSJ International Conference on Intelligent Robots and
+Systems (IROS). 2023, pp. 244–250. DOI: 10.1109/IROS55552.2023.10341966.
+[41]
+C. Hydén. “The development of a method for traffic safety evaluation: The Swedish Traffic Conflicts Technique”.
+PhD thesis. Lund University, 1987.
+[42]
+A. Laureshyn, Svensson, and C. Hydén. “Evaluation of traffic safety, based on micro-level behavioural data:
+Theoretical framework and first implementation”. In: Accident Analysis & Prevention 42.6 (2010), pp. 1637–
+1646. DOI: 10.1016/j.aap.2010.03.021.
+[43]
+W. Schiff and M. L. Detwiler. “Information used in judging impending collision”. In: Perception 8.6 (1979),
+pp. 647–658. DOI: 10.1068/p080647.
+21
+
+
+[PAGE 22]
+[44]
+K. H. Teigen. “The proximity heuristic in judgments of accident probabilities”. In: British Journal of Psychology
+96.4 (2005), pp. 423–440. DOI: 10.1348/000712605x47431.
+[45]
+F. Camara and C. Fox. “Space invaders: pedestrian proxemic utility functions and trust zones for autonomous
+vehicle interactions”. In: International Journal of Social Robotics 13 (2020), pp. 1929–1949. DOI: 10.1007/
+s12369-020-00717-x.
+[46]
+Y. Jiao, S. C. Calvert, S. van Cranenburgh, and H. van Lint. “A Unified Probabilistic Approach to Traffic Conflict
+Detection”. In: Analytic Methods in Accident Research 45 (2025), p. 100369. DOI: 10.1016/j.amar.2024.
+100369.
+[47]
+Y. Jiao, S. C. Calvert, S. van Cranenburgh, and H. van Lint. “Inferring vehicle spacing in urban traffic from
+trajectory data”. In: Transportation Research Part C: Emerging Technologies 155 (Oct. 2023), p. 104289. DOI:
+10.1016/j.trc.2023.104289.
+[48]
+Q. Meng and X. Qu. “Estimation of rear-end vehicle crash frequencies in urban road tunnels”. In: Accident
+Analysis and Prevention 48 (2012), pp. 254–263. DOI: 10.1016/j.aap.2012.01.025.
+[49]
+D. S. Pawar and G. R. Patil. “Critical gap estimation for pedestrians at uncontrolled mid-block crossings on
+high-speed arterials”. In: Safety Science 86 (2016), pp. 295–303. DOI: 10.1016/j.ssci.2016.03.011.
+[50]
+N. Anwari, M. Abdel-Aty, A. Goswamy, and O. Zheng. “Investigating surrogate safety measures at midblock
+pedestrian crossings using multivariate models with roadside camera data”. In: Accident Analysis and Prevention
+192 (2023), p. 107233. DOI: 10.1016/j.aap.2023.107233.
+[51]
+G. Erion, J. D. Janizek, P. Sturmfels, S. M. Lundberg, and S.-I. Lee. “Improving performance of deep learning
+models with axiomatic attribution priors and expected gradients”. In: Nature Machine Intelligence 3.7 (2021),
+pp. 620–631. DOI: 10.1038/s42256-021-00343-w.
+[52]
+M. Sundararajan, A. Taly, and Q. Yan. “Axiomatic Attribution for Deep Networks”. In: Proceedings of the 34th
+International Conference on Machine Learning (ICML). Vol. 70. 2017, pp. 3319–3328.
+[53]
+F.-H. Chan, Y.-T. Chen, Y. Xiang, and M. Sun. “Anticipating accidents in dashcam videos”. In: Asian Conference
+on Computer Vision. 2016, pp. 136–153.
+[54]
+A. P. Shah, J.-B. Lamare, T. Nguyen-Anh, and A. Hauptmann. “CADP: A Novel Dataset for CCTV Traffic
+Camera based Accident Analysis”. In: 2018 15th IEEE International Conference on Advanced Video and Signal
+Based Surveillance (AVSS). 2018, pp. 1–9. DOI: 10.1109/AVSS.2018.8639160.
+[55]
+W. Bao, Q. Yu, and Y. Kong. “Uncertainty-based Traffic Accident Anticipation with Spatio-Temporal Relational
+Learning”. In: ACM Multimedia Conference. May 2020. DOI: 10.1145/3394171.3413827.
+[56]
+J. Fang, D. Yan, J. Qiao, J. Xue, H. Wang, and S. Li. “DADA-2000: Can Driving Accident be Predicted by
+Driver Attentionƒ Analyzed by A Benchmark”. In: 2019 IEEE Intelligent Transportation Systems Conference
+(ITSC). 2019, pp. 4303–4309. DOI: 10.1109/ITSC.2019.8917218.
+[57]
+J. Fang, D. Yan, J. Qiao, J. Xue, and H. Yu. “DADA: Driver Attention Prediction in Driving Accident Scenarios”.
+In: IEEE Transactions on Intelligent Transportation Systems 23.6 (2022), pp. 4959–4971. DOI: 10.1109/TITS.
+2020.3044678.
+[58]
+E. Sears, M. A. Perez, K. Dan, T. Shimamiya, T. Hashimoto, M. Kimura, S. Yamada, and T. Seo. A Study on
+the Factors That Affect the Occurrence of Crashes and Near-Crashes. Tech. rep. Version V2. VTTI, 2019. DOI:
+10.15787/VTT1/FQLUWZ. URL: https://doi.org/10.15787/VTT1/FQLUWZ.
+[59]
+C. K. Layman, M. A. Perez, T. Sugino, and J. Eggert. Research of Driver Assistant System. Tech. rep. Version V3.
+VTTI, 2019. DOI: 10.15787/VTT1/DEDACT. URL: https://doi.org/10.15787/VTT1/DEDACT.
+[60]
+J. M. Hankey, M. A. Perez, and J. A. McClafferty. Description of the SHRP 2 Naturalistic Database and the
+Crash, Near-Crash, and Baseline Data Sets. Tech. rep. Virginia Tech Transportation Institute, 2016.
+[61]
+Y. Jiao and S. Calvert. Bird’s eye view trajectory reconstruction of naturalistic crashes and near-crashes in the
+SHRP2 NDS. Tech. rep. Version V1. VTTI, 2025. DOI: 10.15787/VTT1/EFYEJR.
+[62]
+B. Wilson, W. Qi, T. Agarwal, J. Lambert, J. Singh, S. Khandelwal, B. Pan, R. Kumar, A. Hartnett, J. K. Pontes,
+D. Ramanan, P. Carr, and J. Hays. “Argoverse 2: Next Generation Datasets for Self-Driving Perception and
+Forecasting”. In: Thirty-fifth Conference on Neural Information Processing Systems Datasets and Benchmarks
+Track (Round 2). 2021. URL: https://openreview.net/forum?id=vKQGe36av4k.
+[63]
+G. Li, Y. Jiao, S. C. Calvert, and J. ( van Lint. “Lateral conflict resolution data derived from Argoverse-2:
+Analysing safety and efficiency impacts of autonomous vehicles at intersections”. In: Transportation Research
+Part C: Emerging Technologies 167 (2024), p. 104802. DOI: 10.1016/j.trc.2024.104802.
+22
+
+
+[PAGE 23]
+[64]
+R. Krajewski, J. Bock, L. Kloeker, and L. Eckstein. “The highD Dataset: A drone dataset of naturalistic vehicle
+trajectories on German highways for validation of highly automated driving systems”. In: IEEE 21st International
+Conference on Intelligent Transportation Systems (ITSC). Maui, HI, United States, Nov. 2018, pp. 2118–2125.
+DOI: 10.1109/itsc.2018.8569552.
+[65]
+H. Guo, K. Xie, and M. Keyvan-Ekbatani. “Modeling driver’s evasive behavior during safety–critical lane
+changes: Two-dimensional time-to-collision and deep reinforcement learning”. In: Accident Analysis & Preven-
+tion 186 (2023), p. 107063. DOI: 10.1016/j.aap.2023.107063.
+[66]
+S. P. Venthuruthiyil and M. Chunchu. “Anticipated Collision Time (ACT): A two-dimensional surrogate safety
+indicator for trajectory-based proactive safety assessment”. In: Transportation Research Part C: Emerging
+Technologies 139 (2022), p. 103655. DOI: 10.1016/j.trc.2022.103655.
+[67]
+H. Cheng, Y. Jiang, H. Zhang, K. Chen, H. Huang, S. Xu, J. Wang, and S. Zheng. “Emergency Index (EI): A
+two-dimensional surrogate safety measure considering vehicles’ interaction depth”. In: Transportation Research
+Part C: Emerging Technologies 171 (2025), p. 104981. DOI: 10.1016/j.trc.2024.104981.
+[68]
+J. Eggert and T. Puphal. “Continuous risk measures for ADAS and AD”. In: Future Active Safety Technology
+Symposium. 2017.
+[69]
+T. Puphal, M. Probst, and J. Eggert. “Probabilistic uncertainty-aware risk spot detector for naturalistic driving”.
+In: IEEE Transactions on Intelligent Vehicles 4.3 (2019), pp. 406–415. DOI: 10.1109/tiv.2019.2919465.
+[70]
+E. de Gelder, K. Adjenughwure, J. Manders, R. Snijders, J.-P. Paardekooper, O. Op den Camp, A. Tejada,
+and B. De Schutter. “PRISMA: A novel approach for deriving probabilistic surrogate safety measures for risk
+evaluation”. In: Accident Analysis & Prevention 192 (2023), p. 107273. DOI: 10.1016/j.aap.2023.107273.
+[71]
+H. Summala. “Brake reaction times and driver behavior analysis”. In: Transportation Human Factors 2.3 (Sept.
+2000), pp. 217–226. DOI: 10.1207/sthf0203\_2.
+[72]
+G. Markkula, J. Engström, J. Lodin, J. Bärgman, and T. Victor. “A farewell to brake reaction times? Kinematics-
+dependent brake response in naturalistic rear-end emergencies”. In: Accident Analysis and Prevention 95 (Oct.
+2016), pp. 209–226. DOI: 10.1016/j.aap.2016.07.007.
+[73]
+J. Davis and M. Goadrich. “The relationship between Precision-Recall and ROC curves”. In: Proceedings of the
+23rd international conference on Machine learning. 2006, pp. 233–240.
+[74]
+Y. Jiao, S. Calvert, S. van Cranenburgh, and H. van Lint. Data underlying the publication: Learning collision
+risk proactively from naturalistic driving data at scale. 2025. DOI: 10.4121/9caa1e6c-9abd-4e36-ae28-
+c9ea4542d940.
+[75]
+Y. Jiao. Yiru-Jiao/GSSM: First official release. Version 12Nov2025. 2025. DOI: 10.5281/zenodo.17591050.
+[76]
+D. E. Rumelhart, G. E. Hinton, and R. J. Williams. “Learning representations by back-propagating errors”. In:
+Nature 323 (1986), pp. 533–536. DOI: 10.1038/323533a0.
+[77]
+S. Hochreiter and J. Schmidhuber. “Long Short-Term Memory”. In: Neural Computation 9.8 (1997), pp. 1735–
+1780. DOI: 10.1162/neco.1997.9.8.1735.
+[78]
+A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin. “Attention
+is All you Need”. In: Advances in Neural Information Processing Systems. Ed. by I. Guyon, U. V. Luxburg,
+S. Bengio, H. Wallach, R. Fergus, S. Vishwanathan, and R. Garnett. Vol. 30. 2017.
+[79]
+Y. Lecun, L. Bottou, Y. Bengio, and P. Haffner. “Gradient-based learning applied to document recognition”. In:
+Proceedings of the IEEE 86.11 (1998), pp. 2278–2324. DOI: 10.1109/5.726791.
+[80]
+D. Hendrycks and K. Gimpel. “Gaussian error linear units (GELUs)”. In: arXiv (2016), preprint at https:
+//arxiv.org/abs/1606.08415.
+[81]
+F. X. X. Yu, A. T. Suresh, K. M. Choromanski, D. N. Holtmann-Rice, and S. Kumar. “Orthogonal Random
+Features”. In: Advances in Neural Information Processing Systems. Ed. by D. Lee, M. Sugiyama, U. Luxburg,
+I. Guyon, and R. Garnett. Vol. 29. 2016.
+23
+
+
+[PAGE 24]
+Appendix
+A.1
+SHRP2 trajectory reconstruction error
+Figure A.1 shows the error distributions of bird’s eye view reconstruction of the trajectories derived in the Second
+Strategic Highway Research Program’s (SHRP2) Naturalistic Driving Study (NDS). These include the root mean
+squared error (RMSE) in subject speed, subject yaw rate, subject acceleration, and object speed, as well as the mean
+absolute error (MAE) of object displacement. The errors are evaluated for each event in the categories of crashes,
+near-crashes, and safe baselines.
+0.0
+0.2
+0.4
+Speed RMSE (m/s)
+Probability density
+=0.08
+=0.06
+=0.07
+=0.12
+=0.04
+=0.02
+Subject speed
+0.000
+0.001
+0.002
+Yaw RMSE (rad/s)
+=0.00054
+=0.00071
+=0.00028
+=0.00043
+=0.00020
+=0.00032
+Subject yaw rate
+0.0
+0.5
+1.0
+Acceleration RMSE (m/s2)
+=0.20
+=0.13
+=0.15
+=0.05
+=0.07
+=0.04
+Subject acceleration
+0
+1
+2
+Displacement MAE (m)
+=0.54
+=0.53
+=0.34
+=0.37
+=0.56
+=0.73
+Object displacement
+0.0
+0.5
+1.0
+Speed RMSE (m/s)
+=0.20
+=0.14
+=0.16
+=0.13
+=0.14
+=0.13
+Object speed
+Crashes
+Near-crashes
+Safe baselines
+Figure A.1. Reconstruction error distributions of crashes, near crashes, and safe baselines in the SHRP2 NDS. The mean values (µ)
+and standard deviations (σ) are marked in each plot.
+A.2
+Contextual information details
+As explained in Section 3.2, this study considers 3 categories of contextual information: current features (XC) including
+the instantaneous states of interacting road users, categorical environment features (XE) of external conditions during
+the interaction, and historical kinematic features (XT ) composed of time-series speeds and yaw rates within the past 2.5
+seconds. Table A.1 provides a detailed list of these contextual features used in this study, as well as their encoding unit.
+A.3
+Neural network architecture
+Out of the aim of validating the generalised surrogate safety measure (GSSM) rather than looking for the most powerful
+architecture, our neural networks are relatively simple for computational convenience. As mentioned in Section 3.2, we
+have 3 encoders and 1 decoder. The encoders for current features (XC) and environment features (XE) are multi-layer
+perceptrons (MLPs, [76]), while the encoder for historical kinematic features (XT ) uses a single-layer long short-term
+memory (LSTM, [77]) recurrent neural network. The encoded representation groups are then concatenated and passed
+to the decoder, which uses the attention mechanism [78] to capture inter-feature relations and convolutional neural
+networks (CNN, [79]) for intra-feature relations. Throughout the model, we use the activation function of Gaussian
+error linear units (GELU, [80]). More descriptive details are as follows, while implementation details are referred to in
+our open-sourced repository.
+To ensure that feature attributions are meaningful, we design the encoders to let each attribution unit (a representation
+vector) carry independent information from the others. Aligned with Table A.1, each scalar feature in XC is mapped to
+its own representation vector. The categorical features in XE are first one-hot encoded and grouped into four chunks
+(weather, lighting, road surface, and traffic density), and each chunk is then mapped to a separate representation vector.
+For XC and XE, we use MLP encoders with 5 and 4 linear layers, respectively. The temporal features XT are encoded
+into five representation vectors corresponding to the past 0.5, 1, 1.5, 2, and 2.5 seconds. Concretely, we reverse the
+time steps in the 2.5-second history and feed the reversed sequence into a single-layer unidirectional LSTM. From the
+resulting output sequence, we take five representations at 0.5-second intervals, so that each one encodes the kinematic
+features within 0.5, 1, 1.5, 2, and 2.5 seconds closest to the current moment.
+To enrich and regularise the latent representation, we append a set of orthogonal Gaussian random features [81] which
+are deterministic and unique for a sequence of representation vectors. Seeing the encoded and enriched vectors as
+tokens of different contextual information, we design the decoder to capture both global and local relations of the tokens.
+We first use batch normalisation to align the ranges of all feature dimensions, and then stack 6 self-attention blocks, in
+each of which the feed-forward network has 2 linear layers. Next, we apply a CNN with 2 layers of convolution and a
+kernel size of 3. Lastly, we use two separate 3-layer MLPs to output the targeted parameters µ and log(σ2).
+24
+
+
+[PAGE 25]
+Table A.1. Contextual information considered in this study.
+Category
+Attribution unit
+Feature(s)
+XC
+Per each feature
+{li, lj,
+wi+wj
+2
+, |vi|, xvj, yvj, |vi|2, |vj|2, |vij|2, |vij|sgn(∆v), Ahj, ρij}t=0, optional ai,t=0
+XE
+Lighting condition
+Darkeness (lighted),
+darkness (not lighted),
+dawn,
+daylight,
+dusk,
+unknown.
+Weather condition
+No adverse conditions,
+fog,
+mist/light rain,
+rain and fog,
+raining, sleeting,
+snow/sleet and fog,
+snowing,
+unknown.
+Road surface
+Dry,
+gravel over asphalt,
+gravel/dirt road,
+icy,
+muddy,
+snowy,
+wet,
+unknown.
+Traffic density
+LOS A1: free flow, no lead traffic,
+LOS A2: free flow, leading traffic present,
+LOS B: flow with some restrictions,
+LOS C: stable flow, manoeuvrability and speed are more restricted,
+LOS D: unstable flow - temporary restrictions substantially slow driver,
+LOS E: flow is unstable, vehicles are unable to pass, temporary stoppages, etc.,
+LOS F: forced traffic flow with low speeds and traffic volumes that are below capacity,
+unknown.
+XT
+In the passed 0.5 s
+{ωi, |vi|, xvj, yvj}t∈{−0.5,−0.4,...,−0.1}
+In the passed 1 s
+{ωi, |vi|, xvj, yvj}t∈{−1.0,−0.9,...,−0.1}
+In the passed 1.5 s
+{ωi, |vi|, xvj, yvj}t∈{−1.5,−1.4,...,−0.1}
+In the passed 2 s
+{ωi, |vi|, xvj, yvj}t∈{−2.0,−1.9,...,−0.1}
+In the passed 2.5 s
+{ωi, |vi|, xvj, yvj}t∈{−2.5,−2.4,...,−0.1}
+Note: for two interacting road users i and j, their yaw rates, velocities, lengths, widths, and headings are denoted by ω ∈[−π, π],
+v, l, w, and h; the motion states are in a local coordinate system with the origin at the position of i and y-axis oriented along the
+velocity direction of i; sgn(∆v) = sgn(|vi| −|vj|); Ah ∈[−π, π] denotes the angle between the heading direction and the y-axis;
+ρij ∈[−π, π] is the angle in the polar coordinates of multi-directional spacing.
+A.4
+Hyperparameter settings
+The performance of GSSM depends on a number of implementation choices such as learning-rate schedules, batch
+sizes, and regularisation strengths. To ensure transparency and reproducibility, we report a full set of hyperparameters
+used in the experiments in Table A.2.
+A.5
+Computation efficiency
+As reported in Table 3, a GSSM has 773,286 parameters if the input context has XC only; when both XC and XE are
+considered, there are 857,486 parameters; if XT is also included, the number of parameters becomes 885,664. The
+dominant part of the parameters is of the decoder, correspondingly accounting for 95.92%, 87.46%, and 85.83% of all
+parameters in a model. Such a model with fewer than 0.9 million parameters is fairly small for modern deep learning.
+To quantify the computational cost, we further report the training time and inference time for the different GSSM
+variants alongside other existing methods for comparison. Note that we implement TTC2D, ACT and TAdv in a
+vectorised form for efficient large-scale evaluation. In contrast, EI is used as provided by its authors, as its formulation
+does not readily admit the same level of vectorisation. Altogether, these results show that the proposed GSSM achieves
+competitive computational efficiency while providing substantially richer, context-aware risk estimates.
+25
+
+
+[PAGE 26]
+Table A.2. Hyperparameters set in this paper’s experiments.
+Hyperparameter
+Definition
+Value
+Random seed
+Number that controls generation of pseudo-random values
+131
+Small value threshold
+Threshold to consider a value smaller than it to be near zero
+1e-6
+Representation dimension
+Number of variables in a piece of encoded representation
+64
+Perturbation noise
+Standard deviation of the added Gaussian noise
+1% of variable range
+Max. epochs
+Maximum epochs of training
+150
+Batch size
+Number of samples used per update during model training
+512
+Initial learning rate
+Learning rate at the beginning of model training
+1e-4
+Dropout
+Probability for each value in a tensor to be set to 0
+0.2
+A.6
+Performance curves in different interactions
+Corresponding to Table 7, Figure A.2 shows the performance curves to compare GSSM and other two-dimensional
+surrogate safety measures (2D SSMs) in different types of interactions. The curves are less smooth for interactions of
+merging and with pedestrian/cyclist/animal because of the small number of test events.
+(a) Event type distribution
+1787
+69.0%
+611
+23.6%
+193
+7.4%
+Rear-end
+Adjacent lane
+Other lateral
+116
+29
+17
+11
+8 6 42
+Turning&Crossing
+Merging
+Pedestrian
+Parked
+Cyclist
+Animal
+Oncoming
+Unknown
+(b) ROC curves
+0
+20 40 60 80
+40
+60
+80
+100
+True positive rate (%)
+Rear-end
+0
+20 40 60 80
+40
+60
+80
+100
+Adjacent lane
+False Positive Rate (%)
+40
+60
+80
+100 Crossing/turning
+0
+20 40 60 80
+40
+60
+80
+100
+Merging
+0
+20 40 60 80
+40
+60
+80
+100
+With pedestrian/
+cyclist/animal
+(c) PRC curves
+20 40 60 80 100
+40
+60
+80
+100
+Precision (%)
+20 40 60 80 100
+40
+60
+80
+100
+Recall (%)
+40
+60
+80
+100
+20 40 60 80 100
+40
+60
+80
+100
+20 40 60 80 100
+40
+60
+80
+100
+(d) ATC curves
+1
+2
+3
+4
+0.5
+0.6
+0.7
+0.8
+0.9
+F1 score
+1
+2
+3
+4
+0.5
+0.6
+0.7
+0.8
+0.9
+Median time to impact (s)
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+2
+3
+4
+0.5
+0.6
+0.7
+0.8
+0.9
+1
+2
+3
+4
+0.5
+0.6
+0.7
+0.8
+0.9
+Safety-critical
+GSSM
+ACT
+TTC2D
+Figure A.2. Performance comparison of GSSM and other 2D SSMs in alerting different types of safety-critical events. The GSSM
+under comparison is S-CET, which is trained on SafeBaseline and uses contextual information of current features, environment
+features, and historical kinematic features. (a) Types of the crashes and near-crashes with determined ground truth. (b) Receiver
+operating characteristic curves for different types of events. (c) Precision-recall curves for different types of events. (d) Accuracy-
+timeliness curves for different types of events.
+26

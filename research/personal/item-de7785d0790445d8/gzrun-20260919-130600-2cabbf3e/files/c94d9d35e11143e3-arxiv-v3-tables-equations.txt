@@ -1,0 +1,155 @@
+[S2.E1] $\mathrm{GSSM}(s,X)=\log_{10}\left[\frac{\ln 0.5}{\ln(\Pr(S>s|X))}\right]$ (1)
+
+[] $\mathrm{GSSM}(s,X)=\log_{10}\left[\frac{\ln 0.5}{\ln(\Pr(S>s|X))}\right]$ (1)
+
+[S2.E2] $\displaystyle\left[\begin{matrix}x_{ij}\\
+y_{ij}\end{matrix}\right]$ $\displaystyle=\frac{1}{\sqrt{x_{\mathrm{axis}}^{2}+y_{\mathrm{axis}}^{2}}}\left[\begin{matrix}y_{\mathrm{axis}}&-x_{\mathrm{axis}}\\
+x_{\mathrm{axis}}&y_{\mathrm{axis}}\end{matrix}\right]+\left(\left[\begin{matrix}x_{j}\\
+y_{j}\end{matrix}\right]-\left[\begin{matrix}x_{i}\\
+y_{i}\end{matrix}\right]\right);$ (2) $\displaystyle(x_{\mathrm{axis}},y_{\mathrm{axis}})$ $\displaystyle=\begin{cases}(x_{\boldsymbol{v}_{i}}-x_{\boldsymbol{v}_{j}},y_{\boldsymbol{v}_{i}}-y_{\boldsymbol{v}_{j}}),&\text{if }\boldsymbol{v}_{i}\neq\boldsymbol{v}_{j},\\
+(x_{\boldsymbol{h}_{i}},y_{\boldsymbol{h}_{i}}),&\text{otherwise.}\end{cases}$
+
+[S2.E2X] $\displaystyle\left[\begin{matrix}x_{ij}\\
+y_{ij}\end{matrix}\right]$ $\displaystyle=\frac{1}{\sqrt{x_{\mathrm{axis}}^{2}+y_{\mathrm{axis}}^{2}}}\left[\begin{matrix}y_{\mathrm{axis}}&-x_{\mathrm{axis}}\\
+x_{\mathrm{axis}}&y_{\mathrm{axis}}\end{matrix}\right]+\left(\left[\begin{matrix}x_{j}\\
+y_{j}\end{matrix}\right]-\left[\begin{matrix}x_{i}\\
+y_{i}\end{matrix}\right]\right);$ (2)
+
+[S2.E2Xa] $\displaystyle(x_{\mathrm{axis}},y_{\mathrm{axis}})$ $\displaystyle=\begin{cases}(x_{\boldsymbol{v}_{i}}-x_{\boldsymbol{v}_{j}},y_{\boldsymbol{v}_{i}}-y_{\boldsymbol{v}_{j}}),&\text{if }\boldsymbol{v}_{i}\neq\boldsymbol{v}_{j},\\
+(x_{\boldsymbol{h}_{i}},y_{\boldsymbol{h}_{i}}),&\text{otherwise.}\end{cases}$
+
+[S2.E3] $f_{S}(s;\phi(X))=\frac{1}{s\sqrt{2\pi\hat{\sigma}^{2}(X)}}\exp\left[-\frac{(\ln s-\hat{\mu}(X))^{2}}{2\hat{\sigma}^{2}(X)}\right]$ (3)
+
+[] $f_{S}(s;\phi(X))=\frac{1}{s\sqrt{2\pi\hat{\sigma}^{2}(X)}}\exp\left[-\frac{(\ln s-\hat{\mu}(X))^{2}}{2\hat{\sigma}^{2}(X)}\right]$ (3)
+
+[S2.E4] $\mathrm{GSSM}(s,X)=\log_{10}\left[\frac{\ln 0.5}{\ln(1-F_{S}(s;\phi(X))}\right]=\log_{10}\left[\frac{\ln 0.5}{\ln\frac{1}{2}\left(1-\mathrm{erf}\left(\frac{\ln s-\hat{\mu}(X)}{\sqrt{2\hat{\sigma}^{2}(X)}}\right)\right)}\right]$ (4)
+
+[] $\mathrm{GSSM}(s,X)=\log_{10}\left[\frac{\ln 0.5}{\ln(1-F_{S}(s;\phi(X))}\right]=\log_{10}\left[\frac{\ln 0.5}{\ln\frac{1}{2}\left(1-\mathrm{erf}\left(\frac{\ln s-\hat{\mu}(X)}{\sqrt{2\hat{\sigma}^{2}(X)}}\right)\right)}\right]$ (4)
+
+[S3.E5] $\displaystyle\mathcal{L}_{\mathrm{NLL}}$ $\displaystyle=-\ln\prod_{i=1}^{N}f(s_{i};g_{W}(X_{i}))=\frac{1}{N}\sum_{i=1}^{N}\ell_{\mathrm{NLL}}(s_{i},X_{i}),$ (5) $\displaystyle\ell_{\mathrm{NLL}}(s_{i},X_{i})$ $\displaystyle=\frac{1}{2}\left[\ln 2\pi+\ln\hat{\sigma}^{2}(X_{i})+\frac{(\ln s_{i}-\hat{\mu}(X_{i}))^{2}}{\hat{\sigma}^{2}(X_{i})}\right]+\ln s_{i}$
+
+[S3.E5X] $\displaystyle\mathcal{L}_{\mathrm{NLL}}$ $\displaystyle=-\ln\prod_{i=1}^{N}f(s_{i};g_{W}(X_{i}))=\frac{1}{N}\sum_{i=1}^{N}\ell_{\mathrm{NLL}}(s_{i},X_{i}),$ (5)
+
+[S3.E5Xa] $\displaystyle\ell_{\mathrm{NLL}}(s_{i},X_{i})$ $\displaystyle=\frac{1}{2}\left[\ln 2\pi+\ln\hat{\sigma}^{2}(X_{i})+\frac{(\ln s_{i}-\hat{\mu}(X_{i}))^{2}}{\hat{\sigma}^{2}(X_{i})}\right]+\ln s_{i}$
+
+[S3.E6] $\displaystyle\mathcal{L}_{\mathrm{SmoothNLL}}$ $\displaystyle=\frac{1}{N}\sum_{i=1}^{N}\ell_{\mathrm{SmoothNLL}}(s_{i},X_{i},X^{\prime}_{i},\beta),$ (6) $\displaystyle\ell_{\mathrm{SmoothNLL}}(s_{i},X_{i},X^{\prime}_{i},\beta)$ $\displaystyle=\ell_{\mathrm{NLL}}(s_{i},X_{i})+\beta D_{\mathrm{JS}}[f_{S}(s;g_{W}(X_{i}))||f_{S}(s;g_{W}(X_{i}^{\prime}))]$
+
+[S3.E6X] $\displaystyle\mathcal{L}_{\mathrm{SmoothNLL}}$ $\displaystyle=\frac{1}{N}\sum_{i=1}^{N}\ell_{\mathrm{SmoothNLL}}(s_{i},X_{i},X^{\prime}_{i},\beta),$ (6)
+
+[S3.E6Xa] $\displaystyle\ell_{\mathrm{SmoothNLL}}(s_{i},X_{i},X^{\prime}_{i},\beta)$ $\displaystyle=\ell_{\mathrm{NLL}}(s_{i},X_{i})+\beta D_{\mathrm{JS}}[f_{S}(s;g_{W}(X_{i}))||f_{S}(s;g_{W}(X_{i}^{\prime}))]$
+
+[S3.E7] $\displaystyle\phi(X)$ $\displaystyle=g^{D}_{W_{D}}([\theta_{C};\theta_{E};\theta_{T}])$ (7)
+
+[S3.E7X] $\displaystyle\phi(X)$ $\displaystyle=g^{D}_{W_{D}}([\theta_{C};\theta_{E};\theta_{T}])$ (7)
+
+[S3.E8] $\mathrm{EG}(\theta)=\mathbb{E}_{\theta^{\prime}\sim\Theta,\alpha\sim U(0,1)}\left\{(\theta-\theta^{\prime})\frac{\partial}{\partial\theta}\log_{10}\left[\frac{\ln 0.5}{\ln(1-F_{S}(s;g^{D}_{W_{D}}(\theta^{\prime}+\alpha(\theta-\theta^{\prime})))}\right]\right\}$ (8)
+
+[] $\mathrm{EG}(\theta)=\mathbb{E}_{\theta^{\prime}\sim\Theta,\alpha\sim U(0,1)}\left\{(\theta-\theta^{\prime})\frac{\partial}{\partial\theta}\log_{10}\left[\frac{\ln 0.5}{\ln(1-F_{S}(s;g^{D}_{W_{D}}(\theta^{\prime}+\alpha(\theta-\theta^{\prime})))}\right]\right\}$ (8)
+
+[S4.T1.fig1] Table 1: Existing datasets of crashes (and near-crashes). Dataset 1 1 1 Data sources:
+DAD, A3D, CCD, and DoTA were compiled from dashcam recordings posted on YouTube.
+DADA was compiled from dashcam recordings posted on YouTube, Youku, Bilibili, iQiyi, Tencent, etc.
+CADP was compiled from surveillance camera recordings posted on YouTube. Year 2 2 2 For SHRP2 NDS, the listed years are actual data collection time.
+For the other datasets, the years are publication time, since these sets were sourced from the Internet and have no determinate collection time. Annotation 3 3 3 Annotated information includes: event time (T), bounding box positions (S), crash type (C), participants (P), weather (W), lighting (L), driver’s attention map (A). The datasets derived from SHRP2 NDS include additional information such as traffic density and road surface quality. Crashes (and near-crashes) Number Time range Period before impact 4 4 4 Impact means physical contact in crashes; for near-crashes, the moment of closest proximity. DAD [ 53 ] 2016 T 620 5 s Designed to be 4.5 s CADP [ 54 ] 2018 T, S 1,416 5 5 5 Among these videos, 205 are annotated while the others are not. Varying On average 3.7 s A3D [ 37 ] 2019 T, P 1,500 Varying Unrevealed CCD [ 55 ] 2020 T, P, W 1,500 5 s At least 3.0 s DADA [ 56 , 57 ] 2019, 2022 T, S, C, P, W, L, A 2,000 Varying On average 5.2 s DoTA [ 39 ] 2022 T, S, C, P 4,677 Varying On average around 4.0 s SHRP2 NDS [ 58 , 59 ] 2010-2013 T, S, C, P, W, L, etc. 8,895 6 6 6 These include 1,942 crashes and 6,953 near-crashes. Varying At least 20.0 s Reconstructed SHRP2 This paper T, S, C, P, W, L, etc. 6,664 7 7 7 These include 1,402 crashes and 5,262 near-crashes. Varying On average 22.8 s
+
+[S4.T2] Table 2: Operational definitions of traffic safety events in the SHRP2 NDS. Event Operational definition Crash “Any contact that the subject vehicle has with an object, either moving or fixed, at any speed in which kinetic energy is measurably transferred or dissipated is considered a crash. This also includes non-premeditated departures of the roadway where at least one tire leaves the paved or intended travel surface of the road, as well as instances where the subject vehicle strikes another vehicle, roadside barrier, pedestrian, cyclist, animal, or object on or off the roadway.” Near-crash “Any circumstance that requires a rapid evasive manoeuvrer by the subject vehicle, or any other vehicle, pedestrian, cyclist, or animal, to avoid a crash is considered a near-crash. A rapid evasive manoeuvrer is defined as steering, braking, accelerating, or any combination of control inputs.” Safe baseline (Non-conflict) “Normal driving behaviours and scenarios where the driver may react to situational conditions and events, but the reaction is not evasive and the situation does not place the subject or others at elevated risk.”
+
+[S4.E9] $\left[\begin{matrix}x_{i}\\
+y_{i}\\
+\psi_{i}\\
+v_{i}\\
+\omega_{i}\\
+a_{i}\end{matrix}\right]_{t+\Delta t}=\left[\begin{matrix}x_{i}\\
+y_{i}\\
+\psi_{i}\\
+v_{i}\\
+\omega_{i}\\
+a_{i}\end{matrix}\right]_{t}+\left[\begin{matrix}\Delta x_{i}\\
+\Delta y_{i}\\
+\omega_{i}\Delta t\\
+a_{i}\Delta t\\
+0\\
+0\end{matrix}\right]\text{, where}$ (9)
+
+[] $\left[\begin{matrix}x_{i}\\
+y_{i}\\
+\psi_{i}\\
+v_{i}\\
+\omega_{i}\\
+a_{i}\end{matrix}\right]_{t+\Delta t}=\left[\begin{matrix}x_{i}\\
+y_{i}\\
+\psi_{i}\\
+v_{i}\\
+\omega_{i}\\
+a_{i}\end{matrix}\right]_{t}+\left[\begin{matrix}\Delta x_{i}\\
+\Delta y_{i}\\
+\omega_{i}\Delta t\\
+a_{i}\Delta t\\
+0\\
+0\end{matrix}\right]\text{, where}$ (9)
+
+[S4.E10] $\displaystyle\Delta x_{i}$ $\displaystyle=\begin{cases}\begin{aligned} &\cos(\psi_{i})(v_{i}\Delta t+\frac{1}{2}a_{i}\Delta t^{2}),&\text{if }|\omega_{i}|\leq\epsilon,\\
+&\frac{v_{i}\omega_{i}[\sin(\psi_{i}+\omega_{i}\Delta t)-\sin(\psi_{i})]+a_{i}[\cos(\psi_{i}+\omega_{i}\Delta t)-\cos(\psi_{i})]+a_{i}\omega_{i}\sin(\psi_{i}+\omega_{i}\Delta t)\Delta t}{\omega_{i}^{2}},&\text{otherwise};\end{aligned}\end{cases}$ (10) $\displaystyle\Delta y_{i}$ $\displaystyle=\begin{cases}\begin{aligned} &\sin(\psi_{i})(v_{i}\Delta t+\frac{1}{2}a_{i}\Delta t^{2}),&\text{if }|\omega_{i}|\leq\epsilon,\\
+&\frac{v_{i}\omega_{i}[\cos(\psi_{i})-\cos(\psi_{i}+\omega_{i}\Delta t)]+a_{i}[\sin(\psi_{i}+\omega_{i}\Delta t)-\sin(\psi_{i})]-a_{i}\omega_{i}\cos(\psi_{i}+\omega_{i}\Delta t)\Delta t}{\omega_{i}^{2}},&\text{otherwise}.\end{aligned}\end{cases}$
+
+[S4.E10X] $\displaystyle\Delta x_{i}$ $\displaystyle=\begin{cases}\begin{aligned} &\cos(\psi_{i})(v_{i}\Delta t+\frac{1}{2}a_{i}\Delta t^{2}),&\text{if }|\omega_{i}|\leq\epsilon,\\
+&\frac{v_{i}\omega_{i}[\sin(\psi_{i}+\omega_{i}\Delta t)-\sin(\psi_{i})]+a_{i}[\cos(\psi_{i}+\omega_{i}\Delta t)-\cos(\psi_{i})]+a_{i}\omega_{i}\sin(\psi_{i}+\omega_{i}\Delta t)\Delta t}{\omega_{i}^{2}},&\text{otherwise};\end{aligned}\end{cases}$ (10)
+
+[S4.E10Xa] $\displaystyle\Delta y_{i}$ $\displaystyle=\begin{cases}\begin{aligned} &\sin(\psi_{i})(v_{i}\Delta t+\frac{1}{2}a_{i}\Delta t^{2}),&\text{if }|\omega_{i}|\leq\epsilon,\\
+&\frac{v_{i}\omega_{i}[\cos(\psi_{i})-\cos(\psi_{i}+\omega_{i}\Delta t)]+a_{i}[\sin(\psi_{i}+\omega_{i}\Delta t)-\sin(\psi_{i})]-a_{i}\omega_{i}\cos(\psi_{i}+\omega_{i}\Delta t)\Delta t}{\omega_{i}^{2}},&\text{otherwise}.\end{aligned}\end{cases}$
+
+[S4.E11] $\left[\begin{matrix}x_{j}\\
+y_{j}\\
+\psi_{j}\\
+v_{j}\end{matrix}\right]_{t+\Delta t}=\left[\begin{matrix}x_{j}\\
+y_{j}\\
+\psi_{j}\\
+v_{j}\end{matrix}\right]_{t}+\left[\begin{matrix}\cos(\psi_{j})v_{j}\Delta t\\
+\sin(\psi_{j})v_{j}\Delta t\\
+\psi_{j}\\
+v_{j}\end{matrix}\right]$ (11)
+
+[] $\left[\begin{matrix}x_{j}\\
+y_{j}\\
+\psi_{j}\\
+v_{j}\end{matrix}\right]_{t+\Delta t}=\left[\begin{matrix}x_{j}\\
+y_{j}\\
+\psi_{j}\\
+v_{j}\end{matrix}\right]_{t}+\left[\begin{matrix}\cos(\psi_{j})v_{j}\Delta t\\
+\sin(\psi_{j})v_{j}\Delta t\\
+\psi_{j}\\
+v_{j}\end{matrix}\right]$ (11)
+
+[S5.T3.fig1] Table 3: Overview of GSSMs to train in the experiments. Acronym 8 8 8 Acronyms follow the format <Datasets>-<Contextual observables> . For example, “S-C” is trained on SafeBaseline and uses current features $X_{C}$ Training dataset(s) 9 9 9 The dataset names are abbreviated as “S” = SafeBaseline, “A” = ArgoverseHV, “h” = highD. If multiple datasets are used (e.g., “SAh”), the GSSM is trained on their union. Contextual observables Experiment(s) involved in 10 10 10 The experiments are abbreviated as “E”=Effectiveness, “S”=Scalability, “C”=Context-awareness, “G”=Generalisability, “R”=Risk attribution. A GSSM may be involved in multiple experiments. S-C SafeBaseline $[X_{C}]$ S, C h-C highD E, G A-C ArgoverseHV G SA-C SafeBaseline $\cup$ ArgoverseHV {10%,20%,⋯,100%} 11 11 11 The data combined in addition to SafeBaseline are randomly sampled for 10%-100% from the whole dataset. S Sh-C SafeBaseline $\cup$ highD {10%,20%,⋯,100%} S SAh-C SafeBaseline $\cup$ 10%ArgoverseHV $\cup$ 100%highD S S-Ca SafeBaseline $[X_{C},a_{i}]$ C S-CE $[X_{C},X_{E}]$ C S-CaE $[X_{C},a_{i},X_{E}]$ C S-CET $[X_{C},X_{E},X_{T}]$ C, R, G S-CaET $[X_{C},a_{i},X_{E},X_{T}]$ C
+
+[S5.T4] Table 4: Two-dimensional Surrogate Safety Measures (2D SSMs) used as baseline methods. Two-dimensional SSM Year Brief summary Time Advantage (TAdv) [ 42 ] 2010 Expected time gap between two road users passing a common spatial zone, assuming no behaviour change in the short future. Anticipated Collision Time (ACT) [ 66 ] 2022 The shortest distance between two road users divided by their closing-in rate, assuming a constant closing-in rate in the short future. Two-dimensional Time-to-Collision (TTC2D) [ 67 ] 2023 Minimum of the longitudinal and lateral Time-to-Collision values, assuming no behaviour change in the short future. Emergency Index (EI) [ 68 ] 2025 Intensity of evasive action required to prevent a potential collision, based on the change rate in overlapping path.
+
+[S5.E12] $R_{\mathrm{FN}}=\frac{\mathrm{FN}}{\mathrm{TP}+\mathrm{FN}},\quad R_{\mathrm{FP}}=\frac{\mathrm{FPs}}{\mathrm{FPs}+\mathrm{TNs}}.$ (12)
+
+[] $R_{\mathrm{FN}}=\frac{\mathrm{FN}}{\mathrm{TP}+\mathrm{FN}},\quad R_{\mathrm{FP}}=\frac{\mathrm{FPs}}{\mathrm{FPs}+\mathrm{TNs}}.$ (12)
+
+[S5.E13] $\mathrm{Precision}=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FPs}},\quad\mathrm{Recall}=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}},\quad F_{1}=\frac{2\mathrm{Precision}\cdot\mathrm{Recall}}{\mathrm{Precision}+\mathrm{Recall}}.$ (13)
+
+[] $\mathrm{Precision}=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FPs}},\quad\mathrm{Recall}=\frac{\mathrm{TP}}{\mathrm{TP}+\mathrm{FN}},\quad F_{1}=\frac{2\mathrm{Precision}\cdot\mathrm{Recall}}{\mathrm{Precision}+\mathrm{Recall}}.$ (13)
+
+[S5.E14] $\mathrm{TTI}=t_{\mathrm{impact}}-\max\{t\mid M_{t}>M^{*},M_{t-1}\leq M^{*},t\leq t_{\mathrm{impact}}\}$ (14)
+
+[] $\mathrm{TTI}=t_{\mathrm{impact}}-\max\{t\mid M_{t}>M^{*},M_{t-1}\leq M^{*},t\leq t_{\mathrm{impact}}\}$ (14)
+
+[S5.T5] Table 5: Performance curves of risk quantification at varying thresholds. Performance curve Horizontal axis Vertical axis Optimal point Receiver operating characteristic curve (ROC) $R_{\mathrm{FP}}\in[0,1]$ $1-R_{\mathrm{FN}}=R_{\mathrm{TP}}\in[0,1]$ In theory, $(0,1)$ Precision-recall curve (PRC) $\mathrm{Recall}\in[0,1]$ $\mathrm{Precision}\in[0,1]$ In theory, $(1,1)$ Accuracy-timeliness curve (ATC) $m\mathrm{TTI}\in[0,10]$ $F_{1}\in[0,1]$ $(\max F_{1},m\mathrm{TTI}^{*})$
+
+[S5.E15] $A^{\mathrm{ROC}}_{R}=\frac{1}{1-R}\int_{R}^{1}(1-R_{\mathrm{FN}})\mathrm{d}R_{\mathrm{FP}}$ (15)
+
+[] $A^{\mathrm{ROC}}_{R}=\frac{1}{1-R}\int_{R}^{1}(1-R_{\mathrm{FN}})\mathrm{d}R_{\mathrm{FP}}$ (15)
+
+[S5.E16] $\mathrm{Precision}^{\mathrm{PRC}}_{R}=\max(\mathrm{Precision}\mid\mathrm{Recall}\geq R)$ (16)
+
+[] $\mathrm{Precision}^{\mathrm{PRC}}_{R}=\max(\mathrm{Precision}\mid\mathrm{Recall}\geq R)$ (16)
+
+[S6.T6] Table 6: Numeric performance evaluation of GSSM and existing 2D SSMs. For all of the metrics, higher values indicate better performance. The best value in each column is underlined and marked bold; the second-best value is marked bold. Method AUPRC $A_{80\%}^{\mathrm{ROC}}$ $A_{90\%}^{\mathrm{ROC}}$ $\mathrm{Precision}_{80\%}^{\mathrm{PRC}}$ $\mathrm{Precision}_{90\%}^{\mathrm{PRC}}$ $P^{*}_{\mathrm{TTI}\geq 1.5}$ $m\mathrm{TTI}^{*}$ GSSM 0.900 0.817 0.729 0.887 0.814 0.819 2.598 ACT 0.824 0.721 0.561 0.850 0.795 0.769 2.781 TTC2D 0.818 0.493 0.139 0.865 0.674 0.860 2.829 TAdv 0.700 0.584 0.414 0.738 0.640 0.606 1.730 EI 0.842 0.426 0.251 0.706 0.539 0.747 2.263
+
+[S6.T7] Table 7: Comparison of collision alert performance in different types of safety-critical events. The GSSM under comparison is S-CET, which is trained on SafeBaseline and uses contextual information of current features, environment features, and historical kinematic features. The best value in each column is underlined and marked bold; the second-best value is marked bold. Event Number of events Method $\mathrm{AUPRC}$ $A_{80\%}^{\mathrm{ROC}}$ $A_{90\%}^{\mathrm{ROC}}$ $\mathrm{Precision}_{80\%}^{\mathrm{PRC}}$ $\mathrm{Precision}_{90\%}^{\mathrm{PRC}}$ $P^{*}_{\mathrm{TTI}\geq 1.5}$ $m\mathrm{TTI}^{*}$ Rear-end 1787 GSSM 0.858 0.926 0.887 0.952 0.930 0.877 2.526 ACT 0.869 0.852 0.786 0.881 0.877 0.719 2.280 TTC2D 0.869 0.702 0.452 0.932 0.906 0.856 2.489 TAdv 0.726 0.734 0.636 0.798 0.749 0.486 1.440 EI 0.911 0.745 0.562 0.930 0.812 0.730 2.102 Adjacent lane 611 GSSM 0.771 0.693 0.608 0.702 0.658 0.826 3.376 ACT 0.685 0.532 0.334 0.683 0.608 0.896 4.670 TTC2D 0.698 0.317 0.000 0.632 N/A 0.848 3.679 TAdv 0.588 0.381 0.271 0.512 0.475 0.751 2.375 EI 0.636 0.220 0.042 0.451 0.451 0.851 3.476 Crossing/turning 93 GSSM 0.747 0.603 0.538 0.755 0.729 0.967 4.851 ACT 0.735 0.350 0.017 0.792 0.677 0.933 5.160 TTC2D 0.677 0.000 0.000 N/A N/A 0.950 4.773 TAdv 0.713 0.367 0.183 0.731 0.649 0.820 2.898 EI 0.699 0.000 0.000 N/A N/A 0.934 4.130 Merging 29 GSSM 0.863 0.798 0.721 0.828 0.771 0.889 5.110 ACT 0.701 0.518 0.225 0.758 0.659 1.000 5.165 TTC2D 0.783 0.000 0.000 N/A N/A 0.857 3.829 TAdv 0.677 0.251 0.000 0.522 N/A 0.727 2.706 EI 0.772 0.285 0.000 0.553 N/A 0.897 3.206 With pedestrian/ cyclist/animal 31 GSSM 0.852 0.391 0.302 0.800 0.800 1.000 5.941 ACT 0.705 0.066 0.000 0.758 N/A 0.966 5.384 TTC2D 0.694 0.000 0.000 N/A N/A 0.897 4.514 TAdv 0.703 0.102 0.005 0.714 0.700 0.806 3.191 EI 0.733 0.000 0.000 N/A N/A 0.867 3.781
+
+[Ax1.T1] Table A.1: Contextual information considered in this study. Category Encoding unit Feature(s) $X_{C}$ Per each feature $\{l_{i},l_{j},\frac{w_{i}+w_{j}}{2},|\boldsymbol{v}_{i}|,x_{\boldsymbol{v}_{j}},y_{\boldsymbol{v}_{j}},|\boldsymbol{v}_{i}|^{2},|\boldsymbol{v}_{j}|^{2},|\boldsymbol{v}_{ij}|^{2},|\boldsymbol{v}_{ij}|\mathrm{sgn}(\Delta v),A_{\boldsymbol{h}_{j}},\rho_{ij}\}_{t=0}$ , optional $a_{i,t=0}$ $X_{E}$ Lighting condition Darkeness (lighted), darkeness (not lighted), dawn, daylight, dusk, unknown. Weather condition No adverse conditions, fog, mist/light rain, rain and fog, raining, sleeting, snow/sleet and fog, snowing, unknown. Road surface Dry, gravel over asphalt, gravel/dirt road, icy, muddy, snowy, wet, unknown. Traffic density LOS A1: free flow, no lead traffic, LOS A2: free flow, leading traffic present, LOS B: flow with some restrictions, LOS C: stable flow, maneuverability and speed are more restricted, LOS D: unstable flow - temporary restrictions substantially slow driver, LOS E: flow is unstable, vehicles are unable to pass, temporary stoppages, etc., LOS F: forced traffic flow with low speeds and traffic volumes that are below capacity, unknown. $X_{T}$ In the passed 0.5 s $\{\omega_{i},|\boldsymbol{v}_{i}|,x_{\boldsymbol{v}_{j}},y_{\boldsymbol{v}_{j}}\}_{t\in\{-0.5,-0.4,\dots,-0.1\}}$ In the passed 1 s $\{\omega_{i},|\boldsymbol{v}_{i}|,x_{\boldsymbol{v}_{j}},y_{\boldsymbol{v}_{j}}\}_{t\in\{-1.0,-0.9,\dots,-0.1\}}$ In the passed 1.5 s $\{\omega_{i},|\boldsymbol{v}_{i}|,x_{\boldsymbol{v}_{j}},y_{\boldsymbol{v}_{j}}\}_{t\in\{-1.5,-1.4,\dots,-0.1\}}$ In the passed 2 s $\{\omega_{i},|\boldsymbol{v}_{i}|,x_{\boldsymbol{v}_{j}},y_{\boldsymbol{v}_{j}}\}_{t\in\{-2.0,-1.9,\dots,-0.1\}}$ In the passed 2.5 s $\{\omega_{i},|\boldsymbol{v}_{i}|,x_{\boldsymbol{v}_{j}},y_{\boldsymbol{v}_{j}}\}_{t\in\{-2.5,-2.4,\dots,-0.1\}}$ Note : for two interacting road users $i$ and $j$ , their yaw rates, velocities, lengths, widths, and headings are denoted by $\omega\in[-\pi,\pi]$ , $\boldsymbol{v}$ , $l$ , $w$ , and $\boldsymbol{h}$ ; the motion states are in a local coordinate system with the origin at the position of $i$ and y-axis oriented along the velocity direction of $i$ ; $\mathrm{sgn}(\Delta v)=\mathrm{sgn}(|\boldsymbol{v}_{i}|-|\boldsymbol{v}_{j}|)$ ; $A_{\boldsymbol{h}}\in[-\pi,\pi]$ denotes the angle between the heading direction and the y-axis; $\rho_{ij}\in[-\pi,\pi]$ is the angle in the polar coordinates of multi-directional spacing.
+
+[Ax1.T2] Table A.2: Hyperparameters set in this paper’s experiments. Hyperparameter Definition Value Random seed Number that controls generation of pseudo-random values 131 Small value threshold Threshold to consider a value smaller than it to be near zero 1e-6 Representation dimension Number of variables in a piece of encoded representation 64 Perturbation noise Standard deviation of the added Gaussian noise in Section 3.1 1% of variable range $\beta$ Weight of JS-divergence in Equation ( 6 ) 5 $\epsilon$ Threshold of yaw rate in Equation ( 10 ) 0.001 Max. epochs Maximum epochs of training 150 Batch size Number of samples used per update during model training 512 Initial learning rate Learning rate at the beginning of model training 1e-4 Dropout Probability for each value in a tensor to be set 0 0.2

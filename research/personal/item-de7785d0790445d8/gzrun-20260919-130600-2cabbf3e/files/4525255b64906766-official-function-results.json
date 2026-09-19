@@ -1,0 +1,46 @@
+{
+  "versions": {
+    "numpy": "2.2.6",
+    "pandas": "2.3.3",
+    "scipy": "1.15.3"
+  },
+  "partial_auc": {
+    "exact_v5": 0.575,
+    "official_1000_grid": 0.5749987992567012
+  },
+  "coordinate_rotation": {
+    "axis": [
+      3,
+      4
+    ],
+    "displacement": [
+      6,
+      8
+    ],
+    "output": [
+      8.881784197001252e-16,
+      10.0
+    ],
+    "expected": [
+      0,
+      10
+    ]
+  },
+  "tti_counterexample": {
+    "true_warning": [
+      1,
+      0
+    ],
+    "TTI": [
+      2,
+      8
+    ],
+    "official_median": 5.0,
+    "TP_only_median": 2.0
+  },
+  "CI_default_alpha": {
+    "low_wrapper": 0.05,
+    "upper_wrapper": 0.05,
+    "base": 0.01
+  }
+}

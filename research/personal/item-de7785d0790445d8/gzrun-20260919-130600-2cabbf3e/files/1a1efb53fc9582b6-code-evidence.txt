@@ -1,0 +1,1370 @@
+
+FILE src_posterior_inference/model.py
+URL https://github.com/Yiru-Jiao/GSSM/blob/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/model.py
+
+0001 '''
+0002 This script defines the GSSM model and loss function for posterior inference of context conditioned proximity distribution.
+0003 '''
+0004 
+0005 import os
+0006 import sys
+0007 import torch
+0008 import torch.nn as nn
+0009 from torch.utils.data import Dataset
+0010 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+0011 from src_posterior_inference.inference_utils import modules
+0012 small_eps = 1e-6
+0013 
+0014 
+0015 def send_x_to_device(x, device):
+0016     if isinstance(x, list):
+0017         return tuple([i.to(device) for i in x])
+0018     else:
+0019         return x.to(device)
+0020 
+0021 
+0022 class custom_dataset(Dataset):
+0023     def __init__(self, X):
+0024         self.X = X
+0025         if isinstance(X, tuple):
+0026             def get_length():
+0027                 return len(self.X[0])
+0028             def get_item(idx):
+0029                 return tuple([torch.from_numpy(x_i[idx]).float() for x_i in self.X])
+0030         else:
+0031             def get_length():
+0032                 return len(self.X)
+0033             def get_item(idx):
+0034                 return torch.from_numpy(self.X[idx]).float()
+0035         self.get_length = get_length
+0036         self.get_item = get_item
+0037 
+0038     def __len__(self): 
+0039         return self.get_length()
+0040 
+0041     def __getitem__(self, idx): 
+0042         return self.get_item(idx)
+0043     
+0044 
+0045 class GSSM(nn.Module):
+0046     def __init__(self, encoder_selection='all', single_output=None, return_attention=False):
+0047         super(GSSM, self).__init__()
+0048         if encoder_selection=='all':
+0049             encoder_selection = ['current+acc', 'environment', 'profiles']
+0050         self.encoder_selection = encoder_selection
+0051 
+0052         # Define encoders and determine the final sequence length
+0053         self.final_seq_len = 0
+0054         if 'current' in encoder_selection:
+0055             self.CurrentEncoder = modules.CurrentEncoder(input_dims=12, output_dims=64)
+0056             self.final_seq_len += 12
+0057         elif 'current+acc' in encoder_selection:
+0058             self.CurrentEncoder = modules.CurrentEncoder(input_dims=13, output_dims=64)
+0059             self.final_seq_len += 13
+0060         else:
+0061             Warning('Current encoder must be selected.')
+0062         if 'environment' in encoder_selection:
+0063             self.EnvEncoder = modules.EnvEncoder(input_dims=27, output_dims=64)
+0064             self.final_seq_len += 4
+0065         if 'profiles' in encoder_selection:
+0066             self.TSEncoder = modules.TSEncoder(input_dims=4, output_dims=64)
+0067             self.final_seq_len += 5
+0068         self.combi_encoder = self.define_combi_encoder()
+0069         self.AttentionDecoder = modules.AttentionDecoder(self.final_seq_len, latent_dims=64,
+0070                                                          single_output=single_output,
+0071                                                          return_attention=return_attention)
+0072 
+0073     def define_combi_encoder(self,):
+0074         if self.encoder_selection==['current'] or self.encoder_selection==['current+acc']:
+0075             def combi_encoder(x):
+0076                 x_current = self.CurrentEncoder(x)
+0077                 return x_current # (batch_size, 12/13, latent_dims=64)
+0078         elif self.encoder_selection==['current','environment'] or self.encoder_selection==['current+acc','environment']:
+0079             def combi_encoder(x):
+0080                 x_current, x_environment = x
+0081                 x_current = self.CurrentEncoder(x_current)
+0082                 x_environment = self.EnvEncoder(x_environment)
+0083                 return torch.cat([x_current, x_environment], dim=1) # (batch_size, 16/17, latent_dims=64)
+0084         elif self.encoder_selection==['current','profiles'] or self.encoder_selection==['current+acc','profiles']:
+0085             def combi_encoder(x):
+0086                 x_current, x_ts = x
+0087                 x_current = self.CurrentEncoder(x_current)
+0088                 x_ts = self.TSEncoder(x_ts)
+0089                 return torch.cat([x_current, x_ts], dim=1) # (batch_size, 17/18, latent_dims=64)
+0090         elif self.encoder_selection==['current','environment','profiles'] or self.encoder_selection==['current+acc','environment','profiles']:
+0091             def combi_encoder(x):
+0092                 x_current, x_environment, x_ts = x
+0093                 x_current = self.CurrentEncoder(x_current)
+0094                 x_environment = self.EnvEncoder(x_environment)
+0095                 x_ts = self.TSEncoder(x_ts)
+0096                 return torch.cat([x_current, x_environment, x_ts], dim=1) # (batch_size, 21/22, latent_dims=64)
+0097         else:
+0098             Warning('Invalid encoder selection.')
+0099         return combi_encoder
+0100 
+0101     def forward(self, x):
+0102         latent = self.combi_encoder(x)
+0103         out = self.AttentionDecoder(latent)
+0104         return out
+0105 
+0106 
+0107 class LogNormalNLL(nn.Module):
+0108     '''
+0109     Negative log-likelihood loss function for log-normal distribution.
+0110     '''
+0111     def __init__(self, small_eps=small_eps):
+0112         super(LogNormalNLL, self).__init__()
+0113         self.log2pi = torch.log(torch.tensor(2*3.1415926535897932384626433832795))
+0114         self.small_eps = small_eps
+0115 
+0116     def forward(self, out, s):
+0117         mu = out[0]
+0118         log_var = out[1]
+0119         log_s = torch.log(torch.clamp(s, min=self.small_eps))
+0120         nll = 0.5 * (self.log2pi + log_var + (log_s-mu)**2 / torch.exp(log_var)) + log_s
+0121         loss = nll.mean()
+0122         return loss
+0123 
+0124 
+0125 class SmoothLogNormalNLL(nn.Module):
+0126     '''
+0127     Negative log-likelihood loss function for log-normal distribution with smoothness regularization.
+0128     '''
+0129     def __init__(self, beta=5., small_eps=small_eps):
+0130         super(SmoothLogNormalNLL, self).__init__()
+0131         self.beta = beta
+0132         self.log2pi = torch.log(torch.tensor(2*3.1415926535897932384626433832795))
+0133         self.small_eps = small_eps
+0134 
+0135     def kl_divergence(self, mu1, log_var1, mu2, log_var2):
+0136         return 0.5 * (log_var2 - log_var1 + (torch.exp(log_var1)+(mu1-mu2)**2) / torch.exp(log_var2) - 1)
+0137     
+0138     def js_divergence(self, mu1, log_var1, mu2, log_var2):
+0139         mu = 0.5 * (mu1 + mu2)
+0140         var = 0.5 * (torch.exp(log_var1) + torch.exp(log_var2))
+0141         log_var = torch.log(torch.clamp(var, min=self.small_eps))
+0142         kl1 = self.kl_divergence(mu1, log_var1, mu, log_var)
+0143         kl2 = self.kl_divergence(mu2, log_var2, mu, log_var)
+0144         return 0.5 * (kl1 + kl2)
+0145 
+0146     def forward(self, out, s, inducing_out):
+0147         mu = out[0]
+0148         log_var = out[1]
+0149         log_s = torch.log(torch.clamp(s, min=self.small_eps))
+0150         nll = 0.5 * (self.log2pi + log_var + (log_s-mu)**2 / torch.exp(log_var)) + log_s
+0151 
+0152         mu_prime, log_var_prime = inducing_out
+0153         js_divergence = self.js_divergence(mu, log_var, mu_prime, log_var_prime)
+0154         loss = nll.mean() + self.beta*js_divergence.mean()
+0155         return loss
+
+FILE src_posterior_inference/inference_utils/modules.py
+URL https://github.com/Yiru-Jiao/GSSM/blob/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/inference_utils/modules.py
+
+0001 '''
+0002 This script defines the encoders and decoder for the GSSM model.
+0003 '''
+0004 
+0005 import torch
+0006 from torch import nn
+0007 from collections import OrderedDict
+0008 small_eps = 1e-6
+0009 
+0010 
+0011 class TSEncoder(nn.Module):
+0012     '''
+0013     This encoder extracts the time series features into 5 representations,
+0014     within each the features are designed to **interact** with each other.
+0015     '''
+0016     def __init__(self, input_dims=4, output_dims=64):
+0017         super(TSEncoder, self).__init__()
+0018         self.dropout = nn.Dropout(0.2)
+0019         self.batch_norm = nn.BatchNorm1d(input_dims)
+0020         self.lstm = nn.LSTM(input_dims, output_dims, num_layers=1, batch_first=True, bidirectional=False)
+0021 
+0022     def forward(self, x): # x: (batch_size, 25, feature_dims=4)
+0023         x = torch.flip(x, [1]) # reverse time series to encode the latest time step first
+0024         x_bn = self.batch_norm(x.permute(0, 2, 1)) # batch_norm to normalise the features
+0025         x_bn = x_bn.permute(0, 2, 1) # (batch_size, feature_dims=4, 25) -> (batch_size, 25, feature_dims=4)
+0026         x_bn = self.dropout(x_bn) # dropout to break time steps and avoid positional leakage
+0027         output, _ = self.lstm(x_bn) # output: (batch_size, 25, hidden_dims=64)
+0028         out = output[:, 4::5, :] # each encode the passed 0.5, 1, 1.5, 2, 2.5 seconds
+0029         return out #(batch_size, 5, 64)
+0030 
+0031 
+0032 class CurrentEncoder(nn.Module):
+0033     '''
+0034     This encoder functions as encoding the representation for each features,
+0035     therefore the features are designed to **not interact** with each other.
+0036     '''
+0037     def __init__(self, input_dims, output_dims=64):
+0038         super(CurrentEncoder, self).__init__()
+0039         self.feature_extractor = self.ordered_layers(10, output_dims)
+0040 
+0041     # Define an layer-ordered MLP
+0042     def ordered_layers(self, num_layers, output_dims):
+0043         ordered_layers = OrderedDict()
+0044         ordered_layers['linear0'] = nn.Linear(2, 8)
+0045         ordered_layers['gelu0'] = nn.GELU()
+0046         ordered_layers['linear1'] = nn.Linear(8, output_dims//2)
+0047         ordered_layers['gelu1'] = nn.GELU()
+0048         ordered_layers['linear2'] = nn.Linear(output_dims//2, output_dims)
+0049         ordered_layers['dropout2'] = nn.Dropout(0.2)
+0050         ordered_layers['gelu2'] = nn.GELU()
+0051         for i in range(3, num_layers-1):
+0052             ordered_layers[f'linear{i}'] = nn.Linear(output_dims, output_dims)
+0053             ordered_layers[f'dropout{i}'] = nn.Dropout(0.2)
+0054             ordered_layers[f'gelu{i}'] = nn.GELU()
+0055         ordered_layers[f'linear{num_layers-1}'] = nn.Linear(output_dims, output_dims)
+0056         return nn.Sequential(ordered_layers)
+0057 
+0058     def forward(self, x): # x: (batch_size, 12 or 13)
+0059         features = x.unsqueeze(-1) #(batch_size, 12 or 13, 1)
+0060         noise = torch.zeros_like(features) # add reference to the features
+0061         features = torch.cat([features, noise], dim=-1) # (batch_size, 12 or 13, 2)
+0062         out = self.feature_extractor(features) # (batch_size, 12 or 13, 64)
+0063         return out
+0064 
+0065 
+0066 class EnvEncoder(nn.Module):
+0067     '''
+0068     This encoder extracts the environment features into 4 representations,
+0069     within each the features are designed to **interact** with each other.
+0070     '''
+0071     def __init__(self, input_dims=27, output_dims=64):
+0072         super(EnvEncoder, self).__init__()
+0073         self.feature_extractor = nn.ModuleList([
+0074             self.ordered_layers(6, indim, output_dims) for indim in [5, 8, 7, 7]
+0075         ]) # 4 different blocks for the 4 different categorical features
+0076 
+0077     # Define an layer-ordered MLP
+0078     def ordered_layers(self, num_layers, input_dims, output_dims):
+0079         ordered_layers = OrderedDict()
+0080         ordered_layers['linear0'] = nn.Linear(input_dims, output_dims//2)
+0081         ordered_layers['gelu0'] = nn.GELU()
+0082         ordered_layers['linear1'] = nn.Linear(output_dims//2, output_dims)
+0083         ordered_layers['dropout1'] = nn.Dropout(0.2)
+0084         ordered_layers['gelu1'] = nn.GELU()
+0085         for i in range(2, num_layers-1):
+0086             ordered_layers[f'linear{i}'] = nn.Linear(output_dims, output_dims)
+0087             ordered_layers[f'dropout{i}'] = nn.Dropout(0.2)
+0088             ordered_layers[f'gelu{i}'] = nn.GELU()
+0089         ordered_layers[f'linear{num_layers-1}'] = nn.Linear(output_dims, output_dims)
+0090         return nn.Sequential(ordered_layers)
+0091 
+0092     def forward(self, x): # x: (batch_size, 27)
+0093         lighting = x[:,0:5] # (batch_size, 5)
+0094         weather = x[:,5:13] # (batch_size, 8)
+0095         surface = x[:,13:20] # (batch_size, 7)
+0096         traffic = x[:,20:27] # (batch_size, 7)
+0097         out = [block(features) for block, features in zip(self.feature_extractor, [lighting, weather, surface, traffic])]
+0098         return torch.stack(out, dim=1) # (batch_size, 4, 64)
+0099 
+0100 
+0101 class BNRF(nn.Module):
+0102     '''
+0103     Batch-Norm + Random Feature (BNRF)
+0104     This module first attaches an orthogonal Gaussian random feature that is deterministic for a latent representation,
+0105     and then applies batch normalisation to the concatenated latent representations inculing random features.
+0106     The attached random featurs are with no gradients to regularise the latent space.
+0107     '''
+0108     def __init__(self, seq_len, additional_dim=None):
+0109         super(BNRF, self).__init__()
+0110         self.seq_len = seq_len
+0111         if additional_dim is None:
+0112             self.additional_dim = 2
+0113         else:
+0114             self.additional_dim = additional_dim
+0115         self.batch_norm1d = nn.BatchNorm1d(seq_len+self.additional_dim)
+0116         self.register_buffer('projector', # register a buffer to store the orthogonal random feature
+0117                              torch.ones((self.additional_dim, self.seq_len), requires_grad=False)*float('inf'))
+0118 
+0119     @staticmethod
+0120     def _make_orthogonal_rows(m, n, device):
+0121         # full random Gaussian matrix
+0122         G = torch.randn(n, n, device=device, requires_grad=False) # (seq_len, seq_len)
+0123         # QR decomposition -> orthonormal columns (so rows of Q^T are orthonormal)
+0124         Q, _ = torch.linalg.qr(G, mode='reduced')          # Q: seq_len×seq_len
+0125         Q = Q[:m].contiguous()                             # keep first `additional_dim` rows of Q^T
+0126                                                            # (additional_dim, seq_len)
+0127 
+0128         # scaling factors for each row of Q^T
+0129         chi_samples = torch.randn(m, n, device=device).norm(dim=1, keepdim=True) # (additional_dim, seq_len)
+0130         return (chi_samples / (n**0.5)) * Q  # (additional_dim, seq_len)
+0131     
+0132     def forward(self, x): # x: (batch_size, seq_len, latent_dims=64)
+0133         if self.projector.isinf().all():
+0134             self.projector = self._make_orthogonal_rows(self.additional_dim, self.seq_len, x.device)
+0135 
+0136         # random_feature = torch.einsum('as,bsd->bad', self.projector, x) 
+0137         random_feature = torch.matmul(x.transpose(1,2), self.projector.transpose(0,1)).transpose(1,2) # (batch_size, additional_dim, latent_dims=64)
+0138         
+0139         latent = self.batch_norm1d(torch.cat([x, random_feature], dim=1)) # (batch_size, seq_len+additional_dim, latent_dims=64)
+0140         return latent
+0141 
+0142 
+0143 class AttentionBlock(nn.Module):
+0144     '''
+0145     This defines a block for the self-attention mechanism.
+0146     '''
+0147     def __init__(self, input_dims):
+0148         super(AttentionBlock, self).__init__()
+0149         self.linear_q = nn.Sequential(
+0150             nn.Linear(input_dims, input_dims),
+0151         )
+0152         self.linear_k = nn.Sequential(
+0153             nn.Linear(input_dims, input_dims),
+0154         )
+0155         self.linear_v = nn.Sequential(
+0156             nn.Linear(input_dims, input_dims),
+0157         )
+0158         self.dropout = nn.Dropout(0.2)
+0159         self.layer_norm = nn.LayerNorm(input_dims)
+0160 
+0161     def forward(self, x): # x: (batch_size, seq_len, input_dims)
+0162         queries = self.linear_q(x)
+0163         keys = self.linear_k(x)
+0164         values = self.linear_v(x)
+0165 
+0166         scores = torch.matmul(queries, keys.transpose(-2, -1)) / (values.size(-1) ** 0.5)
+0167         attention = torch.nn.functional.softmax(scores, dim=-1) # (batch_size, seq_len, seq_len)
+0168         attention = self.dropout(attention)
+0169         attended = torch.matmul(attention, values) # (batch_size, seq_len, output_dims)
+0170 
+0171         attended = self.layer_norm(attended + x)
+0172         return attended, attention
+0173     
+0174 
+0175 class FeedForwardBlock(nn.Module):
+0176     '''
+0177     This defines a block for the feed-forward network.
+0178     The output dimensions can be either the same as the input dimensions or larger.
+0179     If the output dimensions are larger, the number needs to be divisible by the input dimensions
+0180     to allow for residual connection.
+0181     '''
+0182     def __init__(self, input_dims, output_dims):
+0183         super(FeedForwardBlock, self).__init__()
+0184         self.input_dims = input_dims
+0185         self.output_dims = output_dims
+0186         self.mlp = nn.Sequential(
+0187             nn.Linear(input_dims, output_dims),
+0188             nn.Dropout(0.2),
+0189             nn.GELU(),
+0190             nn.Linear(output_dims, output_dims)
+0191         )
+0192         self.layer_norm = nn.LayerNorm(output_dims)
+0193 
+0194     def forward(self, x): # x: (batch_size, seq_len, input_dims)
+0195         if self.input_dims == self.output_dims:
+0196             residual = x
+0197         else: # output_dims needs to be larger than and divisible by input_dims
+0198             residual = torch.repeat_interleave(x, self.output_dims//self.input_dims, dim=-1)
+0199         out = self.mlp(x)
+0200         out = self.layer_norm(out + residual)
+0201         return out
+0202 
+0203 
+0204 class StackedAttention(nn.Module):
+0205     '''
+0206     This module stacks multiple attention blocks and feed-forward blocks together.
+0207     '''
+0208     def __init__(self, dims_list, prefix='block'):
+0209         super(StackedAttention, self).__init__()
+0210         self.attention_blocks = nn.ModuleList([
+0211             AttentionBlock(in_dim) for in_dim, _ in dims_list
+0212         ])
+0213         self.feedforward_blocks = nn.ModuleList([
+0214             FeedForwardBlock(in_dim, out_dim) for in_dim, out_dim in dims_list
+0215         ])
+0216         self.prefix = prefix
+0217 
+0218     def forward(self, x, attention_matrices=None):
+0219         out = x
+0220         for i, (attn_block, ff_block) in enumerate(zip(self.attention_blocks, self.feedforward_blocks)):
+0221             attended, attention = attn_block(out)
+0222             out = ff_block(attended)
+0223             if attention_matrices is not None:
+0224                 attention_matrices[f'{self.prefix}_{i}'] = attention
+0225         return out, attention_matrices
+0226 
+0227 
+0228 class AttentionDecoder(nn.Module):
+0229     '''
+0230     State self-attention: (batch_size, seq_len, latent_dims=64) -> (batch_size, seq_len+additional_dim, hidden_dims=256=64*4)
+0231     Local interaction with CNN: (batch_size, 256, seq_len+additional_dim) -> (batch_size, 16, seq_len+additional_dim) -> (batch_size, 128)
+0232     Output with MLP: (batch_size, 128) -> (batch_size, 1)
+0233     '''
+0234     def __init__(self, seq_len, latent_dims=64, single_output=None, return_attention=False):
+0235         super(AttentionDecoder, self).__init__()
+0236         self.seq_len = seq_len
+0237         self.latent_dims = latent_dims
+0238         self.single_output = single_output
+0239         self.return_attention = return_attention
+0240 
+0241         # Define the BNRF module
+0242         self.bnrf = BNRF(self.seq_len)
+0243         self.seq_len += self.bnrf.additional_dim
+0244 
+0245         # Define the attention blocks
+0246         self.SelfAttention = StackedAttention([
+0247             (self.latent_dims, self.latent_dims),
+0248             (self.latent_dims, self.latent_dims),
+0249             (self.latent_dims, self.latent_dims*2),
+0250             (self.latent_dims*2, self.latent_dims*2),
+0251             (self.latent_dims*2, self.latent_dims*4),
+0252             (self.latent_dims*4, self.latent_dims*4),
+0253         ])
+0254 
+0255         # Define the output layers
+0256         self.output_cnn = nn.Sequential( # (batch_size, latent_dims*4=256, seq_len)
+0257             nn.Conv1d(self.latent_dims*4, self.latent_dims, kernel_size=3, padding=1),
+0258             nn.GELU(),
+0259             nn.Conv1d(self.latent_dims, 16, kernel_size=3, padding=1),
+0260             nn.GELU(),
+0261             nn.Flatten(), # (batch_size, 16*seq_len)
+0262             nn.Linear(16*self.seq_len, 128),
+0263             nn.Dropout(0.2),
+0264             nn.GELU(),
+0265         )
+0266         self.output_mu = nn.Sequential( # (batch_size, 128)
+0267             nn.Linear(128, 64),
+0268             nn.Dropout(0.2),
+0269             nn.GELU(),
+0270             nn.Linear(64, 16),
+0271             nn.Dropout(0.2),
+0272             nn.GELU(),
+0273             nn.Linear(16, 1),
+0274         )
+0275         self.output_log_var = nn.Sequential( # (batch_size, 128)
+0276             nn.Linear(128, 64),
+0277             nn.Dropout(0.2),
+0278             nn.GELU(),
+0279             nn.Linear(64, 16),
+0280             nn.Dropout(0.2),
+0281             nn.GELU(),
+0282             nn.Linear(16, 1),
+0283         )
+0284 
+0285     def forward(self, state):
+0286         '''
+0287         The input state can include
+0288         - current: (batch_size, 12 or 13, latent_dims=64),
+0289         - environment: (batch_size, 4, latent_dims=64),
+0290         - ts: (batch_size, 5, latent_dims=64),
+0291         - optional spacing (batch_size, 1) when testing.
+0292         '''
+0293         if self.return_attention:
+0294             attention_matrices = dict()
+0295         else:
+0296             attention_matrices = None
+0297         if self.single_output == 'intensity':
+0298             spacing = state[:,-1,0:1].detach() # (batch_size, 1)
+0299             state = state[:,:-1]
+0300         latent = self.bnrf(state) # (batch_size, seq_len, latent_dims=64)
+0301         attended_state, attention_matrices = self.SelfAttention(latent, attention_matrices) # (batch_size, seq_len, latent_dims*4=256)
+0302         transposed_state = attended_state.permute(0, 2, 1) # (batch_size, latent_dims*4=256, seq_len)
+0303         out = self.output_cnn(transposed_state) # (batch_size, 16, seq_len) -> (batch_size, 128)
+0304         mu = self.output_mu(out)
+0305         log_var = self.output_log_var(out)
+0306         if self.single_output is None:
+0307             mu = mu.squeeze() # [batch_size]
+0308             log_var = log_var.squeeze()
+0309             if self.return_attention:
+0310                 return mu, log_var, (attended_state, attention_matrices) # attended_state: [batch_size, seq_len, latent_dims=64]
+0311                                                            # attention_matrices: {block_i: [batch_size, seq_len, seq_len]}
+0312             else:
+0313                 return mu, log_var
+0314         elif self.single_output == 'mu':
+0315             return mu
+0316         elif self.single_output == 'log_var':
+0317             return log_var
+0318         elif self.single_output == 'intensity':
+0319             assert spacing.size() == mu.size(), f'{spacing.size()} != {mu.size()}'
+0320             assert spacing.size() == log_var.size(), f'{spacing.size()} != {log_var.size()}'
+0321             log_p = torch.log(torch.tensor(0.5))
+0322             log_s = torch.log(torch.clamp(spacing, min=small_eps))
+0323             squared2var = torch.sqrt(2*torch.exp(log_var))
+0324             one_minus_cdf = 0.5*(1-torch.erf((log_s-mu)/squared2var))
+0325             max_intensity = log_p / torch.log(torch.clamp(one_minus_cdf, min=small_eps, max=1-small_eps))
+0326             return torch.log10(torch.clamp(max_intensity, min=1.))
+
+FILE src_data_preparation/segment_datasets.py
+URL https://github.com/Yiru-Jiao/GSSM/blob/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/segment_datasets.py
+
+0001 '''
+0002 This script segments data into scenes and organises the features for model training.
+0003 '''
+0004 
+0005 import os
+0006 import sys
+0007 import multiprocessing
+0008 import time as systime
+0009 import numpy as np
+0010 from represent_utils.utils_data_segmentation import ContextSegmenter, read_dataset
+0011 
+0012 
+0013 def main(path_prepared, path_processed, manual_seed):
+0014     initial_time = systime.time()
+0015     print(f'Available cores for parallel processing: {multiprocessing.cpu_count()}')
+0016 
+0017     for dataset in ['highD', 'SafeBaseline', 'ArgoverseHV']:
+0018         path_save = f'{path_prepared}{dataset}/'
+0019         os.makedirs(path_save, exist_ok=True)
+0020         if os.path.exists(path_save + f'profiles_{dataset}_val.h5'):
+0021             print(f'{dataset} set already segmented.')
+0022             continue
+0023 
+0024         print('Loading data...')
+0025         data_both = read_dataset(dataset, path_processed, manual_seed)
+0026         # Separate all the events into train (80%) and val (20%) sets, the test set will be (near-)crashes in SHRP2
+0027         '''
+0028         highD: 420,077 train scenes (min. dist. 1.14 m) + 102,853 val scenes (min. dist. 2.84 m)
+0029         SafeBaseline: 427,674 train scenes (min. dist. 1.78 m) + 105,671 val scenes (min. dist. 2.59 m)
+0030         ArgoverseHV: 439,175 train scenes (min. dist. 0.04 m) + 109,462 val scenes (min. dist. 0.20 m)
+0031         '''
+0032         event_ids = data_both['event_id'].unique()
+0033         len_event_ids = len(event_ids)
+0034         train_event_ids = np.random.RandomState(manual_seed).choice(event_ids, int(0.8*len_event_ids), replace=False)
+0035         val_event_ids = np.setdiff1d(event_ids, train_event_ids)
+0036         data_train = data_both[data_both['event_id'].isin(train_event_ids)]
+0037         data_val = data_both[data_both['event_id'].isin(val_event_ids)]
+0038 
+0039         # Segment and save scenes
+0040         initial_scene_id = 0
+0041         for data, suffix in zip([data_train, data_val], ['train', 'val']):
+0042             print('Segmenting ' + dataset + ' ' + suffix + ' set...')
+0043             segmenter = ContextSegmenter(data, initial_scene_id, dataset, manual_seed)
+0044             print(f'{suffix} current examples:', segmenter.current_features_set.iloc[:5].to_string(), '\n', segmenter.current_features_set.describe().to_string())
+0045             print(f'{suffix} profiles examples:', segmenter.profiles_set.iloc[:5].to_string(), '\n', segmenter.profiles_set.describe().to_string())
+0046             segmenter.profiles_set.to_hdf(path_save + f'profiles_{dataset}_{suffix}.h5', key='profiles')
+0047             segmenter.current_features_set.to_hdf(path_save + f'current_features_{dataset}_{suffix}.h5', key='features')
+0048             if dataset=='SafeBaseline':
+0049                 print(f'{suffix} environment features examples:', segmenter.environment_features_set.iloc[:5].to_string(), '\n', segmenter.environment_features_set.describe().to_string())
+0050                 segmenter.environment_features_set.to_hdf(path_save + f'environment_features_{dataset}_{suffix}.h5', key='features')
+0051             initial_scene_id = segmenter.current_features_set['scene_id'].max() + 1
+0052 
+0053             print('--------------------- ' + dataset + ' ' + suffix + ' set segmented ---------------------')
+0054             print(f'Number of scenes: {initial_scene_id - segmenter.initial_scene_id}')
+0055             print(f"Minimum dist.: {segmenter.current_features_set['s'].min():.2f}")
+0056             print(f"Unique scene ids in current features set: {segmenter.current_features_set['scene_id'].nunique()}, should be the same as the profiles set: {segmenter.profiles_set['scene_id'].nunique()}")
+0057             print('--------------------------------------------------------------------')
+0058 
+0059     print('--- Total time elapsed: ' + systime.strftime('%H:%M:%S', systime.gmtime(systime.time() - initial_time)) + ' ---')
+0060 
+0061 
+0062 if __name__ == '__main__':
+0063     sys.stdout.reconfigure(line_buffering=True)
+0064     manual_seed = 131
+0065     np.random.seed(manual_seed)
+0066 
+0067     os.makedirs('./PreparedData/Segments/', exist_ok=True)
+0068     path_prepared = './PreparedData/Segments/'
+0069     path_processed = './ProcessedData/'
+0070     main(path_prepared, path_processed, manual_seed)
+0071     sys.exit(0)
+
+FILE src_safety_evaluation/validation_utils/utils_eval_metrics.py
+URL https://github.com/Yiru-Jiao/GSSM/blob/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/utils_eval_metrics.py
+
+0001 '''
+0002 This file contains functions to calculate evaluation metrics for safety warnings.
+0003 '''
+0004 
+0005 import numpy as np
+0006 import pandas as pd
+0007 from scipy.stats import binom
+0008 small_eps = 1e-6
+0009 
+0010 
+0011 def get_statistics(warning, return_statistics=False):
+0012     # true_positives = warning[warning['danger_recorded']&(warning['true_warning']>0.5)].groupby('threshold').size()
+0013     # false_positives = warning[warning['safety_recorded']&(warning['false_warning']>0.5)].groupby('threshold').size()
+0014     # true_negatives = warning[warning['safety_recorded']&(warning['false_warning']<0.5)].groupby('threshold').size()
+0015     # false_negatives = warning[warning['danger_recorded']&(warning['true_warning']<0.5)].groupby('threshold').size()
+0016     true_positives = warning[warning['danger_recorded']&(warning['true_warning']>0.5)].groupby('threshold').size()
+0017     false_positives = warning[warning['safety_recorded']].groupby('threshold')['num_false_warning'].sum()
+0018     true_negatives = warning[warning['safety_recorded']].groupby('threshold')['num_true_non_warning'].sum()
+0019     false_negatives = warning[warning['danger_recorded']&(warning['true_warning']<0.5)].groupby('threshold').size()
+0020     statistics = pd.concat([true_positives, false_positives, true_negatives, false_negatives], axis=1, keys=['TP', 'FP', 'TN', 'FN'])
+0021     statistics = statistics.fillna(0) # nan can be caused by empty combination of threshold and warning
+0022     if return_statistics:
+0023         return statistics.reset_index().sort_values('TP')
+0024     else:
+0025         statistics = statistics.sort_index()
+0026         return statistics['TP'], statistics['FP'], statistics['TN'], statistics['FN']
+0027 
+0028 
+0029 def partial_auc(fpr, tpr, min_tpr=0.80, resolution=1000, normalize=True):
+0030     '''
+0031     Integrate the ROC curve only where TPR >= min_tpr
+0032     '''
+0033     fpr = np.asarray(fpr, dtype=float)
+0034     tpr = np.asarray(tpr, dtype=float)
+0035 
+0036     # sort the points by FPR
+0037     order = np.argsort(fpr)
+0038     fpr, tpr = fpr[order], tpr[order]
+0039 
+0040     # interpolate onto a dense, uniform FPR grid
+0041     virtual_fpr = np.linspace(small_eps, 1 - small_eps, resolution)
+0042     interp_tpr = np.interp(virtual_fpr, fpr, tpr)
+0043 
+0044     # keep only the part above the TPR floor
+0045     mask = interp_tpr >= min_tpr
+0046     if not mask.any():
+0047         return 0.0
+0048     
+0049     area = np.trapz(interp_tpr[mask] - min_tpr, virtual_fpr[mask])
+0050     if normalize:
+0051         area /= (1.0 - min_tpr)            # theoretical max area
+0052     return area
+0053 
+0054 
+0055 def get_auprc(recall, precision, resolution=1000):
+0056     '''
+0057     Area under the Precision-Recall curve
+0058     '''
+0059     recall = np.asarray(recall, dtype=float)
+0060     precision = np.asarray(precision, dtype=float)
+0061 
+0062     order = np.argsort(recall)
+0063     recall, precision = recall[order], precision[order]
+0064 
+0065     virtual_recall = np.linspace(small_eps, 1 - small_eps, resolution)
+0066     interp_precision  = np.interp(virtual_recall, recall, precision)
+0067 
+0068     return np.trapz(interp_precision, virtual_recall)
+0069 
+0070 
+0071 def partial_prc(recall, precision, min_recall=0.80):
+0072     '''
+0073     Get the maximum Precision when Recall >= min_recall
+0074     '''
+0075     recall    = np.asarray(recall, dtype=float)
+0076     precision = np.asarray(precision, dtype=float)
+0077 
+0078     # keep only the part above the Recall floor
+0079     mask = recall >= min_recall
+0080     if not mask.any():
+0081         return None
+0082     return precision[mask].max()
+0083 
+0084 
+0085 def _median_ci_bounds(x: pd.Series, alpha: float = 0.01):
+0086     """
+0087     Exact (1 - alpha) CI for the population median via order statistics.
+0088     Uses Binomial(n, 0.5) quantiles (SciPy) — stable for large n.
+0089     Returns (lower_bound, upper_bound).
+0090     """
+0091     arr = np.asarray(x.dropna())
+0092     n = arr.size
+0093     if n == 0:
+0094         return (np.nan, np.nan)
+0095 
+0096     arr.sort()
+0097 
+0098     # Binomial quantiles for p = 0.5
+0099     kL = int(binom.ppf(alpha / 2.0, n, 0.5))          # in [0, n]
+0100     kU = int(binom.ppf(1.0 - alpha / 2.0, n, 0.5))    # in [0, n]
+0101 
+0102     # Map to 0-based order-statistic indices:
+0103     # Lower = kL, Upper = kU - 1  (clipped to [0, n-1])
+0104     lo_idx = max(0, min(kL, n - 1))
+0105     hi_idx = max(0, min(kU - 1, n - 1))
+0106 
+0107     return (arr[lo_idx], arr[hi_idx])
+0108 
+0109 def get_low_CI(TTI: pd.Series, alpha: float = 0.05) -> float:
+0110     """Lower bound of the exact (1 - alpha) CI for the median."""
+0111     return _median_ci_bounds(TTI, alpha=alpha)[0]
+0112 
+0113 def get_up_CI(TTI: pd.Series, alpha: float = 0.05) -> float:
+0114     """Upper bound of the exact (1 - alpha) CI for the median."""
+0115     return _median_ci_bounds(TTI, alpha=alpha)[1]
+0116 
+0117 
+0118 def get_time(warning, f1=None, cutoff=1.5):
+0119     '''
+0120     Median time-to-impact (TTI) and the proportion with TTI ≥ cutoff.
+0121     '''
+0122     w = warning.copy()
+0123     w['TTI'] = w['impact_time'] - w['warning_timestamp'] / 1000.0
+0124 
+0125     if f1 is None:
+0126         tp, fp, tn, fn = get_statistics(warning, return_statistics=False)
+0127         f1 = tp / np.maximum(small_eps, tp + 0.5*(fp + fn))
+0128     median_tti = w[w['TTI']<10].groupby('threshold')['TTI'].median()
+0129     tti_q25 = w[w['TTI']<10].groupby('threshold')['TTI'].quantile(0.25)
+0130     tti_q75 = w[w['TTI']<10].groupby('threshold')['TTI'].quantile(0.75)
+0131     tti_lowCI = w[w['TTI']<10].groupby('threshold')['TTI'].apply(get_low_CI)
+0132     tti_upCI = w[w['TTI']<10].groupby('threshold')['TTI'].apply(get_up_CI)
+0133 
+0134     tti_star = (median_tti.loc[f1.idxmax()],
+0135                 tti_q25.loc[f1.idxmax()],
+0136                 tti_q75.loc[f1.idxmax()],
+0137                 tti_lowCI.loc[f1.idxmax()],
+0138                 tti_upCI.loc[f1.idxmax()])
+0139     w = w[w['threshold'] == f1.idxmax()]
+0140     ptti_star = len(w[w['TTI']>=cutoff])/len(w[~w['TTI'].isna()])
+0141     return tti_star, ptti_star
+0142 
+0143 
+0144 def get_eval_metrics(warning, thresholds={'roc': [0.80, 0.90], 'prc':[0.80, 0.90], 'tti': None}, with_CI=False):
+0145     '''
+0146     Compute safety-oriented evaluation metrics from a dataframe with
+0147     per-threshold confusion counts stored in columns tp, fp, tn, fn.
+0148     '''
+0149     # confusion-matrix stats
+0150     tp, fp, tn, fn = get_statistics(warning, return_statistics=False)
+0151 
+0152     # ROC
+0153     roc_metrics = {}
+0154     fpr = fp / np.maximum(small_eps, fp + tn)
+0155     tpr = tp / np.maximum(small_eps, tp + fn)
+0156     for threshold in thresholds['roc']:
+0157         roc_metrics[f'aroc_{int(threshold*100)}'] = partial_auc(fpr, tpr, threshold)
+0158 
+0159     # PRC
+0160     prc_metrics = {}
+0161     recall = tp / np.maximum(small_eps, tp + fn)
+0162     precision = tp / np.maximum(small_eps, tp + fp)
+0163     auprc = get_auprc(recall, precision)
+0164     for threshold in thresholds['prc']:
+0165         prc_metrics[f'pprc_{int(threshold*100)}'] = partial_prc(recall, precision, threshold)
+0166 
+0167     # ATC
+0168     if thresholds['tti'] is not None:
+0169         f1 = tp / np.maximum(small_eps, tp + 0.5*(fp + fn))
+0170         tti_star, ptti_star = get_time(warning, f1, thresholds['tti'])
+0171     else:
+0172         tti_star = (None, None, None)
+0173         ptti_star = None
+0174 
+0175     if with_CI:
+0176         return {
+0177             'auprc': auprc,
+0178             **roc_metrics,
+0179             **prc_metrics,
+0180             'PTTI_star': ptti_star,
+0181             'mTTI_star': tti_star[0],
+0182             'TTI_star_q25': tti_star[1],
+0183             'TTI_star_q75': tti_star[2],
+0184             'TTI_star_lowCI': tti_star[3],
+0185             'TTI_star_upCI': tti_star[4],
+0186         }
+0187     else:
+0188         return {
+0189             'auprc': auprc,
+0190             **roc_metrics,
+0191             **prc_metrics,
+0192             'PTTI_star': ptti_star,
+0193             'mTTI_star': tti_star[0],
+0194         }
+
+FILE src_safety_evaluation/validation_utils/utils_evaluation.py
+URL https://github.com/Yiru-Jiao/GSSM/blob/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/utils_evaluation.py
+
+0001 '''
+0002 This script contains utility functions for safety evaluation and analysis.
+0003 '''
+0004 
+0005 import os
+0006 import sys
+0007 import torch
+0008 import numpy as np
+0009 import pandas as pd
+0010 from torch.utils.data import Dataset, DataLoader
+0011 from scipy.special import erf
+0012 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+0013 from src_posterior_inference.inference_utils.utils_train_eval_test import train_val_test
+0014 from src_safety_evaluation.validation_utils.utils_eval_metrics import get_statistics
+0015 small_eps = 1e-6
+0016 
+0017 
+0018 def read_events(path_events, meta_only=False):
+0019     event_categories = sorted(os.listdir(path_events))
+0020     event_meta = pd.concat([pd.read_csv(path_events + f'{event_cat}/event_meta.csv') for event_cat in event_categories])
+0021     event_meta = event_meta.set_index('event_id')
+0022     if meta_only:
+0023         return event_meta
+0024     else:
+0025         event_data = pd.concat([pd.read_hdf(path_events + f'{event_cat}/event_data.h5', key='data') for event_cat in event_categories])
+0026         assert np.all(np.isin(event_data['event_id'].unique(), event_meta.index.values))
+0027         return event_meta, event_data
+0028 
+0029 
+0030 def read_evaluation(indicator, path_results, model_name=None):
+0031     if indicator in ['TAdv', 'TTC2D', 'ACT', 'EI']:
+0032         safety_evaluation = pd.read_hdf(f'{path_results}TAdv_TTC2D_ACT_EI.h5', key='data')
+0033         return safety_evaluation
+0034     elif indicator=='UCD':
+0035         safety_evaluation = pd.read_hdf(f'{path_results}SafeBaseline_UCD.h5', key='data')
+0036         return safety_evaluation
+0037     elif indicator=='GSSM':
+0038         safety_evaluation = pd.read_hdf(f'{path_results}{model_name}.h5', key='data')
+0039         return safety_evaluation
+0040 
+0041 
+0042 def set_veh_dimensions(event_meta, avg_width, avg_length):
+0043     veh_dimensions = event_meta[['ego_width','ego_length','target_width','target_length']].copy()
+0044     condition = event_meta[['target_width','target_length']].isna().any(axis=1)
+0045     veh_dimensions.loc[condition, ['target_width','target_length']] = event_meta.loc[condition, ['other_width','other_length']].values
+0046     for var in ['ego_width','ego_length','target_width','target_length']:
+0047         veh_dimensions.loc[veh_dimensions[var].isna(), var] = avg_width if 'width' in var else avg_length
+0048     return veh_dimensions
+0049 
+0050 
+0051 def define_model(device, path_prepared, dataset, encoder_selection, mixrate=2, single_output=None, return_attention=False):
+0052     # Define the model
+0053     pipeline = train_val_test(device, path_prepared, dataset, encoder_selection, single_output, return_attention)
+0054     # Load trained model
+0055     pipeline.load_model(mixrate)
+0056     print(f'Model loaded: {pipeline.dataset_name}-{pipeline.encoder_name}')
+0057     return pipeline._model
+0058 
+0059 
+0060 def lognormal_pdf(x, mu, sigma, rescale=True):
+0061     p = 1/x/np.sqrt(2*np.pi)/sigma*np.exp(-1/2*(np.log(x)-mu)**2/sigma**2)
+0062     if rescale:
+0063         mode = np.exp(mu-sigma**2)
+0064         pmax = 1/mode/np.sqrt(2*np.pi)/sigma*np.exp(-1/2*sigma**2)
+0065         p = p/pmax
+0066     return p
+0067 
+0068 
+0069 def lognormal_cdf(x, mu, sigma):
+0070     x = np.maximum(small_eps, x)
+0071     return 1/2+1/2*erf((np.log(x)-mu)/sigma/np.sqrt(2))
+0072 
+0073 
+0074 def extreme_cdf(x, mu, sigma, n=10):
+0075     return (1-lognormal_cdf(x,mu,sigma))**n
+0076 
+0077 
+0078 def torch_intensity(spacing, mu, log_var=None, var=None):
+0079     assert spacing.size() == mu.size(), f'{spacing.size()} != {mu.size()}'
+0080     assert spacing.size() == log_var.size(), f'{spacing.size()} != {log_var.size()}'
+0081     log_p = torch.log(torch.tensor(0.5, device=mu.device))
+0082     log_s = torch.log(torch.clamp(spacing, min=small_eps))
+0083     if var is None:
+0084         squared2var = torch.sqrt(2*torch.exp(log_var))
+0085     elif log_var is None:
+0086         squared2var = torch.sqrt(2*var)
+0087     else:
+0088         ValueError('At least one of log_var and var should be provided.')
+0089     one_minus_cdf = 0.5*(1-torch.erf((log_s-mu)/squared2var))
+0090     max_intensity = log_p / torch.log(torch.clamp(one_minus_cdf, min=small_eps, max=1-small_eps))
+0091     return torch.log10(torch.clamp(max_intensity, min=1.))
+0092 
+0093 
+0094 def send_x_to_device(x, device):
+0095     if isinstance(x, list):
+0096         return tuple([i.to(device) for i in x])
+0097     else:
+0098         return x.to(device)
+0099 
+0100 
+0101 class custom_dataset(Dataset): 
+0102     def __init__(self, X, s):
+0103         self.X = X
+0104         self.s = torch.from_numpy(s).float()
+0105         if isinstance(X, tuple):
+0106             def get_length():
+0107                 return len(self.X[0])
+0108             def get_item(idx):
+0109                 return tuple([torch.from_numpy(x_i[idx]).float() for x_i in self.X])
+0110         else:
+0111             def get_length():
+0112                 return len(self.X)
+0113             def get_item(idx):
+0114                 return torch.from_numpy(self.X[idx]).float()
+0115         self.get_length = get_length
+0116         self.get_item = get_item
+0117 
+0118     def __len__(self): 
+0119         return self.get_length()
+0120 
+0121     def __getitem__(self, idx): 
+0122         return self.get_item(idx), self.s[idx]
+0123     
+0124 
+0125 def get_GSSM(states, model, device):
+0126     contexts, spacing_list = states
+0127     data_loader = DataLoader(custom_dataset(contexts, spacing_list), batch_size=1024, shuffle=False)
+0128     org_training = model.training
+0129 
+0130     mu_list = []
+0131     sigma_list = []
+0132     logn_list = []
+0133     model.eval()
+0134     with torch.no_grad():
+0135         for X, s in data_loader:
+0136             out = model(send_x_to_device(X, device))
+0137             mu, log_var = out
+0138             logn = torch_intensity(s.to(device), mu, log_var=log_var)
+0139             mu_list.append(mu.cpu().numpy()) # [n_samples]
+0140             sigma_list.append(np.exp(0.5*log_var.cpu().numpy()))
+0141             logn_list.append(logn.cpu().numpy())
+0142     model.train(org_training)
+0143 
+0144     mu = np.concatenate(mu_list)
+0145     sigma = np.concatenate(sigma_list)
+0146     logn = np.concatenate(logn_list)
+0147 
+0148     return mu, sigma, logn # around (0.050171666, 693146.834) -> (0, 5.8408)
+0149 
+0150 
+0151 def determine_conflicts(evaluation, conflict_indicator, threshold):
+0152     evaluation = evaluation.reset_index()
+0153     evaluation['conflict'] = False
+0154 
+0155     if conflict_indicator in ['TAdv', 'TTC2D', 'ACT']:
+0156         evaluation.loc[(evaluation[conflict_indicator]<threshold), 'conflict'] = True
+0157         return evaluation
+0158     
+0159     elif conflict_indicator in ['EI']:
+0160         evaluation.loc[(evaluation[conflict_indicator]>threshold), 'conflict'] = True
+0161         return evaluation
+0162     
+0163     elif conflict_indicator in ['GSSM', 'UCD']:
+0164         evaluation.loc[evaluation['intensity']>threshold, 'conflict'] = True
+0165         return evaluation
+0166 
+0167 
+0168 def is_target_recorded(danger, pre_danger, target_id, indicator):
+0169     '''
+0170     The conflicting target was not marked in the SHRP2 data, and it's possible the target was not recorded in
+0171     the data. We thus need to filter out those invalid cases. 
+0172     Later the method evaluation will assess missed detection based on [the target in danger] and assess false
+0173     detection based on [other surrounding vehicles in the pre-danger period]. 
+0174     To remain those eval-use data unintervened, this filtering is based on [the target in the pre-danger period] 
+0175     and [other surrounding vehicles in the danger period]. It is thus assumed that the conflicting target is less
+0176     risky in the pre-danger period than within the danger period. 
+0177     More specifically,
+0178     1) if the selected target has no data before the danger period, a filtering is not possible so we 
+0179        skip the event, better being conservative than misleading;
+0180     2) for the selected target, the 25th, 50th, and 75th percentiles of the risk indicated by the indicator values
+0181        should be less in the pre-danger period than in the danger period, otherwise, the real conflicting target
+0182        might be missed.
+0183     * The use of 25th, 50th, and 75th percentiles (rather than e.g., min, mean, max) intends for a more robust 
+0184       comparison and to avoid potential influence of outliers.
+0185     '''
+0186     danger = danger.loc[[target_id]]
+0187     pre_danger = pre_danger[pre_danger['target_id']==target_id]
+0188 
+0189     # 1) No data before the danger period
+0190     if len(pre_danger)<1:
+0191         target_not_recorded = True
+0192         percentiles_pre_danger = [np.nan, np.nan, np.nan]
+0193         percentiles_danger = [np.nan, np.nan, np.nan]
+0194     else:
+0195         target_not_recorded = False
+0196         # To avoid error in returning percentiles, replace inf with a large value and -inf with a small value
+0197         pre_danger_positive_inf = np.isinf(pre_danger[indicator])&(pre_danger[indicator]>0)
+0198         pre_danger_negative_inf = np.isinf(pre_danger[indicator])&(pre_danger[indicator]<0)
+0199         danger_positive_inf = np.isinf(danger[indicator])&(danger[indicator]>0)
+0200         danger_negative_inf = np.isinf(danger[indicator])&(danger[indicator]<0)
+0201         pre_danger.loc[pre_danger_positive_inf, indicator] = max(1e6, pre_danger.loc[~pre_danger_positive_inf, indicator].max())
+0202         pre_danger.loc[pre_danger_negative_inf, indicator] = min(-1e6, pre_danger.loc[~pre_danger_negative_inf, indicator].min())
+0203         danger.loc[danger_positive_inf, indicator] = max(1e6, danger.loc[~danger_positive_inf, indicator].max())
+0204         danger.loc[danger_negative_inf, indicator] = min(-1e6, danger.loc[~danger_negative_inf, indicator].min())
+0205         if indicator in ['TAdv', 'TTC2D', 'ACT']:
+0206             # For these indicators, the smaller the value, the higher the risk
+0207             percentiles_pre_danger = pre_danger[indicator].quantile([0.25, 0.5, 0.75]).values
+0208             percentiles_danger = danger[indicator].quantile([0.25, 0.5, 0.75]).values
+0209             for i in range(3):
+0210                 if percentiles_pre_danger[i] <= percentiles_danger[i]:
+0211                     target_not_recorded = True
+0212         elif indicator in ['intensity', 'EI']:
+0213             # For these indicators, the larger the value, the higher the risk
+0214             percentiles_pre_danger = pre_danger[indicator].quantile([0.25, 0.5, 0.75]).values
+0215             percentiles_danger = danger[indicator].quantile([0.25, 0.5, 0.75]).values
+0216             for i in range(3):
+0217                 if percentiles_pre_danger[i] >= percentiles_danger[i]:
+0218                     target_not_recorded = True
+0219 
+0220     return target_not_recorded, (percentiles_pre_danger, percentiles_danger)
+0221 
+0222 
+0223 def determine_target(indicator, danger, pre_danger):
+0224     if indicator in ['GSSM', 'UCD']:
+0225         indicator = 'intensity'
+0226     if len(danger)<1: # no surrounding vehicles recorded in the danger period
+0227         target_id = np.nan
+0228         indicator_values = ([np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan])
+0229     elif danger[indicator].isna().all() or pre_danger[indicator].isna().all(): # in case of invalid values
+0230         target_id = np.nan
+0231         indicator_values = ([np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan])
+0232     else: # a target is temporarily selected as the most risky one in the danger period
+0233         if indicator in ['TAdv', 'TTC2D', 'ACT']:
+0234             target_id = danger.groupby('target_id')[indicator].mean().idxmin()
+0235             target_not_recorded, indicator_values = is_target_recorded(danger, pre_danger, target_id, indicator)
+0236         elif indicator in ['EI', 'intensity']:
+0237             target_id = danger.groupby('target_id')[indicator].mean().idxmax()
+0238             target_not_recorded, indicator_values = is_target_recorded(danger, pre_danger, target_id, indicator)
+0239 
+0240         if target_not_recorded:
+0241             target_id = np.nan
+0242             indicator_values = ([np.nan, np.nan, np.nan], [np.nan, np.nan, np.nan])
+0243     return target_id, indicator_values
+0244 
+0245 
+0246 def parallel_records(threshold, safety_evaluation, event_data, event_meta, indicator):
+0247     safety_evaluation = safety_evaluation.sort_values(['target_id','time']).set_index('event_id')
+0248     event_data = event_data.reset_index().set_index(['event_id', 'target_id', 'time'])
+0249     event_meta = event_meta[event_meta['duration_enough']&(event_meta['conflict']!='none')]
+0250     event_ids = np.intersect1d(event_meta.index.values, safety_evaluation.index.unique())
+0251 
+0252     records = event_meta[['danger_start', 'danger_end']].copy()
+0253     initial_columns = ['danger_recorded', 'true_warning', 'safety_recorded', 'safe_target_ids', 'num_false_warning', 'num_true_non_warning', 'false_warning']
+0254     initial_vlaues = [False, np.nan, False, 'none', np.nan, np.nan, np.nan]
+0255     for event_id in event_ids:
+0256         event = safety_evaluation.loc[event_id]
+0257         records.loc[event_id, initial_columns] = initial_vlaues
+0258 
+0259         danger = event[(event['time']>=event_meta.loc[event_id, 'danger_start']/1000)&
+0260                        (event['time']<=event_meta.loc[event_id, 'danger_end']/1000)].reset_index().set_index('target_id')
+0261         pre_danger = event[(event['time']<event_meta.loc[event_id, 'danger_start']/1000)].reset_index()
+0262 
+0263         # Determine the conflicting target and warning
+0264         target_id, indicator_values = determine_target(indicator, danger, pre_danger)
+0265         if np.isnan(target_id):
+0266             continue
+0267         target_danger = danger.loc[[target_id]]
+0268         if len(target_danger)<20:
+0269             # a potential target in danger for at least 2 seconds
+0270             continue
+0271         records.loc[event_id, 'danger_recorded'] = True
+0272         records.loc[event_id, 'target_id'] = target_id
+0273         records.loc[event_id, ['25th_pre_danger','50th_pre_danger','75th_pre_danger']] = indicator_values[0]
+0274         records.loc[event_id, ['25th_danger','50th_danger','75th_danger']] = indicator_values[1]
+0275         target_danger = determine_conflicts(target_danger, indicator, threshold)
+0276         if target_danger['conflict'].sum()>5: # at least warning for 0.5 second
+0277             records.loc[event_id, 'true_warning'] = 1
+0278         else:
+0279             records.loc[event_id, 'true_warning'] = 0
+0280 
+0281         # Determine safety period for the conflicting target
+0282         '''
+0283         the beginning of a non-target vehicle in an event before start_timestamp with no hard braking
+0284         * no hard braking, i.e., acceleration > -1.5 m/s^2 in the period
+0285         * start: 1.5 seconds after the target is detected
+0286         * end: considering 2~5 seconds after start, at least 3 seconds before conflict start_timestamp
+0287         '''
+0288         targets = event[event['target_id']!=target_id]
+0289         targets_period = targets[targets['time']<(event_meta.loc[event_id, 'start_timestamp']/1000-3.)]
+0290         if len(targets_period) < 35:
+0291             # later there will be a filter of 35 time moments per target, so here it is meaningless if less than 35
+0292             records.loc[event_id, 'safety_recorded'] = False
+0293             continue
+0294         safety_recorded = False
+0295         target_ids = []
+0296         false_warnings = 0
+0297         targets_period = targets_period.reset_index().set_index(['event_id', 'target_id', 'time'])
+0298         for target_id in targets_period.index.get_level_values('target_id').unique():
+0299             target_period = targets_period.loc[(event_id, target_id)]
+0300             if len(target_period)<35:
+0301                 # a potential target in safety for at least 2 seconds after start (i.e. 15+20)
+0302                 continue
+0303             target_period = target_period.iloc[15:65]
+0304             no_hard_braking = (event_data.loc[(event_id, target_id, target_period.index), 'acc_ego'].min()>-1.5)
+0305             if no_hard_braking:
+0306                 safety_recorded = True
+0307                 target_ids.append(target_id)
+0308                 target_period = determine_conflicts(target_period, indicator, threshold)
+0309                 if np.any(target_period['conflict']):
+0310                     false_warnings += 1
+0311         true_non_warnings = len(target_ids) - false_warnings
+0312 
+0313         if safety_recorded:
+0314             records.loc[event_id, ['safety_recorded', 'num_false_warning', 'num_true_non_warning']] = [True, false_warnings, true_non_warnings]
+0315             records.loc[event_id, 'safe_target_ids'] = ','.join([str(i) for i in target_ids])
+0316             records.loc[event_id, 'false_warning'] = 1 if false_warnings>0 else 0
+0317 
+0318     records['threshold'] = threshold
+0319     return records
+0320 
+0321 
+0322 def optimize_threshold(warning, conflict_indicator, return_stats=False):
+0323     statistics = get_statistics(warning, return_statistics=True)
+0324     statistics['false negative rate'] = statistics['FN']/(statistics['TP']+statistics['FN'])
+0325     statistics['false positive rate'] = statistics['FP']/(statistics['FP']+statistics['TN'])
+0326     statistics['precision'] = statistics['TP']/(statistics['TP']+statistics['FP'])
+0327     statistics['recall'] = statistics['TP']/(statistics['TP']+statistics['FN'])
+0328 
+0329     if conflict_indicator in ['TAdv', 'TTC2D', 'ACT']:
+0330         statistics = statistics.sort_values(by=['false positive rate','false negative rate','threshold'], ascending=[True, True, True])
+0331     elif conflict_indicator in ['GSSM', 'EI', 'UCD']:
+0332         statistics = statistics.sort_values(by=['false positive rate','false negative rate','threshold'], ascending=[True, True, False])
+0333 
+0334     optimal_rate = statistics[statistics['recall']>=0.85]['precision'].max()
+0335     if np.isnan(optimal_rate):
+0336         if return_stats:
+0337             return statistics, None, None
+0338         else:
+0339             return np.nan
+0340     else:
+0341         optimal_warning = statistics.loc[statistics['precision']==optimal_rate]
+0342         optimal_threshold = optimal_warning.iloc[0]
+0343         if return_stats:
+0344             optimal_warning = warning[warning['threshold']==optimal_threshold['threshold']]
+0345             return statistics, optimal_warning, optimal_threshold
+0346         else:
+0347             print(warning['model'].values[0], ' ', conflict_indicator, ' ',
+0348                  ' optimal threshold: ', optimal_threshold['threshold'], 
+0349                  ' false negative rate: ', round(optimal_threshold['false negative rate']*100, 2),
+0350                  ' false positive rate: ', round(optimal_threshold['false positive rate']*100, 2),
+0351                  ' precision: ', round(optimal_threshold['precision']*100, 2),
+0352                  ' recall: ', round(optimal_threshold['recall']*100, 2))
+0353             return optimal_threshold['threshold']
+0354 
+0355 
+0356 def issue_warning(indicator, optimal_threshold, safety_evaluation, event_meta):
+0357     safety_evaluation = safety_evaluation.sort_values(['target_id','time']).set_index('event_id')
+0358     event_meta = event_meta[event_meta['duration_enough']&(event_meta['conflict']!='none')]
+0359     event_ids = np.intersect1d(event_meta.index.values, safety_evaluation.index.unique())
+0360 
+0361     records = event_meta[['danger_start', 'danger_end', 'reaction_timestamp', 'impact_timestamp']].copy()
+0362     records['indicator'] = indicator
+0363     records['optimal_threshold'] = optimal_threshold
+0364     records['danger_recorded'] = False
+0365     for event_id in event_ids:
+0366         event = safety_evaluation.loc[event_id].reset_index().set_index('target_id')
+0367 
+0368         danger = event[(event['time']>=event_meta.loc[event_id, 'danger_start']/1000)&
+0369                        (event['time']<=event_meta.loc[event_id, 'danger_end']/1000)]
+0370         pre_danger = event[(event['time']<event_meta.loc[event_id, 'danger_start']/1000)].reset_index()
+0371 
+0372         # Determine the conflicting target
+0373         target_id, indicator_values = determine_target(indicator, danger, pre_danger)
+0374         if np.isnan(target_id):
+0375             continue
+0376         target_danger = danger.loc[[target_id]]
+0377         if len(target_danger)<20:
+0378             # a potential target in danger for at least 2 seconds
+0379             continue
+0380         records.loc[event_id, 'danger_recorded'] = True
+0381         records.loc[event_id, 'target_id'] = target_id
+0382         records.loc[event_id, ['25th_pre_danger','50th_pre_danger','75th_pre_danger']] = indicator_values[0]
+0383         records.loc[event_id, ['25th_danger','50th_danger','75th_danger']] = indicator_values[1]
+0384         target = determine_conflicts(event.loc[target_id], indicator, optimal_threshold)
+0385 
+0386         # Locate the warning moment: the last safe->unsafe transition moment before impact timestamp
+0387         warning = target[target['time']<=event_meta.loc[event_id, 'impact_timestamp']/1000]['conflict'].astype(int).values
+0388         if np.all(warning==1): # warning all the time
+0389             records.loc[event_id,'warning_timestamp'] = target.iloc[0]['time']*1000
+0390         elif np.all(warning==0): # no warning at all
+0391             records.loc[event_id,'warning_timestamp'] = np.nan
+0392         else: # warning at some time moments
+0393             warning_change = warning[1:] - warning[:-1] # 1: safe->unsafe, -1: unsafe->safe, 0: no change
+0394             shift_moments = np.where(warning_change>0.5)[0]
+0395             if len(shift_moments)>0:
+0396                 records.loc[event_id,'warning_timestamp'] = target.iloc[shift_moments[-1]+1]['time']*1000
+0397             else: # no shift from safe to unsafe before impact
+0398                 if warning[0]==1: # warning from the beginning
+0399                     records.loc[event_id,'warning_timestamp'] = target.iloc[0]['time']*1000
+0400                 else: # there shouldn't be other cases, but just in case
+0401                     records.loc[event_id,'warning_timestamp'] = np.nan
+0402 
+0403         # Calculate the warning period: the percentage of warning time moments within [danger_start, danger_end]
+0404         target_danger = target[(target['time']>=event_meta.loc[event_id, 'danger_start']/1000)&
+0405                                (target['time']<=event_meta.loc[event_id, 'danger_end']/1000)]
+0406         true_warning = target_danger[target_danger['conflict']]
+0407         records.loc[event_id, 'true_warning_period'] = len(true_warning) / len(target_danger)
+0408 
+0409     return records
+0410 
+0411 
+0412 def evaluate(indicator, threshold, safety_evaluation, event_data, event_meta, voted_targets):
+0413     safety_evaluation = safety_evaluation.sort_values(['target_id','time']).set_index('event_id')
+0414     event_data = event_data.reset_index().set_index(['event_id', 'target_id', 'time'])
+0415     event_meta = event_meta.loc[voted_targets.index.values]
+0416     event_ids = np.intersect1d(event_meta.index.values, safety_evaluation.index.unique())
+0417 
+0418     records = event_meta[['danger_start', 'danger_end']].copy()
+0419     initial_columns = ['danger_recorded', 'true_warning', 'safety_recorded', 'safe_target_ids', 'num_false_warning', 'num_true_non_warning', 'false_warning']
+0420     initial_vlaues = [True, np.nan, False, 'none', np.nan, np.nan, np.nan]
+0421     for event_id in event_ids:
+0422         event = safety_evaluation.loc[event_id]
+0423         records.loc[event_id, initial_columns] = initial_vlaues
+0424 
+0425         danger = event[(event['time']>=event_meta.loc[event_id, 'danger_start']/1000)&
+0426                        (event['time']<=event_meta.loc[event_id, 'danger_end']/1000)].reset_index().set_index('target_id')
+0427 
+0428         # Determine the conflicting target and warning
+0429         target_id = voted_targets.loc[event_id, 'target_id']
+0430         target_danger = danger.loc[[target_id]]
+0431         records.loc[event_id, 'target_id'] = target_id
+0432         target_danger = determine_conflicts(target_danger, indicator, threshold)
+0433         if target_danger['conflict'].sum()>5: # at least warning for 0.5 second
+0434             records.loc[event_id, 'true_warning'] = 1
+0435         else:
+0436             records.loc[event_id, 'true_warning'] = 0
+0437 
+0438         # Locate the warning moment: the last safe->unsafe transition moment before impact timestamp
+0439         target = determine_conflicts(event[event['target_id']==target_id], indicator, threshold)
+0440         impact_time = event_meta.loc[event_id, 'impact_timestamp']/1000
+0441         warning = target[target['time']<=impact_time]['conflict'].astype(int).values
+0442         if np.all(warning==1): # warning all the time
+0443             records.loc[event_id,'warning_timestamp'] = target.iloc[0]['time']*1000
+0444         elif np.all(warning==0): # no warning at all
+0445             records.loc[event_id,'warning_timestamp'] = np.nan
+0446         else: # warning at some time moments
+0447             warning_change = warning[1:] - warning[:-1] # 1: safe->unsafe, -1: unsafe->safe, 0: no change
+0448             shift_moments = np.where(warning_change>0.5)[0]
+0449             if len(shift_moments)>0:
+0450                 records.loc[event_id,'warning_timestamp'] = target.iloc[shift_moments[-1]+1]['time']*1000
+0451             else: # no shift from safe to unsafe before impact
+0452                 if warning[0]==1: # warning from the beginning
+0453                     records.loc[event_id,'warning_timestamp'] = target.iloc[0]['time']*1000
+0454                 else: # there shouldn't be other cases, but just in case
+0455                     records.loc[event_id,'warning_timestamp'] = np.nan
+0456         records.loc[event_id, 'impact_time'] = impact_time
+0457         records.loc[event_id, 'reaction_time'] = event_meta.loc[event_id, 'reaction_timestamp']/1000
+0458 
+0459         # Calculate the warning period: the percentage of warning time moments within [danger_start, danger_end]
+0460         target_danger = target[(target['time']>=event_meta.loc[event_id, 'danger_start']/1000)&
+0461                                (target['time']<=event_meta.loc[event_id, 'danger_end']/1000)]
+0462         true_warning = target_danger[target_danger['conflict']]
+0463         records.loc[event_id, 'true_warning_period'] = len(true_warning) / len(target_danger)
+0464 
+0465         # Determine safety period for the conflicting target
+0466         '''
+0467         the beginning of a non-target vehicle in an event before start_timestamp with no hard braking
+0468         * no hard braking, i.e., acceleration > -1.5 m/s^2 in the period
+0469         * start: 1.5 seconds after the target is detected
+0470         * end: considering 2~5 seconds after start, at least 3 seconds before conflict start_timestamp
+0471         '''
+0472         targets = event[event['target_id']!=target_id]
+0473         targets_period = targets[targets['time']<(event_meta.loc[event_id, 'start_timestamp']/1000-3.)]
+0474         if len(targets_period) < 35:
+0475             # later there will be a filter of 35 time moments per target, so here it is meaningless if less than 35
+0476             records.loc[event_id, 'safety_recorded'] = False
+0477             continue
+0478         safety_recorded = False
+0479         target_ids = []
+0480         false_warnings = 0
+0481         targets_period = targets_period.reset_index().set_index(['event_id', 'target_id', 'time'])
+0482         for target_id in targets_period.index.get_level_values('target_id').unique():
+0483             target_period = targets_period.loc[(event_id, target_id)]
+0484             if len(target_period)<35:
+0485                 # a potential target in safety for at least 2 seconds after start (i.e. 15+20)
+0486                 continue
+0487             target_period = target_period.iloc[15:65]
+0488             no_hard_braking = (event_data.loc[(event_id, target_id, target_period.index), 'acc_ego'].min()>-1.5)
+0489             if no_hard_braking:
+0490                 safety_recorded = True
+0491                 target_ids.append(target_id)
+0492                 target_period = determine_conflicts(target_period, indicator, threshold)
+0493                 if np.any(target_period['conflict']):
+0494                     false_warnings += 1
+0495         true_non_warnings = len(target_ids) - false_warnings
+0496 
+0497         if safety_recorded:
+0498             records.loc[event_id, ['safety_recorded', 'num_false_warning', 'num_true_non_warning']] = [True, false_warnings, true_non_warnings]
+0499             records.loc[event_id, 'safe_target_ids'] = ','.join([str(i) for i in target_ids])
+0500             records.loc[event_id, 'false_warning'] = 1 if false_warnings>0 else 0
+0501 
+0502     records['threshold'] = threshold
+0503     return records
+
+FILE src_safety_evaluation/vote_conflicting_target.py
+URL https://github.com/Yiru-Jiao/GSSM/blob/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/vote_conflicting_target.py
+
+0001 '''
+0002 This script is to make votes using various SSMs to select the conflicting target for each event in the SHRP2 dataset.
+0003 '''
+0004 
+0005 import os
+0006 import sys
+0007 import numpy as np
+0008 import pandas as pd
+0009 from tqdm import tqdm
+0010 import time as systime
+0011 manual_seed = 131
+0012 
+0013 
+0014 def main(path_result):
+0015     initial_time = systime.time()
+0016     print('---- available cpus:', os.cpu_count(), '----')
+0017 
+0018     '''
+0019     Vote for the conflicting targets using all SSM models.
+0020     '''
+0021     # Read meta data for all event categories
+0022     os.makedirs(path_result + 'Conflicts/', exist_ok=True)
+0023     event_meta = pd.read_csv(path_result + 'Analyses/EventMeta.csv', index_col=0)
+0024 
+0025     if os.path.exists(path_result + 'Conflicts/Voted_conflicting_targets.csv'):
+0026         voted_targets = pd.read_csv(path_result + 'Conflicts/Voted_conflicting_targets.csv', index_col=0)
+0027         print('--- Conflicting targets already voted ---')
+0028     else:
+0029         print('--- Voting conflicting targets ---')
+0030         voted_targets = event_meta[['duration_enough','event_category','conflict']].copy()
+0031 
+0032         # Record the identified target by all used SSMs
+0033         warning_files = sorted(os.listdir(path_result + 'Analyses/'))
+0034         warning_files = [f for f in warning_files if f.startswith('Warning_') and f.endswith('.h5')]
+0035 
+0036         models = []
+0037         for warning_file in warning_files:
+0038             model = warning_file.split('Warning_')[1][:-3]
+0039             if 'UCD' in model:
+0040                 continue
+0041             if 'mixed' in model:
+0042                 if 'ArgoverseHV' in model:
+0043                     if '0.1' not in model:
+0044                         continue
+0045                 elif 'highD' in model:
+0046                     if '1.0' not in model:
+0047                         continue
+0048             models.append(model)
+0049             warning = pd.read_hdf(path_result+'Analyses/'+warning_file, key='results')
+0050             warning = warning.groupby('event_id')['target_id'].first()
+0051             voted_targets.loc[warning.index, model] = warning.values
+0052         voted_targets[models] = voted_targets[models].fillna(-1).astype(int)
+0053         print(f'Models to use ({len(models)}):\n', models)
+0054         if len(models) < 15:
+0055             print('--- Exit: Not enough models to vote ---')
+0056             sys.exit(0)
+0057 
+0058         # Seeing each model makes a vote, select the target with the most votes 
+0059         # and less than 1/3 of the total votes against (considering NaNs as abstentions)
+0060         for event_id in tqdm(voted_targets.index, desc='Vote for conflicting target', ascii=True, miniters=100):
+0061             candidates = voted_targets.loc[event_id][models].values
+0062             candidates, votes = np.unique(candidates, return_counts=True)
+0063             if np.any(candidates<0):
+0064                 abstentions = votes[candidates<0][0]
+0065                 votes = votes[candidates>=0]
+0066                 candidates = candidates[candidates>=0]
+0067             else:
+0068                 abstentions = 0
+0069             if len(candidates) < 1:
+0070                 voted_targets.loc[event_id, 'target_id'] = -1
+0071                 voted_targets.loc[event_id, 'target_note'] = 'No target is identified by any SSMs'
+0072                 continue
+0073             if votes.max() < len(models)/3:
+0074                 voted_targets.loc[event_id, 'target_id'] = -1
+0075                 voted_targets.loc[event_id, 'target_note'] = 'The most votes are less than 1/3 of total'
+0076                 continue
+0077             most_voted = candidates[votes.argmax()]
+0078             if votes.sum()-votes.max() >= len(models)/3:
+0079                 voted_targets.loc[event_id, 'target_id'] = -1
+0080                 voted_targets.loc[event_id, 'target_note'] = 'More than 1/3 votes are not for the most voted target'
+0081                 continue
+0082             voted_targets.loc[event_id, 'target_id'] = most_voted
+0083             voted_targets.loc[event_id, 'target_note'] = f'For: {votes.max()}, against: {votes.sum()-votes.max()}, abstentions: {abstentions}'
+0084 
+0085         voted_targets['target_id'] = voted_targets['target_id'].astype(int)
+0086         voted_targets['target_note'] = voted_targets['target_note'].astype(str)
+0087         voted_targets.to_csv(path_result + 'Conflicts/Voted_conflicting_targets.csv', index=True, header=True)
+0088 
+0089     print('--- Total time elapsed: ' + systime.strftime('%H:%M:%S', systime.gmtime(systime.time() - initial_time)) + ' ---')
+0090     sys.exit(0)
+0091 
+0092 
+0093 if __name__ == '__main__':
+0094     sys.stdout.reconfigure(line_buffering=True)
+0095     np.random.seed(manual_seed)
+0096     path_result = 'ResultData/'
+0097     main(path_result)

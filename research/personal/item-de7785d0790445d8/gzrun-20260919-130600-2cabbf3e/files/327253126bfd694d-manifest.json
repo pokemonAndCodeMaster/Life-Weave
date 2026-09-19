@@ -1,0 +1,565 @@
+{
+  "paper": "Learning collision risk proactively from naturalistic driving data at scale",
+  "arxiv_version": "2505.13556v5",
+  "code_branch": "main",
+  "code_commit": "0ee2542eb28e50948cae8561332365d5f76e29d4",
+  "fetch_date": "2026-09-19",
+  "reading_log": "reading-log.md",
+  "entries": [
+    {
+      "file": "research/sources/arxiv-v5.html",
+      "url": "https://arxiv.org/html/2505.13556v5",
+      "final_url": "https://arxiv.org/html/2505.13556v5",
+      "bytes": 486336,
+      "fetched_utc": "2026-09-19T13:06:47.663784+00:00",
+      "sha256": "bb4eeea70d302b42990a61473b3abeede02ffea62cb05d279049e641742e86dd",
+      "version": "2505.13556v5"
+    },
+    {
+      "file": "research/sources/arxiv-abs.html",
+      "url": "https://arxiv.org/abs/2505.13556",
+      "final_url": "https://arxiv.org/abs/2505.13556",
+      "bytes": 44541,
+      "fetched_utc": "2026-09-19T13:06:45.317653+00:00",
+      "sha256": "49016031e1c0d60f6c51576976f319f13b773fc790c4c02f1af1a6422d8bde35",
+      "version": "see source metadata"
+    },
+    {
+      "file": "research/sources/github-repo.json",
+      "url": "https://api.github.com/repos/Yiru-Jiao/GSSM",
+      "final_url": "https://api.github.com/repos/Yiru-Jiao/GSSM",
+      "bytes": 5271,
+      "fetched_utc": "2026-09-19T13:06:45.436717+00:00",
+      "sha256": "7a192fd10ce716ee386a25192003465f2794456ef9d4eac68b207a213aa3917f",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "file": "research/sources/github-commits.json",
+      "url": "https://api.github.com/repos/Yiru-Jiao/GSSM/commits?per_page=20",
+      "final_url": "https://api.github.com/repos/Yiru-Jiao/GSSM/commits?per_page=20",
+      "bytes": 33841,
+      "fetched_utc": "2026-09-19T13:06:45.719461+00:00",
+      "sha256": "d6e11c903049f4266ddc55d04154dac8a177957177b0c0c818bc60d910119820",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "file": "research/sources/nature.html",
+      "url": "https://www.nature.com/articles/s42256-026-01189-w",
+      "final_url": "https://www.nature.com/articles/s42256-026-01189-w?error=cookies_not_supported&code=851d3e3e-e584-4e7b-b412-e39e68eab21e",
+      "bytes": 368968,
+      "fetched_utc": "2026-09-19T13:06:52.979819+00:00",
+      "sha256": "e76a4a04837fd44834e4d7853ac833c305dd7227eab03cec17328e9cb4fe4466",
+      "version": "see source metadata"
+    },
+    {
+      "file": "research/sources/arxiv-v3.html",
+      "url": "https://arxiv.org/html/2505.13556v3",
+      "final_url": "https://arxiv.org/html/2505.13556v3",
+      "bytes": 416383,
+      "fetched_utc": "2026-09-19T13:06:46.367788+00:00",
+      "sha256": "e2dfe1a28c55364e7d5c7d8009adb010c5552b0ff142ecbd34b920b7a8b5464e",
+      "version": "see source metadata"
+    },
+    {
+      "path": "research/code/ProcessedData/SHRP2/readme_data_structure.md",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/ProcessedData/SHRP2/readme_data_structure.md",
+      "bytes": 6658,
+      "fetched_utc": "2026-09-19T13:07:36.724752+00:00",
+      "sha256": "8250c1e7cd01aa1409eaf317b05718ed620e98c976093cc95dbbf17ba6cf5323",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/clean_pycache.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/clean_pycache.py",
+      "bytes": 943,
+      "fetched_utc": "2026-09-19T13:07:37.730211+00:00",
+      "sha256": "cc269ca684ca448a222a3bc2898de6e3d7f3165d0e2a90b9a43989227f29f1ae",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/environment_test.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/environment_test.py",
+      "bytes": 3918,
+      "fetched_utc": "2026-09-19T13:07:36.728680+00:00",
+      "sha256": "098f281a28229762489cf4b59ed527fad141ea8059c6a98fb6427ee92db44b0b",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/pyproject.toml",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/pyproject.toml",
+      "bytes": 3657,
+      "fetched_utc": "2026-09-19T13:07:37.737338+00:00",
+      "sha256": "82a961b4deca5ed1b617cae2738abbb58a6f739e76a03d7d0635821a44e5fa68",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/readme.md",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/readme.md",
+      "bytes": 10808,
+      "fetched_utc": "2026-09-19T13:07:37.734229+00:00",
+      "sha256": "ec95518c454a61cdda2a9327fa9dbe988e226632d519e86239494a66d6ac31ab",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_data_preparation/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:37.732665+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_data_preparation/prepare_argoverse.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/prepare_argoverse.py",
+      "bytes": 3903,
+      "fetched_utc": "2026-09-19T13:07:37.750354+00:00",
+      "sha256": "e7f3d82946c2c029e6be9d89eff8d30bbaaeb6e9256782928fe33cf4d9859588",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_data_preparation/prepare_highD.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/prepare_highD.py",
+      "bytes": 7889,
+      "fetched_utc": "2026-09-19T13:07:36.730134+00:00",
+      "sha256": "3f6550ee036405946a24ef5554e3a2a5c612e3a8a5f47a9861b80e5888d19122",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_data_preparation/represent_utils/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/represent_utils/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:37.170601+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_data_preparation/represent_utils/coortrans.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/represent_utils/coortrans.py",
+      "bytes": 6483,
+      "fetched_utc": "2026-09-19T13:07:37.230702+00:00",
+      "sha256": "4c919c8b1080ae2b53dd3056727614d4de6998bc66f422badfe2ce057d8d22a5",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_data_preparation/represent_utils/get_heading_highD.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/represent_utils/get_heading_highD.py",
+      "bytes": 6214,
+      "fetched_utc": "2026-09-19T13:07:37.206831+00:00",
+      "sha256": "14df843c0a24593dbd47013b1c8421d534fe908796fad2da989030c2d3459d82",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_data_preparation/represent_utils/utils_data_segmentation.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/represent_utils/utils_data_segmentation.py",
+      "bytes": 11155,
+      "fetched_utc": "2026-09-19T13:07:37.695829+00:00",
+      "sha256": "c26a52a01db4b2c5bf439861bd0bcf9f827b04d5be2f501bc664f52f6fd57553",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_data_preparation/segment_datasets.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_data_preparation/segment_datasets.py",
+      "bytes": 4042,
+      "fetched_utc": "2026-09-19T13:07:37.672038+00:00",
+      "sha256": "755edf00dd5852191a2b9ba0f87ecb26285275e7d9696e0bf763db6f7cceb126",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_posterior_inference/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:37.744494+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_posterior_inference/inference_utils/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/inference_utils/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:39.201526+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_posterior_inference/inference_utils/modules.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/inference_utils/modules.py",
+      "bytes": 14715,
+      "fetched_utc": "2026-09-19T13:07:39.276534+00:00",
+      "sha256": "4fc8350caca3b61541a60d5c2eb48bbbc88fc61cca4eda107659e0504c908121",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_posterior_inference/inference_utils/utils_data.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/inference_utils/utils_data.py",
+      "bytes": 5646,
+      "fetched_utc": "2026-09-19T13:07:38.219372+00:00",
+      "sha256": "42e7b9cbc22f6e267d1f1900f99c2c44dee067bd41617ece2569291ec3234c3e",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_posterior_inference/inference_utils/utils_general.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/inference_utils/utils_general.py",
+      "bytes": 2353,
+      "fetched_utc": "2026-09-19T13:07:38.192897+00:00",
+      "sha256": "1cc7425129dd59d91012b2fe0015d02b0a6f5ec1613286a60fbf7c3e422c17a0",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_posterior_inference/inference_utils/utils_train_eval_test.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/inference_utils/utils_train_eval_test.py",
+      "bytes": 19024,
+      "fetched_utc": "2026-09-19T13:07:38.283849+00:00",
+      "sha256": "dfcc081ab61bb0d3fc180eb584ea9d4d81af09c5442f87a9fbce5bbeef0c1086",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_posterior_inference/model.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/model.py",
+      "bytes": 6502,
+      "fetched_utc": "2026-09-19T13:07:38.218796+00:00",
+      "sha256": "4a3d5b7a8da1b917ba3870d50156f9861817f86aeb9d15eaac1737054d8fae09",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_posterior_inference/pi_train_eval.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_posterior_inference/pi_train_eval.py",
+      "bytes": 8696,
+      "fetched_utc": "2026-09-19T13:07:38.239455+00:00",
+      "sha256": "09161287bfb45227b71ca3c2ce460f3b82d3a513fcb5f8dd2709674ecec06dfb",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:38.224687+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/analyse_events.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/analyse_events.py",
+      "bytes": 6726,
+      "fetched_utc": "2026-09-19T13:07:38.706184+00:00",
+      "sha256": "8787a8a2022bb1c22c1b064227f85363014a696f174d9132e273f4b46eb5bca0",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/attribute_intensity.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/attribute_intensity.py",
+      "bytes": 8238,
+      "fetched_utc": "2026-09-19T13:07:38.701767+00:00",
+      "sha256": "b086d4d4e38259f765d8cf770b70ad1c75cbc5e0bf75339a795f80bce6bf2d80",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/evaluate_safety.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/evaluate_safety.py",
+      "bytes": 10472,
+      "fetched_utc": "2026-09-19T13:07:38.705764+00:00",
+      "sha256": "8e4a226590d90f5d57a1beba6b283fc0d3835d1ea9270817aea2cf75f64ac2ae",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/organise_events.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/organise_events.py",
+      "bytes": 11702,
+      "fetched_utc": "2026-09-19T13:07:38.728567+00:00",
+      "sha256": "ed6ffadc52045d60ee1dcf98c0935faadda68ad1b9ee630a567904fe9e74813d",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/reuse_ucd/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/reuse_ucd/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:38.718172+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/reuse_ucd/reuse_gaussian.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/reuse_ucd/reuse_gaussian.py",
+      "bytes": 7732,
+      "fetched_utc": "2026-09-19T13:07:38.791039+00:00",
+      "sha256": "5648ea08910e294ff5852d4f5e784c7f1ecd8604bd2713af2df9c935a390ef7a",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/reuse_ucd/train_gaussian.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/reuse_ucd/train_gaussian.py",
+      "bytes": 3097,
+      "fetched_utc": "2026-09-19T13:07:39.182910+00:00",
+      "sha256": "4b13217080a4fe423f14b6bbeacca6c6befeb45e6b1365edf1a31270288fb040",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/reuse_ucd/unified_conflit_detection.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/reuse_ucd/unified_conflit_detection.py",
+      "bytes": 15655,
+      "fetched_utc": "2026-09-19T13:07:39.183876+00:00",
+      "sha256": "2842a56db64abd35d49e97167809547075416b86b4f6b3daefe9622affd57b8f",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/risk_evaluation.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/risk_evaluation.py",
+      "bytes": 6459,
+      "fetched_utc": "2026-09-19T13:07:39.157095+00:00",
+      "sha256": "81bd6f5feb6a5070bbb652b69e4dec139085793455e55c973db35e73a83a3f62",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/EmergencyIndex.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/EmergencyIndex.py",
+      "bytes": 13597,
+      "fetched_utc": "2026-09-19T13:07:39.203873+00:00",
+      "sha256": "65c5cde2be3c3499bfdedb3aeffdca57841358af1fc410ea4242aff1e349c25d",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/SSMsOnPlane/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/SSMsOnPlane/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:42.402276+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/SSMsOnPlane/efficiency_utils.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/SSMsOnPlane/efficiency_utils.py",
+      "bytes": 1027,
+      "fetched_utc": "2026-09-19T13:07:39.260200+00:00",
+      "sha256": "7e45b81e7daf07dd05646a2e96be5b537e3704ccb584f6371a3283e659d10282",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/SSMsOnPlane/geometry_utils.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/SSMsOnPlane/geometry_utils.py",
+      "bytes": 9319,
+      "fetched_utc": "2026-09-19T13:07:39.623989+00:00",
+      "sha256": "214e3594e9cdcabe98fdeb23e3e24ecb2c36613d8ae9b8313e57776a5b499b8e",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/SSMsOnPlane/longitudinal_ssms.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/SSMsOnPlane/longitudinal_ssms.py",
+      "bytes": 6642,
+      "fetched_utc": "2026-09-19T13:07:39.653416+00:00",
+      "sha256": "18d14242a4657ab93278902713f42f8ddaf787c4fca34e371c9c4ceb746c5e8c",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/SSMsOnPlane/two_dimensional_ssms.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/SSMsOnPlane/two_dimensional_ssms.py",
+      "bytes": 17278,
+      "fetched_utc": "2026-09-19T13:07:40.815665+00:00",
+      "sha256": "2e2e06eb3faa05abefc347fec809b1d868ad9565ab497ba7a9e98883424f09a9",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:39.705319+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/utils_attribution.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/utils_attribution.py",
+      "bytes": 4608,
+      "fetched_utc": "2026-09-19T13:07:40.725130+00:00",
+      "sha256": "657b88ec3a8a946857ebe74a5aaa27737d93b4da95af86a13eff9bb26f46f9e2",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/utils_eval_metrics.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/utils_eval_metrics.py",
+      "bytes": 7217,
+      "fetched_utc": "2026-09-19T13:07:39.726765+00:00",
+      "sha256": "14ed1b5762a3bf6884970cc919af1d4570d078f62d015d53c74557266e687ac5",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/utils_evaluation.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/utils_evaluation.py",
+      "bytes": 26826,
+      "fetched_utc": "2026-09-19T13:07:39.819466+00:00",
+      "sha256": "e9f801c9728df0ba08d72f3de79bf62cc925df9d11ac1cd9d43bd06fc10cdafb",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/validation_utils/utils_features.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/validation_utils/utils_features.py",
+      "bytes": 4923,
+      "fetched_utc": "2026-09-19T13:07:40.077417+00:00",
+      "sha256": "df172f0c90c9999979b7a4dcda9ccadf2156ff828ff5cf39503b054eeca90879",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_safety_evaluation/vote_conflicting_target.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_safety_evaluation/vote_conflicting_target.py",
+      "bytes": 4432,
+      "fetched_utc": "2026-09-19T13:07:40.116397+00:00",
+      "sha256": "a673a675114ccc04cbe6d6d9ed8514740aa8eaba6afff8d71287d3fcde98acfd",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:40.239936+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/event_visualiser.ipynb",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/event_visualiser.ipynb",
+      "bytes": 7249,
+      "fetched_utc": "2026-09-19T13:07:41.269619+00:00",
+      "sha256": "edb656db5637eccb052373449261b09c75dd2afa694f3f18edd04cdb52cb6b08",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/organise_metadata.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/organise_metadata.py",
+      "bytes": 16100,
+      "fetched_utc": "2026-09-19T13:07:40.330040+00:00",
+      "sha256": "05aeaef20fdb7772eedbb8298606d71b24643fb7ca305fc85c4e3106951e8a02",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/reconstruct_birdseye.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/reconstruct_birdseye.py",
+      "bytes": 12408,
+      "fetched_utc": "2026-09-19T13:07:40.572196+00:00",
+      "sha256": "19b6c434f159057731babe3726d8effefd875c35f981884b7c3509ed7fb26d3d",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/reconstruction_utils/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/reconstruction_utils/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:40.603040+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/reconstruction_utils/utils_ego_sur.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/reconstruction_utils/utils_ego_sur.py",
+      "bytes": 13913,
+      "fetched_utc": "2026-09-19T13:07:41.794604+00:00",
+      "sha256": "ae78f4fc9c587dd4ab4dfe4733fe5d9b8e160992364ca3a5d0be9ff936f027fb",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/reconstruction_utils/utils_ekf.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/reconstruction_utils/utils_ekf.py",
+      "bytes": 9445,
+      "fetched_utc": "2026-09-19T13:07:40.802176+00:00",
+      "sha256": "e168d5320397c5e6dccd5abf7235e5a0693756b96b76f5639ac29994a889a4fa",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/search_ekf_parameter.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/search_ekf_parameter.py",
+      "bytes": 19781,
+      "fetched_utc": "2026-09-19T13:07:41.083864+00:00",
+      "sha256": "81a479351551795c7aa4db74026776647bbbac4d7c7884b9368d113b6dce02ae",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_trajectory_reconstruction/transform_files.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_trajectory_reconstruction/transform_files.py",
+      "bytes": 1659,
+      "fetched_utc": "2026-09-19T13:07:41.066527+00:00",
+      "sha256": "7827f8dbba11324abec91bed74eae51945f19dd2456be2d68c72bfe395473568",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_visualisation/figure_table_to_reproduce.ipynb",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_visualisation/figure_table_to_reproduce.ipynb",
+      "bytes": 29771,
+      "fetched_utc": "2026-09-19T13:07:41.264894+00:00",
+      "sha256": "1a7b9acf61a04b37fd9f8381938f4bd5247f2a9e30acdf0844c7f9a7e1d46a53",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_visualisation/visual_utils/__init__.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_visualisation/visual_utils/__init__.py",
+      "bytes": 0,
+      "fetched_utc": "2026-09-19T13:07:42.342215+00:00",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "path": "research/code/src_visualisation/visual_utils/utils_tabfig.py",
+      "url": "https://raw.githubusercontent.com/Yiru-Jiao/GSSM/0ee2542eb28e50948cae8561332365d5f76e29d4/src_visualisation/visual_utils/utils_tabfig.py",
+      "bytes": 69375,
+      "fetched_utc": "2026-09-19T13:07:42.561067+00:00",
+      "sha256": "7c02400ceafbc873855ef234833f2a34d5e30077d6c20cb63b2b2ab26aae9f1c",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "file": "research/sources/arxiv-v5.pdf",
+      "url": "https://arxiv.org/pdf/2505.13556v5",
+      "bytes": 917749,
+      "fetched_utc": "2026-09-19T13:08:39.276833+00:00",
+      "sha256": "eb2a71e99b15c89d1886a210b839b6050d304c3c4e46224d8ceb2460c0c21fbb",
+      "version": "2505.13556v5"
+    },
+    {
+      "file": "research/sources/nature-supplement.pdf",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs42256-026-01189-w/MediaObjects/42256_2026_1189_MOESM1_ESM.pdf",
+      "bytes": 454669,
+      "fetched_utc": "2026-09-19T13:08:38.400111+00:00",
+      "sha256": "6290f6bba6b27f3ee2870d825091f7e9b9cfe94a8fdbb9552abec6825ad5321a",
+      "version": "see source metadata"
+    },
+    {
+      "file": "research/sources/nature-reporting.pdf",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.1038%2Fs42256-026-01189-w/MediaObjects/42256_2026_1189_MOESM2_ESM.pdf",
+      "bytes": 3416603,
+      "fetched_utc": "2026-09-19T13:08:55.620862+00:00",
+      "sha256": "7994b461a359d9c6e569c74e4445cbfd2ffaaa52583f9e33431b8db940ec70b2",
+      "version": "see source metadata"
+    },
+    {
+      "file": "research/sources/github-tags.json",
+      "url": "https://api.github.com/repos/Yiru-Jiao/GSSM/tags",
+      "bytes": 412,
+      "fetched_utc": "2026-09-19T13:08:37.049173+00:00",
+      "sha256": "0ea4ca0147265d0afd044531eb67891ad99b96356b53ff1f5ecdafb2f643a793",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "file": "research/sources/github-metrics-history.json",
+      "url": "https://api.github.com/repos/Yiru-Jiao/GSSM/commits?path=src_safety_evaluation/validation_utils/utils_eval_metrics.py&per_page=15",
+      "bytes": 18372,
+      "fetched_utc": "2026-09-19T13:08:37.249255+00:00",
+      "sha256": "80677f1f99c63a16cd14fd4fb0053711a57aaeb1db5770577cd2fd3117796909",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "file": "research/figures/shrp2-event-counts-original.png",
+      "url": "https://arxiv.org/html/2505.13556v5/SHRP2_event_counts.png",
+      "sha256": "478ead3e8f7775a735a00fafe7872e81c503e82bdf39045bd07c2e1b93c8c079",
+      "fetched_utc": "2026-09-19T13:10:14.148274+00:00",
+      "version": "2505.13556v5"
+    },
+    {
+      "file": "research/sources/github-tree.json",
+      "url": "https://api.github.com/repos/Yiru-Jiao/GSSM/git/trees/0ee2542eb28e50948cae8561332365d5f76e29d4?recursive=1",
+      "sha256": "0cae14def654e7d898c2e4557555cfda861f06beca893433e54dd36d45a04882",
+      "fetched_utc": "2026-09-19T13:07:10.390643+00:00",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    },
+    {
+      "file": "research/sources/correction-commit.json",
+      "url": "https://api.github.com/repos/Yiru-Jiao/GSSM/commits/82284cf2700a915c919270c1b841f181fd93c5d5",
+      "sha256": "aebce0640976bf966c5c8314ff3267d0e1cb24e6547cc19795134427d58be641",
+      "fetched_utc": "2026-09-19T13:12:47.647933+00:00",
+      "version": "0ee2542eb28e50948cae8561332365d5f76e29d4"
+    }
+  ]
+}
