@@ -1,0 +1,99 @@
+{
+  "workspace": "personal",
+  "itemId": "item-810217743bbb4be2",
+  "runId": "gzrun-20260919-095844-49f47906",
+  "title": "Qwen-Drive-1.0 原文核验与持续论文研究",
+  "version": "dd86d4311d9ac09001d3867f0e63c2ab8ef368ca0a309fa9fe619b9fb995712d",
+  "files": [
+    {
+      "path": "research/identity.txt",
+      "file": "files/d8ca532ecb33953f-identity.txt",
+      "mime": "text/plain",
+      "sourceSha256": "9d1f02814f3e1bae31c9bf2c282cda555479cf133171801022191c51c3541327",
+      "sha256": "9d1f02814f3e1bae31c9bf2c282cda555479cf133171801022191c51c3541327",
+      "bytes": 4943
+    },
+    {
+      "path": "research/figures/pdf-page-01.png",
+      "file": "files/9838f7acf715cf33-pdf-page-01.png",
+      "mime": "image/png",
+      "sourceSha256": "58906047cb1599f46b142b5bb4ba5112282471bcdcf6a4cafaf5f2ec9618b912",
+      "sha256": "58906047cb1599f46b142b5bb4ba5112282471bcdcf6a4cafaf5f2ec9618b912",
+      "bytes": 202833
+    },
+    {
+      "path": "research/figures/pdf-page-25.png",
+      "file": "files/5ff212ed1f777239-pdf-page-25.png",
+      "mime": "image/png",
+      "sourceSha256": "f4814f0bc7d996e2ef5441e1f344eb752e7549e481f304146c5806958281c12e",
+      "sha256": "f4814f0bc7d996e2ef5441e1f344eb752e7549e481f304146c5806958281c12e",
+      "bytes": 85885
+    },
+    {
+      "path": "research/figures/head.png",
+      "file": "files/3466e239245ce4a2-head.png",
+      "mime": "image/png",
+      "sourceSha256": "beb438c442644f8a7ce9bd927c8167c5a9f1b6dad9a3c00b55802cc109ec45bb",
+      "sha256": "beb438c442644f8a7ce9bd927c8167c5a9f1b6dad9a3c00b55802cc109ec45bb",
+      "bytes": 217845
+    },
+    {
+      "path": "research/figures/qwendrive_overview.png",
+      "file": "files/0d59dba4918feebf-qwendrive_overview.png",
+      "mime": "image/png",
+      "sourceSha256": "39401487312746913156281e4ed8b8cad5494aa576547fe627103e5a5fa6a096",
+      "sha256": "39401487312746913156281e4ed8b8cad5494aa576547fe627103e5a5fa6a096",
+      "bytes": 1160055
+    },
+    {
+      "path": "research/figures/training_recipe.png",
+      "file": "files/03124ae233ff0ab0-training_recipe.png",
+      "mime": "image/png",
+      "sourceSha256": "27e7aa91cd6fb030bca4ab372faf116978b8d3cbfbd9f91c9d52d73139615697",
+      "sha256": "27e7aa91cd6fb030bca4ab372faf116978b8d3cbfbd9f91c9d52d73139615697",
+      "bytes": 250211
+    },
+    {
+      "path": "research/figures/data_analysis.png",
+      "file": "files/2392474204428bf5-data_analysis.png",
+      "mime": "image/png",
+      "sourceSha256": "b0816a6d4f98258c1db3d51111dbcb94669f1f6ce727fb8409af238b2fb814fe",
+      "sha256": "b0816a6d4f98258c1db3d51111dbcb94669f1f6ce727fb8409af238b2fb814fe",
+      "bytes": 650361
+    },
+    {
+      "path": "research/figures/pdf-page-20.png",
+      "file": "files/a82bb0c0207a384a-pdf-page-20.png",
+      "mime": "image/png",
+      "sourceSha256": "81052309f91097050ece2e1c1274eeb29c0db2fe3f9ca1a8903e5934e447731a",
+      "sha256": "81052309f91097050ece2e1c1274eeb29c0db2fe3f9ca1a8903e5934e447731a",
+      "bytes": 324092
+    },
+    {
+      "path": "research/sources.json",
+      "file": "files/e186239f7db7d25f-sources.json",
+      "mime": "text/plain",
+      "sourceSha256": "fee1d06d0191507fb3b3c7b9ebe981a0b5637192127c3368756d37b80f7361ea",
+      "sha256": "fee1d06d0191507fb3b3c7b9ebe981a0b5637192127c3368756d37b80f7361ea",
+      "bytes": 10310
+    },
+    {
+      "path": "research/verification.md",
+      "file": "files/e612227a6d3420bf-verification.md",
+      "mime": "text/plain",
+      "sourceSha256": "65c726255b082132461ab10460183e74ab03ddcb09452aaa62c3f23ea3eae633",
+      "sha256": "8fa787fe1c92e5cf781a2c397dd97e3feaf88191246783976ae97601d508016c",
+      "bytes": 5843
+    },
+    {
+      "path": "research/pdf-fulltext.txt",
+      "file": "files/d3fe76311af51007-pdf-fulltext.txt",
+      "mime": "text/plain",
+      "sourceSha256": "7e9d7abfe1708695ddb4119d535022254aa1dc9d56d37868c3bdb1f8f563c722",
+      "sha256": "7e9d7abfe1708695ddb4119d535022254aa1dc9d56d37868c3bdb1f8f563c722",
+      "bytes": 157372
+    }
+  ],
+  "warnings": [],
+  "boundary": "研究成果归档，不代表已接受的正式知识。外部网址仍需联网。"
+}

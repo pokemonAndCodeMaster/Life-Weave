@@ -1,0 +1,239 @@
+{
+  "item_id": "item-810217743bbb4be2",
+  "context": "ctxv-2850e382f5c44005/v1",
+  "recorded_at": "2026-09-19T10:03:41.367635+00:00",
+  "note": "retrieved_at records request start, not download completion; timestamps UTC",
+  "sources": [
+    {
+      "file": "research/raw/paper-v1.html",
+      "url": "https://arxiv.org/html/2609.00111v1",
+      "retrieved_at": "2026-09-19T10:00:28.715437+00:00",
+      "status": 200,
+      "bytes": 641939,
+      "sha256": "445a11418bbfa9923f767b83e67a01573db833aa9784186828593149590f4c54"
+    },
+    {
+      "file": "research/raw/repo-tree.json",
+      "url": "https://api.github.com/repos/QwenLM/Qwen-Drive-1.0/git/trees/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0?recursive=1",
+      "retrieved_at": "2026-09-19T10:00:28.717328+00:00",
+      "status": 200,
+      "bytes": 50410,
+      "sha256": "a122c61c508e82775744e89be4b185e09c9c994141c1c0e17761516d66341ada"
+    },
+    {
+      "file": "research/raw/repo-README.md",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/README.md",
+      "retrieved_at": "2026-09-19T10:00:28.717817+00:00",
+      "status": 200,
+      "bytes": 11318,
+      "sha256": "6f013f56d4f9e6dd11576dadfa255515b4ef4f36b61bc3c639499875be1ebd92"
+    },
+    {
+      "file": "research/raw/repo-docs-model.md",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/docs/model.md",
+      "retrieved_at": "2026-09-19T10:00:28.718388+00:00",
+      "status": 200,
+      "bytes": 6345,
+      "sha256": "287963a90308b801b24b5c4e7ad64f0bf2067af41a187918e3b25d56b58d5eb3"
+    },
+    {
+      "file": "research/raw/repo-docs-data.md",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/docs/data.md",
+      "retrieved_at": "2026-09-19T10:00:28.718875+00:00",
+      "status": 200,
+      "bytes": 10065,
+      "sha256": "ff2a42e033e7680527b2bcd53f33c16076ee83c8cc34db7bf3efe25675fd9e4c"
+    },
+    {
+      "file": "research/raw/repo-docs-evaluation.md",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/docs/evaluation.md",
+      "retrieved_at": "2026-09-19T10:00:28.719671+00:00",
+      "status": 200,
+      "bytes": 7640,
+      "sha256": "be71f1e47718c79a5f35c6bfd5488a6c6b2d09598fc9d5beeeec7d220846d08c"
+    },
+    {
+      "file": "research/raw/repo-docs-perception.md",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/docs/perception.md",
+      "retrieved_at": "2026-09-19T10:00:28.721129+00:00",
+      "status": 200,
+      "bytes": 5390,
+      "sha256": "5ce2a77be32be46fa1aa11b399ca81d821e5996db41e89956be121d33088b823"
+    },
+    {
+      "file": "research/raw/repo-docs-cookbook.md",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/docs/cookbook.md",
+      "retrieved_at": "2026-09-19T10:00:28.722134+00:00",
+      "status": 200,
+      "bytes": 7831,
+      "sha256": "af1a4331c849b0133d1a31bcfedfc9f1d945345d951d4780def2bf0378c79e4d"
+    },
+    {
+      "file": "research/figures/qwendrive_overview.png",
+      "url": "https://arxiv.org/html/2609.00111v1/qwendrive_overview.png",
+      "retrieved_at": "2026-09-19T10:01:19.008107+00:00",
+      "status": 200,
+      "bytes": 1160055,
+      "sha256": "39401487312746913156281e4ed8b8cad5494aa576547fe627103e5a5fa6a096"
+    },
+    {
+      "file": "research/figures/head.png",
+      "url": "https://arxiv.org/html/2609.00111v1/head.png",
+      "retrieved_at": "2026-09-19T10:01:19.010062+00:00",
+      "status": 200,
+      "bytes": 217845,
+      "sha256": "beb438c442644f8a7ce9bd927c8167c5a9f1b6dad9a3c00b55802cc109ec45bb"
+    },
+    {
+      "file": "research/figures/training_recipe.png",
+      "url": "https://arxiv.org/html/2609.00111v1/training_recipe.png",
+      "retrieved_at": "2026-09-19T10:01:19.010681+00:00",
+      "status": 200,
+      "bytes": 250211,
+      "sha256": "27e7aa91cd6fb030bca4ab372faf116978b8d3cbfbd9f91c9d52d73139615697"
+    },
+    {
+      "file": "research/figures/data_analysis.png",
+      "url": "https://arxiv.org/html/2609.00111v1/data_analysis.png",
+      "retrieved_at": "2026-09-19T10:01:19.011182+00:00",
+      "status": 200,
+      "bytes": 650361,
+      "sha256": "b0816a6d4f98258c1db3d51111dbcb94669f1f6ce727fb8409af238b2fb814fe"
+    },
+    {
+      "file": "research/raw/repo-src-qwen_drive-modeling_qwen_drive.py",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/src/qwen_drive/modeling_qwen_drive.py",
+      "retrieved_at": "2026-09-19T10:01:19.011779+00:00",
+      "status": 200,
+      "bytes": 17790,
+      "sha256": "dd2dc3bad492f9f53030f66495b2159093d5565a040459fa5308ebe8c812a18c"
+    },
+    {
+      "file": "research/raw/repo-src-qwen_drive-planning_expert.py",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/src/qwen_drive/planning_expert.py",
+      "retrieved_at": "2026-09-19T10:01:19.013011+00:00",
+      "status": 200,
+      "bytes": 18106,
+      "sha256": "2d9330d71d4b7930ffedfdc2d842ece5d83d94d65960e26ea1473c80931c4ce1"
+    },
+    {
+      "file": "research/raw/repo-src-qwen_drive-metrics.py",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/src/qwen_drive/metrics.py",
+      "retrieved_at": "2026-09-19T10:01:19.013782+00:00",
+      "status": 200,
+      "bytes": 6607,
+      "sha256": "321fb08f58baebd78e5c6a735073308dd9fb15f60f0a362868a44858bf3f8427"
+    },
+    {
+      "file": "research/raw/repo-scripts-eval_navsim.py",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/scripts/eval_navsim.py",
+      "retrieved_at": "2026-09-19T10:01:19.015052+00:00",
+      "status": 200,
+      "bytes": 5752,
+      "sha256": "7ac18b905b980ecbb62a8281c2263c78d42da2824fd448839a2ae99575b7be4b"
+    },
+    {
+      "file": "research/raw/repo-src-qwen_drive_perception-modeling_perception.py",
+      "url": "https://raw.githubusercontent.com/QwenLM/Qwen-Drive-1.0/28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0/src/qwen_drive_perception/modeling_perception.py",
+      "retrieved_at": "2026-09-19T10:01:19.016434+00:00",
+      "status": 200,
+      "bytes": 11960,
+      "sha256": "7be90735ca1567f962cd2a97569da2891a3771806945aca3d0c74b8aff25eaf4"
+    },
+    {
+      "file": "research/raw/arxiv-abs.html",
+      "url": "https://arxiv.org/abs/2609.00111",
+      "retrieved_at": "2026-09-19T09:59:37.556515+00:00",
+      "status": 200,
+      "bytes": 43597,
+      "type": "text/html; charset=utf-8",
+      "final_url": "https://arxiv.org/abs/2609.00111",
+      "sha256": "adcf49d7ca31bd01d6150f874de800e070ef69bd8325987ddc50cc7efff38d91"
+    },
+    {
+      "file": "research/raw/paper-v1.pdf",
+      "url": "https://arxiv.org/pdf/2609.00111v1",
+      "retrieved_at": "2026-09-19T09:59:37.558577+00:00",
+      "status": 200,
+      "bytes": 32477575,
+      "type": "application/pdf",
+      "final_url": "https://arxiv.org/pdf/2609.00111v1",
+      "sha256": "b53c66b6797c053dc6238944ec38080acc9efd7ef9712395b85e083573fbc4aa"
+    },
+    {
+      "file": "research/raw/repo-metadata.json",
+      "url": "https://api.github.com/repos/QwenLM/Qwen-Drive-1.0/commits/main",
+      "retrieved_at": "2026-09-19T09:59:37.559188+00:00",
+      "status": 200,
+      "bytes": 7664,
+      "type": "application/json; charset=utf-8",
+      "final_url": "https://api.github.com/repos/QwenLM/Qwen-Drive-1.0/commits/main",
+      "sha256": "3f077884db7849332dd0dba8e22b980de6111cd8635629e8cb95396d209380e0"
+    },
+    {
+      "file": "research/raw/official-model.md",
+      "url": "https://huggingface.co/Qwen/Qwen-Drive-1.0-4B/raw/main/README.md",
+      "retrieved_at": "2026-09-19T09:59:37.559655+00:00",
+      "status": 200,
+      "bytes": 44350,
+      "type": "text/plain; charset=utf-8",
+      "final_url": "https://huggingface.co/Qwen/Qwen-Drive-1.0-4B/raw/main/README.md",
+      "sha256": "18e864bce847ff4c045e137ca26342df1e0c544a959cfdbb28529ab905841725"
+    }
+  ],
+  "paper": {
+    "title": "Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomous Driving",
+    "version": "2609.00111v1",
+    "pages": 40,
+    "read_scope": "HTML main sections 1-5 and appendices A-C; PDF spot checks pages 1,20,25; not every image visually inspected"
+  },
+  "code": {
+    "repository": "https://github.com/QwenLM/Qwen-Drive-1.0",
+    "commit": "28091c1532e869bc7aee91fc0aef6b3e6fd0b2e0",
+    "scope": "README, docs, selected inference and evaluation functions; static inspection only"
+  },
+  "verified_figures": [
+    {
+      "file": "research/figures/data_analysis.png",
+      "sha256": "b0816a6d4f98258c1db3d51111dbcb94669f1f6ce727fb8409af238b2fb814fe",
+      "visually_inspected": true,
+      "origin": "arXiv v1 original PNG"
+    },
+    {
+      "file": "research/figures/head.png",
+      "sha256": "beb438c442644f8a7ce9bd927c8167c5a9f1b6dad9a3c00b55802cc109ec45bb",
+      "visually_inspected": true,
+      "origin": "arXiv v1 original PNG"
+    },
+    {
+      "file": "research/figures/pdf-page-01.png",
+      "sha256": "58906047cb1599f46b142b5bb4ba5112282471bcdcf6a4cafaf5f2ec9618b912",
+      "visually_inspected": true,
+      "origin": "PDF local page render"
+    },
+    {
+      "file": "research/figures/pdf-page-20.png",
+      "sha256": "81052309f91097050ece2e1c1274eeb29c0db2fe3f9ca1a8903e5934e447731a",
+      "visually_inspected": true,
+      "origin": "PDF local page render"
+    },
+    {
+      "file": "research/figures/pdf-page-25.png",
+      "sha256": "f4814f0bc7d996e2ef5441e1f344eb752e7549e481f304146c5806958281c12e",
+      "visually_inspected": true,
+      "origin": "PDF local page render"
+    },
+    {
+      "file": "research/figures/qwendrive_overview.png",
+      "sha256": "39401487312746913156281e4ed8b8cad5494aa576547fe627103e5a5fa6a096",
+      "visually_inspected": true,
+      "origin": "arXiv v1 original PNG"
+    },
+    {
+      "file": "research/figures/training_recipe.png",
+      "sha256": "27e7aa91cd6fb030bca4ab372faf116978b8d3cbfbd9f91c9d52d73139615697",
+      "visually_inspected": true,
+      "origin": "arXiv v1 original PNG"
+    }
+  ]
+}
