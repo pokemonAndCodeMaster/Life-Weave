@@ -60,7 +60,7 @@ def main(argv=None):
             return json.load(response)
 
     try:
-        item = quote(getattr(args, 'item_id', ''), safe='')
+        item = quote(getattr(args, 'item_id', '') or '', safe='')
         if args.command == 'discover':
             result = call('/work-discovery?' + urlencode({'query': args.query}))
         elif args.command == 'continue':
