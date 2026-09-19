@@ -2,6 +2,8 @@
 
 LifeWeave（经纬）希望帮助个人与协作中的人，把工作、学习、爱好和生活中的事情有序推进。当前提供本机工作台；愿景中的所有生活管理和多人能力尚未完成。
 
+**一次读完整个项目：[完整项目说明（整合版）](complete-guide.md)。** 整合版收录当前分篇说明全文，以及本目录下的历史交付和验证文字；原分篇仍是维护入口。更新分篇后运行 `python scripts/build_complete_guide.py`，用 `python scripts/build_complete_guide.py --check` 检查整合版是否同步。
+
 | 读者想知道什么 | 阅读入口 |
 | --- | --- |
 | 为什么做、准备怎样解决问题 | [产品设计](product.md) |
