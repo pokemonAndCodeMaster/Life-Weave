@@ -18,6 +18,7 @@ class Library:
     def __init__(self, postgres: PGConnector, roots: dict[str, Path]):
         self.db = postgres
         self.roots = roots
+        self.reference_provider = None
 
     def sources(self, workspace: str):
         if workspace not in self.roots:
@@ -55,7 +56,8 @@ class Library:
         if path.stat().st_size > 2_000_000:
             raise ValueError('文件超过 2 MB，请拆分或使用本地编辑器阅读')
         content = path.read_text(encoding='utf-8')
-        return {'path':relative, 'sourceId':source_id, 'sourceTitle':source['title'], 'writable':source['writable'], 'content':content, 'version':fingerprint(content), 'title':self.title(content,relative)}
+        refs = self.reference_provider(workspace,source_id,relative,content) if self.reference_provider else None
+        return {'path':relative, 'sourceId':source_id, 'sourceTitle':source['title'], 'writable':source['writable'], 'content':content, 'version':fingerprint(content), 'title':self.title(content,relative), 'references':refs}
 
     @staticmethod
     def title(content: str, fallback: str):
@@ -93,9 +95,9 @@ class Library:
         row = fetch_one('INSERT INTO workbench.document_revision(id,workspace,source_id,path,base_version,before_content,content,reason) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *', (identity,workspace,source_id,path,base_version,old,content,reason))
         return self.with_diff(row)
 
-    @staticmethod
-    def with_diff(row):
-        return {**row, 'diff': ''.join(difflib.unified_diff(row['before_content'].splitlines(keepends=True),row['content'].splitlines(keepends=True),fromfile='当前正文',tofile='建议正文'))}
+    def with_diff(self,row):
+        refs = self.reference_provider(row['workspace'],row['source_id'],row['path'],row['content']) if self.reference_provider else None
+        return {**row, 'references':refs, 'diff': ''.join(difflib.unified_diff(row['before_content'].splitlines(keepends=True),row['content'].splitlines(keepends=True),fromfile='当前正文',tofile='建议正文'))}
 
     def revisions(self, workspace: str):
         return [self.with_diff(row) for row in self.db.fetch_all('SELECT * FROM workbench.document_revision WHERE workspace=%s ORDER BY created_at DESC', (workspace,))]

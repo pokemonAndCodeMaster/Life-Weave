@@ -122,7 +122,7 @@ class TaskSources:
             if not separator:
                 raise ValueError('知识引用格式不正确')
             doc = self.library.document(workspace, source_id, path)
-            entries.append({'id': 'document-' + hashlib.sha256(ref.encode()).hexdigest()[:16], 'title': doc['title'], 'target': 'knowledge', 'version': doc['version'], 'content': doc['content'], 'sourcePath': ref, 'pinnedInput': True})
+            entries.append({'id': 'document-' + hashlib.sha256(ref.encode()).hexdigest()[:16], 'title': doc['title'], 'target': 'knowledge', 'version': doc['version'], 'content': doc['content'], 'references':doc.get('references'), 'sourcePath': ref, 'pinnedInput': True})
         if sum(len(row['content'].encode()) for row in entries) > 2_000_000:
             raise ValueError('任务知识正文合计超过 2 MB，请缩小选择范围')
         return entries

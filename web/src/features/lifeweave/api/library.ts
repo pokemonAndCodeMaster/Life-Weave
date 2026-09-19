@@ -1,8 +1,9 @@
 import { http } from '@/shared/api/http'
 import type { WorkspaceKind } from '../types'
 export interface Source { id: string; title: string; root: string; writable: boolean }
-export interface Document { path: string; sourceId: string; title: string; content: string; version: string; writable: boolean; sourceTitle: string }
-export interface Revision { id: string; source_id: string; path: string; content: string; before_content: string; diff: string; reason: string; status: 'draft'|'accepted'|'rejected'; created_at: string }
+export interface ReferenceMap { links: Record<string,string>; images: Record<string,string>; warnings: string[] }
+export interface Document { path: string; sourceId: string; title: string; content: string; version: string; writable: boolean; sourceTitle: string; references?: ReferenceMap|null }
+export interface Revision { id: string; source_id: string; path: string; content: string; before_content: string; diff: string; reason: string; status: 'draft'|'accepted'|'rejected'; created_at: string; references?: ReferenceMap|null }
 const root = (ws: WorkspaceKind) => `/lifeweave/${ws}/library`
 export async function documents(ws: WorkspaceKind,q='') { return (await http.get<{items:Document[];unavailableSources:string[]}>(`${root(ws)}/documents`,{params:{q}})).data }
 export async function document(ws: WorkspaceKind,path:string,sourceId='local') { return (await http.get<Document>(`${root(ws)}/document`,{params:{path,sourceId}})).data }

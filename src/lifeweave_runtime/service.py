@@ -180,7 +180,8 @@ class LifeWeaveRuntimeService:
             f"{entry.get('title') or entry.get('id')} @ {entry.get('version')}\n"
             f"目标/适用对象：{entry.get('target') or '未声明'}\n"
             f"来源：{entry.get('sourcePath') or '工作台发布'}；相对路径以本方法目录为准。\n"
-            f"{entry.get('content') or ''}"
+            f"{entry.get('content') or ''}\n"
+            f"成果来源映射（相对引用不能当作本轮文件）：{json.dumps(entry.get('references') or {}, ensure_ascii=False)}"
             for entry in capabilities
         ) or "（没有发布能力附加材料）"
         return (

@@ -10,6 +10,7 @@ from pydantic import Field
 
 from src.lifeweave.models import WireModel, WorkspaceKey
 from src.lifeweave_knowledge.library import fingerprint
+from .research_references import references, merge_references
 
 
 class ResearchOutputs:
@@ -80,10 +81,28 @@ class ResearchOutputs:
             raise ValueError('请先取得成功运行的成果，再提出知识修订')
         return run
 
-    @staticmethod
-    def _candidate(row):
+    def _candidate(self, row):
         return {**row, 'itemId':row['item_id'], 'runId':row['run_id'], 'runVersion':row['run_version'],
+                'references':self.document_references(row['workspace'],row['source_id'],row['path'],row['content']),
                 'sourceUrl':f'/api/lifeweave/{row["workspace"]}/runs/{row["run_id"]}/research-output/download'}
+
+    def document_references(self, workspace, source_id, path, content):
+        if source_id!='local' or '/research-output/download' not in content:
+            return {'links':{},'images':{},'warnings':[]}
+        rows = self.library.db.fetch_all('''SELECT c.run_id,c.run_version FROM workbench.research_knowledge_candidate c
+            JOIN workbench.document_revision r ON r.id=c.revision_id
+            WHERE c.workspace=%s AND r.source_id=%s AND r.path=%s AND r.status IN ('accepted','draft')''',
+            (workspace,source_id,path))
+        groups=[]
+        for row in rows:
+            source=f'/api/lifeweave/{workspace}/runs/{row["run_id"]}/research-output/download'
+            if source not in content:
+                continue
+            run=self.runtime.get_run_snapshot(workspace,row['run_id'])
+            original=self._content(run)
+            if fingerprint(original)==row['run_version']:
+                groups.append(references(original,workspace,row['run_id']))
+        return merge_references(groups)
 
     def candidates(self, workspace, item_id):
         self.work.get_item(workspace, item_id)

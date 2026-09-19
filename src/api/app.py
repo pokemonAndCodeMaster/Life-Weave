@@ -84,6 +84,7 @@ def create_app() -> FastAPI:
     runtime.task_sources = app.state.task_sources
     app.state.work_continuation = WorkContinuation(work, runtime)
     app.state.research_outputs = ResearchOutputs(work, runtime, app.state.library, ROOT)
+    app.state.library.reference_provider = app.state.research_outputs.document_references
     conversations = Conversations(manager.postgres(), work, runtime, app.state.work_continuation,
                                  app.state.task_sources, ConversationInterpreter(ROOT, local_workers))
     conversations.outputs = app.state.research_outputs

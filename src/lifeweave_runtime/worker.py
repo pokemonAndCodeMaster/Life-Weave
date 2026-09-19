@@ -358,6 +358,7 @@ class LifeWeaveWorker:
                     "target": entry.get("target"),
                     "status": status,
                     "path": str(destination.relative_to(worktree)),
+                    "references": entry.get('references') or {},
                 }
             )
         if manifest:

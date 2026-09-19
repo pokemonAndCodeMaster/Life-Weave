@@ -42,3 +42,12 @@ it('保留复杂下标与反斜杠公式分隔符，代码中的表达式保持�
  expect(container.querySelector('code')?.textContent).toBe('\\(code\\)')
  expect(container.querySelector('.katex-error')).toBeNull()
 })
+
+it('keeps run source and image identity in knowledge while leaving code and ordinary links intact',()=>{
+ const base='/api/lifeweave/personal/runs/run-first'
+ const wrapper=render(MarkdownBody,{props:{content:'[出处](research/source.md) ![图](figure.png) [知识](other.md)\n\n```md\n[例](research/source.md)\n```',references:{links:{'research/source.md':base+'/source?path=research%2Fsource.md'},images:{'figure.png':base+'/assets?path=figure.png'},warnings:[]}}})
+ expect(wrapper.container.querySelector('a')!.getAttribute('href')).toBe(base+'/source?path=research%2Fsource.md')
+ expect(wrapper.container.querySelector('img')!.getAttribute('src')).toBe(base+'/assets?path=figure.png')
+ expect(wrapper.container.querySelectorAll('a')[1]!.getAttribute('href')).toBe('other.md')
+ expect(wrapper.container.querySelector('code')!.textContent).toContain('[例](research/source.md)')
+})

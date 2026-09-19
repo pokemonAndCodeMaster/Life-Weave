@@ -5,7 +5,8 @@ import DOMPurify from 'dompurify'
 import katex from 'katex'
 import markedKatex from 'marked-katex-extension'
 import 'katex/dist/katex.min.css'
-const props=defineProps<{content:string;sourceBase?:string;assetBase?:string}>()
+import type { ReferenceMap } from '../api/library'
+const props=defineProps<{content:string;sourceBase?:string;assetBase?:string;references?:ReferenceMap|null}>()
 const html=computed(()=>{
  const formulas=new Map<string,{text:string;displayMode:boolean}>()
  const placeholder=(token:Tokens.Generic)=>{
@@ -23,8 +24,11 @@ const html=computed(()=>{
    if(match)return {type:'latexDelimited',raw:match[0],text:match[1],displayMode:source.startsWith('\\[')}
   },renderer:placeholder,
  }],walkTokens(token){
-  if(token.type!=='link'||!props.sourceBase)return
+  if(token.type!=='link')return
   const href=String(token.href??'')
+  const mapped=props.references?.links[href]
+  if(mapped&&/^\/api\/lifeweave\/(personal|team)\/runs\/[^/]+\/source\?path=/.test(mapped)){token.href=mapped;return}
+  if(!props.sourceBase)return
   if(!/^[a-z]+:/i.test(href)&&!href.startsWith('#')&&!href.startsWith('/')){
    const path=href.split('#')[0]!.replace(/:\d+(?:-\d+)?$/,'')
    token.href=props.sourceBase+'?path='+encodeURIComponent(path)
@@ -37,8 +41,11 @@ const html=computed(()=>{
  for(const img of document.querySelectorAll('img')){
   const src=img.getAttribute('src')??''
   const alt=img.getAttribute('alt')||'图片'
+  const mapped=props.references?.images[src]
   const local=props.assetBase && /^\/api\/lifeweave\/(personal|team)\/runs\/[^/]+\/assets$/.test(props.assetBase)
-  if(local && src && !/^[a-z][a-z0-9+.-]*:/i.test(src) && !src.startsWith('/') && !src.split('/').some(p=>p==='..'||p.startsWith('.'))){
+  if(mapped&&/^\/api\/lifeweave\/(personal|team)\/runs\/[^/]+\/assets\?path=/.test(mapped)){
+   img.setAttribute('src',mapped);img.setAttribute('loading','lazy');img.setAttribute('referrerpolicy','no-referrer')
+  }else if(local && src && !/^[a-z][a-z0-9+.-]*:/i.test(src) && !src.startsWith('/') && !src.split('/').some(p=>p==='..'||p.startsWith('.'))){
    img.setAttribute('src',props.assetBase+'?path='+encodeURIComponent(src))
    img.setAttribute('loading','lazy');img.setAttribute('referrerpolicy','no-referrer')
   }else{
@@ -52,7 +59,7 @@ const html=computed(()=>{
  }
  for(const link of document.querySelectorAll('a[href]')){
   const href=link.getAttribute('href')??''
-  if(/^https?:/i.test(href)||(props.sourceBase&&href.startsWith(props.sourceBase+'?'))){
+  if(/^https?:/i.test(href)||/^\/api\/lifeweave\/(personal|team)\/runs\//.test(href)||(props.sourceBase&&href.startsWith(props.sourceBase+'?'))){
    link.setAttribute('target','_blank');link.setAttribute('rel','noopener noreferrer')
   }
  }
@@ -73,7 +80,7 @@ function failedImage(event:Event){
  notice.textContent=(image.alt||'图片')+'（加载失败；请核对本轮资产）';image.replaceWith(notice)
 }
 </script>
-<template><div class="lw-markdown" @error.capture="failedImage" v-html="html"></div></template>
+<template><div><p v-for="warning in references?.warnings||[]" :key="warning" class="lw-notice warning">{{ warning }}</p><div class="lw-markdown" @error.capture="failedImage" v-html="html"></div></div></template>
 <style scoped>
 .lw-markdown :deep(img){max-width:100%;height:auto}
 .lw-markdown :deep(.katex-display){max-width:100%;overflow-x:auto;overflow-y:hidden;padding:.4em 0}

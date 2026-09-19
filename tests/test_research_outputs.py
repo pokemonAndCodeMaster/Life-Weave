@@ -137,3 +137,32 @@ def test_generated_research_sources_remain_readable_without_opening_private_path
     assert c.get(url,params={'path':'.runtime/research/sources.md'}).text=='# 已读取来源'
     for path in ('.env','.runtime/../.env','.runtime/research/../../.env','.runtime/research/.private.md','.runtime/research/escape.md'):
         assert c.get(url,params={'path':path}).status_code==400
+
+
+def test_knowledge_reference_projection_preserves_raw_versions_and_conflicts(output_client):
+    c=output_client
+    item=post(c,'/items',{'itemType':'research','title':'来源上下文'})['id']
+    body='# 成果\n\n[出处](research/source.md) ![图](<research/fig one.png>) [官网](https://example.org)\n\n```md\n[示例](private.md)\n```\n'
+    run=completed_run(c,item,body)
+    route=f'/items/{item}/knowledge-candidates'
+    request={'runId':run['id'],'path':'研究/带来源.md','content':body+'\n[已有笔记](other.md)','baseVersion':'new','reason':'来源保真','requestId':'refs'}
+    candidate=post(c,route,request)
+    mapping=candidate['references']
+    assert 'research/source.md' in mapping['links'] and 'other.md' not in mapping['links'] and 'private.md' not in mapping['links']
+    assert 'research/fig%20one.png' in mapping['images']
+    assert '/'+run['id']+'/assets?' in mapping['images']['research/fig%20one.png']
+    post(c,'/library/revisions/'+candidate['id']+'/decision',{'accept':True},200)
+    doc=c.app.state.library.document('personal','local',request['path'])
+    assert doc['content']==candidate['content'] and doc['references']==mapping
+    original_version=doc['version']
+    cap=c.app.state.task_sources.snapshot('personal',None,['local:'+request['path']])[0]
+    assert cap['references']==mapping and cap['version']==original_version
+    # The interpretation/worker sees the same explicit run URLs, never an inferred local file.
+    next_run=post(c,'/runs',{'itemId':item,'instruction':'读取知识','engine':'codex','knowledgeRefs':['local:'+request['path']]},202)
+    assert mapping['links']['research/source.md'] in c.app.state.lifeweave_runtime_service.get_run_snapshot('personal',next_run['id'])['prompt_snapshot']
+    # Two distinct sources using identical relative links are visibly ambiguous.
+    second=completed_run(c,item,body+'\n另一轮事实')
+    merged=post(c,route,{**request,'runId':second['id'],'requestId':'ambiguous','baseVersion':doc['version'],'content':doc['content']+'\n'+body})
+    assert merged['references']['warnings'] and 'research/source.md' not in merged['references']['links']
+    assert c.app.state.library.document('personal','local',request['path'])['version']==original_version
+    assert c.app.state.library.document('personal','local',request['path'])['references']==mapping
