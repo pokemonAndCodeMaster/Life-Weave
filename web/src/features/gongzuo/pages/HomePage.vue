@@ -15,7 +15,7 @@ const activeRuns = computed(() => runs.value.filter((run) => ['queued', 'claimed
 const isTeam = computed(() => activeWorkspace.value === 'team')
 
 function itemUrl(id: string, tab = 'overview') {
-  return `/gongzuo/${activeWorkspace.value}/items/${encodeURIComponent(id)}/${tab}`
+  return `/lifeweave/${activeWorkspace.value}/items/${encodeURIComponent(id)}/${tab}`
 }
 
 async function saveQuickIdea() {
@@ -28,11 +28,11 @@ async function saveQuickIdea() {
 
 <template>
   <PageHeader
-    title="我的工作"
-    subtitle="把需要判断、正在推进与委托运行放在同一处。"
+    title="我的日常"
+    subtitle="工作、学习与生活中的计划，在这里接着推进。"
     eyebrow="FOCUS / 把注意力留给真正需要你的事"
   >
-    <button class="gz-btn" type="button" @click="router.push(`/gongzuo/${activeWorkspace}/meeting`)">
+    <button class="gz-btn" type="button" @click="router.push(`/lifeweave/${activeWorkspace}/meeting`)">
       <GongzuoIcon name="meeting" />{{ isTeam ? '打开组会' : '打开周回顾' }}
     </button>
   </PageHeader>
@@ -64,7 +64,7 @@ async function saveQuickIdea() {
 
       <div class="gz-section-title">
         <h2>我关注的结果</h2>
-        <RouterLink class="gz-btn ghost sm" :to="`/gongzuo/${activeWorkspace}/items`">查看全部 <GongzuoIcon name="arrow" /></RouterLink>
+        <RouterLink class="gz-btn ghost sm" :to="`/lifeweave/${activeWorkspace}/items`">查看全部 <GongzuoIcon name="arrow" /></RouterLink>
       </div>
       <div class="gz-panel">
         <div v-for="item in activeItems" :key="item.id" class="gz-list-row">

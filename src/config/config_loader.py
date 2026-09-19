@@ -9,6 +9,7 @@ from threading import RLock
 from typing import Any, Mapping, Sequence
 
 import yaml
+from .environment import compatible_environment
 
 
 class ConfigurationError(RuntimeError):
@@ -133,7 +134,7 @@ class ConfigManager:
             raw = _deep_merge(raw, parsed)
 
         file_environment = _parse_env_file(self.env_file)
-        environment = {**file_environment, **os.environ}
+        environment = {**compatible_environment(file_environment), **compatible_environment(os.environ)}
         expanded = _expand_values(raw, environment)
         self._validate(expanded)
         return expanded

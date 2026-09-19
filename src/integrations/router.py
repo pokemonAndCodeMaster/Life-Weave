@@ -2,7 +2,7 @@ from pathlib import Path
 from fastapi import APIRouter,Request,HTTPException
 from pydantic import BaseModel,Field
 from src.gongzuo.models import WorkspaceKey
-router=APIRouter(prefix='/api/gongzuo/{workspace}',tags=['connections'])
+router=APIRouter(prefix='/api/lifeweave/{workspace}',tags=['connections'])
 class ConnectionInput(BaseModel):
  token:str=''
  credentialFile:str=''

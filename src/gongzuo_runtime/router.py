@@ -24,7 +24,7 @@ from .models import (
 from .service import GongzuoRuntimeService
 
 
-router = APIRouter(prefix="/api/gongzuo/{workspace}", tags=["gongzuo-runtime"])
+router = APIRouter(prefix="/api/lifeweave/{workspace}", tags=["gongzuo-runtime"])
 
 
 def runtime_service(request: Request) -> GongzuoRuntimeService:

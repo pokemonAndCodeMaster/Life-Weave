@@ -7,7 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from src.gongzuo.models import WorkspaceKey
 
-router=APIRouter(prefix='/api/gongzuo/{workspace}',tags=['gongzuo-knowledge'])
+router=APIRouter(prefix='/api/lifeweave/{workspace}',tags=['gongzuo-knowledge'])
 
 
 class CandidateCreate(BaseModel):

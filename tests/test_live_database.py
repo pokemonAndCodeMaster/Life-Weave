@@ -12,8 +12,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 @pytest.fixture(scope='module')
 def client(tmp_path_factory):
-    if os.environ.get('GONGZUO_TEST_DB') != '1':
-        pytest.skip('GONGZUO_TEST_DB=1 enables disposable PostgreSQL integration tests')
+    if os.environ.get('LIFEWEAVE_TEST_DB') != '1':
+        pytest.skip('LIFEWEAVE_TEST_DB=1 enables disposable PostgreSQL integration tests')
     from src.api.app import create_app
     from src.cli import migrate
     root = tmp_path_factory.mktemp('live-app')
@@ -21,10 +21,10 @@ def client(tmp_path_factory):
     connection = psycopg.connect(host=str(ROOT/'.runtime/postgres/socket'), port=55440, user='gongzuo', dbname='postgres', autocommit=True)
     connection.execute(sql.SQL('CREATE DATABASE {}').format(sql.Identifier(name)))
     with pytest.MonkeyPatch.context() as patch:
-        patch.setenv('GONGZUO_DB_NAME', name)
-        patch.setenv('GONGZUO_LOCAL_WORKER', '0')
-        patch.setenv('GONGZUO_PERSONAL_KNOWLEDGE_ROOT', str(root/'personal'))
-        patch.setenv('GONGZUO_TEAM_KNOWLEDGE_ROOT', str(root/'team'))
+        patch.setenv('LIFEWEAVE_DB_NAME', name)
+        patch.setenv('LIFEWEAVE_LOCAL_WORKER', '0')
+        patch.setenv('LIFEWEAVE_PERSONAL_KNOWLEDGE_ROOT', str(root/'personal'))
+        patch.setenv('LIFEWEAVE_TEAM_KNOWLEDGE_ROOT', str(root/'team'))
         try:
             migrate()
             app = create_app()
@@ -38,14 +38,28 @@ def client(tmp_path_factory):
 
 
 def post(client, route, body, status=201):
-    response = client.post('/api/gongzuo/personal'+route, json=body)
+    response = client.post('/api/lifeweave/personal'+route, json=body)
     assert response.status_code == status, response.text
     return response.json()
 
 
+def test_legacy_api_keeps_method_body_query_and_same_data(client):
+    old = '/api/gongzuo/personal/items'
+    redirect = client.post(old, json={'itemType':'other','title':'旧入口继续使用'}, follow_redirects=False)
+    assert redirect.status_code == 308
+    assert redirect.headers['location'] == '/api/lifeweave/personal/items'
+    created = client.post(old, json={'itemType':'other','title':'旧入口继续使用'})
+    assert created.status_code == 201
+    item_id = created.json()['id']
+    assert client.get('/api/lifeweave/personal/items/'+item_id).json()['title'] == '旧入口继续使用'
+    redirect = client.get('/api/gongzuo/personal/runs?state=failed&limit=5', follow_redirects=False)
+    assert redirect.headers['location'] == '/api/lifeweave/personal/runs?state=failed&limit=5'
+    assert client.post(old, json={}, headers={'Origin':'https://outside.example'}, follow_redirects=False).status_code == 403
+
+
 def test_persistent_work_context_conflict_and_acceptance(client):
     item = post(client, '/items', {'itemType':'research','title':'真实数据库纵切','payload':{'goal':'明确结果'}})
-    path = '/api/gongzuo/personal/items/'+item['id']
+    path = '/api/lifeweave/personal/items/'+item['id']
     assert client.get(path).json()['context']['content']['goal'] == '明确结果'
     assert client.get(path.replace('/personal/', '/team/')).status_code == 404
     accepted = client.post(path+'/accept', json={'version':1})
@@ -70,10 +84,10 @@ def test_knowledge_review_conflicts_and_external_read_only(client, tmp_path):
     assert not target.exists()
     post(client,'/library/revisions/'+draft['id']+'/decision',{'accept':True},200)
     assert target.read_text() == '# 笔记\n\n第一版'
-    doc = client.get('/api/gongzuo/personal/library/document', params={'path':'学习/笔记.md'}).json()
+    doc = client.get('/api/lifeweave/personal/library/document', params={'path':'学习/笔记.md'}).json()
     draft2 = post(client,'/library/revisions',{'path':doc['path'],'content':'# 笔记\n第二版','baseVersion':doc['version'],'reason':'冲突验证'})
     target.write_text('# 笔记\n来自本地编辑器的新内容')
-    response = client.post('/api/gongzuo/personal/library/revisions/'+draft2['id']+'/decision',json={'accept':True})
+    response = client.post('/api/lifeweave/personal/library/revisions/'+draft2['id']+'/decision',json={'accept':True})
     assert response.status_code == 409
     assert '本地编辑器' in target.read_text()
     post(client,'/library/revisions/'+draft2['id']+'/decision',{'accept':False},200)
@@ -81,13 +95,13 @@ def test_knowledge_review_conflicts_and_external_read_only(client, tmp_path):
     source = post(client,'/library/sources',{'title':'外部来源','root':str(outside)})
     doc = library.document('personal', source['id'], 'index.md')
     draft3 = post(client,'/library/revisions',{'sourceId':source['id'],'path':'index.md','content':'不可静默覆盖','baseVersion':doc['version'],'reason':'边界'})
-    response = client.post('/api/gongzuo/personal/library/revisions/'+draft3['id']+'/decision',json={'accept':True})
+    response = client.post('/api/lifeweave/personal/library/revisions/'+draft3['id']+'/decision',json={'accept':True})
     assert response.status_code == 409 and file.read_text() == '# 原知识\n独立来源'
-    assert client.get('/api/gongzuo/team/library/document', params={'path':'index.md','sourceId':source['id']}).status_code == 404
+    assert client.get('/api/lifeweave/team/library/document', params={'path':'index.md','sourceId':source['id']}).status_code == 404
     for path in ('../index.md','raw/index.md','/etc/passwd','.hidden.md'):
-        assert client.get('/api/gongzuo/personal/library/document',params={'path':path}).status_code == 409
+        assert client.get('/api/lifeweave/personal/library/document',params={'path':path}).status_code == 409
     (library.roots['personal']/'escape.md').symlink_to(file)
-    assert client.get('/api/gongzuo/personal/library/document',params={'path':'escape.md'}).status_code == 409
+    assert client.get('/api/lifeweave/personal/library/document',params={'path':'escape.md'}).status_code == 409
 
 
 class FakeLinear:
@@ -143,8 +157,8 @@ def test_task_inputs_are_frozen_and_run_limits_are_enforced(client, tmp_path):
     assert len(entries) == 11 and entries[0]['files']['references/example.md'] == '原方法依据'
     support.write_text('源方法后来变化')
     assert snapshot['capability_snapshot'][0]['files']['references/example.md'] == '原方法依据'
-    assert client.post('/api/gongzuo/personal/runs',json={**payload,'knowledgeRefs':['local:学习/笔记.md']*11}).status_code == 422
-    assert client.post('/api/gongzuo/personal/runs',json={**payload,'methodId':'missing'}).status_code == 409
+    assert client.post('/api/lifeweave/personal/runs',json={**payload,'knowledgeRefs':['local:学习/笔记.md']*11}).status_code == 422
+    assert client.post('/api/lifeweave/personal/runs',json={**payload,'methodId':'missing'}).status_code == 409
     cancelled = post(client,'/runs/'+run['id']+'/cancel',{},200)
     assert cancelled['state'] == 'cancelled'
     retry = post(client,'/runs/'+run['id']+'/retry',{'syncContext':True},202)
@@ -152,7 +166,7 @@ def test_task_inputs_are_frozen_and_run_limits_are_enforced(client, tmp_path):
 
 
 def test_origin_boundary(client):
-    assert client.post('/api/gongzuo/personal/items',json={'itemType':'personal','title':'不应创建'},headers={'Origin':'https://elsewhere.test'}).status_code == 403
+    assert client.post('/api/lifeweave/personal/items',json={'itemType':'personal','title':'不应创建'},headers={'Origin':'https://elsewhere.test'}).status_code == 403
 
 
 def test_manual_result_body_is_readable_and_duplicate_save_is_idempotent(client):
@@ -161,34 +175,34 @@ def test_manual_result_body_is_readable_and_duplicate_save_is_idempotent(client)
     first=post(client,'/items/'+item['id']+'/manual-results',body)
     again=post(client,'/items/'+item['id']+'/manual-results',body)
     assert first==again
-    detail=client.get('/api/gongzuo/personal/items/'+item['id']).json()
+    detail=client.get('/api/lifeweave/personal/items/'+item['id']).json()
     assert len(detail['evidence'])==1 and detail['evidence'][0]['payload']['body']==body['content']
-    entity=client.get('/api/gongzuo/personal/entities/'+first['artifactId']).json()
+    entity=client.get('/api/lifeweave/personal/entities/'+first['artifactId']).json()
     assert entity['payload']['body']==body['content']
-    assert client.post('/api/gongzuo/team/items/'+item['id']+'/manual-results',json=body).status_code==404
+    assert client.post('/api/lifeweave/team/items/'+item['id']+'/manual-results',json=body).status_code==404
 
 
 def test_current_context_reaches_lists_meeting_and_export_without_rewriting_snapshot(client):
     item=post(client,'/items',{'itemType':'research','title':'多入口共识验证','payload':{'goal':'旧目标','scope':'旧范围','owner':'独立负责人'}})
-    meeting=client.get('/api/gongzuo/personal/state').json()['meeting']
-    response=client.put('/api/gongzuo/personal/meeting',json={'version':meeting['version'],'config':{'title':'范围验证','sections':[{'key':'deliveries','title':'交付','enabled':True,'mode':'generic','filters':{'itemIds':[item['id']]},'fields':['title','payload'],'payloadFields':['goal','scope','owner']}]}})
+    meeting=client.get('/api/lifeweave/personal/state').json()['meeting']
+    response=client.put('/api/lifeweave/personal/meeting',json={'version':meeting['version'],'config':{'title':'范围验证','sections':[{'key':'deliveries','title':'交付','enabled':True,'mode':'generic','filters':{'itemIds':[item['id']]},'fields':['title','payload'],'payloadFields':['goal','scope','owner']}]}})
     assert response.status_code==200,response.text
     snapshot=post(client,'/meeting/freeze',{})
     proposal=post(client,'/items/'+item['id']+'/context/proposals',{'baseVersion':1,'title':'澄清目标','proposedContent':{'goal':'新目标','scope':'新范围'}})
-    pending=next(row for row in client.get('/api/gongzuo/personal/state').json()['items'] if row['id']==item['id'])
+    pending=next(row for row in client.get('/api/lifeweave/personal/state').json()['items'] if row['id']==item['id'])
     assert pending['contextProposals'][0]['id']==proposal['id']
     post(client,'/context-proposals/'+proposal['id']+'/accept',{'version':1},200)
-    current=next(row for row in client.get('/api/gongzuo/personal/state').json()['items'] if row['id']==item['id'])
+    current=next(row for row in client.get('/api/lifeweave/personal/state').json()['items'] if row['id']==item['id'])
     assert current['context']['content']['goal']=='新目标' and current['payload']['goal']=='旧目标'
-    preview=client.get('/api/gongzuo/personal/meeting/preview').json()
+    preview=client.get('/api/lifeweave/personal/meeting/preview').json()
     assert preview['sections'][0]['entries'][0]['values']['payload']=={'goal':'新目标','scope':'新范围','owner':'独立负责人'}
-    exported=client.get('/api/gongzuo/personal/meeting/markdown').text
+    exported=client.get('/api/lifeweave/personal/meeting/markdown').text
     assert '目标：新目标' in exported and '范围：新范围' in exported
-    frozen=client.get('/api/gongzuo/personal/meeting/markdown',params={'snapshotId':snapshot['id']}).text
+    frozen=client.get('/api/lifeweave/personal/meeting/markdown',params={'snapshotId':snapshot['id']}).text
     assert '目标：旧目标' in frozen and '新目标' not in frozen
 
 
 def test_team_local_worker_requires_explicit_account_choice(client):
-    response=client.put('/api/gongzuo/team/settings/local-worker',json={'enabled':True,'useLocalAccount':False})
+    response=client.put('/api/lifeweave/team/settings/local-worker',json={'enabled':True,'useLocalAccount':False})
     assert response.status_code==409
-    assert client.get('/api/gongzuo/team/settings').json()['localWorker']['enabled'] is False
+    assert client.get('/api/lifeweave/team/settings').json()['localWorker']['enabled'] is False

@@ -41,9 +41,9 @@ async function openPage(id = 'child-1', parentEstablished = true) {
   await workspace.load('personal')
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: [{ path: '/gongzuo/:workspace/items/:itemId/:tab', component: Harness }],
+    routes: [{ path: '/lifeweave/:workspace/items/:itemId/:tab', component: Harness }],
   })
-  await router.push('/gongzuo/personal/items/' + id + '/overview')
+  await router.push('/lifeweave/personal/items/' + id + '/overview')
   await router.isReady()
   render(Harness, { global: { plugins: [router] } })
 }
@@ -69,7 +69,7 @@ describe('事项页委托', () => {
     expect(dialog.getByText(/共同背景：parent-1 · v7/)).toBeTruthy()
     await fireEvent.update(dialog.getByRole('textbox', { name: '这次具体做什么' }), '检查缺口解释是否完整')
     await fireEvent.click(dialog.getByRole('button', { name: '开始委托' }))
-    await waitFor(() => expect(post).toHaveBeenCalledWith('/gongzuo/personal/runs', expect.objectContaining({
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/lifeweave/personal/runs', expect.objectContaining({
       itemId: 'child-1', instruction: '检查缺口解释是否完整', engine: 'codex',
     })))
   })
@@ -82,7 +82,7 @@ describe('事项页委托', () => {
     expect(dialog.getByText('本次事项：parent-1 · 改善验收体验')).toBeTruthy()
     expect(dialog.getByText(/使用共享上下文 v7/)).toBeTruthy()
     await fireEvent.click(dialog.getByRole('button', { name: '开始委托' }))
-    await waitFor(() => expect(post).toHaveBeenCalledWith('/gongzuo/personal/runs', expect.objectContaining({ itemId: 'parent-1' })))
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/lifeweave/personal/runs', expect.objectContaining({ itemId: 'parent-1' })))
   })
 
   it('父共同背景缺失时，仍在父事项建立背景，不误发子事项运行', async () => {

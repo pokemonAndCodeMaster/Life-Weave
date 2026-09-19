@@ -524,7 +524,7 @@ def test_persisted_stop_intent_wins_over_late_worker_success_but_keeps_output(
             "artifacts": [
                 {
                     "kind": "executor-result",
-                    "ref": f"/api/gongzuo/personal/runs/{run['id']}/artifacts/result",
+                    "ref": f"/api/lifeweave/personal/runs/{run['id']}/artifacts/result",
                     "version": "sha256:late",
                 }
             ],
@@ -703,7 +703,7 @@ def test_team_worker_never_falls_back_to_personal_auth_or_provider_environment(
     (team_codex / "auth.json").write_text("team-secret", encoding="utf-8")
     monkeypatch.setenv("CODEX_HOME", str(personal_codex))
     monkeypatch.setenv("OPENAI_API_KEY", "personal-provider-secret")
-    monkeypatch.delenv("GONGZUO_TEAM_CODEX_HOME", raising=False)
+    monkeypatch.delenv("LIFEWEAVE_TEAM_CODEX_HOME", raising=False)
     executor = ShellExecutor()
     runtime, _, _ = service(tmp_path, executor)
     worker = GongzuoWorker(
@@ -713,13 +713,13 @@ def test_team_worker_never_falls_back_to_personal_auth_or_provider_environment(
         machine_id="node",
     )
 
-    with pytest.raises(FileNotFoundError, match="GONGZUO_TEAM_CODEX_HOME"):
+    with pytest.raises(FileNotFoundError, match="LIFEWEAVE_TEAM_CODEX_HOME"):
         worker._isolated_environment(
             tmp_path / "team-missing-home", workspace="team", engine="codex"
         )
     assert not (tmp_path / "team-missing-home" / ".codex" / "auth.json").exists()
 
-    monkeypatch.setenv("GONGZUO_TEAM_CODEX_HOME", str(team_codex))
+    monkeypatch.setenv("LIFEWEAVE_TEAM_CODEX_HOME", str(team_codex))
     team_env, team_inherits = worker._isolated_environment(
         tmp_path / "team-home", workspace="team", engine="codex"
     )

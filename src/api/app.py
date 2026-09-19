@@ -3,10 +3,11 @@ from __future__ import annotations
 import os
 import secrets
 from contextlib import asynccontextmanager
+from src.config.environment import get_env
 from pathlib import Path
 
 from fastapi import FastAPI, Request
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
@@ -38,7 +39,7 @@ def create_app() -> FastAPI:
     config = ConfigManager(project_root=ROOT)
     manager = DatabaseManager(config)
     work = GongzuoService(GongzuoRepository(manager.postgres()))
-    roots = {key: Path(os.environ.get(f'GONGZUO_{key.upper()}_KNOWLEDGE_ROOT', str(ROOT / '.runtime/knowledge' / key))).expanduser().resolve() for key in ('personal', 'team')}
+    roots = {key: Path(get_env(f'LIFEWEAVE_{key.upper()}_KNOWLEDGE_ROOT', str(ROOT / '.runtime/knowledge' / key))).expanduser().resolve() for key in ('personal', 'team')}
     for root in roots.values():
         root.mkdir(parents=True, exist_ok=True)
     knowledge = GongzuoKnowledgeService(GongzuoKnowledgeRepository(manager.postgres()), roots=roots, gongzuo_service=work)
@@ -60,7 +61,7 @@ def create_app() -> FastAPI:
             await local_workers.close()
             manager.close()
 
-    app = FastAPI(title='共作工作台', version='0.1.0', lifespan=lifespan)
+    app = FastAPI(title='LifeWeave · 经纬', version='0.1.0', lifespan=lifespan)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver'])
     app.state.database_manager = manager
     app.state.gongzuo_service = work
@@ -80,6 +81,13 @@ def create_app() -> FastAPI:
             origin = request.headers.get('origin')
             if origin and origin not in {'http://127.0.0.1:8010', 'http://localhost:8010', 'http://127.0.0.1:5180', 'http://localhost:5180'}:
                 return JSONResponse({'detail': '请从本机工作台页面发起操作'}, status_code=403)
+        if request.url.path == '/api/gongzuo' or request.url.path.startswith('/api/gongzuo/'):
+            target = '/api/lifeweave' + request.url.path[len('/api/gongzuo'):]
+            # Preserve encoded path/query and method/body for saved clients and references.
+            target = request.scope.get('raw_path', target.encode()).decode('ascii').replace('/api/gongzuo', '/api/lifeweave', 1)
+            if request.url.query:
+                target += '?' + request.url.query
+            return RedirectResponse(target, status_code=308)
         return await call_next(request)
 
     app.include_router(work_router)
@@ -92,13 +100,16 @@ def create_app() -> FastAPI:
     @app.get('/api/health')
     def health():
         result = manager.postgres().health_check()
-        return {'status': 'ok', 'app': '共作', 'database': result.database, 'version': '0.1.0'}
+        return {'status': 'ok', 'app': 'LifeWeave · 经纬', 'database': result.database, 'version': '0.1.0'}
 
-    @app.get('/api/gongzuo/config')
+    @app.get('/api/lifeweave/config')
     def configuration():
         return {'workspaces': ['personal', 'team'], 'defaultWorkspace': 'personal', 'identityMode': 'local-user'}
 
     dist = ROOT / 'web/dist'
+    @app.get('/favicon.svg', include_in_schema=False)
+    def favicon():
+        return FileResponse(ROOT / 'web/public/favicon.svg', media_type='image/svg+xml')
     if (dist / 'assets').exists():
         app.mount('/assets', StaticFiles(directory=dist / 'assets'), name='assets')
 

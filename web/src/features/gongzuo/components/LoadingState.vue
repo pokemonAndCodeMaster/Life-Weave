@@ -4,7 +4,7 @@ defineEmits<{ retry: [] }>()
 </script>
 
 <template>
-  <div v-if="loading" class="gz-panel gz-empty" role="status">正在读取共作工作区…</div>
+  <div v-if="loading" class="gz-panel gz-empty" role="status">正在读取经纬工作区…</div>
   <div v-else-if="error" class="gz-panel gz-empty" role="alert">
     <p>{{ error }}</p>
     <button class="gz-btn" type="button" @click="$emit('retry')">重新读取</button>

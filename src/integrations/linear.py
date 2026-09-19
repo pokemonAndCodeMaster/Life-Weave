@@ -59,7 +59,7 @@ class LinearService:
    if binding:
     conn.execute('UPDATE workbench.linear_binding SET remote_snapshot=%s,synced_at=now() WHERE workspace=%s AND issue_id=%s',(Jsonb(remote),workspace,remote['id']))
     return {'itemId':binding['item_id'],'created':False,'remote':remote}
-   payload={'goal':remote['description'] or remote['title'],'scope':'从 Linear 引入，在共作中推进；本地状态与原事项分别维护。','owner':'我','due':remote.get('dueDate'),'priority':remote['priority'],'linearUrl':remote['url'],'linearIdentifier':remote['identifier']}
+   payload={'goal':remote['description'] or remote['title'],'scope':'从 Linear 引入，在经纬中推进；本地状态与原事项分别维护。','owner':'我','due':remote.get('dueDate'),'priority':remote['priority'],'linearUrl':remote['url'],'linearIdentifier':remote['identifier']}
    conn.execute("INSERT INTO workbench.t_gongzuo_item(id,workspace_key,item_type,title,payload,created_by,updated_by) VALUES(%s,%s,'other',%s,%s,'local-user','local-user')",(item_id,workspace,remote['title'],Jsonb(payload)))
    conn.execute('INSERT INTO workbench.t_gongzuo_context(id,workspace_key,item_id) VALUES(%s,%s,%s)',(context_id,workspace,item_id))
    conn.execute("INSERT INTO workbench.t_gongzuo_context_version(id,context_id,revision_no,status,content,provenance,accepted_by,accepted_at,created_by) VALUES(%s,%s,1,'accepted',%s,%s,'local-user',now(),'local-user')",(version_id,context_id,Jsonb({'goal':payload['goal'],'scope':payload['scope']}),Jsonb([{'source':remote['url'],'updatedAt':remote['updatedAt']}])) )

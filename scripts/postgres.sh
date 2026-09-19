@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-PG_BIN="${GONGZUO_PG_BIN:-/usr/lib/postgresql/16/bin}"
+PG_BIN="${LIFEWEAVE_PG_BIN:-${GONGZUO_PG_BIN:-/usr/lib/postgresql/16/bin}}"
 PG_RUNTIME="$ROOT/.runtime/postgres"
 PG_DATA="$PG_RUNTIME/data"
 PG_SOCKET="$PG_RUNTIME/socket"
-PG_PORT="${GONGZUO_DB_PORT:-55440}"
-PG_USER="${GONGZUO_DB_USER:-gongzuo}"
-PG_DATABASE="${GONGZUO_DB_NAME:-gongzuo}"
+PG_PORT="${LIFEWEAVE_DB_PORT:-${GONGZUO_DB_PORT:-55440}}"
+PG_USER="${LIFEWEAVE_DB_USER:-${GONGZUO_DB_USER:-gongzuo}}"
+PG_DATABASE="${LIFEWEAVE_DB_NAME:-${GONGZUO_DB_NAME:-gongzuo}}"
 [[ "$PG_USER" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ && "$PG_DATABASE" =~ ^[a-zA-Z_][a-zA-Z0-9_]*$ ]] || exit 2
 mkdir -p "$PG_SOCKET"
 chmod 700 "$PG_RUNTIME" "$PG_SOCKET"
@@ -28,7 +28,7 @@ case "${1:-status}" in
   status) ready ;;
   backup)
     mkdir -p "$ROOT/.runtime/backups"
-    DEST="$ROOT/.runtime/backups/gongzuo-$(date +%Y%m%d-%H%M%S).dump"
+    DEST="$ROOT/.runtime/backups/lifeweave-$(date +%Y%m%d-%H%M%S).dump"
     "$PG_BIN/pg_dump" -h "$PG_SOCKET" -p "$PG_PORT" -U "$PG_USER" -d "$PG_DATABASE" -Fc -f "$DEST"
     chmod 600 "$DEST"
     echo "$DEST"

@@ -9,10 +9,10 @@ import type {
   WorkItem,
 } from '../types'
 
-const root = (workspace: WorkspaceKind) => `/gongzuo/${workspace}`
+const root = (workspace: WorkspaceKind) => `/lifeweave/${workspace}`
 
 export async function getGongzuoConfig() {
-  const { data } = await http.get<{ workspaces: WorkspaceKind[]; defaultWorkspace: WorkspaceKind; identityMode: string }>('/gongzuo/config')
+  const { data } = await http.get<{ workspaces: WorkspaceKind[]; defaultWorkspace: WorkspaceKind; identityMode: string }>('/lifeweave/config')
   return data
 }
 
@@ -24,7 +24,7 @@ export function apiError(error: unknown): ApiErrorShape {
   const fallback = status === 409
     ? '内容已经被其他更新修改，请刷新后再试。'
     : status === 0
-      ? '无法连接共作服务，请确认后端已经启动。'
+      ? '无法连接经纬服务，请确认后端已经启动。'
       : '这次操作没有完成，请稍后重试。'
   return {
     status,

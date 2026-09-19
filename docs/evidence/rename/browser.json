@@ -1,0 +1,14 @@
+{
+  "home": {
+    "path": "http://127.0.0.1:8010/lifeweave/personal/home",
+    "title": "我的日常 · 经纬 LifeWeave"
+  },
+  "savedDetail": "http://127.0.0.1:8010/lifeweave/personal/items/item-85b6472a17f64292/outputs?view=all#result",
+  "historicalSource": {
+    "path": "http://127.0.0.1:8010/api/lifeweave/personal/runs/gzrun-20260918-160526-18eb2f21/source?path=README.md",
+    "originalContentRetained": true
+  },
+  "knowledge": "Original Chinese document link remains readable",
+  "teamWorker": "Enabled state retained after directory move",
+  "pageErrors": []
+}

@@ -23,7 +23,7 @@ const ideas = computed(() => state.value?.ideas ?? [])
         <div class="gz-idea-match"><GongzuoIcon name="link" /> {{ idea.reason }}</div>
         <div class="gz-origin">{{ idea.origin }} · 原始记录保留</div>
         <div class="gz-inline">
-          <RouterLink v-if="idea.related" class="gz-btn sm" :to="`/gongzuo/${activeWorkspace}/items/${encodeURIComponent(idea.related)}/overview`">查看 {{ idea.related }}</RouterLink>
+          <RouterLink v-if="idea.related" class="gz-btn sm" :to="`/lifeweave/${activeWorkspace}/items/${encodeURIComponent(idea.related)}/overview`">查看 {{ idea.related }}</RouterLink>
           <button v-else class="gz-btn sm" type="button" @click="openModal('item-create', { idea })">形成工作事项</button>
           <button class="gz-btn ghost sm" type="button" @click="openModal('idea-discuss', { idea })">继续讨论</button>
         </div>

@@ -40,7 +40,7 @@ async function loadDetail(id: string) {
 }
 
 function setTab(value: string) {
-  router.push(`/gongzuo/${activeWorkspace.value}/items/${encodeURIComponent(itemId.value)}/${value}`)
+  router.push(`/lifeweave/${activeWorkspace.value}/items/${encodeURIComponent(itemId.value)}/${value}`)
 }
 
 function delegateCurrentItem() {

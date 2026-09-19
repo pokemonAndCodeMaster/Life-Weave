@@ -11,6 +11,7 @@ import subprocess
 import sys
 import urllib.error
 import urllib.request
+from src.config.environment import get_env
 from pathlib import Path
 from typing import Any, Protocol
 
@@ -70,7 +71,7 @@ class HttpWorkerClient:
         self._opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
 
     def _request(self, suffix: str, payload: dict[str, Any]) -> Any:
-        url = f"{self.server}/api/gongzuo/{self.workspace}/worker/{self.machine_id}{suffix}"
+        url = f"{self.server}/api/lifeweave/{self.workspace}/worker/{self.machine_id}{suffix}"
         request = urllib.request.Request(
             url,
             data=json.dumps(payload, ensure_ascii=False).encode("utf-8"),
@@ -188,7 +189,7 @@ class GongzuoWorker:
         if workspace == "team":
             allowlist = {
                 name.strip()
-                for name in os.environ.get("GONGZUO_TEAM_ENV_ALLOWLIST", "").split(",")
+                for name in get_env("LIFEWEAVE_TEAM_ENV_ALLOWLIST", "").split(",")
                 if name.strip()
             }
             safe_names = {
@@ -200,10 +201,10 @@ class GongzuoWorker:
                 {name: value for name, value in os.environ.items() if name in safe_names | allowlist}
             )
         if engine == "codex":
-            configured = (self.authentication_sources.get("GONGZUO_TEAM_CODEX_HOME") or os.environ.get("GONGZUO_TEAM_CODEX_HOME")) if workspace == "team" else None
+            configured = (self.authentication_sources.get("LIFEWEAVE_TEAM_CODEX_HOME") or get_env("LIFEWEAVE_TEAM_CODEX_HOME")) if workspace == "team" else None
             if workspace == "team" and not configured:
                 raise FileNotFoundError(
-                    "团队 Codex 凭证未配置：必须设置 GONGZUO_TEAM_CODEX_HOME"
+                    "团队 Codex 凭证未配置：必须设置 LIFEWEAVE_TEAM_CODEX_HOME"
                 )
             codex_source = Path(
                 configured or os.environ.get("CODEX_HOME", str(Path.home() / ".codex"))
@@ -214,13 +215,13 @@ class GongzuoWorker:
                 self._copy_auth_file(codex_source / name, home / ".codex" / name)
         elif engine == "opencode":
             if workspace == "team":
-                data_source_value = (self.authentication_sources.get("GONGZUO_TEAM_OPENCODE_DATA_HOME") or os.environ.get("GONGZUO_TEAM_OPENCODE_DATA_HOME"))
-                config_source_value = (self.authentication_sources.get("GONGZUO_TEAM_OPENCODE_CONFIG_HOME") or os.environ.get("GONGZUO_TEAM_OPENCODE_CONFIG_HOME"))
-                explicit_config = os.environ.get("GONGZUO_TEAM_OPENCODE_CONFIG")
+                data_source_value = (self.authentication_sources.get("LIFEWEAVE_TEAM_OPENCODE_DATA_HOME") or get_env("LIFEWEAVE_TEAM_OPENCODE_DATA_HOME"))
+                config_source_value = (self.authentication_sources.get("LIFEWEAVE_TEAM_OPENCODE_CONFIG_HOME") or get_env("LIFEWEAVE_TEAM_OPENCODE_CONFIG_HOME"))
+                explicit_config = get_env("LIFEWEAVE_TEAM_OPENCODE_CONFIG")
                 if not data_source_value or not (config_source_value or explicit_config):
                     raise FileNotFoundError(
-                        "团队 OpenCode 必须显式配置 GONGZUO_TEAM_OPENCODE_DATA_HOME，"
-                        "以及 GONGZUO_TEAM_OPENCODE_CONFIG_HOME 或 GONGZUO_TEAM_OPENCODE_CONFIG"
+                        "团队 OpenCode 必须显式配置 LIFEWEAVE_TEAM_OPENCODE_DATA_HOME，"
+                        "以及 LIFEWEAVE_TEAM_OPENCODE_CONFIG_HOME 或 LIFEWEAVE_TEAM_OPENCODE_CONFIG"
                     )
                 data_source = Path(data_source_value)
                 config_source = Path(config_source_value) if config_source_value else None
@@ -573,7 +574,7 @@ class GongzuoWorker:
             artifact_values = [
                 {
                     "kind": "executor-result",
-                    "ref": f"/api/gongzuo/{run['workspace']}/runs/{run_id}/artifacts/result",
+                    "ref": f"/api/lifeweave/{run['workspace']}/runs/{run_id}/artifacts/result",
                     "version": result_hash,
                     "mediaType": "text/plain",
                 }
@@ -644,12 +645,12 @@ class GongzuoWorker:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="共作远程/本地执行节点")
+    parser = argparse.ArgumentParser(description="经纬远程/本地执行节点")
     parser.add_argument("--server", required=True)
     parser.add_argument("--workspace", choices=("personal", "team"))
     parser.add_argument("--machine-id")
     parser.add_argument("--runtime-root", type=Path, required=True)
-    parser.add_argument("--token-env", default="GONGZUO_WORKER_TOKEN")
+    parser.add_argument("--token-env", default="LIFEWEAVE_WORKER_TOKEN")
     parser.add_argument(
         "--credential-file",
         type=Path,
@@ -675,7 +676,7 @@ def main(argv: list[str] | None = None) -> int:
     machine_id = args.machine_id or credential.get("id")
     if workspace not in {"personal", "team"} or not machine_id:
         parser.error("必须通过参数或 credential file 提供 workspace 和 machine id")
-    token = os.environ.get(args.token_env) or credential.get("workerToken")
+    token = get_env(args.token_env) or credential.get("workerToken")
     if not token:
         parser.error(f"环境变量 {args.token_env} 或 credential file 未提供 token")
     client = HttpWorkerClient(args.server, workspace, machine_id, str(token))

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, HTTPException
 from pydantic import BaseModel, Field, ConfigDict
 from src.gongzuo.models import WorkspaceKey
 
-router = APIRouter(prefix='/api/gongzuo/{workspace}/library', tags=['library'])
+router = APIRouter(prefix='/api/lifeweave/{workspace}/library', tags=['library'])
 
 class SourceCreate(BaseModel):
     title: str = Field(min_length=1,max_length=200)

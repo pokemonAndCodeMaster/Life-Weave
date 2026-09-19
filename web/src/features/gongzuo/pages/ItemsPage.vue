@@ -34,7 +34,7 @@ const contributions = computed(() => (state.value?.items ?? []).filter((item) =>
 const options = computed(() => [...(state.value?.domains ?? []), ...(state.value?.topics ?? []).map((topic) => topic.name)])
 
 function itemUrl(id: string) {
-  return `/gongzuo/${activeWorkspace.value}/items/${encodeURIComponent(id)}/overview`
+  return `/lifeweave/${activeWorkspace.value}/items/${encodeURIComponent(id)}/overview`
 }
 
 function selectTopic(name: string) {
@@ -78,7 +78,7 @@ function selectTopic(name: string) {
       <span class="gz-spacer"></span><span class="gz-caption">分组</span>
       <select v-model="group" aria-label="分组方式"><option value="none">不分组</option><option value="topic">专题</option><option value="domain">领域</option></select>
       <button class="gz-btn" type="button" @click="savePreferences({ group, filter, kind })">保存此呈现</button>
-      <RouterLink class="gz-btn" :to="`/gongzuo/${activeWorkspace}/meeting`"><GongzuoIcon name="meeting" />会议呈现</RouterLink>
+      <RouterLink class="gz-btn" :to="`/lifeweave/${activeWorkspace}/meeting`"><GongzuoIcon name="meeting" />会议呈现</RouterLink>
     </div>
     <div v-if="group === 'topic'" class="gz-notice neutral gz-mb-14"><GongzuoIcon name="layers" /><span>跨专题事项仍是同一个 ID。分组允许重复出现；本页总数按事项去重。</span></div>
     <div class="gz-panel">

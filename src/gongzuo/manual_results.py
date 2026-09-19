@@ -6,7 +6,7 @@ from pydantic import BaseModel, Field
 from psycopg.types.json import Jsonb
 from .models import WorkspaceKey
 
-router = APIRouter(prefix='/api/gongzuo/{workspace}', tags=['results'])
+router = APIRouter(prefix='/api/lifeweave/{workspace}', tags=['results'])
 
 
 class ManualResult(BaseModel):

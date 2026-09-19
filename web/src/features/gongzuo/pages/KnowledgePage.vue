@@ -42,7 +42,7 @@ watch([activeWorkspace,()=>route.query.path,()=>route.query.source],()=> { selec
  <div class="gz-tabs"><button class="gz-tab" :class="{active:tab==='documents'}" @click="tab='documents'">知识库</button><button class="gz-tab" :class="{active:tab==='revisions'}" @click="tab='revisions'">修订与历史 <span v-if="pending">{{ pending }}</span></button></div>
  <p v-if="error" class="gz-notice warning" role="alert">{{ error }}</p><p v-if="message" class="gz-notice" role="status">{{ message }}</p>
  <template v-if="tab==='documents'">
-  <form class="gz-toolbar" @submit.prevent="action(refresh)"><input v-model="query" class="gz-grow" aria-label="搜索知识全文" placeholder="搜索标题、路径或正文"/><button class="gz-btn" :disabled="busy">搜索</button><RouterLink class="gz-text-btn" :to="`/gongzuo/${activeWorkspace}/settings`">管理知识来源</RouterLink></form>
+  <form class="gz-toolbar" @submit.prevent="action(refresh)"><input v-model="query" class="gz-grow" aria-label="搜索知识全文" placeholder="搜索标题、路径或正文"/><button class="gz-btn" :disabled="busy">搜索</button><RouterLink class="gz-text-btn" :to="`/lifeweave/${activeWorkspace}/settings`">管理知识来源</RouterLink></form>
   <div class="gz-knowledge-grid">
    <aside class="gz-panel gz-knowledge-nav"><button v-for="doc in entries" :key="doc.sourceId+doc.path" class="gz-knowledge-link" :class="{active:selected?.path===doc.path&&selected?.sourceId===doc.sourceId}" @click="read(doc)"><span>{{ doc.title }}<small>{{ doc.sourceTitle }} · {{ doc.path }}</small></span></button><div v-if="!entries.length" class="gz-empty">还没有知识。新建一篇，或在设置中接入已有目录。</div></aside>
    <article class="gz-panel gz-article">

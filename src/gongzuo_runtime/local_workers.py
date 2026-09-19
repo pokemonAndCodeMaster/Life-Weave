@@ -3,6 +3,7 @@ import asyncio
 import json
 import logging
 import os
+from src.config.environment import get_env
 from pathlib import Path
 from .worker import GongzuoWorker, ServiceWorkerClient
 
@@ -26,7 +27,7 @@ class LocalWorkers:
         return {**config, 'running':workspace in self.tasks and not self.tasks[workspace].done()}
 
     async def initialize(self):
-        if os.environ.get('GONGZUO_LOCAL_WORKER', '1') != '1':
+        if get_env('LIFEWEAVE_LOCAL_WORKER', '1') != '1':
             return
         for workspace in ('personal', 'team'):
             if self.status(workspace)['enabled']:
@@ -77,9 +78,9 @@ class LocalWorkers:
         # Only this explicitly enabled local worker gets these account sources.
         # Remote/team worker defaults continue to require explicit credentials.
         authentication = {
-            'GONGZUO_TEAM_CODEX_HOME':os.environ.get('CODEX_HOME', str(Path.home()/'.codex')),
-            'GONGZUO_TEAM_OPENCODE_DATA_HOME':os.environ.get('XDG_DATA_HOME', str(Path.home()/'.local/share')),
-            'GONGZUO_TEAM_OPENCODE_CONFIG_HOME':os.environ.get('XDG_CONFIG_HOME', str(Path.home()/'.config')),
+            'LIFEWEAVE_TEAM_CODEX_HOME':os.environ.get('CODEX_HOME', str(Path.home()/'.codex')),
+            'LIFEWEAVE_TEAM_OPENCODE_DATA_HOME':os.environ.get('XDG_DATA_HOME', str(Path.home()/'.local/share')),
+            'LIFEWEAVE_TEAM_OPENCODE_CONFIG_HOME':os.environ.get('XDG_CONFIG_HOME', str(Path.home()/'.config')),
         } if workspace == 'team' else {}
         worker = GongzuoWorker(client=ServiceWorkerClient(self.runtime, workspace, identity['id'], identity['worker_token']), executors=self.engines, runtime_root=self.root/'.runtime/executions', machine_id=identity['id'], authentication_sources=authentication)
         async def loop():

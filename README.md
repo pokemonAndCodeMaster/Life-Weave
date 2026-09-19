@@ -1,15 +1,28 @@
-# 共作工作台
+# LifeWeave · 经纬
 
-把想法变成可推进的工作，把背景、AI 委托、成果和知识留在同一个地方。
+**工作与生活，有序展开。**
+
+LifeWeave 希望把工作、学习、爱好和生活中的想法、计划、行动与积累连接起来。中文名“经纬”取交织成整体之意；英文工程名统一为 `lifeweave`。当前可用的是本机 AI 工作台：管理事项与背景、阅读和修订知识、委托 AI、审阅成果及回顾进展。
 
 这是独立的本机应用与 Git 仓库。数据、依赖和进程都由本目录管理，不启动 Omni-Brain 或质检平台。部分工作模型与执行代码来自 Omni-Brain，来源和本轮交付范围见 [交付记录](docs/delivery.md)。
 
+## 理解项目
+
+第一次接触项目，按下面顺序阅读：
+
+1. [产品设计](docs/product.md)：为谁解决什么问题、日常怎样使用、为什么这样组织。
+2. [架构与关键实现](docs/architecture.md)：数据由谁维护，用户动作怎样穿过前后端，代码从哪里读起。
+3. [当前完成情况](docs/status.md)：已经能用、实现但未实测、尚未实现的能力及证据。
+4. [开发与运行维护](docs/development.md)：本地启动、配置、验证、改名兼容和排障。
+
+[文档导航](docs/README.md) 区分当前说明与历史证据；[命名说明](docs/naming.md) 解释名称与适配边界。
+
 ## 开始使用
 
-需要 Linux / WSL、Python 3.10+、Node.js 22+、npm，以及 PostgreSQL 16 的服务端命令。默认 PostgreSQL 命令目录为 `/usr/lib/postgresql/16/bin`，可用 `GONGZUO_PG_BIN` 指定。AI 功能需要已安装并登录的 Codex 或 OpenCode CLI。
+需要 Linux / WSL、Python 3.10+、Node.js 22+、npm，以及 PostgreSQL 16 的服务端命令。默认 PostgreSQL 命令目录为 `/usr/lib/postgresql/16/bin`，可用 `LIFEWEAVE_PG_BIN` 指定。AI 功能需要已安装并登录的 Codex 或 OpenCode CLI。
 
 ```bash
-cd /home/yyh/project/gongzuo-workbench
+cd /home/yyh/project/lifeweave
 python scripts/workbench.py setup
 python scripts/workbench.py start
 ```
@@ -46,7 +59,7 @@ python scripts/workbench.py start
 
 备份位于 `.runtime/backups/`，包括 PostgreSQL dump 和工作台知识压缩包。外部知识、CLI 账号凭证、方法连接配置和运行目录需按需另行备份。不要把包含个人数据或凭证的 `.runtime/` 提交到仓库。
 
-恢复时先停止应用，将 dump 用 `pg_restore` 恢复到一个**新的数据库**，将知识包解压到新的知识目录，再用 `GONGZUO_DB_NAME` 和 `GONGZUO_PERSONAL_KNOWLEDGE_ROOT` / `GONGZUO_TEAM_KNOWLEDGE_ROOT` 指向它们。先检查恢复结果，再切换日常使用环境；不覆盖现用数据库。
+恢复时先停止应用，将 dump 用 `pg_restore` 恢复到一个**新的数据库**，将知识包解压到新的知识目录，再用 `LIFEWEAVE_DB_NAME` 和 `LIFEWEAVE_PERSONAL_KNOWLEDGE_ROOT` / `LIFEWEAVE_TEAM_KNOWLEDGE_ROOT` 指向它们。先检查恢复结果，再切换日常使用环境；不覆盖现用数据库。
 
 数据库仅监听本项目私有 Unix socket，目录 `.runtime/postgres/`，端口参数 `55440`，默认数据库和角色均为 `gongzuo`。服务日志为 `.runtime/server.log`；AI 的隔离目录、私有账号副本与产物位于 `.runtime/executions/`，运行记录保存在数据库。不要在 AI 正在执行时停止服务。
 
@@ -58,7 +71,7 @@ python scripts/workbench.py start
 
 ```bash
 .venv/bin/pytest
-GONGZUO_TEST_DB=1 .venv/bin/pytest tests/test_live_database.py
+LIFEWEAVE_TEST_DB=1 .venv/bin/pytest tests/test_live_database.py
 cd web
 npm run type-check
 npm test
@@ -67,4 +80,4 @@ npm run build
 
 数据库集成测试在本项目 PostgreSQL 中创建随机命名的临时数据库，完成后删除；不会清空使用中的工作台数据库。实际浏览器与 AI 验证记录见 [交付记录](docs/delivery.md)。
 
-API 文档：<http://127.0.0.1:8010/docs>。数据库变更新增到 `migrations/`，启动时按摘要校验并只应用新版本。
+API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`，页面前缀 `/lifeweave/`。旧 `/gongzuo/` 入口仍会跳转。数据库变更新增到 `migrations/`，启动时按摘要校验并只应用新版本。

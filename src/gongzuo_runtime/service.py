@@ -181,7 +181,7 @@ class GongzuoRuntimeService:
             for entry in capabilities
         ) or "（没有发布能力附加材料）"
         return (
-            "# 共作委托的不可变运行输入\n\n"
+            "# 经纬委托的不可变运行输入\n\n"
             f"工作事项：{item.get('id') or item.get('itemId')}\n"
             f"事项快照：\n```json\n{json.dumps(item, ensure_ascii=False, indent=2, default=str)}\n```\n\n"
             f"已接受上下文版本：{context.get('versionId')} / v{context.get('revisionNo')}\n"

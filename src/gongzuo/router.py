@@ -11,7 +11,7 @@ from .models import (ActivityCreate, ContextProposalCreate, ContextResolve, Disc
 from .repository import ConcurrentUpdateError
 from .service import GongzuoService
 
-router = APIRouter(prefix='/api/gongzuo/{workspace}', tags=['gongzuo'])
+router = APIRouter(prefix='/api/lifeweave/{workspace}', tags=['gongzuo'])
 Actor = Annotated[str, Depends(get_actor_id)]
 
 
