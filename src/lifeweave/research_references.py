@@ -27,6 +27,9 @@ def merge_references(groups):
     result = {'links':{}, 'images':{}, 'warnings':[]}
     conflicts = {'links':set(), 'images':set()}
     for group in groups:
+        for warning in group.get('warnings', []):
+            if warning not in result['warnings']:
+                result['warnings'].append(warning)
         for kind in ('links','images'):
             for href,target in group[kind].items():
                 if href in conflicts[kind]:

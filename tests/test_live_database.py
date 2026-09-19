@@ -391,3 +391,11 @@ def test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable(dedi
     readable = client.get(output['downloadUrl'])
     assert readable.text == output['content']
     assert readable.headers['ETag'] == '"'+hashlib.sha256(readable.content).hexdigest()+'"'
+    candidate = post(client, '/items/'+item['id']+'/knowledge-candidates', {
+        'runId': run['id'], 'path': '研究/NUL-'+transport+'.md', 'content': output['content'],
+        'baseVersion': 'new', 'reason': '保留提取字符的解释边界', 'requestId': 'nul-knowledge',
+    })
+    assert candidate['references']['warnings'] == [output['storageNote']]
+    post(client, '/library/revisions/'+candidate['id']+'/decision', {'accept': True}, 200)
+    document = client.get(base+'/library/document', params={'path': '研究/NUL-'+transport+'.md'}).json()
+    assert document['references']['warnings'] == [output['storageNote']]
