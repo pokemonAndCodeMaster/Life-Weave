@@ -80,4 +80,4 @@ npm run build
 
 数据库集成测试在本项目 PostgreSQL 中创建随机命名的临时数据库，完成后删除；不会清空使用中的工作台数据库。实际浏览器与 AI 验证记录见 [交付记录](docs/delivery.md)。
 
-API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`，页面前缀 `/lifeweave/`。旧 `/gongzuo/` 入口仍会跳转。数据库变更新增到 `migrations/`，启动时按摘要校验并只应用新版本。
+API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`，页面前缀 `/lifeweave/`。旧页面仍会跳转；旧 API 客户端须跟随 308，或改用新前缀。配置读取范围见 [运行维护](docs/development.md#配置和凭证)。数据库变更新增到 `migrations/`，启动时按摘要校验并只应用新版本。

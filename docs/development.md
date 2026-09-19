@@ -28,7 +28,9 @@ Vue 使用 TypeScript 和 Composition API；前后端输入字段主要通过模
 
 ## 配置和凭证
 
-配置来自 [config/base.yaml](../config/base.yaml)、根目录可选 `.env` 和进程环境。`.env` 应保持本机私有。`LIFEWEAVE_*` 是新前缀，旧 `GONGZUO_*` 仍兼容；进程环境优先，在同一来源中新变量优先。
+数据库和日志配置由 ConfigManager 读取 [config/base.yaml](../config/base.yaml)、根目录可选 `.env` 和进程环境，进程环境优先。**知识根、执行器、节点启用选项和 `scripts/postgres.sh` 只读取进程环境，不自动加载 `.env`。** 涉及它们的配置请先 `export` 再运行启动命令；修改 PostgreSQL 参数也应使用进程环境，让数据库脚本与后端取得相同配置。
+
+`.env` 应保持本机私有。`LIFEWEAVE_*` 是新前缀，旧 `GONGZUO_*` 仍兼容；在同一配置来源中新变量优先。`LIFEWEAVE_PG_BIN` 仅用于数据库生命周期脚本，后端不会据此启动其他数据库程序。
 
 | 变量 | 默认 / 作用 |
 | --- | --- |
@@ -81,7 +83,7 @@ python scripts/workbench.py start
 | 现象 | 首先检查 |
 | --- | --- |
 | 页面打不开 | `status`、`.runtime/server.log`、8010 是否被占用；确认从本工程启动 |
-| 页面接口不存在 | 新接口 `/api/lifeweave/…`；检查前端构建是否更新，旧 API 应返回 308 |
+| 页面接口不存在，或旧客户端报 308 | 新接口 `/api/lifeweave/…`；检查前端构建。旧 API 使用 308，客户端需跟随重定向，或直接改为新前缀；Python 3.10 urllib 默认不跟随 |
 | 委托一直排队 | 设置页是否启用本空间节点、执行器是否已安装、维护中心节点状态 |
 | CLI 已安装但运行失败 | 该轮错误和过程；安装检测不等于账号、模型和上游服务可用 |
 | 知识修改冲突 | 源文件是否在提交候选之后被编辑；重新读取并比较，不强制覆盖 |
