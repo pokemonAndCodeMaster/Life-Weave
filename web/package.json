@@ -14,12 +14,15 @@
   "dependencies": {
     "axios": "1.18.1",
     "dompurify": "3.4.15",
+    "katex": "^0.18.7",
     "marked": "16.3.0",
+    "marked-katex-extension": "^5.1.13",
     "vue": "3.5.40",
     "vue-router": "5.2.0"
   },
   "devDependencies": {
     "@testing-library/vue": "^8.1.0",
+    "@types/katex": "^0.16.8",
     "@types/node": "24.10.1",
     "@vitejs/plugin-vue": "6.0.8",
     "@vue/test-utils": "^2.4.11",

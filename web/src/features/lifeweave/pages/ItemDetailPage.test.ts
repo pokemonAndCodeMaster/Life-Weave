@@ -32,6 +32,7 @@ async function openPage(id = 'child-1', parentEstablished = true) {
   const child = fixture('child-1', 'parent-1')
   const items = [parent, child]
   get.mockImplementation(async (url: string) => {
+    if (url.endsWith('/research-output')) return { data: { current: null, versions: [] } }
     if (url.endsWith('/state')) return { data: { items, ideas: [], topics: [], domains: [], resources: [], relations: [] } }
     if (url.endsWith('/runs') || url.endsWith('/machines')) return { data: { items: [] } }
     return { data: items.find((entry) => url.endsWith('/items/' + entry.id)) }

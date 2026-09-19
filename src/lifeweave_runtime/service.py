@@ -42,6 +42,7 @@ class LifeWeaveRuntimeService:
         self.runtime_root.mkdir(parents=True, exist_ok=True)
         self.repository_root = repository_root.resolve() if repository_root else None
         self.registration_tokens = dict(registration_tokens or {})
+        self.support_provider = None
         self.capability_provider = capability_provider
         self.task_sources = None
         self.offline_after_seconds = offline_after_seconds
@@ -172,6 +173,7 @@ class LifeWeaveRuntimeService:
         capabilities: list[dict[str, Any]],
         instruction: str,
         feedback: list[dict[str, Any]] | None = None,
+        support: dict[str, Any] | None = None,
     ) -> str:
         capability_text = "\n\n".join(
             f"### {'试验候选' if entry.get('isCandidate') else '已发布能力'} · "
@@ -193,6 +195,8 @@ class LifeWeaveRuntimeService:
             f"## 已发布能力与本次候选覆盖\n{capability_text}\n\n"
             f"## 本次具体任务\n{instruction}\n\n"
             f"## 事项中的纠偏反馈（本轮固定读取）\n{json.dumps(feedback or [], ensure_ascii=False, indent=2, default=str)}\n\n"
+            f"## 明确方向、偏好与前轮成果（本次快照）\n{json.dumps(support or {}, ensure_ascii=False, indent=2, default=str)}\n\n"
+            "本次明确要求可临时覆盖偏好，不回写长期偏好。若有前轮成果，请围绕同一目标修订并交付完整新正文，说明修订处；不要只追加无关报告。\n"
             "请说明相关反馈怎样影响本轮结果；反馈不自动覆盖已接受目标或扩大权限，冲突时指出差异。\n"
             "请交付实际结果、未覆盖范围与可核验证据。技术执行结束不代表事项已被业务接受。\n"
         )
@@ -251,6 +255,7 @@ class LifeWeaveRuntimeService:
         context = self._json_snapshot(context)
         capabilities = self._json_snapshot(capabilities)
         feedback = self._json_snapshot(self.lifeweave_service.execution_feedback(workspace, item_id))
+        support = self._json_snapshot(self.support_provider(workspace,item_id)) if self.support_provider else {}
         attempt = self.repository.next_attempt(workspace, item_id)
         source = Path(directory).expanduser() if directory else self.repository_root
         repository_path: str | None = None
@@ -269,7 +274,7 @@ class LifeWeaveRuntimeService:
                 "actor_id": actor_id,
                 "instruction": instruction,
                 "prompt_snapshot": self._prompt(
-                    item=item, context=context, capabilities=capabilities, instruction=instruction, feedback=feedback
+                    item=item, context=context, capabilities=capabilities, instruction=instruction, feedback=feedback, support=support
                 ),
                 "item_snapshot": item,
                 "context_snapshot": context,
@@ -293,6 +298,7 @@ class LifeWeaveRuntimeService:
                 ),
                 "environment_snapshot": {
                     "feedbackSnapshot": feedback,
+                    "researchSupport": support,
                     "inputRecommendations": recommendations,
                     "selectedInputs": {"methodId": method_id, "knowledgeRefs": knowledge_refs or []},
                     "requestedRuntime": runtime,
@@ -349,6 +355,7 @@ class LifeWeaveRuntimeService:
         context = self._json_snapshot(context)
         capabilities = self._json_snapshot(capabilities)
         feedback = self._json_snapshot(self.lifeweave_service.execution_feedback(workspace, str(old['item_id'])))
+        support = self._json_snapshot(self.support_provider(workspace,str(old['item_id']))) if self.support_provider else {}
         new_instruction = instruction or str(old["instruction"])
         attempt = self.repository.next_attempt(workspace, str(old["item_id"]))
         new_id = f"gzrun-{datetime.now(timezone.utc):%Y%m%d-%H%M%S}-{uuid4().hex[:8]}"
@@ -368,6 +375,7 @@ class LifeWeaveRuntimeService:
                     capabilities=capabilities,
                     instruction=new_instruction,
                     feedback=feedback,
+                    support=support,
                 ),
                 "item_snapshot": item if sync_context else old["item_snapshot"],
                 "context_snapshot": context,
@@ -391,6 +399,7 @@ class LifeWeaveRuntimeService:
                 else None,
                 "environment_snapshot": {
                     "feedbackSnapshot": feedback,
+                    "researchSupport": support,
                     "inputRecommendations": (old.get('environment_snapshot') or {}).get('inputRecommendations'),
                     "selectedInputs": (old.get('environment_snapshot') or {}).get('selectedInputs'),
                     "requestedRuntime": old["runtime"],
@@ -590,7 +599,7 @@ class LifeWeaveRuntimeService:
         # Workers report observed execution facts; they cannot replace input
         # provenance fixed by the control service when the attempt was created.
         fixed_input_keys = {'feedbackSnapshot', 'inputRecommendations', 'selectedInputs',
-                            'requestedRuntime', 'requestedImage', 'retriedFrom', 'contextSynced'}
+                            'requestedRuntime', 'requestedImage', 'retriedFrom', 'contextSynced', 'researchSupport'}
         environment = dict(existing.get('environment_snapshot') or {})
         environment.update({key: value for key, value in (report.get('environment') or {}).items()
                             if key not in fixed_input_keys})

@@ -19,7 +19,11 @@ class TaskSources:
 
     def roots(self, workspace):
         file = self.config_file(workspace)
-        return json.loads(file.read_text()) if file.exists() else []
+        configured = json.loads(file.read_text()) if file.exists() else []
+        # Product-owned methods travel with this source version, not a developer's
+        # global session. Explicit user roots remain independently registered.
+        builtin = Path(__file__).resolve().parents[2] / 'methods'
+        return list(dict.fromkeys([*(p for p in configured if p != str(builtin)), str(builtin)]))
 
     def add_root(self, workspace, root):
         path = Path(root).expanduser().resolve()

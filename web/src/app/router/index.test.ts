@@ -6,7 +6,7 @@ describe('LifeWeave entry compatibility', () => {
   it('opens the current home and preserves saved detail links with query and fragment', async () => {
     const router = createRouter({ history: createMemoryHistory(), routes: application.options.routes })
     await router.push('/')
-    expect(router.currentRoute.value.path).toBe('/lifeweave/personal/home')
+    expect(router.currentRoute.value.path).toBe('/lifeweave/personal/conversation')
     await router.push('/gongzuo/team/items/saved-item/outputs?view=all#result')
     expect(router.currentRoute.value.fullPath).toBe('/lifeweave/team/items/saved-item/outputs?view=all#result')
     expect(router.currentRoute.value.params.itemId).toBe('saved-item')

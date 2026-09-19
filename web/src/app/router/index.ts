@@ -7,8 +7,9 @@ const router = createRouter({
   },
   routes: [
     { path: '/gongzuo/:legacyPath(.*)*', redirect: (to) => ({ path: to.path.replace(/^\/gongzuo(?=\/|$)/, '/lifeweave'), query: to.query, hash: to.hash }) },
-    { path: '/', redirect: '/lifeweave/personal/home' },
-    { path: '/lifeweave', redirect: '/lifeweave/personal/home' },
+    { path: '/', redirect: '/lifeweave/personal/conversation' },
+    { path: '/lifeweave', redirect: '/lifeweave/personal/conversation' },
+    { path: '/lifeweave/:workspace(personal|team)/conversation/:conversationId?', name: 'conversation', component: () => import('@/features/lifeweave/pages/ConversationPage.vue'), meta: { lifeweave: true, title: '与经纬对话' } },
     { path: '/lifeweave/:workspace(personal|team)/home', name: 'home', component: () => import('@/features/lifeweave/pages/HomePage.vue'), meta: { lifeweave: true, title: '我的日常' } },
     { path: '/lifeweave/:workspace(personal|team)/items', name: 'items', component: () => import('@/features/lifeweave/pages/ItemsPage.vue'), meta: { lifeweave: true, title: '工作事项' } },
     { path: '/lifeweave/:workspace(personal|team)/ideas', name: 'ideas', component: () => import('@/features/lifeweave/pages/IdeasPage.vue'), meta: { lifeweave: true, title: '灵感与讨论' } },
@@ -20,7 +21,7 @@ const router = createRouter({
     { path: '/lifeweave/:workspace(personal|team)/settings', name: 'settings', component: () => import('@/features/lifeweave/pages/SettingsPage.vue') },
     { path: '/lifeweave/:workspace(personal|team)/connections', name: 'connections', component: () => import('@/features/lifeweave/pages/ConnectionsPage.vue') },
     { path: '/lifeweave/:workspace(personal|team)/runs', name: 'runs', component: () => import('@/features/lifeweave/pages/RunsPage.vue') },
-    { path: '/:pathMatch(.*)*', redirect: '/lifeweave/personal/home' },
+    { path: '/:pathMatch(.*)*', redirect: '/lifeweave/personal/conversation' },
   ],
 })
 export default router

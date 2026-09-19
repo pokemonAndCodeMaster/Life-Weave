@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from contextlib import contextmanager
+from contextvars import ContextVar
 from dataclasses import dataclass
 from typing import Any, Iterator, Mapping, Sequence
 
@@ -27,6 +28,7 @@ class PGConnector:
         self.alias = str(config["alias"])
         self.database = str(config["database"])
         self.schema = str(config["schema"])
+        self._bound: ContextVar[Any] = ContextVar(f'pg-atomic-{id(self)}', default=None)
         self._pool = ConnectionPool(
             conninfo=self._conninfo(config),
             min_size=int(config.get("min_size", 1)),
@@ -60,6 +62,10 @@ class PGConnector:
 
     @contextmanager
     def connection(self) -> Iterator[Connection[dict[str, Any]]]:
+        bound = self._bound.get()
+        if bound is not None:
+            yield bound
+            return
         self.open()
         with self._pool.connection() as connection:
             yield connection
@@ -69,6 +75,20 @@ class PGConnector:
         with self.connection() as connection:
             with connection.transaction():
                 yield connection
+
+    @contextmanager
+    def atomic(self) -> Iterator[Connection[dict[str, Any]]]:
+        """Compose existing domain operations and their receipt in one transaction.
+
+        Synchronous scope only: never hold this binding across an await or spawn a
+        task inside it. Existing transactions become savepoints on this connection.
+        """
+        with self.transaction() as connection:
+            token = self._bound.set(connection)
+            try:
+                yield connection
+            finally:
+                self._bound.reset(token)
 
     def fetch_all(
         self,
@@ -85,7 +105,8 @@ class PGConnector:
         """Execute a query inside a PostgreSQL read-only transaction."""
         with self.connection() as connection:
             with connection.transaction():
-                connection.execute("SET TRANSACTION READ ONLY")
+                if self._bound.get() is None:
+                    connection.execute("SET TRANSACTION READ ONLY")
                 with connection.cursor() as cursor:
                     cursor.execute(statement, params)
                     return list(cursor.fetchall())

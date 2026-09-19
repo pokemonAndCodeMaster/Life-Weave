@@ -82,14 +82,15 @@ class Library:
                 result.append({key:value for key,value in doc.items() if key != 'content'})
         return {'items':result,'unavailableSources':unavailable,'unavailableDocuments':unavailable_documents}
 
-    def propose(self, workspace: str, source_id: str, path: str, content: str, base_version: str, reason: str):
+    def propose(self, workspace: str, source_id: str, path: str, content: str, base_version: str, reason: str, *, connection=None):
         target = self.file(workspace,source_id,path)
         old = self.document(workspace,source_id,path)['content'] if target.exists() else ''
         expected = fingerprint(old) if target.exists() else 'new'
         if base_version != expected:
             raise ValueError('正文已经变化。请重新阅读并合并，草稿不会覆盖来源。')
         identity = 'revision-'+uuid4().hex[:16]
-        row = self.db.fetch_one('INSERT INTO workbench.document_revision(id,workspace,source_id,path,base_version,before_content,content,reason) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *', (identity,workspace,source_id,path,base_version,old,content,reason))
+        fetch_one = self.db.fetch_one if connection is None else lambda query, params: connection.execute(query, params).fetchone()
+        row = fetch_one('INSERT INTO workbench.document_revision(id,workspace,source_id,path,base_version,before_content,content,reason) VALUES (%s,%s,%s,%s,%s,%s,%s,%s) RETURNING *', (identity,workspace,source_id,path,base_version,old,content,reason))
         return self.with_diff(row)
 
     @staticmethod

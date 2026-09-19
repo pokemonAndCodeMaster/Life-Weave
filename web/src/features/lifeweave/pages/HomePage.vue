@@ -32,6 +32,7 @@ async function saveQuickIdea() {
     subtitle="工作、学习与生活中的计划，在这里接着推进。"
     eyebrow="FOCUS / 把注意力留给真正需要你的事"
   >
+    <RouterLink class="lw-btn primary" :to="`/lifeweave/${activeWorkspace}/conversation`"><LifeWeaveIcon name="message" />与经纬对话</RouterLink>
     <button class="lw-btn" type="button" @click="router.push(`/lifeweave/${activeWorkspace}/meeting`)">
       <LifeWeaveIcon name="meeting" />{{ isTeam ? '打开组会' : '打开周回顾' }}
     </button>

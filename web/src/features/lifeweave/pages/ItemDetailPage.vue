@@ -11,6 +11,9 @@ import LoadingState from '../components/LoadingState.vue'
 import PageHeader from '../components/PageHeader.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 import WorkContinuationPanel from '../components/WorkContinuationPanel.vue'
+import ResearchOutputPanel from '../components/ResearchOutputPanel.vue'
+import ResearchKnowledgeReview from '../components/ResearchKnowledgeReview.vue'
+import NextReviewEditor from '../components/conversation/NextReviewEditor.vue'
 import { useLifeWeaveWorkspace } from '../composables/useLifeWeaveWorkspace'
 import {listRuns} from '../api/lifeweave'
 import type {LifeWeaveRun} from '../types'
@@ -18,7 +21,7 @@ import type { ItemTab } from '../types'
 
 const route = useRoute()
 const router = useRouter()
-const { activeWorkspace, loading, error, itemDetails, rootOf, loadItem, openModal } = useLifeWeaveWorkspace()
+const { activeWorkspace, loading, error, itemDetails, rootOf, loadItem, openModal, notify } = useLifeWeaveWorkspace()
 const itemId = computed(() => String(route.params.itemId ?? ''))
 const item = computed(() => itemDetails.value[itemId.value])
 const rootItem = computed(() => item.value ? rootOf(item.value) : undefined)
@@ -27,6 +30,12 @@ const tabs: Array<{ key: ItemTab; label: string }> = [
   { key: 'overview', label: '概览' }, { key: 'context', label: '共享上下文' }, { key: 'outputs', label: '成果与验证' }, { key: 'activity', label: '推进记录' }, { key: 'retro', label: '复盘与成长' },
 ]
 const itemRuns=shallowRef<LifeWeaveRun[]>([])
+const researchRefresh = shallowRef(0)
+function quoteForConversation(quote: { text: string; runId: string | null; anchor: string }) {
+  try { sessionStorage.setItem(`lifeweave:quote:${activeWorkspace.value}:${itemId.value}`, JSON.stringify(quote)) }
+  catch { notify('浏览器未能保存引用，请复制段落后打开对话继续。'); return }
+  void router.push({ path: `/lifeweave/${activeWorkspace.value}/conversation`, query: { itemId: itemId.value } })
+}
 let runTimer:ReturnType<typeof setTimeout>|undefined;let mounted=true;let runGeneration=0
 async function refreshItemRuns(ticket:number){
  const workspace=activeWorkspace.value;const id=itemId.value
@@ -51,12 +60,14 @@ function delegateCurrentItem() {
 }
 
 watch([itemId,activeWorkspace], ([id]) => {runGeneration++;clearTimeout(runTimer);itemRuns.value=[];if(id){void loadDetail(id);void refreshItemRuns(runGeneration)}}, { immediate: true })
+watch(() => itemRuns.value.map(run => `${run.id}:${run.state}`).join('|'), (value, previous) => { if (value !== previous) researchRefresh.value++ })
 </script>
 
 <template>
   <LoadingState v-if="!item" :loading="loading" :error="error?.message" empty="找不到这个事项。" @retry="loadDetail(itemId)" />
   <template v-else-if="rootItem">
     <PageHeader :title="item.title" :subtitle="item.goal" :eyebrow="`${item.id} / ${item.kind}`">
+      <RouterLink class="lw-btn primary" :to="{ path: `/lifeweave/${activeWorkspace}/conversation`, query: { itemId } }"><LifeWeaveIcon name="message" />与经纬继续这件事</RouterLink>
       <button class="lw-btn primary" type="button" @click="delegateCurrentItem"><LifeWeaveIcon :name="rootItem.context.established ? 'spark' : 'layers'" />{{ rootItem.context.established ? '委托 AI' : '先建立上下文' }}</button>
       <button class="lw-btn" type="button" @click="openModal('discussion', { item: rootItem })"><LifeWeaveIcon name="message" />就地讨论</button>
     </PageHeader>
@@ -71,9 +82,12 @@ watch([itemId,activeWorkspace], ([id]) => {runGeneration++;clearTimeout(runTimer
         <ItemOutputsTab v-else-if="tab === 'outputs'" :item="item" :runs="itemRuns" />
         <ItemActivityTab v-else-if="tab === 'activity'" :item="item" :root-item="rootItem" />
         <ItemRetroTab v-else :item="item" :root-item="rootItem" />
+        <ResearchOutputPanel v-if="tab === 'overview' || tab === 'outputs'" :key="`${activeWorkspace}:${itemId}:output`" :workspace="activeWorkspace" :item-id="itemId" :refresh-key="researchRefresh" @quote="quoteForConversation" @feedback-saved="researchRefresh++" @candidate-created="researchRefresh++" />
+        <ResearchKnowledgeReview v-if="tab === 'outputs'" :key="`${activeWorkspace}:${itemId}:knowledge`" :workspace="activeWorkspace" :item-id="itemId" :refresh-key="researchRefresh" @changed="researchRefresh++" />
         <WorkContinuationPanel v-if="tab === 'overview'" :workspace="activeWorkspace" :item-id="itemId" @saved="loadDetail(itemId)" />
       </section>
       <aside class="lw-detail-aside">
+        <NextReviewEditor :key="`${activeWorkspace}:${itemId}:review`" :workspace="activeWorkspace" :item="item" @saved="loadDetail(itemId)" />
         <section class="lw-panel pad">
           <div class="lw-between"><h2>工作关系</h2><button class="lw-btn ghost icon-only" type="button" aria-label="编辑工作关系" @click="openModal('relations', { item })"><LifeWeaveIcon name="edit" /></button></div>
           <div class="lw-prop"><span>协调责任</span><div>{{ item.owner }}</div></div><div class="lw-prop"><span>参与者</span><div>{{ item.participants.join('、') || '未登记' }}</div></div><div class="lw-prop"><span>关联专题</span><div class="lw-chips"><StatusBadge v-for="topic in item.topics" :key="topic" :value="topic" /><span v-if="!item.topics.length" class="lw-muted">不要求关联</span></div></div><div class="lw-prop"><span>所属领域</span><div>{{ item.domains.join('、') || '未登记' }}</div></div><div class="lw-prop"><span>影响资产</span><div>{{ item.assets.join('、') || '未登记' }}</div></div>

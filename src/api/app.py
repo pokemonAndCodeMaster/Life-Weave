@@ -24,6 +24,10 @@ from src.lifeweave.manual_results import router as results_router
 from src.lifeweave.router import router as work_router
 from src.lifeweave.continuation import WorkContinuation
 from src.lifeweave.continuation_router import router as continuation_router
+from src.lifeweave.conversations import Conversations, research_support
+from src.lifeweave.conversation_interpreter import ConversationInterpreter
+from src.lifeweave.conversation_router import router as conversation_router
+from src.lifeweave.research_outputs import ResearchOutputs, router as research_outputs_router
 from src.lifeweave_knowledge import LifeWeaveKnowledgeRepository, LifeWeaveKnowledgeService
 from src.lifeweave_knowledge.router import router as knowledge_router
 from src.lifeweave_runtime.repository import LifeWeaveRuntimeRepository
@@ -56,10 +60,12 @@ def create_app() -> FastAPI:
     async def lifespan(app: FastAPI):
         manager.postgres().open()
         runtime.recover_expired_leases()
+        conversations.recover()
         try:
             await local_workers.initialize()
             yield
         finally:
+            await conversations.close()
             await local_workers.close()
             manager.close()
 
@@ -77,6 +83,12 @@ def create_app() -> FastAPI:
     app.state.task_sources = TaskSources(ROOT, app.state.library)
     runtime.task_sources = app.state.task_sources
     app.state.work_continuation = WorkContinuation(work, runtime)
+    app.state.research_outputs = ResearchOutputs(work, runtime, app.state.library, ROOT)
+    conversations = Conversations(manager.postgres(), work, runtime, app.state.work_continuation,
+                                 app.state.task_sources, ConversationInterpreter(ROOT, local_workers))
+    conversations.outputs = app.state.research_outputs
+    app.state.conversations = conversations
+    runtime.support_provider = lambda workspace, item_id: research_support(conversations,workspace,item_id)
 
     @app.middleware('http')
     async def local_boundary(request: Request, call_next):
@@ -95,6 +107,8 @@ def create_app() -> FastAPI:
 
     app.include_router(work_router)
     app.include_router(continuation_router)
+    app.include_router(conversation_router)
+    app.include_router(research_outputs_router)
     app.include_router(results_router)
     app.include_router(integrations_router)
     app.include_router(library_router)
