@@ -1,0 +1,62 @@
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+nul real HTTP worker consumed PASS
+nul worker succeeded PASS
+nul readable projection PASS
+nul original bytes/hash/headers PASS
+normal real HTTP worker consumed PASS
+normal worker succeeded PASS
+normal readable projection PASS
+normal original bytes/hash/headers PASS
+nul output browser warning PASS
+browser original NUL bytes and hash PASS
+readable download content hash PASS
+审查/字符投影.md candidate exact content plus disclosed provenance PASS
+审查/字符投影.md before accepting file unchanged PASS
+NUL candidate retains original source/image map PASS
+nul candidate NUL warning PASS
+nul formal warnings/maps match candidate PASS
+nul accepted original and hash unchanged PASS
+nul original download exact/version PASS
+nul downloaded HTML visible warnings PASS
+nul formal source and image map PASS
+nul formal clicked source exact PASS
+nul downloaded HTML source and image map PASS
+nul downloaded HTML clicked source exact PASS
+nul reading and downloads never mutate original/version PASS
+normal output browser warning PASS
+审查/普通知识.md candidate exact content plus disclosed provenance PASS
+审查/普通知识.md before accepting file unchanged PASS
+ordinary knowledge has zero fabricated warnings PASS
+normal candidate NUL warning PASS
+normal formal warnings/maps match candidate PASS
+normal accepted original and hash unchanged PASS
+normal original download exact/version PASS
+normal downloaded HTML visible warnings PASS
+normal formal source and image map PASS
+normal formal clicked source exact PASS
+normal downloaded HTML source and image map PASS
+normal downloaded HTML clicked source exact PASS
+normal reading and downloads never mutate original/version PASS
+normal output browser warning PASS
+审查/字符投影.md candidate exact content plus disclosed provenance PASS
+审查/字符投影.md before accepting file unchanged PASS
+multiple runs keep NUL explanation and ambiguity PASS
+overlap candidate NUL warning PASS
+overlap formal warnings/maps match candidate PASS
+overlap accepted original and hash unchanged PASS
+overlap original download exact/version PASS
+overlap downloaded HTML visible warnings PASS
+overlap ambiguity visible in exported HTML PASS
+overlap reading and downloads never mutate original/version PASS
+no browser uncaught errors PASS
+no HTTP errors in primary browser PASS
+owned server stopped PASS
+owned database removed PASS
+owned temporary root removed PASS
+OVERALL pass

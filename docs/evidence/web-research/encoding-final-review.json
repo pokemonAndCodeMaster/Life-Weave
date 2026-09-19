@@ -1,0 +1,988 @@
+{
+  "real_accepted_source": {
+    "url": "http://127.0.0.1:8011/api/lifeweave/personal/runs/gzrun-20260919-091738-82581407/source?path=.runtime%2Fresearch%2Fgzrun-20260919-091738-82581407%2Fsources.md",
+    "body": "# 本轮来源记录\n\n- 事项：`item-023bf9dab82a4466`；上下文：`ctxv-587e0d4d4770425b / v1`。\n- 本轮：`gzrun-20260919-091738-82581407`。\n- 资料接收方式：当前用户委托正文中的完整快照。记录时间：2026-09-19 09:18:08 UTC（北京时间17:18:08，工具读时）；不是源文件获取时间。\n- 隔离成果范围：本目录。没有访问外部网站，没有读取应用数据库或前轮运行目录，没有修改知识原文。\n\n| 材料 | 来源、版本与读取范围 | 本轮转存 |\n|---|---|---|\n| 阳台采光观察（验收材料） | sourceId=local；生活/阳台采光.md；发布版本61d37fe6aaa6d5c3c6bf6b0419024f04e14801ffb1fce1cbaa029f89826ddc98；读取委托内全文 | [observation.md](observation.md) |\n| 前轮完整报告 | 用户提供previousOutput.content全文；运行gzrun-20260919-090842-da7699c6；版本29930f859bb99b830e2c3e3945948d28d1b899a37af4c275b13012b902477c8f | [previous-report.md](previous-report.md) |\n| 固定纠偏反馈 | feedback-159077e4931841fe991b66ec3a0f6318ae66f545；createdAt=2026-09-19 17:17:00.563439+08:00；读取委托内完整反馈对象 | [feedback.json](feedback.json) |\n| 已发布研究方法 | 本地读取.agents/skills/method-33b5c0152803d0354a86/SKILL.md全文；委托声明发布提交2b64ba37d60c7b3bd41486386d76ec020f3e3c058a93d826f487556dc2b6025f，未独立核验提交 | 方法使用说明见本记录 |\n\n知识页面引用：[阳台采光观察（验收材料）](/lifeweave/personal/knowledge?source=local&path=%E7%94%9F%E6%B4%BB%2F%E9%98%B3%E5%8F%B0%E9%87%87%E5%85%89.md)。本轮未请求此页面；它是来源定位链接。\n\n上述材料是从委托转存的可读副本，不声称与源系统文件逐字节一致。previous-report.md中“本轮”等措辞均属于历史报告，包括其旧状态和保存声明，不能作为本次执行证据。本轮数学反例是假设模型，未增加测量数据。\n\n修订映射：保留原核心结论、观察表、差值与比值、潜在结果、原差值分解、原始长势反例和统计局限；加入浇水反例及三项分解，更新反馈和执行说明。完整修订正文：[report.md](report.md)。本地文件摘要见[manifest.json](manifest.json)，摘要仅用于本轮文件核对，不等同于应用源版本。\n\n未取得或验证的材料：实际浇水量、水分状态、起始长势、光强、光照时序、重复观察及应用业务接受回执。现有材料足以说明不能唯一识别因果，但不能验证真实混杂因素或效应数值。\n",
+    "version": "5de064f9225d0e4fba0aace4fcf5e113188f326444637e66edc7c9f471533615",
+    "references": {
+      "links": {
+        ".runtime/research/gzrun-20260919-091738-82581407/sources.md": "/api/lifeweave/personal/runs/gzrun-20260919-091738-82581407/source?path=.runtime%2Fresearch%2Fgzrun-20260919-091738-82581407%2Fsources.md",
+        ".runtime/research/gzrun-20260919-091738-82581407/manifest.json": "/api/lifeweave/personal/runs/gzrun-20260919-091738-82581407/source?path=.runtime%2Fresearch%2Fgzrun-20260919-091738-82581407%2Fmanifest.json"
+      },
+      "images": {},
+      "warnings": []
+    }
+  },
+  "real_raw_download_unchanged": true,
+  "real_html_source": {
+    "href": "http://127.0.0.1:8011/api/lifeweave/personal/runs/gzrun-20260919-091738-82581407/source?path=.runtime%2Fresearch%2Fgzrun-20260919-091738-82581407%2Fsources.md",
+    "note": "来源链接和图片仍通过原工作台读取，需要该工作台可访问。\n\n现有差异不足以说明采光造成了新叶数量差异。 A比B多4片新叶，与采光影响生长的假说",
+    "body": "# 本轮来源记录\n\n- 事项：`item-023bf9dab82a4466`；上下文：`ctxv-587e0d4d4770425b / v1`。\n- 本轮：`gzrun-20260919-091738-82581407`。\n- 资料接收方式：当前用户委托正文中的完整快照。记录时间：2026-09-19 09:18:08 UTC（北京时间17:18:08，工具读时）；不是源文件获取时间。\n- 隔离成果范围：本目录。没有访问外部网站，没有读取应用数据库或前轮运行目录，没有修改知识原文。\n\n| 材料 | 来源、版本与读取范围 | 本轮转存 |\n|---|---|---|\n| 阳台采光观察（验收材料） | sourceId=local；生活/阳台采光.md；发布版本61d37fe6aaa6d5c3c6bf6b0419024f04e14801ffb1fce1cbaa029f89826ddc98；读取委托内全文 | [observation.md](observation.md) |\n| 前轮完整报告 | 用户提供previousOutput.content全文；运行gzrun-20260919-090842-da7699c6；版本29930f859bb99b830e2c3e3945948d28d1b899a37af4c275b13012b902477c8f | [previous-report.md](previous-report.md) |\n| 固定纠偏反馈 | feedback-159077e4931841fe991b66ec3a0f6318ae66f545；createdAt=2026-09-19 17:17:00.563439+08:00；读取委托内完整反馈对象 | [feedback.json](feedback.json) |\n| 已发布研究方法 | 本地读取.agents/skills/method-33b5c0152803d0354a86/SKILL.md全文；委托声明发布提交2b64ba37d60c7b3bd41486386d76ec020f3e3c058a93d826f487556dc2b6025f，未独立核验提交 | 方法使用说明见本记录 |\n\n知识页面引用：[阳台采光观察（验收材料）](/lifeweave/personal/knowledge?source=local&path=%E7%94%9F%E6%B4%BB%2F%E9%98%B3%E5%8F%B0%E9%87%87%E5%85%89.md)。本轮未请求此页面；它是来源定位链接。\n\n上述材料是从委托转存的可读副本，不声称与源系统文件逐字节一致。previous-report.md中“本轮”等措辞均属于历史报告，包括其旧状态和保存声明，不能作为本次执行证据。本轮数学反例是假设模型，未增加测量数据。\n\n修订映射：保留原核心结论、观察表、差值与比值、潜在结果、原差值分解、原始长势反例和统计局限；加入浇水反例及三项分解，更新反馈和执行说明。完整修订正文：[report.md](report.md)。本地文件摘要见[manifest.json](manifest.json)，摘要仅用于本轮文件核对，不等同于应用源版本。\n\n未取得或验证的材料：实际浇水量、水分状态、起始长势、光强、光照时序、重复观察及应用业务接受回执。现有材料足以说明不能唯一识别因果，但不能验证真实混杂因素或效应数值。\n"
+  },
+  "real_reuse_text": "跳到主要内容\n经纬\nLifeWeave\n团队空间\n我的空间 · 个人版\n日常安排\n与经纬对话\n我的日常\n0\n工作事项\n计划与优先级\nAI 委托\nLinear 事项\n灵感与讨论\n知识\n固定呈现\n我的周回顾\n工作与生活，有序展开。\n把注意力留给重要的事。\n设置与连接\n我\n个人使用者\nLifeWeave · 经纬\n我的空间\n/\n与经纬对话\n查找事项或知识\n⌘ K\n对话\n记录\n与经纬对话\n从眼前的问题开始，接着已有的工作往前走。\n开始新对话\n最近对话\n只记一下：下个月想试试陶艺课。暂时不要安排，不要创建研究事项或开始执行。\n2026/9/19\n已有知识怎样解释阳台采光与新叶数量的相关关系？请用浇水量的例子说明为什么不能直接推出因果，并指出你实际读取的已接受知识来源。这只是一个问题，不建立事项或执行委托\n2026/9/19\n请开始一项研究委托：阅读已有的阳台采光观察知识，分析A与B新叶差异是否足以说明采光的因果影响。请给出一个具体例子、必要的公式与表格，再写出有边界的完整解释。不要\n2026/9/19 · 已关联事项\n周末想买一盆薄荷，先记一下，暂时不推进。\n2026/9/19\n网页正式对话验证\n2026/9/19\n当前方向与明确偏好\n已有知识怎样解释阳台采光与新叶数量的相关关系？请用浇水量的例子说明为什么不能直接推出因果，并指出你实际读取的已接受知识来源。这只是一个问题，不建立事项或执行委托\n\n问题、想法和委托，都可以在这里接着聊。\n\n刷新\n我\n\n已有知识怎样解释阳台采光与新叶数量的相关关系？请用浇水量的例子说明为什么不能直接推出因果，并指出你实际读取的已接受知识来源。这只是一个问题，不建立事项或执行委托。\n\n经纬\n已回复\n\n先看浇水量的假设例子：假如A浇水充足、水分适宜，B浇水较少、水分不足；再假设水分适宜时，无论每天直射光1小时还是4小时都长6片新叶，水分不足时两种光照下都只长2片。那么仍会观察到“光照多的A比B多4片”，但这个假设中的差异完全来自浇水，固定水分后的光照效应为0。\n\n这是假设反例，不是实际浇水记录。它说明同样的观察结果可以对应不同原因，不能证明实际就是浇水造成的，也不能证明光照没有作用。\n\n原始观察只有：A每天约4小时直射光、两周长6片新叶；B约1小时、长2片。A比B多4片、数量为3倍，是描述性比较，不能解释为“多照3小时就多长4片”。两盆没有随机分配，浇水和原始长势未控制，每种光照也只有一盆，无法分离光照与其他因素的影响。因果问题需要比较同一植物在其他条件固定时接受不同光照的结果；B的2片不能直接替代A在低光照下的结果。\n\n我本轮实际读到的是本次JSON提供的两篇已接受知识全文快照：\n\n阳台采光观察（验收材料）：提供原始观察及未控制条件。\n阳台采光因果解释：提供浇水假设反例、反事实分析与结论边界。\n\n我未另行打开这些链接或读取文中提及的报告、来源记录和核对清单。\n\n本次参考来源（2）\n说说你现在想做什么\n本次范围\n按自然表达判断\n只记录\n仅讨论\n明确委托\n发送\n\n普通问答可以直接开始。只有需要持续推进时才关联事项；运行进度以实际回执为准。",
+  "controlled_identity": {
+    "db": "test_lifeweave_encoding_0037440f33cc",
+    "item": "item-ae29aad2d98a480d",
+    "run": "gzrun-20260919-094851-aaf2473b",
+    "candidate": "revision-1e99de10f1d54eb9",
+    "refs": {
+      "links": {
+        "research/source.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+        "research/source one.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+        "research/来源.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+        "research/source.md:2": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+        "research/source.md#section": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+        "research/100%.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+        "research/literal%20.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+        "research/source(a).md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md"
+      },
+      "images": {
+        "research/figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+        "research/fig one.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+        "research/图.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+        "research/fig(a).png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png",
+        "research/100%.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+        "research/literal%20.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png"
+      },
+      "warnings": []
+    }
+  },
+  "candidate_browser": [
+    {
+      "text": "受控引用反例\n普通来源\n带空格来源\n中文来源\n行号来源\n锚点来源\n百分号来源\n字面编码来源\n括号来源\n引用式来源\n外链\n\n\n\n\n\n\n\n\n\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n\n",
+      "links": [
+        {
+          "text": "普通来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "带空格来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "中文来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md"
+        },
+        {
+          "text": "行号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "锚点来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "百分号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md"
+        },
+        {
+          "text": "字面编码来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md"
+        },
+        {
+          "text": "括号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource(a).md"
+        },
+        {
+          "text": "引用式来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "外链",
+          "href": "https://example.org/"
+        }
+      ],
+      "images": [
+        {
+          "alt": "普通图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "带空格图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "中文图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "括号图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig(a).png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "编码空格图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "百分号图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "字面编码图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式中文图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        }
+      ],
+      "code": [
+        "[代码示例](research/source.md)\n![代码图](research/figure.png)\n"
+      ]
+    },
+    {
+      "text": "受控引用反例\n普通来源\n带空格来源\n中文来源\n行号来源\n锚点来源\n百分号来源\n字面编码来源\n括号来源\n引用式来源\n外链\n\n\n\n\n\n\n\n\n\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n\n普通知识链接\n\n来源：研究成果 · 事项 item-ae29aad2d98a480d · 运行 gzrun-20260919-094851-aaf2473b · 版本 34c02a16760e582220dc5b5010eebcb788ffb9185fd620bb8b5bef042d333e58\n",
+      "links": [
+        {
+          "text": "普通来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "带空格来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "中文来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md"
+        },
+        {
+          "text": "行号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "锚点来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "百分号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md"
+        },
+        {
+          "text": "字面编码来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md"
+        },
+        {
+          "text": "括号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md"
+        },
+        {
+          "text": "引用式来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "外链",
+          "href": "https://example.org/"
+        },
+        {
+          "text": "普通知识链接",
+          "href": "other.md"
+        },
+        {
+          "text": "研究成果",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/research-output/download"
+        }
+      ],
+      "images": [
+        {
+          "alt": "普通图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "带空格图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "中文图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "括号图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "编码空格图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "百分号图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "字面编码图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式中文图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        }
+      ],
+      "code": [
+        "[代码示例](research/source.md)\n![代码图](research/figure.png)\n"
+      ]
+    }
+  ],
+  "candidate_actual_clicks": {
+    "original:带空格来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "original:中文来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "original:行号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "original:百分号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "original:字面编码来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "original:括号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource(a).md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "original:引用式来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "candidate:带空格来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "candidate:中文来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "candidate:行号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "candidate:百分号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "candidate:字面编码来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "candidate:括号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "candidate:引用式来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    }
+  },
+  "original_image_sources": {
+    "figure.png": 200,
+    "fig one.png": 200,
+    "图.png": 200,
+    "fig(a).png": 200
+  },
+  "accepted_browser": [
+    {
+      "text": "受控引用反例\n普通来源\n带空格来源\n中文来源\n行号来源\n锚点来源\n百分号来源\n字面编码来源\n括号来源\n引用式来源\n外链\n\n\n\n\n\n\n\n\n\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n\n普通知识链接\n\n来源：研究成果 · 事项 item-ae29aad2d98a480d · 运行 gzrun-20260919-094851-aaf2473b · 版本 34c02a16760e582220dc5b5010eebcb788ffb9185fd620bb8b5bef042d333e58\n",
+      "links": [
+        {
+          "text": "普通来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "带空格来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "中文来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md"
+        },
+        {
+          "text": "行号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "锚点来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "百分号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md"
+        },
+        {
+          "text": "字面编码来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md"
+        },
+        {
+          "text": "括号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md"
+        },
+        {
+          "text": "引用式来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "外链",
+          "href": "https://example.org/"
+        },
+        {
+          "text": "普通知识链接",
+          "href": "other.md"
+        },
+        {
+          "text": "研究成果",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/research-output/download"
+        }
+      ],
+      "images": [
+        {
+          "alt": "普通图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "带空格图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "中文图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "括号图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "编码空格图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "百分号图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "字面编码图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式中文图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        }
+      ],
+      "code": [
+        "[代码示例](research/source.md)\n![代码图](research/figure.png)\n"
+      ]
+    }
+  ],
+  "source_clicks": {
+    "普通来源": {
+      "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "status": 200,
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "带空格来源": {
+      "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "status": 200,
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "中文来源": {
+      "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+      "status": 200,
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "行号来源": {
+      "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "status": 200,
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "锚点来源": {
+      "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "status": 200,
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    }
+  },
+  "actual_clicks": {
+    "普通来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "带空格来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "中文来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "行号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "锚点来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "百分号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "字面编码来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "括号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "引用式来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    }
+  },
+  "raw_unchanged": true,
+  "accepted_version": "5d8ea69327ace72ec9c6c6f2236acf7e72deee05420b7bb6c7d56fbdc058272f",
+  "ordinary_knowledge_target": "http://127.0.0.1:8014/lifeweave/personal/knowledge?path=%E7%A0%94%E7%A9%B6/other.md&source=local",
+  "download_browser": [
+    {
+      "text": "受控引用反例\n普通来源\n带空格来源\n中文来源\n行号来源\n锚点来源\n百分号来源\n字面编码来源\n括号来源\n引用式来源\n外链\n\n\n\n\n\n\n\n\n\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n\n普通知识链接\n\n来源：研究成果 · 事项 item-ae29aad2d98a480d · 运行 gzrun-20260919-094851-aaf2473b · 版本 34c02a16760e582220dc5b5010eebcb788ffb9185fd620bb8b5bef042d333e58\n",
+      "links": [
+        {
+          "text": "普通来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "带空格来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "中文来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md"
+        },
+        {
+          "text": "行号来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "锚点来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "百分号来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md"
+        },
+        {
+          "text": "字面编码来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md"
+        },
+        {
+          "text": "括号来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md"
+        },
+        {
+          "text": "引用式来源",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "外链",
+          "href": "https://example.org/"
+        },
+        {
+          "text": "普通知识链接",
+          "href": "http://127.0.0.1:8014/lifeweave/personal/knowledge?source=local&path=%E7%A0%94%E7%A9%B6%2Fother.md"
+        },
+        {
+          "text": "研究成果",
+          "href": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/research-output/download"
+        }
+      ],
+      "images": [
+        {
+          "alt": "普通图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "带空格图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "中文图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "括号图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "编码空格图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "百分号图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "字面编码图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式中文图",
+          "src": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        }
+      ],
+      "code": [
+        "[代码示例](research/source.md)\n![代码图](research/figure.png)\n"
+      ]
+    }
+  ],
+  "download_actual_clicks": {
+    "带空格来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "中文来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "行号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "百分号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "字面编码来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "括号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "引用式来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    }
+  },
+  "ambiguous": {
+    "links": {},
+    "images": {},
+    "warnings": [
+      "多个来源使用相同相对引用 research/source.md，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/source one.md，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/来源.md，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/source.md:2，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/source.md#section，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/100%.md，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/literal%20.md，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/source(a).md，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/figure.png，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/fig one.png，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/图.png，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/fig(a).png，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/100%.png，请从各自来源成果打开；未自动选择其中一次运行。",
+      "多个来源使用相同相对引用 research/literal%20.png，请从各自来源成果打开；未自动选择其中一次运行。"
+    ]
+  },
+  "ambiguity_visible": "研究/引用反例.md · 等待审阅\n\n受控来源验收\n\n下载来源成果 · a06a489df5d7\n--- 当前正文\n+++ 建议正文\n@@ -37,3 +37,41 @@\n \n ---\n 来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/research-output/download) · 事项 `item-ae29aad2d98a480d` · 运行 `gzrun-20260919-094851-aaf2473b` · 版本 `34c02a16760e582220dc5b5010eebcb788ffb9185fd620bb8b5bef042d333e58`\n+\n+# 受控引用反例\n+\n+[普通来源](research/source.md)\n+[带空格来源](<research/source one.md>)\n+[中文来源](research/来源.md)\n+[行号来源](research/source.md:2)\n+[锚点来源](research/source.md#section)\n+[百分号来源](research/100%25.md)\n+[字面编码来源](research/literal%2520.md)\n+[括号来源](research/source(a).md)\n+[引用式来源][source-ref]\n+\n+[source-ref]: <research/source one.md>\n+[外链](https://example.org/)\n+\n+![普通图](research/figure.png)\n+![带空格图](<research/fig one.png>)\n+![中文图](research/图.png)\n+![括号图](research/fig(a).png)\n+![编码空格图](research/fig%20one.png)\n+![引用式图][fig]\n+![百分号图](research/100%25.png)\n+![字面编码图](research/literal%2520.png)\n+![引用式中文图][cn]\n+\n+[cn]: research/图.png\n+\n+[fig]: <research/fig one.png>\n+\n+```md\n+[代码示例](research/source.md)\n+![代码图](research/figure.png)\n+```\n+\n+\n+---\n+来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-094859-6b130009/research-output/download) · 事项 `item-ae29aad2d98a480d` · 运行 `gzrun-20260919-094859-6b130009` · 版本 `a06a489df5d7fa67797c2a93c78bc61c1e38a89966fc0b5f57082f61aaae688d`\n\n阅读建议全文\n\n多个来源使用相同相对引用 research/source.md，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/source one.md，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/来源.md，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/source.md:2，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/source.md#section，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/100%.md，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/literal%20.md，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/source(a).md，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/figure.png，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/fig one.png，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/图.png，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/fig(a).png，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/100%.png，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 research/literal%20.png，请从各自来源成果打开；未自动选择其中一次运行。\n\n受控引用反例\n\n普通来源 带空格来源 中文来源 行号来源 锚点来源 百分号来源 字面编码来源 括号来源 引用式来源\n\n外链\n\n普通图（未加载外部或不可用图片） 带空格图（未加载外部或不可用图片） 中文图（未加载外部或不可用图片） 括号图（未加载外部或不可用图片） 编码空格图（未加载外部或不可用图片） 引用式图（未加载外部或不可用图片） 百分号图（未加载外部或不可用图片） 字面编码图（未加载外部或不可用图片） 引用式中文图（未加载外部或不可用图片）\n\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n\n\n普通知识链接\n\n来源：研究成果 · 事项 item-ae29aad2d98a480d · 运行 gzrun-20260919-094851-aaf2473b · 版本 34c02a16760e582220dc5b5010eebcb788ffb9185fd620bb8b5bef042d333e58\n\n受控引用反例\n\n普通来源 带空格来源 中文来源 行号来源 锚点来源 百分号来源 字面编码来源 括号来源 引用式来源\n\n外链\n\n普通图（未加载外部或不可用图片） 带空格图（未加载外部或不可用图片） 中文图（未加载外部或不可用图片） 括号图（未加载外部或不可用图片） 编码空格图（未加载外部或不可用图片） 引用式图（未加载外部或不可用图片） 百分号图（未加载外部或不可用图片） 字面编码图（未加载外部或不可用图片） 引用式中文图（未加载外部或不可用图片）\n\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n\n\n来源：研究成果 · 事项 item-ae29aad2d98a480d · 运行 gzrun-20260919-094859-6b130009 · 版本 a06a489df5d7fa67797c2a93c78bc61c1e38a89966fc0b5f57082f61aaae688d\n\n接受并更新知识原文\n拒绝修订\n读取最新原文并重新合并",
+  "stable_formal_after_draft": true,
+  "library_revision_browser": [
+    {
+      "text": "受控引用反例\n普通来源\n带空格来源\n中文来源\n行号来源\n锚点来源\n百分号来源\n字面编码来源\n括号来源\n引用式来源\n外链\n\n\n\n\n\n\n\n\n\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n\n普通知识链接\n\n来源：研究成果 · 事项 item-ae29aad2d98a480d · 运行 gzrun-20260919-094851-aaf2473b · 版本 34c02a16760e582220dc5b5010eebcb788ffb9185fd620bb8b5bef042d333e58\n",
+      "links": [
+        {
+          "text": "普通来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "带空格来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "中文来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md"
+        },
+        {
+          "text": "行号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "锚点来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        {
+          "text": "百分号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md"
+        },
+        {
+          "text": "字面编码来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md"
+        },
+        {
+          "text": "括号来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md"
+        },
+        {
+          "text": "引用式来源",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md"
+        },
+        {
+          "text": "外链",
+          "href": "https://example.org/"
+        },
+        {
+          "text": "普通知识链接",
+          "href": "other.md"
+        },
+        {
+          "text": "研究成果",
+          "href": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/research-output/download"
+        }
+      ],
+      "images": [
+        {
+          "alt": "普通图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "带空格图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "中文图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "括号图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "编码空格图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "百分号图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "字面编码图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png",
+          "width": 1,
+          "complete": true
+        },
+        {
+          "alt": "引用式中文图",
+          "src": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "width": 1,
+          "complete": true
+        }
+      ],
+      "code": [
+        "[代码示例](research/source.md)\n![代码图](research/figure.png)\n"
+      ]
+    }
+  ],
+  "revision_actual_clicks": {
+    "带空格来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "中文来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "行号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "百分号来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    },
+    "字面编码来源": {
+      "url": "http://127.0.0.1:8014/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+      "body": "# Source identity gzrun-20260919-094851-aaf2473b\n\n## section\nIndependent review content."
+    }
+  },
+  "downstream_recommendations": {
+    "strategy": "lexical-v1",
+    "contextVersionId": "ctxv-cb2e4095f1534c4b",
+    "methods": [],
+    "documents": [
+      {
+        "path": "研究/引用反例.md",
+        "sourceId": "local",
+        "sourceTitle": "工作台知识",
+        "writable": true,
+        "version": "5d8ea69327ace72ec9c6c6f2236acf7e72deee05420b7bb6c7d56fbdc058272f",
+        "title": "受控引用反例",
+        "references": {
+          "links": {
+            "research/source.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+            "research/source one.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+            "research/来源.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+            "research/source.md:2": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+            "research/source.md#section": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+            "research/100%.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+            "research/literal%20.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+            "research/source(a).md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md"
+          },
+          "images": {
+            "research/figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+            "research/fig one.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+            "research/图.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+            "research/fig(a).png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png",
+            "research/100%.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+            "research/literal%20.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png"
+          },
+          "warnings": []
+        },
+        "score": 15,
+        "matchedTerms": [
+          "反例",
+          "引用",
+          "用反"
+        ],
+        "reason": "标题或正文包含：反例、引用、用反",
+        "ref": "local:研究/引用反例.md"
+      }
+    ],
+    "unavailable": [],
+    "suggested": {
+      "methodId": null,
+      "knowledgeRefs": [
+        "local:研究/引用反例.md"
+      ]
+    },
+    "limits": {
+      "methodsPerRun": 1,
+      "documentsPerRun": 10
+    },
+    "boundary": "按当前目标文本匹配初筛，允许调整；不证明方法适用或实际执行。入队时读取来源并固定实际版本。"
+  },
+  "downstream": {
+    "capabilities": [
+      {
+        "id": "document-84784e69da524728",
+        "title": "受控引用反例",
+        "target": "knowledge",
+        "content": "# 受控引用反例\n\n[普通来源](research/source.md)\n[带空格来源](<research/source one.md>)\n[中文来源](research/来源.md)\n[行号来源](research/source.md:2)\n[锚点来源](research/source.md#section)\n[百分号来源](research/100%25.md)\n[字面编码来源](research/literal%2520.md)\n[括号来源](research/source(a).md)\n[引用式来源][source-ref]\n\n[source-ref]: <research/source one.md>\n[外链](https://example.org/)\n\n![普通图](research/figure.png)\n![带空格图](<research/fig one.png>)\n![中文图](research/图.png)\n![括号图](research/fig(a).png)\n![编码空格图](research/fig%20one.png)\n![引用式图][fig]\n![百分号图](research/100%25.png)\n![字面编码图](research/literal%2520.png)\n![引用式中文图][cn]\n\n[cn]: research/图.png\n\n[fig]: <research/fig one.png>\n\n```md\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n```\n\n[普通知识链接](other.md)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/research-output/download) · 事项 `item-ae29aad2d98a480d` · 运行 `gzrun-20260919-094851-aaf2473b` · 版本 `34c02a16760e582220dc5b5010eebcb788ffb9185fd620bb8b5bef042d333e58`\n",
+        "version": "5d8ea69327ace72ec9c6c6f2236acf7e72deee05420b7bb6c7d56fbdc058272f",
+        "references": {
+          "links": {
+            "research/100%.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+            "research/source.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+            "research/来源.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+            "research/source.md:2": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+            "research/source(a).md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md",
+            "research/literal%20.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+            "research/source one.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+            "research/source.md#section": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+          },
+          "images": {
+            "research/图.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+            "research/100%.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+            "research/fig(a).png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png",
+            "research/figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+            "research/fig one.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+            "research/literal%20.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png"
+          },
+          "warnings": []
+        },
+        "sourcePath": "local:研究/引用反例.md",
+        "pinnedInput": true
+      }
+    ],
+    "prompt": "# 经纬委托的不可变运行输入\n\n工作事项：item-7e2c58a56e024109\n事项快照：\n```json\n{\n  \"id\": \"item-7e2c58a56e024109\",\n  \"workspace\": \"personal\",\n  \"itemType\": \"research\",\n  \"title\": \"后续任务：引用反例\",\n  \"status\": \"open\",\n  \"payload\": {},\n  \"version\": 1,\n  \"createdBy\": \"local-user\",\n  \"createdAt\": \"2026-09-19 17:49:02.449714+08:00\",\n  \"updatedBy\": \"local-user\",\n  \"updatedAt\": \"2026-09-19 17:49:02.449714+08:00\"\n}\n```\n\n已接受上下文版本：ctxv-cb2e4095f1534c4b / v1\n上下文内容：\n{'goal': '后续任务：引用反例', 'scope': ''}\n\n共同上下文来源事项：item-7e2c58a56e024109\n本贡献的局部目标与范围：\n同上\n\n来源：\n```json\n[]\n```\n\n## 已发布能力与本次候选覆盖\n### 已发布能力 · 受控引用反例 @ 5d8ea69327ace72ec9c6c6f2236acf7e72deee05420b7bb6c7d56fbdc058272f\n目标/适用对象：knowledge\n来源：local:研究/引用反例.md；相对路径以本方法目录为准。\n# 受控引用反例\n\n[普通来源](research/source.md)\n[带空格来源](<research/source one.md>)\n[中文来源](research/来源.md)\n[行号来源](research/source.md:2)\n[锚点来源](research/source.md#section)\n[百分号来源](research/100%25.md)\n[字面编码来源](research/literal%2520.md)\n[括号来源](research/source(a).md)\n[引用式来源][source-ref]\n\n[source-ref]: <research/source one.md>\n[外链](https://example.org/)\n\n![普通图](research/figure.png)\n![带空格图](<research/fig one.png>)\n![中文图](research/图.png)\n![括号图](research/fig(a).png)\n![编码空格图](research/fig%20one.png)\n![引用式图][fig]\n![百分号图](research/100%25.png)\n![字面编码图](research/literal%2520.png)\n![引用式中文图][cn]\n\n[cn]: research/图.png\n\n[fig]: <research/fig one.png>\n\n```md\n[代码示例](research/source.md)\n![代码图](research/figure.png)\n```\n\n[普通知识链接](other.md)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/research-output/download) · 事项 `item-ae29aad2d98a480d` · 运行 `gzrun-20260919-094851-aaf2473b` · 版本 `34c02a16760e582220dc5b5010eebcb788ffb9185fd620bb8b5bef042d333e58`\n\n成果来源映射（相对引用不能当作本轮文件）：{\"links\": {\"research/source.md\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md\", \"research/source one.md\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md\", \"research/来源.md\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md\", \"research/source.md:2\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md\", \"research/source.md#section\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md\", \"research/100%.md\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md\", \"research/literal%20.md\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md\", \"research/source(a).md\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md\"}, \"images\": {\"research/figure.png\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png\", \"research/fig one.png\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png\", \"research/图.png\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png\", \"research/fig(a).png\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png\", \"research/100%.png\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png\", \"research/literal%20.png\": \"/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png\"}, \"warnings\": []}\n\n## 本次具体任务\n根据已采纳知识读取原来源，不得误作本轮本地文件\n\n## 事项中的纠偏反馈（本轮固定读取）\n[]\n\n## 明确方向、偏好与前轮成果（本次快照）\n{\n  \"personalModel\": {\n    \"version\": 0,\n    \"goals\": \"\",\n    \"preferences\": \"\",\n    \"updatedAt\": null\n  },\n  \"previousOutput\": null\n}\n\n本次明确要求可临时覆盖偏好，不回写长期偏好。若有前轮成果，请围绕同一目标修订并交付完整新正文，说明修订处；不要只追加无关报告。\n请说明相关反馈怎样影响本轮结果；反馈不自动覆盖已接受目标或扩大权限，冲突时指出差异。\n请交付实际结果、未覆盖范围与可核验证据。技术执行结束不代表事项已被业务接受。\n"
+  },
+  "downstream_manifest": [
+    {
+      "id": "document-84784e69da524728",
+      "version": "5d8ea69327ace72ec9c6c6f2236acf7e72deee05420b7bb6c7d56fbdc058272f",
+      "target": "knowledge",
+      "status": "published",
+      "path": ".lifeweave/knowledge/document-84784e69da524728.md",
+      "references": {
+        "links": {
+          "research/100%.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F100%25.md",
+          "research/source.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+          "research/来源.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2F%E6%9D%A5%E6%BA%90.md",
+          "research/source.md:2": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md",
+          "research/source(a).md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%28a%29.md",
+          "research/literal%20.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fliteral%2520.md",
+          "research/source one.md": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource%20one.md",
+          "research/source.md#section": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/source?path=research%2Fsource.md"
+        },
+        "images": {
+          "research/图.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F%E5%9B%BE.png",
+          "research/100%.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2F100%25.png",
+          "research/fig(a).png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%28a%29.png",
+          "research/figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffigure.png",
+          "research/fig one.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Ffig%20one.png",
+          "research/literal%20.png": "/api/lifeweave/personal/runs/gzrun-20260919-094851-aaf2473b/assets?path=research%2Fliteral%2520.png"
+        },
+        "warnings": []
+      }
+    }
+  ],
+  "path_guards": {
+    "source:.env": 400,
+    "source:.runtime/research/.hidden.md": 400,
+    "source:.runtime/research/allowed.md": 200,
+    "source:../x.md": 400,
+    "source:/etc/passwd": 400,
+    "source:../../gzrun-20260919-094859-6b130009/repo/research/source.md": 400,
+    "assets:.env": 409,
+    "assets:../x.png": 409,
+    "assets:/etc/passwd": 409,
+    "assets:../../gzrun-20260919-094859-6b130009/repo/research/figure.png": 409
+  },
+  "cross_workspace": 404,
+  "browser_errors": [],
+  "checks": {
+    "candidate_browser_images": {
+      "count": 18,
+      "all_natural_width_positive": true,
+      "notices": []
+    },
+    "accepted_browser_images": {
+      "count": 9,
+      "all_natural_width_positive": true,
+      "notices": []
+    },
+    "download_browser_images": {
+      "count": 9,
+      "all_natural_width_positive": true,
+      "notices": []
+    },
+    "library_revision_browser_images": {
+      "count": 9,
+      "all_natural_width_positive": true,
+      "notices": []
+    },
+    "candidate_actual_clicks": true,
+    "actual_clicks": true,
+    "download_actual_clicks": true,
+    "revision_actual_clicks": true,
+    "downstream_references_match": true,
+    "downstream_version_matches": true,
+    "downstream_prompt_contains_maps": true,
+    "code_literal_preserved": true,
+    "temporary_root_absent": true,
+    "port_8014_released": true
+  },
+  "cleanup": {
+    "database_dropped": "test_lifeweave_encoding_0037440f33cc",
+    "thread_stopped": true,
+    "temporary_root_removed_on_exit": "/tmp/lifeweave-encoding-review-gqvj0rm7"
+  },
+  "reviewed_candidate": "032a02971078efeb5bffce22018fd49ee345fcd9"
+}

@@ -1,0 +1,101 @@
+{
+  "candidate": "d69b257",
+  "checks": [
+    {
+      "path": ".runtime/research/readable.json",
+      "expected": 200,
+      "status": 200,
+      "result": "pass"
+    },
+    {
+      "path": ".runtime/private/secret.json",
+      "expected": 400,
+      "status": 400,
+      "result": "pass"
+    },
+    {
+      "path": ".runtime/research/alias.json",
+      "expected": 400,
+      "status": 400,
+      "result": "pass"
+    },
+    {
+      "path": "../outside.md",
+      "expected": 400,
+      "status": 400,
+      "result": "pass"
+    },
+    {
+      "path": "/etc/passwd",
+      "expected": 400,
+      "status": 400,
+      "result": "pass"
+    },
+    {
+      "path": ".runtime/research/../private/secret.json",
+      "expected": 400,
+      "status": 400,
+      "result": "pass"
+    },
+    {
+      "name": "跨空间来源隔离",
+      "status": 404,
+      "result": "pass"
+    },
+    {
+      "name": "修复未改写真实成果",
+      "result": "pass",
+      "version": "1082224c7daedd7e48afa0b74f6e4f7def6763d21f8b0f2b1384320be8c8aaab"
+    },
+    {
+      "name": "真实成果来源 sources.md",
+      "status": 200,
+      "result": "pass"
+    },
+    {
+      "name": "真实成果来源 manifest.json",
+      "status": 200,
+      "result": "pass",
+      "parsedJSON": {
+        "runId": "gzrun-20260919-091738-82581407",
+        "scope": "Local artifact hashes only; not source-system version verification or application acceptance.",
+        "files": [
+          {
+            "file": "observation.md",
+            "bytes": 307,
+            "sha256": "61d37fe6aaa6d5c3c6bf6b0419024f04e14801ffb1fce1cbaa029f89826ddc98"
+          },
+          {
+            "file": "previous-report.md",
+            "bytes": 5696,
+            "sha256": "ef6b5d706cc75c3ce3db4a5b286b80ab3d1463850961b879506d98126d2d408e"
+          },
+          {
+            "file": "feedback.json",
+            "bytes": 1065,
+            "sha256": "759b761deb3cd17dbee2ab75b495728e82a98eb9407dc753be20a05db9d97133"
+          },
+          {
+            "file": "report.md",
+            "bytes": 8648,
+            "sha256": "803c7cf7f71a60706084b9c3e6b9635f691f0db8899684b34eab0c00e4a8f07a"
+          },
+          {
+            "file": "sources.md",
+            "bytes": 2561,
+            "sha256": "4648c52eb9cb813eaa32051339f3c47a1043d482ed8ed89ab7b73d6433cca9ad"
+          }
+        ]
+      }
+    },
+    {
+      "name": "成熟解析器校验真实manifest",
+      "result": "pass",
+      "keys": [
+        "runId",
+        "scope",
+        "files"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,382 @@
+{
+  "candidate": "464306a6bbc5534dd604dae7e86a8a14d44f1519",
+  "checks": [
+    {
+      "name": "nul real HTTP worker consumed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul worker succeeded",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul readable projection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul original bytes/hash/headers",
+      "pass": true,
+      "detail": {
+        "date": "Sat, 19 Sep 2026 10:13:49 GMT",
+        "server": "uvicorn",
+        "x-artifact-version": "sha256:20e12e4e04b3b492c50831b0f87caf5d7343e5290bd9512010a968c8605796e6",
+        "etag": "\"sha256:20e12e4e04b3b492c50831b0f87caf5d7343e5290bd9512010a968c8605796e6\"",
+        "content-length": "103",
+        "content-type": "text/plain; charset=utf-8"
+      }
+    },
+    {
+      "name": "normal real HTTP worker consumed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal worker succeeded",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal readable projection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal original bytes/hash/headers",
+      "pass": true,
+      "detail": {
+        "date": "Sat, 19 Sep 2026 10:13:49 GMT",
+        "server": "uvicorn",
+        "x-artifact-version": "sha256:cba02271569b1fba230c9a93d7cb0723b52528c7a83efa74e2f98f16b470ae95",
+        "etag": "\"sha256:cba02271569b1fba230c9a93d7cb0723b52528c7a83efa74e2f98f16b470ae95\"",
+        "content-length": "133",
+        "content-type": "text/plain; charset=utf-8"
+      }
+    },
+    {
+      "name": "nul output browser warning",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "browser original NUL bytes and hash",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "readable download content hash",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "审查/字符投影.md candidate exact content plus disclosed provenance",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "审查/字符投影.md before accepting file unchanged",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "NUL candidate retains original source/image map",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul candidate NUL warning",
+      "pass": true,
+      "detail": {
+        "warnings": [
+          "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。"
+        ],
+        "browserText": "知识候选与修订\n审查/字符投影.md · 等待审阅\n\n从研究成果提炼可复用知识\n\n下载来源成果 · 6184adc790a1\n--- 当前正文\n+++ 建议正文\n@@ -0,0 +1,11 @@\n+# PDF提取样本\n+\n+公式 A␀B。\n+\n+[来源文本](source.md)\n+\n+![图示](figure.png)\n+\n+\n+---\n+来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download) · 事项 `item-67e225a2f9004909` · 运行 `gzrun-20260919-101350-c168e351` · 版本 `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc`\n\n阅读建议全文\n\n原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。\n\nPDF提取样本\n\n公式 A␀B。\n\n来源文本\n\n来源：研究成果 · 事项 item-67e225a2f9004909 · 运行 gzrun-20260919-101350-c168e351 · 版本 6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc\n\n接受并更新知识原文\n拒绝修订\n读取最新原文并重新合并"
+      }
+    },
+    {
+      "name": "nul formal warnings/maps match candidate",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul accepted original and hash unchanged",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul original download exact/version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul downloaded HTML visible warnings",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul formal source and image map",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul formal clicked source exact",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul downloaded HTML source and image map",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul downloaded HTML clicked source exact",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "nul reading and downloads never mutate original/version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal output browser warning",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "审查/普通知识.md candidate exact content plus disclosed provenance",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "审查/普通知识.md before accepting file unchanged",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "ordinary knowledge has zero fabricated warnings",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal candidate NUL warning",
+      "pass": true,
+      "detail": {
+        "warnings": [],
+        "browserText": "知识候选与修订\n审查/普通知识.md · 等待审阅\n\n从研究成果提炼可复用知识\n\n下载来源成果 · f3f69a294596\n--- 当前正文\n+++ 建议正文\n@@ -0,0 +1,11 @@\n+# 普通知识样本\n+\n+正常字符、字面 `\\u0000` 和 ␀。\n+\n+[来源文本](source.md)\n+\n+![图示](figure.png)\n+\n+\n+---\n+来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/research-output/download) · 事项 `item-938d60d6aac246e5` · 运行 `gzrun-20260919-101350-2ec12ac5` · 版本 `f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c`\n\n阅读建议全文\n普通知识样本\n\n正常字符、字面 \\u0000 和 ␀。\n\n来源文本\n\n来源：研究成果 · 事项 item-938d60d6aac246e5 · 运行 gzrun-20260919-101350-2ec12ac5 · 版本 f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c\n\n接受并更新知识原文\n拒绝修订\n读取最新原文并重新合并"
+      }
+    },
+    {
+      "name": "normal formal warnings/maps match candidate",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal accepted original and hash unchanged",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal original download exact/version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal downloaded HTML visible warnings",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal formal source and image map",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal formal clicked source exact",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal downloaded HTML source and image map",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal downloaded HTML clicked source exact",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal reading and downloads never mutate original/version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "normal output browser warning",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "审查/字符投影.md candidate exact content plus disclosed provenance",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "审查/字符投影.md before accepting file unchanged",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "multiple runs keep NUL explanation and ambiguity",
+      "pass": true,
+      "detail": {
+        "links": {},
+        "images": {},
+        "warnings": [
+          "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。",
+          "多个来源使用相同相对引用 source.md，请从各自来源成果打开；未自动选择其中一次运行。",
+          "多个来源使用相同相对引用 figure.png，请从各自来源成果打开；未自动选择其中一次运行。"
+        ]
+      }
+    },
+    {
+      "name": "overlap candidate NUL warning",
+      "pass": true,
+      "detail": {
+        "warnings": [
+          "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。",
+          "多个来源使用相同相对引用 source.md，请从各自来源成果打开；未自动选择其中一次运行。",
+          "多个来源使用相同相对引用 figure.png，请从各自来源成果打开；未自动选择其中一次运行。"
+        ],
+        "browserText": "知识候选与修订\n审查/字符投影.md · 等待审阅\n\n从研究成果提炼可复用知识\n\n下载来源成果 · f3f69a294596\n--- 当前正文\n+++ 建议正文\n@@ -9,3 +9,16 @@\n \n ---\n 来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download) · 事项 `item-67e225a2f9004909` · 运行 `gzrun-20260919-101350-c168e351` · 版本 `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc`\n+\n+\n+# 普通知识样本\n+\n+正常字符、字面 `\\u0000` 和 ␀。\n+\n+[来源文本](source.md)\n+\n+![图示](figure.png)\n+\n+\n+---\n+来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/research-output/download) · 事项 `item-938d60d6aac246e5` · 运行 `gzrun-20260919-101350-2ec12ac5` · 版本 `f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c`\n\n阅读建议全文\n\n原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。\n\n多个来源使用相同相对引用 source.md，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 figure.png，请从各自来源成果打开；未自动选择其中一次运行。\n\nPDF提取样本\n\n公式 A␀B。\n\n来源文本\n\n图示（未加载外部或不可用图片）\n\n来源：研究成果 · 事项 item-67e225a2f9004909 · 运行 gzrun-20260919-101350-c168e351 · 版本 6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc\n\n普通知识样本\n\n正常字符、字面 \\u0000 和 ␀。\n\n来源文本\n\n图示（未加载外部或不可用图片）\n\n来源：研究成果 · 事项 item-938d60d6aac246e5 · 运行 gzrun-20260919-101350-2ec12ac5 · 版本 f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c\n\n接受并更新知识原文\n拒绝修订\n读取最新原文并重新合并\n审查/普通知识.md · 已接受"
+      }
+    },
+    {
+      "name": "overlap formal warnings/maps match candidate",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "overlap accepted original and hash unchanged",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "overlap original download exact/version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "overlap downloaded HTML visible warnings",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "overlap ambiguity visible in exported HTML",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "overlap reading and downloads never mutate original/version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "no browser uncaught errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "no HTTP errors in primary browser",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "owned server stopped",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "owned database removed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "owned temporary root removed",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "runs": [
+    {
+      "name": "nul",
+      "itemId": "item-67e225a2f9004909",
+      "runId": "gzrun-20260919-101350-c168e351",
+      "output": {
+        "id": "gzrun-20260919-101350-c168e351",
+        "kind": "run",
+        "title": "知识提示独立复核 nul",
+        "content": "# PDF提取样本\n\n公式 A␀B。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n",
+        "version": "6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc",
+        "runId": "gzrun-20260919-101350-c168e351",
+        "state": "succeeded",
+        "createdAt": "2026-09-19T18:13:50.378872+08:00",
+        "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/source",
+        "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/assets",
+        "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download",
+        "storageNote": "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。",
+        "rawDownloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/artifacts/result"
+      },
+      "raw": "RAW HEADER\n# PDF提取样本\n\n公式 A\u0000B。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n\nRAW END\u0000",
+      "rawHash": "20e12e4e04b3b492c50831b0f87caf5d7343e5290bd9512010a968c8605796e6"
+    },
+    {
+      "name": "normal",
+      "itemId": "item-938d60d6aac246e5",
+      "runId": "gzrun-20260919-101350-2ec12ac5",
+      "output": {
+        "id": "gzrun-20260919-101350-2ec12ac5",
+        "kind": "run",
+        "title": "知识提示独立复核 normal",
+        "content": "# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n",
+        "version": "f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c",
+        "runId": "gzrun-20260919-101350-2ec12ac5",
+        "state": "succeeded",
+        "createdAt": "2026-09-19T18:13:50.546024+08:00",
+        "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/source",
+        "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/assets",
+        "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/research-output/download",
+        "storageNote": null,
+        "rawDownloadUrl": null
+      },
+      "raw": "RAW HEADER\n# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n\nRAW END",
+      "rawHash": "cba02271569b1fba230c9a93d7cb0723b52528c7a83efa74e2f98f16b470ae95"
+    }
+  ],
+  "database": "test_notice_final_4414ecd17c12",
+  "temporaryRoot": "/tmp/knowledge-notice-final-hj2167eg",
+  "port": 8015,
+  "firstDoc": {
+    "path": "审查/字符投影.md",
+    "sourceId": "local",
+    "sourceTitle": "工作台知识",
+    "writable": true,
+    "content": "# PDF提取样本\n\n公式 A␀B。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download) · 事项 `item-67e225a2f9004909` · 运行 `gzrun-20260919-101350-c168e351` · 版本 `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc`\n",
+    "version": "64de78171e5385777791fd672435fe97403c77e481adb3e3bd7dc2232d3c49dc",
+    "title": "PDF提取样本",
+    "references": {
+      "links": {
+        "source.md": "/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/source?path=source.md"
+      },
+      "images": {
+        "figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/assets?path=figure.png"
+      },
+      "warnings": [
+        "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。"
+      ]
+    }
+  },
+  "result": "pass"
+}

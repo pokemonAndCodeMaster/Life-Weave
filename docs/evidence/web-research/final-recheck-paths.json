@@ -1,0 +1,56 @@
+[
+  {
+    "workspace": "personal",
+    "path": ".runtime/research/gzrun-20260919-091738-82581407/sources.md",
+    "status": 200,
+    "bytes": 2561
+  },
+  {
+    "workspace": "personal",
+    "path": ".codex/auth.json",
+    "status": 400,
+    "body": "{\"detail\":\"只提供本次独立工作目录中的普通源文件\"}"
+  },
+  {
+    "workspace": "personal",
+    "path": ".env",
+    "status": 400,
+    "body": "{\"detail\":\"只提供本次独立工作目录中的普通源文件\"}"
+  },
+  {
+    "workspace": "personal",
+    "path": ".runtime/research/../../.codex/auth.json",
+    "status": 400,
+    "body": "{\"detail\":\"只提供本次独立工作目录中的普通源文件\"}"
+  },
+  {
+    "workspace": "personal",
+    "path": ".runtime/research/.private.md",
+    "status": 400,
+    "body": "{\"detail\":\"只提供本次独立工作目录中的普通源文件\"}"
+  },
+  {
+    "workspace": "personal",
+    "path": "../home/.codex/auth.json",
+    "status": 400,
+    "body": "{\"detail\":\"只提供本次独立工作目录中的普通源文件\"}"
+  },
+  {
+    "workspace": "personal",
+    "path": "../../gzrun-20260919-090842-da7699c6/repo/README.md",
+    "status": 400,
+    "body": "{\"detail\":\"只提供本次独立工作目录中的普通源文件\"}"
+  },
+  {
+    "workspace": "personal",
+    "path": "/etc/passwd",
+    "status": 400,
+    "body": "{\"detail\":\"只提供本次独立工作目录中的普通源文件\"}"
+  },
+  {
+    "workspace": "team",
+    "path": ".runtime/research/gzrun-20260919-091738-82581407/sources.md",
+    "status": 404,
+    "body": "{\"detail\":\"对象不存在：gzrun-20260919-091738-82581407\"}"
+  }
+]

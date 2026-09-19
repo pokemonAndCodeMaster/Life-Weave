@@ -1,0 +1,42 @@
+[
+  {
+    "file": "observation.md",
+    "status": 200,
+    "declaredBytes": 307,
+    "actualBytes": 307,
+    "sha256Matches": true,
+    "result": "pass"
+  },
+  {
+    "file": "previous-report.md",
+    "status": 200,
+    "declaredBytes": 5696,
+    "actualBytes": 5696,
+    "sha256Matches": true,
+    "result": "pass"
+  },
+  {
+    "file": "feedback.json",
+    "status": 200,
+    "declaredBytes": 1065,
+    "actualBytes": 1065,
+    "sha256Matches": true,
+    "result": "pass"
+  },
+  {
+    "file": "report.md",
+    "status": 200,
+    "declaredBytes": 8648,
+    "actualBytes": 8648,
+    "sha256Matches": true,
+    "result": "pass"
+  },
+  {
+    "file": "sources.md",
+    "status": 200,
+    "declaredBytes": 2561,
+    "actualBytes": 2561,
+    "sha256Matches": true,
+    "result": "pass"
+  }
+]

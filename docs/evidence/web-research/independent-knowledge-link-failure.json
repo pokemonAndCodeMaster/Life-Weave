@@ -1,0 +1,7 @@
+{
+  "href": ".runtime/research/gzrun-20260919-091738-82581407/sources.md",
+  "status": 409,
+  "url": "http://127.0.0.1:8011/api/lifeweave/personal/library/document?path=%E7%A0%94%E7%A9%B6%2F.runtime%2Fresearch%2Fgzrun-20260919-091738-82581407%2Fsources.md&sourceId=local",
+  "response": "{\"detail\":\"请选择知识目录中的 Markdown 文件，不包含原始材料和隐藏目录\"}",
+  "pageURL": "http://127.0.0.1:8011/lifeweave/personal/knowledge?source=local&path=%E7%A0%94%E7%A9%B6/%E9%98%B3%E5%8F%B0%E9%87%87%E5%85%89%E5%9B%A0%E6%9E%9C%E8%A7%A3%E9%87%8A.md"
+}

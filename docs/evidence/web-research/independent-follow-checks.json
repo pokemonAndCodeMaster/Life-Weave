@@ -1,0 +1,54 @@
+[
+  {
+    "name": "硬中断重启保留原文并标失败",
+    "result": "pass",
+    "turn": {
+      "id": "turn-f14687fb9311c1c6145363e85c0b140b",
+      "conversationId": "conversation-561ab882a4a4bb89b4faf8e66362a02f",
+      "workspace": "personal",
+      "requestId": "08d254d3-718c-4958-8c62-3fb1902a6bc3",
+      "body": "等待受控中断：独立服务重启验收",
+      "mode": "auto",
+      "status": "failed",
+      "reply": "",
+      "receipts": [],
+      "sources": [
+        {
+          "path": "生活/独立采光.md",
+          "title": "阳台采光",
+          "excerpt": false,
+          "version": "b794a2acb644c485eb34d3fdb4a6c098078bf1703da61f35a16ec49b30421f38",
+          "sourceId": "local"
+        }
+      ],
+      "itemId": null,
+      "runId": null,
+      "error": "服务中断了这轮处理，未自动重发；原话已保存，可以重试",
+      "createdAt": "2026-09-19T17:23:50.413587+08:00",
+      "updatedAt": "2026-09-19T17:24:38.607952+08:00",
+      "inputContext": {
+        "itemId": null,
+        "runId": null,
+        "anchor": null
+      }
+    }
+  },
+  {
+    "name": "新浏览器重启后继续旧事项",
+    "result": "pass",
+    "feedbackCount": 1
+  },
+  {
+    "name": "真实修订稿引用可打开",
+    "result": "pass",
+    "url": "/api/lifeweave/personal/runs/gzrun-20260919-091738-82581407/source?path=.runtime%2Fresearch%2Fgzrun-20260919-091738-82581407%2Fsources.md",
+    "status": 200,
+    "body": "# 本轮来源记录\n\n- 事项：`item-023bf9dab82a4466`；上下文：`ctxv-587e0d4d4770425b / v1`。\n- 本轮：`gzrun-20260919-091738-82581407`。\n- 资料接收方式：当前用户委托正文中的完整快照。记录时间：2026-09-19 09:18:08 UTC（北京时间17:18:08，工具读时）；不是源文件获取时间。\n- 隔离成果范围：本目录。没有访问外部网站，没有读取应用数据库或前轮运行目录，没有修改知识原文。\n\n| 材料 | 来源、版本与读取范围 | 本轮转存 |\n|---|---|---|\n| 阳台采光观察（验收材料） | sourceId=local；生活/阳台采光.md；发布版本61d37fe6aaa6d5c3c6bf6b0419024f04e14801ffb1fce1cbaa029f89826ddc98；读取"
+  },
+  {
+    "name": "真实修订稿浏览器公式",
+    "result": "pass",
+    "formulas": 35,
+    "revisionRun": "gzrun-20260919-091738-82581407"
+  }
+]

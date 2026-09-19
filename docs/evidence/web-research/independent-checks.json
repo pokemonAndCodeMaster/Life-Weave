@@ -1,0 +1,131 @@
+{
+  "manifest": {
+    "database": "test_lifeweave_review_2995015394b8",
+    "root": "/home/yyh/project/lifeweave/.runtime/independent-web-review",
+    "port": 8013,
+    "candidate": "0e574e4c27b03fdb60a1a819c964e824b265128f",
+    "controlledInterpreter": true,
+    "pid": 824091
+  },
+  "checks": [
+    {
+      "name": "首次入口",
+      "result": "pass",
+      "detail": "http://127.0.0.1:8013/lifeweave/personal/conversation"
+    },
+    {
+      "name": "问答不建事项和运行",
+      "result": "pass",
+      "detail": {
+        "turn": "turn-346a7ba50a51d6203b2cd0cb97598844",
+        "items": 0
+      }
+    },
+    {
+      "name": "记录不执行",
+      "result": "pass",
+      "detail": "turn-0e3fc2c27849d85372f96cf5fe069ebb"
+    },
+    {
+      "name": "同一原请求幂等",
+      "result": "pass",
+      "detail": "turn-0e3fc2c27849d85372f96cf5fe069ebb"
+    },
+    {
+      "name": "同请求内容冲突",
+      "result": "pass",
+      "detail": 409
+    },
+    {
+      "name": "刷新保留记录",
+      "result": "pass",
+      "detail": "conversation-7d25e34ed66674f69bc21621e2533a4c"
+    },
+    {
+      "name": "跨空间对话隔离",
+      "result": "pass",
+      "detail": 404
+    },
+    {
+      "name": "目标提案不自动接受且冲突不覆盖",
+      "result": "pass",
+      "detail": {
+        "proposal": "ctxp-b62096eef225490b",
+        "status": 409
+      }
+    },
+    {
+      "name": "旧运行仍保留旧目标",
+      "result": "pass",
+      "detail": "gzrun-20260919-092157-9d7a5d5b"
+    },
+    {
+      "name": "完整成果公式图片正式消费者",
+      "result": "pass",
+      "detail": {
+        "length": 2459,
+        "math": 1,
+        "imageNaturalWidth": 1
+      }
+    },
+    {
+      "name": "选段反馈关联与下轮读取",
+      "result": "pass",
+      "detail": {
+        "feedback": "feedback-8da5bbdc0f8420289e4d1006122469ec3100a113",
+        "anchor": "gzrun-20260919-092157-9d7a5d5b:ca9296071e95:训练数据说明：观测方位和时长，不足以证明品种差异。",
+        "nextRun": "gzrun-20260919-092158-edc8d16f"
+      }
+    },
+    {
+      "name": "知识接受更新与正式阅读",
+      "result": "pass",
+      "detail": {
+        "path": "生活/独立采光.md",
+        "version": "c9f699930e235f2f79e1293013764428207bbdf754d1d91416962fc0235cdaeb"
+      }
+    },
+    {
+      "name": "另任务自动选材并固定当前知识",
+      "result": "pass",
+      "detail": {
+        "run": "gzrun-20260919-092158-88989bed",
+        "sourceVersion": "c9f699930e235f2f79e1293013764428207bbdf754d1d91416962fc0235cdaeb"
+      }
+    },
+    {
+      "name": "拒绝保持原文",
+      "result": "pass",
+      "detail": "revision-587d75ca3d97409b"
+    },
+    {
+      "name": "知识源变化冲突",
+      "result": "pass",
+      "detail": 409
+    },
+    {
+      "name": "跨空间成果知识资产隔离",
+      "result": "pass",
+      "detail": [
+        404,
+        404,
+        404
+      ]
+    },
+    {
+      "name": "解释失败原话可重试",
+      "result": "pass",
+      "detail": "http://127.0.0.1:8013/lifeweave/personal/conversation/conversation-5ce07dcea7e3139c421839e52183b0d9"
+    },
+    {
+      "name": "取消保留原话",
+      "result": "pass",
+      "detail": "http://127.0.0.1:8013/lifeweave/personal/conversation/conversation-7b3ec8cf4dde1b30dd0d9c8668ba5d5b"
+    },
+    {
+      "name": "浏览器脚本错误",
+      "result": "pass",
+      "detail": []
+    }
+  ]
+}

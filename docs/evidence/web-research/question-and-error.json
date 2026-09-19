@@ -1,0 +1,55 @@
+{
+  "id": "conversation-efa5345050b8e9738735b95fe60bcea6",
+  "workspace": "personal",
+  "requestId": "real-web-smoke",
+  "title": "网页正式对话验证",
+  "itemId": null,
+  "createdAt": "2026-09-19T17:05:25.592945+08:00",
+  "updatedAt": "2026-09-19T17:06:39.800102+08:00",
+  "turns": [
+    {
+      "id": "turn-7e51d826db8af061c91d42d1da094d9e",
+      "conversationId": "conversation-efa5345050b8e9738735b95fe60bcea6",
+      "workspace": "personal",
+      "requestId": "question-1",
+      "body": "普通提问：为什么休息对学习有帮助？用两句话回答，不创建任务。",
+      "mode": "auto",
+      "status": "failed",
+      "reply": "",
+      "receipts": [],
+      "sources": [],
+      "itemId": null,
+      "runId": null,
+      "error": "Error loading config.toml: invalid transport\nin `mcp_servers.\"notebooklm\"`",
+      "createdAt": "2026-09-19T17:05:25.606350+08:00",
+      "updatedAt": "2026-09-19T17:05:25.733786+08:00",
+      "inputContext": {
+        "itemId": null,
+        "runId": null,
+        "anchor": null
+      }
+    },
+    {
+      "id": "turn-c9e834b8f1e827c78bb48f2a410c2526",
+      "conversationId": "conversation-efa5345050b8e9738735b95fe60bcea6",
+      "workspace": "personal",
+      "requestId": "question-2",
+      "body": "普通提问：为什么休息对学习有帮助？用两句话回答，不创建任务。",
+      "mode": "auto",
+      "status": "completed",
+      "reply": "休息能缓解疲劳、恢复注意力，让你接下来更容易理解和吸收新知识。休息也有助于大脑巩固刚学过的内容，尤其是充足的睡眠能让记忆更稳固。",
+      "receipts": [],
+      "sources": [],
+      "itemId": null,
+      "runId": null,
+      "error": null,
+      "createdAt": "2026-09-19T17:06:24.465388+08:00",
+      "updatedAt": "2026-09-19T17:06:39.800102+08:00",
+      "inputContext": {
+        "itemId": null,
+        "runId": null,
+        "anchor": null
+      }
+    }
+  ]
+}

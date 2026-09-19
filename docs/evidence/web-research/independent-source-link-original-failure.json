@@ -1,0 +1,21 @@
+{
+  "candidate": "0e574e4",
+  "scope": "main agent real run, read-only independent HTTP observation",
+  "run": "gzrun-20260919-091738-82581407",
+  "requests": [
+    {
+      "path": ".runtime/research/gzrun-20260919-091738-82581407/sources.md",
+      "status": 400,
+      "response": {
+        "detail": "只提供本次独立工作目录中的普通源文件"
+      }
+    },
+    {
+      "path": ".runtime/research/gzrun-20260919-091738-82581407/manifest.json",
+      "status": 400,
+      "response": {
+        "detail": "只提供本次独立工作目录中的普通源文件"
+      }
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+{
+  "base": "bb161dd",
+  "candidate": "71f00f8",
+  "backup": "lifeweave-20260919-172157.dump",
+  "before": {
+    "document_revision": {
+      "count": 2,
+      "sha256": "e909797180610edfdaac74faef51b1278611654d1388d89ccbf559468898d50d"
+    },
+    "library_source": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "linear_binding": {
+      "count": 1,
+      "sha256": "6c64cb7d9583e392f781cf311bda07f812ce2bc2b21103456c7edd7d0abe2486"
+    },
+    "linear_publication": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_activity": {
+      "count": 8,
+      "sha256": "b34e62794e7e631d2992d3bb1f6b521860f2d71f789d7f71f4f69ed5726ff2b7"
+    },
+    "t_lifeweave_capability": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_capability_verification": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_context": {
+      "count": 3,
+      "sha256": "212c0bf041b15b9d7c21ff74b7453a642628f48b687a5eac69d6e52bd44919f6"
+    },
+    "t_lifeweave_context_proposal": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_context_version": {
+      "count": 3,
+      "sha256": "c60bf6bb0e358e4b32210c16f6cd05577b7826e9328b61b52f70acf54abfeec5"
+    },
+    "t_lifeweave_discussion": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_entity": {
+      "count": 1,
+      "sha256": "c0fcd0c872fb80ee8e7fdfc3fcadda4fe1b9dea3453731a78d4cdae978959457"
+    },
+    "t_lifeweave_evidence": {
+      "count": 5,
+      "sha256": "cd701a0fc3a4b7ec030d4dbf9111c1ff06a6e5c2630ebb7e0c5479df95b038b3"
+    },
+    "t_lifeweave_item": {
+      "count": 3,
+      "sha256": "4503e27a2ffa2dc10cbadc6e69eac20006a8c0febac44a33a30230371737c430"
+    },
+    "t_lifeweave_machine": {
+      "count": 2,
+      "sha256": "11b885761e2543155b9299d45b1e3e02939636cd9ef1d12a3ba91e23f1690aa8"
+    },
+    "t_lifeweave_meeting": {
+      "count": 2,
+      "sha256": "a6d72d6eb444d800aebc192426723e88b53b95712ccaa0f07806fd216d7fa180"
+    },
+    "t_lifeweave_meeting_note": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_meeting_snapshot": {
+      "count": 3,
+      "sha256": "9d7e8f0d81c21fe1ae06045d1e878e48a7433a6fe8163cbb114b342121276247"
+    },
+    "t_lifeweave_preference": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_relation": {
+      "count": 1,
+      "sha256": "f5a034cdc5b8e28b26320c22b59fc107525acbcd15373617df281fce8b8cb3ad"
+    },
+    "t_lifeweave_run": {
+      "count": 4,
+      "sha256": "c7e92e13337cc9b5559e9c527faf413a772e6f9864555366db71df09bdc13f49"
+    },
+    "t_lifeweave_run_event": {
+      "count": 39,
+      "sha256": "58c97f039bc641468ba32be80a6d1aebb543e0212db1d9113827fa45a7d34261"
+    },
+    "t_lifeweave_workspace": {
+      "count": 2,
+      "sha256": "7d743e18e5818b4da4a328b1c4219942f36f15a7a6e788b4cd5b491ddb5ced9c"
+    }
+  },
+  "after": {
+    "document_revision": {
+      "count": 2,
+      "sha256": "e909797180610edfdaac74faef51b1278611654d1388d89ccbf559468898d50d"
+    },
+    "library_source": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "lifeweave_conversation": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "lifeweave_personal_model": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "lifeweave_turn": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "linear_binding": {
+      "count": 1,
+      "sha256": "6c64cb7d9583e392f781cf311bda07f812ce2bc2b21103456c7edd7d0abe2486"
+    },
+    "linear_publication": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "research_knowledge_candidate": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_activity": {
+      "count": 8,
+      "sha256": "b34e62794e7e631d2992d3bb1f6b521860f2d71f789d7f71f4f69ed5726ff2b7"
+    },
+    "t_lifeweave_capability": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_capability_verification": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_context": {
+      "count": 3,
+      "sha256": "212c0bf041b15b9d7c21ff74b7453a642628f48b687a5eac69d6e52bd44919f6"
+    },
+    "t_lifeweave_context_proposal": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_context_version": {
+      "count": 3,
+      "sha256": "c60bf6bb0e358e4b32210c16f6cd05577b7826e9328b61b52f70acf54abfeec5"
+    },
+    "t_lifeweave_discussion": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_entity": {
+      "count": 1,
+      "sha256": "c0fcd0c872fb80ee8e7fdfc3fcadda4fe1b9dea3453731a78d4cdae978959457"
+    },
+    "t_lifeweave_evidence": {
+      "count": 5,
+      "sha256": "cd701a0fc3a4b7ec030d4dbf9111c1ff06a6e5c2630ebb7e0c5479df95b038b3"
+    },
+    "t_lifeweave_item": {
+      "count": 3,
+      "sha256": "4503e27a2ffa2dc10cbadc6e69eac20006a8c0febac44a33a30230371737c430"
+    },
+    "t_lifeweave_machine": {
+      "count": 2,
+      "sha256": "11b885761e2543155b9299d45b1e3e02939636cd9ef1d12a3ba91e23f1690aa8"
+    },
+    "t_lifeweave_meeting": {
+      "count": 2,
+      "sha256": "a6d72d6eb444d800aebc192426723e88b53b95712ccaa0f07806fd216d7fa180"
+    },
+    "t_lifeweave_meeting_note": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_meeting_snapshot": {
+      "count": 3,
+      "sha256": "9d7e8f0d81c21fe1ae06045d1e878e48a7433a6fe8163cbb114b342121276247"
+    },
+    "t_lifeweave_preference": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    },
+    "t_lifeweave_relation": {
+      "count": 1,
+      "sha256": "f5a034cdc5b8e28b26320c22b59fc107525acbcd15373617df281fce8b8cb3ad"
+    },
+    "t_lifeweave_run": {
+      "count": 4,
+      "sha256": "c7e92e13337cc9b5559e9c527faf413a772e6f9864555366db71df09bdc13f49"
+    },
+    "t_lifeweave_run_event": {
+      "count": 39,
+      "sha256": "58c97f039bc641468ba32be80a6d1aebb543e0212db1d9113827fa45a7d34261"
+    },
+    "t_lifeweave_workspace": {
+      "count": 2,
+      "sha256": "7d743e18e5818b4da4a328b1c4219942f36f15a7a6e788b4cd5b491ddb5ced9c"
+    }
+  },
+  "existingChanged": {},
+  "newTables": [
+    "lifeweave_conversation",
+    "lifeweave_turn",
+    "research_knowledge_candidate",
+    "lifeweave_personal_model"
+  ],
+  "knowledgeHashes": {
+    ".runtime/knowledge/personal/开始使用.md": "2f4323039774fb4c347d03e5a4278ddd5fe458f03a17b571dabf780a7a1afcf8",
+    ".runtime/knowledge/personal/知识导航.md": "b23aec658f7b997f8c13bac0ed93520b5b5d27a81e276e402307332eca1bf5b7"
+  }
+}

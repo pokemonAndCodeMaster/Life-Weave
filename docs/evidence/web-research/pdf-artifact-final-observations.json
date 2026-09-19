@@ -1,0 +1,354 @@
+{
+  "candidate": "5993005f5a941935fc5e9e9a701b7e7c7cbde506",
+  "checks": [
+    {
+      "name": "service full worker consumed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "service succeeded",
+      "pass": true,
+      "detail": "succeeded"
+    },
+    {
+      "name": "service input provenance",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "service lossless event",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "service collision and literals",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "service lossless final JSON",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "service readable projection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "service raw bytes and headers",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "service readable bytes and version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http full worker consumed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http succeeded",
+      "pass": true,
+      "detail": "succeeded"
+    },
+    {
+      "name": "http input provenance",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http lossless event",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http collision and literals",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http lossless final JSON",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http readable projection",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http raw bytes and headers",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http readable bytes and version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http-control full worker consumed",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http-control succeeded",
+      "pass": true,
+      "detail": "succeeded"
+    },
+    {
+      "name": "http-control input provenance",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http-control no unrelated note",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http-control raw bytes and headers",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "http-control readable bytes and version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "invalid lease events",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "body": "{\"detail\":\"Run 不存在，或机器租约不匹配\"}"
+      }
+    },
+    {
+      "name": "invalid lease report",
+      "pass": true,
+      "detail": {
+        "status": 403,
+        "body": "{\"detail\":\"租约已失效，拒绝接收 Worker 回报\"}"
+      }
+    },
+    {
+      "name": "old metadata cannot restore unrelated result",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "forged input provenance protected",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "cross workspace /runs/gzrun-20260919-100720-208c1109",
+      "pass": true,
+      "detail": 404
+    },
+    {
+      "name": "cross workspace /runs/gzrun-20260919-100720-208c1109/artifacts/result",
+      "pass": true,
+      "detail": 404
+    },
+    {
+      "name": "cross workspace /items/item-84c7e4c008824124/research-output",
+      "pass": true,
+      "detail": 404
+    },
+    {
+      "name": "cross workspace worker token",
+      "pass": true,
+      "detail": 403
+    },
+    {
+      "name": "invalid lease did not append event",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "browser output NUL note",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "browser raw download exact",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "browser readable download exact",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "candidate NUL warning API",
+      "pass": false,
+      "detail": {
+        "links": {
+          "source.md": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/source?path=source.md"
+        },
+        "images": {},
+        "warnings": []
+      }
+    },
+    {
+      "name": "candidate NUL warning browser",
+      "pass": false,
+      "detail": "知识候选与修订\n审查/PDF字符证据.md · 等待审阅\n\n从研究成果提炼可复用知识\n\n下载来源成果 · 4fcaf2256958\n--- 当前正文\n+++ 建议正文\n@@ -0,0 +1,10 @@\n+# 独立 PDF 阅读夹具\n+\n+公式项 A␀B 保持证据。\n+\n+[提取来源](source.md)\n+\n+字面转义 `\\u0000` 保留。\n+\n+---\n+来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/research-output/download) · 事项 `item-059a12f4abaf4914` · 运行 `gzrun-20260919-100720-971da96c` · 版本 `4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5`\n\n阅读建议全文\n独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n提取来源\n\n字面转义 \\u0000 保留。\n\n来源：研究成果 · 事项 item-059a12f4abaf4914 · 运行 gzrun-20260919-100720-971da96c · 版本 4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5\n\n接受并更新知识原文\n拒绝修订\n读取最新原文并重新合并"
+    },
+    {
+      "name": "candidate source mapping and version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "accepted NUL warning API",
+      "pass": false,
+      "detail": {
+        "links": {
+          "source.md": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/source?path=source.md"
+        },
+        "images": {},
+        "warnings": []
+      }
+    },
+    {
+      "name": "accepted NUL warning browser",
+      "pass": false,
+      "detail": "工作台知识 · 工作台管理\n下载原文\n下载阅读版\n提出修订\n独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n提取来源\n\n字面转义 \\u0000 保留。\n\n来源：研究成果 · 事项 item-059a12f4abaf4914 · 运行 gzrun-20260919-100720-971da96c · 版本 4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5\n\n审查/PDF字符证据.md · 版本 6f860704445b"
+    },
+    {
+      "name": "accepted original file and version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "accepted research mapping unchanged",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "accepted browser source href",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "accepted source resolves exact fixture",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "accepted download version",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "browser no uncaught errors",
+      "pass": true,
+      "detail": []
+    },
+    {
+      "name": "database removed",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "runs": [
+    {
+      "transport": "service",
+      "itemId": "item-bd116efa231643f3",
+      "runId": "gzrun-20260919-100720-9951cf59",
+      "output": {
+        "id": "gzrun-20260919-100720-9951cf59",
+        "kind": "run",
+        "title": "独立 PDF 交付复核 service",
+        "content": "# 独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n[提取来源](source.md)\n\n字面转义 `\\u0000` 保留。",
+        "version": "4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5",
+        "runId": "gzrun-20260919-100720-9951cf59",
+        "state": "succeeded",
+        "createdAt": "2026-09-19T18:07:20.615219+08:00",
+        "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-9951cf59/source",
+        "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-9951cf59/assets",
+        "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-9951cf59/research-output/download",
+        "storageNote": "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。",
+        "rawDownloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-9951cf59/artifacts/result"
+      },
+      "artifactHeaders": {
+        "date": "Sat, 19 Sep 2026 10:07:20 GMT",
+        "server": "uvicorn",
+        "x-artifact-version": "sha256:6ff0ed8ad00762e9e53d44680ccac2d56dc53154ba79cc93b8082476bb97e8ba",
+        "etag": "\"sha256:6ff0ed8ad00762e9e53d44680ccac2d56dc53154ba79cc93b8082476bb97e8ba\"",
+        "content-length": "148",
+        "content-type": "text/plain; charset=utf-8"
+      }
+    },
+    {
+      "transport": "http",
+      "itemId": "item-059a12f4abaf4914",
+      "runId": "gzrun-20260919-100720-971da96c",
+      "output": {
+        "id": "gzrun-20260919-100720-971da96c",
+        "kind": "run",
+        "title": "独立 PDF 交付复核 http",
+        "content": "# 独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n[提取来源](source.md)\n\n字面转义 `\\u0000` 保留。",
+        "version": "4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5",
+        "runId": "gzrun-20260919-100720-971da96c",
+        "state": "succeeded",
+        "createdAt": "2026-09-19T18:07:20.798978+08:00",
+        "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/source",
+        "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/assets",
+        "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/research-output/download",
+        "storageNote": "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。",
+        "rawDownloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/artifacts/result"
+      },
+      "artifactHeaders": {
+        "date": "Sat, 19 Sep 2026 10:07:20 GMT",
+        "server": "uvicorn",
+        "x-artifact-version": "sha256:6ff0ed8ad00762e9e53d44680ccac2d56dc53154ba79cc93b8082476bb97e8ba",
+        "etag": "\"sha256:6ff0ed8ad00762e9e53d44680ccac2d56dc53154ba79cc93b8082476bb97e8ba\"",
+        "content-length": "148",
+        "content-type": "text/plain; charset=utf-8"
+      }
+    },
+    {
+      "transport": "http-control",
+      "itemId": "item-00200bee3e78459b",
+      "runId": "gzrun-20260919-100720-dd929329",
+      "output": {
+        "id": "gzrun-20260919-100720-dd929329",
+        "kind": "run",
+        "title": "独立 PDF 交付复核 http-control",
+        "content": "# 普通结果\n\n中文与字面 \\u0000 不变。",
+        "version": "cf1d0f8cc90e3646fafc5f7daa78581948caa7b56b08d2e3f525d43854e5ff33",
+        "runId": "gzrun-20260919-100720-dd929329",
+        "state": "succeeded",
+        "createdAt": "2026-09-19T18:07:20.923859+08:00",
+        "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-dd929329/source",
+        "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-dd929329/assets",
+        "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-dd929329/research-output/download",
+        "storageNote": null,
+        "rawDownloadUrl": null
+      },
+      "artifactHeaders": {
+        "date": "Sat, 19 Sep 2026 10:07:20 GMT",
+        "server": "uvicorn",
+        "x-artifact-version": "sha256:cf1d0f8cc90e3646fafc5f7daa78581948caa7b56b08d2e3f525d43854e5ff33",
+        "etag": "\"sha256:cf1d0f8cc90e3646fafc5f7daa78581948caa7b56b08d2e3f525d43854e5ff33\"",
+        "content-length": "48",
+        "content-type": "text/plain; charset=utf-8"
+      }
+    }
+  ],
+  "database": "test_pdf_final_1bb2f9b643dd",
+  "temporary_root": "/tmp/pdf-artifact-final-yszc0tr6",
+  "port": 8015,
+  "temporaryRootRemoved": true,
+  "result": "fail"
+}

@@ -1,0 +1,53 @@
+{
+  "candidate": {
+    "id": "revision-53d2de0b8acd46d4",
+    "workspace": "personal",
+    "source_id": "local",
+    "path": "审查/普通知识.md",
+    "base_version": "new",
+    "before_content": "",
+    "content": "# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n[普通图链接](figure.png)\n\n![图示](figure.png)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/research-output/download) · 事项 `item-9fdb4eef54154743` · 运行 `gzrun-20260919-101651-bce06cd6` · 版本 `890a1a6ad09feb88a1dd5e37ef8e823921aafa7755ff3ef66485aedd11ee51d9`\n",
+    "reason": "从研究成果提炼可复用知识",
+    "status": "draft",
+    "created_at": "2026-09-19T18:16:57.122854+08:00",
+    "accepted_at": null,
+    "item_id": "item-9fdb4eef54154743",
+    "run_id": "gzrun-20260919-101651-bce06cd6",
+    "run_version": "890a1a6ad09feb88a1dd5e37ef8e823921aafa7755ff3ef66485aedd11ee51d9",
+    "references": {
+      "links": {
+        "source.md": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/source?path=source.md",
+        "figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/source?path=figure.png"
+      },
+      "images": {
+        "figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/assets?path=figure.png"
+      },
+      "warnings": []
+    },
+    "diff": "--- 当前正文\n+++ 建议正文\n@@ -0,0 +1,13 @@\n+# 普通知识样本\n+\n+正常字符、字面 `\\u0000` 和 ␀。\n+\n+[来源文本](source.md)\n+\n+[普通图链接](figure.png)\n+\n+![图示](figure.png)\n+\n+\n+---\n+来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/research-output/download) · 事项 `item-9fdb4eef54154743` · 运行 `gzrun-20260919-101651-bce06cd6` · 版本 `890a1a6ad09feb88a1dd5e37ef8e823921aafa7755ff3ef66485aedd11ee51d9`\n",
+    "itemId": "item-9fdb4eef54154743",
+    "runId": "gzrun-20260919-101651-bce06cd6",
+    "runVersion": "890a1a6ad09feb88a1dd5e37ef8e823921aafa7755ff3ef66485aedd11ee51d9",
+    "sourceUrl": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/research-output/download"
+  },
+  "document": {
+    "path": "审查/普通知识.md",
+    "sourceId": "local",
+    "sourceTitle": "工作台知识",
+    "writable": true,
+    "content": "# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n[普通图链接](figure.png)\n\n![图示](figure.png)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/research-output/download) · 事项 `item-9fdb4eef54154743` · 运行 `gzrun-20260919-101651-bce06cd6` · 版本 `890a1a6ad09feb88a1dd5e37ef8e823921aafa7755ff3ef66485aedd11ee51d9`\n",
+    "version": "ed033a8ef2ee5493cdae741d2d7a7c740cf912f91347d125b93b5506ce8ff259",
+    "title": "普通知识样本",
+    "references": {
+      "links": {
+        "source.md": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/source?path=source.md",
+        "figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/source?path=figure.png"
+      },
+      "images": {
+        "figure.png": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/assets?path=figure.png"
+      },
+      "warnings": []
+    }
+  },
+  "formalBrowserText": "工作台知识 · 工作台管理\n下载原文\n下载阅读版\n提出修订\n普通知识样本\n\n正常字符、字面 \\u0000 和 ␀。\n\n来源文本\n\n普通图链接\n\n来源：研究成果 · 事项 item-9fdb4eef54154743 · 运行 gzrun-20260919-101651-bce06cd6 · 版本 890a1a6ad09feb88a1dd5e37ef8e823921aafa7755ff3ef66485aedd11ee51d9\n\n审查/普通知识.md · 版本 ed033a8ef2ee"
+}

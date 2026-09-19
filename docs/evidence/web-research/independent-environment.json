@@ -1,0 +1,21 @@
+{
+  "database": "test_lifeweave_review_2995015394b8",
+  "root": "/home/yyh/project/lifeweave/.runtime/independent-web-review",
+  "port": 8013,
+  "controlledInterpreter": true,
+  "pid": 843146,
+  "finalCandidate": "cd8c709",
+  "originalCandidate": "0e574e4c27b03fdb60a1a819c964e824b265128f",
+  "usedPids": [
+    824091,
+    830076,
+    832777,
+    843146
+  ],
+  "cleanup": {
+    "ownedServerStopped": true,
+    "temporaryDatabaseDropped": true,
+    "ownedRootRemoved": true,
+    "dailyAndMainServicesUntouched": true
+  }
+}

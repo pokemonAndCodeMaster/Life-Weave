@@ -1,0 +1,10 @@
+RAW HEADER
+# 普通知识样本
+
+正常字符、字面 `\u0000` 和 ␀。
+
+[来源文本](source.md)
+
+![图示](figure.png)
+
+RAW END

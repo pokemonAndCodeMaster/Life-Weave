@@ -1,0 +1,47 @@
+{
+  "candidate": {
+    "id": "revision-bc6e835bfe9c4839",
+    "workspace": "personal",
+    "source_id": "local",
+    "path": "审查/PDF字符证据.md",
+    "base_version": "new",
+    "before_content": "",
+    "content": "# 独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n[提取来源](source.md)\n\n字面转义 `\\u0000` 保留。\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/research-output/download) · 事项 `item-059a12f4abaf4914` · 运行 `gzrun-20260919-100720-971da96c` · 版本 `4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5`\n",
+    "reason": "从研究成果提炼可复用知识",
+    "status": "draft",
+    "created_at": "2026-09-19T18:07:22.784362+08:00",
+    "accepted_at": null,
+    "item_id": "item-059a12f4abaf4914",
+    "run_id": "gzrun-20260919-100720-971da96c",
+    "run_version": "4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5",
+    "references": {
+      "links": {
+        "source.md": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/source?path=source.md"
+      },
+      "images": {},
+      "warnings": []
+    },
+    "diff": "--- 当前正文\n+++ 建议正文\n@@ -0,0 +1,10 @@\n+# 独立 PDF 阅读夹具\n+\n+公式项 A␀B 保持证据。\n+\n+[提取来源](source.md)\n+\n+字面转义 `\\u0000` 保留。\n+\n+---\n+来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/research-output/download) · 事项 `item-059a12f4abaf4914` · 运行 `gzrun-20260919-100720-971da96c` · 版本 `4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5`\n",
+    "itemId": "item-059a12f4abaf4914",
+    "runId": "gzrun-20260919-100720-971da96c",
+    "runVersion": "4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5",
+    "sourceUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/research-output/download"
+  },
+  "accepted": {
+    "path": "审查/PDF字符证据.md",
+    "sourceId": "local",
+    "sourceTitle": "工作台知识",
+    "writable": true,
+    "content": "# 独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n[提取来源](source.md)\n\n字面转义 `\\u0000` 保留。\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/research-output/download) · 事项 `item-059a12f4abaf4914` · 运行 `gzrun-20260919-100720-971da96c` · 版本 `4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5`\n",
+    "version": "6f860704445b8eb8259de78f2777e7bad04e61bbccfba4ffb185911cb62f1df9",
+    "title": "独立 PDF 阅读夹具",
+    "references": {
+      "links": {
+        "source.md": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/source?path=source.md"
+      },
+      "images": {},
+      "warnings": []
+    }
+  },
+  "browserText": "工作台知识 · 工作台管理\n下载原文\n下载阅读版\n提出修订\n独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n提取来源\n\n字面转义 \\u0000 保留。\n\n来源：研究成果 · 事项 item-059a12f4abaf4914 · 运行 gzrun-20260919-100720-971da96c · 版本 4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5\n\n审查/PDF字符证据.md · 版本 6f860704445b"
+}

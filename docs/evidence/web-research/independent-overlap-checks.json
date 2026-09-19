@@ -1,0 +1,45 @@
+[
+  {
+    "name": "实际打开导出HTML图片与引用仍可用",
+    "result": "pass",
+    "detail": {
+      "url": "http://127.0.0.1:8013/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/source?path=research%2Fsource.md",
+      "image": "http://127.0.0.1:8013/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/assets?path=research%2Ffigure%201.png"
+    }
+  },
+  {
+    "name": "两个run同名引用不静默选择任一个",
+    "result": "pass",
+    "detail": {
+      "links": {
+        ".runtime/research/readable.json": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/source?path=.runtime%2Fresearch%2Freadable.json"
+      },
+      "images": {
+        "research/figure%201.png": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/assets?path=research%2Ffigure%201.png"
+      },
+      "warnings": [
+        "多个来源使用相同相对引用 research/source.md，请从各自来源成果打开；未自动选择其中一次运行。"
+      ]
+    }
+  },
+  {
+    "name": "事项候选消费者显示歧义",
+    "result": "pass",
+    "detail": "多个来源使用相同相对引用 research/source.md，请从各自来源成果打开；未自动选择其中一次运行。"
+  },
+  {
+    "name": "正式知识消费者共享同一冲突结果",
+    "result": "pass",
+    "detail": {
+      "links": {
+        ".runtime/research/readable.json": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/source?path=.runtime%2Fresearch%2Freadable.json"
+      },
+      "images": {
+        "research/figure%201.png": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/assets?path=research%2Ffigure%201.png"
+      },
+      "warnings": [
+        "多个来源使用相同相对引用 research/source.md，请从各自来源成果打开；未自动选择其中一次运行。"
+      ]
+    }
+  }
+]

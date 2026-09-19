@@ -1,0 +1,245 @@
+{
+  "run": {
+    "id": "gzrun-20260919-100720-971da96c",
+    "workspace": "personal",
+    "itemId": "item-059a12f4abaf4914",
+    "attempt": 1,
+    "retryOf": null,
+    "state": "succeeded",
+    "instruction": "运行独立无模型夹具",
+    "engine": "codex",
+    "runtime": "native",
+    "machine": "node-p-9db3cc91db14",
+    "requestedMachineId": "node-p-9db3cc91db14",
+    "session": "fixture-gzrun-20260919-100720-971da96c",
+    "rev": 1,
+    "contextVersionId": "ctxv-55216d68fe244636",
+    "capabilityCandidateId": null,
+    "capabilities": [],
+    "image": null,
+    "directory": "/tmp/pdf-artifact-final-yszc0tr6/.runtime/executions/personal/gzrun-20260919-100720-971da96c/repo",
+    "repositoryPath": null,
+    "repositoryRevision": null,
+    "branch": null,
+    "model": null,
+    "sandbox": "read-only",
+    "exitCode": 0,
+    "error": null,
+    "failureCode": null,
+    "result": "EXECUTOR RAW HEADER\n# 独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n[提取来源](source.md)\n\n字面转义 `\\u0000` 保留。\nRAW FOOTER␀",
+    "resultPayload": {
+      "nested": {
+        "map": {
+          "entries": [
+            [
+              "␀",
+              10
+            ],
+            [
+              "␀",
+              20
+            ]
+          ]
+        },
+        "source": "pdf␀reader",
+        "literal": "\\u0000"
+      },
+      "report": "# 独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n[提取来源](source.md)\n\n字面转义 `\\u0000` 保留。"
+    },
+    "artifactCandidates": [
+      {
+        "ref": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/artifacts/result",
+        "kind": "executor-result",
+        "version": "sha256:6ff0ed8ad00762e9e53d44680ccac2d56dc53154ba79cc93b8082476bb97e8ba",
+        "mediaType": "text/plain"
+      }
+    ],
+    "evidenceCandidates": [
+      {
+        "kind": "technical-execution",
+        "exitCode": 0,
+        "environmentRef": "sha256:e9af6827187603bb38e2abf6eb1ad489457af96ce6be177555c35402bd398994",
+        "artifactVersion": "sha256:6ff0ed8ad00762e9e53d44680ccac2d56dc53154ba79cc93b8082476bb97e8ba",
+        "businessAccepted": false,
+        "executorCompleted": true
+      }
+    ],
+    "environmentSnapshot": {
+      "image": null,
+      "runtime": "native",
+      "executor": "codex",
+      "hostname": "yyh-rog",
+      "identity": "sha256:e9af6827187603bb38e2abf6eb1ad489457af96ce6be177555c35402bd398994",
+      "machineId": "node-p-9db3cc91db14",
+      "sessionHome": "/tmp/pdf-artifact-final-yszc0tr6/.runtime/executions/personal/gzrun-20260919-100720-971da96c/home",
+      "requestedImage": null,
+      "selectedInputs": {
+        "methodId": null,
+        "knowledgeRefs": []
+      },
+      "actualDirectory": "/tmp/pdf-artifact-final-yszc0tr6/.runtime/executions/personal/gzrun-20260919-100720-971da96c/repo",
+      "executorCommand": "independent-deterministic-fixture",
+      "executorVersion": "v1",
+      "researchSupport": {
+        "personalModel": {
+          "goals": "",
+          "version": 0,
+          "updatedAt": null,
+          "preferences": ""
+        },
+        "previousOutput": null
+      },
+      "feedbackSnapshot": [],
+      "requestedRuntime": "native",
+      "repositoryRevision": null,
+      "inputRecommendations": {
+        "limits": {
+          "methodsPerRun": 1,
+          "documentsPerRun": 10
+        },
+        "methods": [],
+        "boundary": "按当前目标文本匹配初筛，允许调整；不证明方法适用或实际执行。入队时读取来源并固定实际版本。",
+        "strategy": "lexical-v1",
+        "documents": [],
+        "suggested": {
+          "methodId": null,
+          "knowledgeRefs": []
+        },
+        "unavailable": [],
+        "contextVersionId": "ctxv-55216d68fe244636"
+      },
+      "_lifeweaveTextStorage": {
+        "note": "PostgreSQL 不支持 NUL；可读正文以 ␀ 显示，原始 JSON 无损保存在 originalJsonBase64。",
+        "format": "original-json-base64-v1",
+        "originalJsonBase64": "eyJsZWFzZV9pZCI6IllkRVprbkhFQTl2VTVQZjFZZXVYa28yMVZnaVh6ZkNhIiwib3V0Y29tZSI6InN1Y2NlZWRlZCIsInNlc3Npb25faWQiOiJmaXh0dXJlLWd6cnVuLTIwMjYwOTE5LTEwMDcyMC05NzFkYTk2YyIsImV4aXRfY29kZSI6MCwicmVzdWx0IjoiRVhFQ1VUT1IgUkFXIEhFQURFUlxuIyBcdTcyZWNcdTdhY2IgUERGIFx1OTYwNVx1OGJmYlx1NTkzOVx1NTE3N1xuXG5cdTUxNmNcdTVmMGZcdTk4NzkgQVx1MDAwMEIgXHU0ZmRkXHU2MzAxXHU4YmMxXHU2MzZlXHUzMDAyXG5cbltcdTYzZDBcdTUzZDZcdTY3NjVcdTZlOTBdKHNvdXJjZS5tZClcblxuXHU1YjU3XHU5NzYyXHU4ZjZjXHU0ZTQ5IGBcXHUwMDAwYCBcdTRmZGRcdTc1NTlcdTMwMDJcblJBVyBGT09URVJcdTAwMDAiLCJyZXN1bHRfcGF5bG9hZCI6eyJyZXBvcnQiOiIjIFx1NzJlY1x1N2FjYiBQREYgXHU5NjA1XHU4YmZiXHU1OTM5XHU1MTc3XG5cblx1NTE2Y1x1NWYwZlx1OTg3OSBBXHUwMDAwQiBcdTRmZGRcdTYzMDFcdThiYzFcdTYzNmVcdTMwMDJcblxuW1x1NjNkMFx1NTNkNlx1Njc2NVx1NmU5MF0oc291cmNlLm1kKVxuXG5cdTViNTdcdTk3NjJcdThmNmNcdTRlNDkgYFxcdTAwMDBgIFx1NGZkZFx1NzU1OVx1MzAwMiIsIm5lc3RlZCI6eyJzb3VyY2UiOiJwZGZcdTAwMDByZWFkZXIiLCJsaXRlcmFsIjoiXFx1MDAwMCIsIm1hcCI6eyJcdTAwMDAiOjEwLCJcdTI0MDAiOjIwfX19LCJhcnRpZmFjdHMiOlt7ImtpbmQiOiJleGVjdXRvci1yZXN1bHQiLCJyZWYiOiIvYXBpL2xpZmV3ZWF2ZS9wZXJzb25hbC9ydW5zL2d6cnVuLTIwMjYwOTE5LTEwMDcyMC05NzFkYTk2Yy9hcnRpZmFjdHMvcmVzdWx0IiwidmVyc2lvbiI6InNoYTI1Njo2ZmYwZWQ4YWQwMDc2MmU5ZTUzZDQ0NjgwY2NhYzJkNTZkYzUzMTU0YmE3OWNjOTNiODA4MjQ3NmJiOTdlOGJhIiwibWVkaWFUeXBlIjoidGV4dC9wbGFpbiJ9XSwiZXZpZGVuY2UiOlt7ImtpbmQiOiJ0ZWNobmljYWwtZXhlY3V0aW9uIiwiZXhlY3V0b3JDb21wbGV0ZWQiOnRydWUsImV4aXRDb2RlIjowLCJhcnRpZmFjdFZlcnNpb24iOiJzaGEyNTY6NmZmMGVkOGFkMDA3NjJlOWU1M2Q0NDY4MGNjYWMyZDU2ZGM1MzE1NGJhNzljYzkzYjgwODI0NzZiYjk3ZThiYSIsImVudmlyb25tZW50UmVmIjoic2hhMjU2OmU5YWY2ODI3MTg3NjAzYmIzOGUyYWJmNmViMWFkNDg5NDU3YWY5NmNlNmJlMTc3NTU1YzM1NDAyYmQzOTg5OTQiLCJidXNpbmVzc0FjY2VwdGVkIjpmYWxzZX1dLCJlbnZpcm9ubWVudCI6eyJtYWNoaW5lSWQiOiJub2RlLXAtOWRiM2NjOTFkYjE0IiwiaG9zdG5hbWUiOiJ5eWgtcm9nIiwicnVudGltZSI6Im5hdGl2ZSIsImltYWdlIjpudWxsLCJleGVjdXRvciI6ImNvZGV4IiwiZXhlY3V0b3JDb21tYW5kIjoiaW5kZXBlbmRlbnQtZGV0ZXJtaW5pc3RpYy1maXh0dXJlIiwiZXhlY3V0b3JWZXJzaW9uIjoidjEiLCJyZXBvc2l0b3J5UmV2aXNpb24iOm51bGwsImFjdHVhbERpcmVjdG9yeSI6Ii90bXAvcGRmLWFydGlmYWN0LWZpbmFsLXlzemMwdHI2Ly5ydW50aW1lL2V4ZWN1dGlvbnMvcGVyc29uYWwvZ3pydW4tMjAyNjA5MTktMTAwNzIwLTk3MWRhOTZjL3JlcG8iLCJzZXNzaW9uSG9tZSI6Ii90bXAvcGRmLWFydGlmYWN0LWZpbmFsLXlzemMwdHI2Ly5ydW50aW1lL2V4ZWN1dGlvbnMvcGVyc29uYWwvZ3pydW4tMjAyNjA5MTktMTAwNzIwLTk3MWRhOTZjL2hvbWUiLCJtYXRlcmlhbGl6ZWRDYXBhYmlsaXRpZXMiOltdLCJpZGVudGl0eSI6InNoYTI1NjplOWFmNjgyNzE4NzYwM2JiMzhlMmFiZjZlYjFhZDQ4OTQ1N2FmOTZjZTZiZTE3NzU1NWMzNTQwMmJkMzk4OTk0In0sImZhaWx1cmVfY29kZSI6bnVsbCwiZXJyb3IiOm51bGx9"
+      },
+      "materializedCapabilities": []
+    },
+    "staleContext": false,
+    "currentRev": 1,
+    "businessAccepted": false,
+    "createdAt": "2026-09-19T18:07:20.716165+08:00",
+    "claimedAt": "2026-09-19T18:07:20.737871+08:00",
+    "startedAt": "2026-09-19T18:07:20.765604+08:00",
+    "finishedAt": "2026-09-19T18:07:20.798978+08:00",
+    "updatedAt": "2026-09-19T18:07:20.799113+08:00"
+  },
+  "events": [
+    {
+      "id": 6,
+      "runId": "gzrun-20260919-100720-971da96c",
+      "sequence": 1,
+      "occurredAt": "2026-09-19T18:07:20.716165+08:00",
+      "eventType": "run.queued",
+      "source": "platform",
+      "channel": null,
+      "summary": "委托已进入执行队列",
+      "payload": {
+        "engine": "codex",
+        "itemId": "item-059a12f4abaf4914",
+        "attempt": 1,
+        "runtime": "native",
+        "contextVersionId": "ctxv-55216d68fe244636",
+        "contextRevisionNo": 1
+      }
+    },
+    {
+      "id": 7,
+      "runId": "gzrun-20260919-100720-971da96c",
+      "sequence": 2,
+      "occurredAt": "2026-09-19T18:07:20.737871+08:00",
+      "eventType": "run.claimed",
+      "source": "worker",
+      "channel": null,
+      "summary": "执行机已取得租约",
+      "payload": {
+        "machineId": "node-p-9db3cc91db14",
+        "leaseSeconds": 30
+      }
+    },
+    {
+      "id": 8,
+      "runId": "gzrun-20260919-100720-971da96c",
+      "sequence": 3,
+      "occurredAt": "2026-09-19T18:07:20.770582+08:00",
+      "eventType": "run.running",
+      "source": "worker",
+      "channel": null,
+      "summary": "执行器已启动",
+      "payload": {
+        "exitCode": null,
+        "machineId": "node-p-9db3cc91db14",
+        "reportedOutcome": "running",
+        "effectiveOutcome": "running"
+      }
+    },
+    {
+      "id": 9,
+      "runId": "gzrun-20260919-100720-971da96c",
+      "sequence": 4,
+      "occurredAt": "2026-09-19T18:07:20.785326+08:00",
+      "eventType": "pdf.extracted",
+      "source": "deterministic-review",
+      "channel": "stdout",
+      "summary": "PDF 公式␀提取完成",
+      "payload": {
+        "depth": {
+          "values": [
+            "x␀y",
+            "\\u0000",
+            "␀"
+          ],
+          "collision": {
+            "entries": [
+              [
+                "a␀b",
+                1
+              ],
+              [
+                "a␀b",
+                2
+              ]
+            ]
+          }
+        },
+        "literal": "\\0",
+        "_lifeweaveTextStorage": {
+          "note": "PostgreSQL 不支持 NUL；可读正文以 ␀ 显示，原始 JSON 无损保存在 originalJsonBase64。",
+          "format": "original-json-base64-v1",
+          "originalJsonBase64": "eyJldmVudF90eXBlIjoicGRmLmV4dHJhY3RlZCIsInNvdXJjZSI6ImRldGVybWluaXN0aWMtcmV2aWV3IiwiY2hhbm5lbCI6InN0ZG91dCIsInN1bW1hcnkiOiJQREYgXHU1MTZjXHU1ZjBmXHUwMDAwXHU2M2QwXHU1M2Q2XHU1YjhjXHU2MjEwIiwicGF5bG9hZCI6eyJkZXB0aCI6eyJ2YWx1ZXMiOlsieFx1MDAwMHkiLCJcXHUwMDAwIiwiXHUyNDAwIl0sImNvbGxpc2lvbiI6eyJhXHUwMDAwYiI6MSwiYVx1MjQwMGIiOjJ9fSwibGl0ZXJhbCI6IlxcMCJ9fQ=="
+        }
+      }
+    },
+    {
+      "id": 10,
+      "runId": "gzrun-20260919-100720-971da96c",
+      "sequence": 5,
+      "occurredAt": "2026-09-19T18:07:20.804852+08:00",
+      "eventType": "run.succeeded",
+      "source": "worker",
+      "channel": null,
+      "summary": "技术执行已结束，结果等待人工判断",
+      "payload": {
+        "exitCode": 0,
+        "machineId": "node-p-9db3cc91db14",
+        "reportedOutcome": "succeeded",
+        "effectiveOutcome": "succeeded"
+      }
+    }
+  ],
+  "output": {
+    "id": "gzrun-20260919-100720-971da96c",
+    "kind": "run",
+    "title": "独立 PDF 交付复核 http",
+    "content": "# 独立 PDF 阅读夹具\n\n公式项 A␀B 保持证据。\n\n[提取来源](source.md)\n\n字面转义 `\\u0000` 保留。",
+    "version": "4fcaf2256958aad4ad97de54acad489418cb38de2d8aaf968bfd571152b8caa5",
+    "runId": "gzrun-20260919-100720-971da96c",
+    "state": "succeeded",
+    "createdAt": "2026-09-19T18:07:20.798978+08:00",
+    "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/source",
+    "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/assets",
+    "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/research-output/download",
+    "storageNote": "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。",
+    "rawDownloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-971da96c/artifacts/result"
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "run": {
+    "id": "gzrun-20260919-100720-dd929329",
+    "workspace": "personal",
+    "itemId": "item-00200bee3e78459b",
+    "attempt": 1,
+    "retryOf": null,
+    "state": "succeeded",
+    "instruction": "运行独立无模型夹具",
+    "engine": "codex",
+    "runtime": "native",
+    "machine": "node-p-2e7845492c86",
+    "requestedMachineId": "node-p-2e7845492c86",
+    "session": "fixture-gzrun-20260919-100720-dd929329",
+    "rev": 1,
+    "contextVersionId": "ctxv-3f3e04f2fdca405d",
+    "capabilityCandidateId": null,
+    "capabilities": [],
+    "image": null,
+    "directory": "/tmp/pdf-artifact-final-yszc0tr6/.runtime/executions/personal/gzrun-20260919-100720-dd929329/repo",
+    "repositoryPath": null,
+    "repositoryRevision": null,
+    "branch": null,
+    "model": null,
+    "sandbox": "read-only",
+    "exitCode": 0,
+    "error": null,
+    "failureCode": null,
+    "result": "# 普通结果\n\n中文与字面 \\u0000 不变。",
+    "resultPayload": {
+      "report": "# 普通结果\n\n中文与字面 \\u0000 不变。"
+    },
+    "artifactCandidates": [
+      {
+        "ref": "/api/lifeweave/personal/runs/gzrun-20260919-100720-dd929329/artifacts/result",
+        "kind": "executor-result",
+        "version": "sha256:cf1d0f8cc90e3646fafc5f7daa78581948caa7b56b08d2e3f525d43854e5ff33",
+        "mediaType": "text/plain"
+      }
+    ],
+    "evidenceCandidates": [
+      {
+        "kind": "technical-execution",
+        "exitCode": 0,
+        "environmentRef": "sha256:e484d47ae94a7e529b03538193983ba654e28e80c19e769da105ad96781fa34e",
+        "artifactVersion": "sha256:cf1d0f8cc90e3646fafc5f7daa78581948caa7b56b08d2e3f525d43854e5ff33",
+        "businessAccepted": false,
+        "executorCompleted": true
+      }
+    ],
+    "environmentSnapshot": {
+      "image": null,
+      "runtime": "native",
+      "executor": "codex",
+      "hostname": "yyh-rog",
+      "identity": "sha256:e484d47ae94a7e529b03538193983ba654e28e80c19e769da105ad96781fa34e",
+      "machineId": "node-p-2e7845492c86",
+      "sessionHome": "/tmp/pdf-artifact-final-yszc0tr6/.runtime/executions/personal/gzrun-20260919-100720-dd929329/home",
+      "requestedImage": null,
+      "selectedInputs": {
+        "methodId": null,
+        "knowledgeRefs": []
+      },
+      "actualDirectory": "/tmp/pdf-artifact-final-yszc0tr6/.runtime/executions/personal/gzrun-20260919-100720-dd929329/repo",
+      "executorCommand": "independent-deterministic-fixture",
+      "executorVersion": "v1",
+      "researchSupport": {
+        "personalModel": {
+          "goals": "",
+          "version": 0,
+          "updatedAt": null,
+          "preferences": ""
+        },
+        "previousOutput": null
+      },
+      "feedbackSnapshot": [],
+      "requestedRuntime": "native",
+      "repositoryRevision": null,
+      "inputRecommendations": {
+        "limits": {
+          "methodsPerRun": 1,
+          "documentsPerRun": 10
+        },
+        "methods": [],
+        "boundary": "按当前目标文本匹配初筛，允许调整；不证明方法适用或实际执行。入队时读取来源并固定实际版本。",
+        "strategy": "lexical-v1",
+        "documents": [],
+        "suggested": {
+          "methodId": null,
+          "knowledgeRefs": []
+        },
+        "unavailable": [],
+        "contextVersionId": "ctxv-3f3e04f2fdca405d"
+      },
+      "materializedCapabilities": []
+    },
+    "staleContext": false,
+    "currentRev": 1,
+    "businessAccepted": false,
+    "createdAt": "2026-09-19T18:07:20.872250+08:00",
+    "claimedAt": "2026-09-19T18:07:20.885699+08:00",
+    "startedAt": "2026-09-19T18:07:20.904445+08:00",
+    "finishedAt": "2026-09-19T18:07:20.923859+08:00",
+    "updatedAt": "2026-09-19T18:07:20.923936+08:00"
+  },
+  "events": [
+    {
+      "id": 11,
+      "runId": "gzrun-20260919-100720-dd929329",
+      "sequence": 1,
+      "occurredAt": "2026-09-19T18:07:20.872250+08:00",
+      "eventType": "run.queued",
+      "source": "platform",
+      "channel": null,
+      "summary": "委托已进入执行队列",
+      "payload": {
+        "engine": "codex",
+        "itemId": "item-00200bee3e78459b",
+        "attempt": 1,
+        "runtime": "native",
+        "contextVersionId": "ctxv-3f3e04f2fdca405d",
+        "contextRevisionNo": 1
+      }
+    },
+    {
+      "id": 12,
+      "runId": "gzrun-20260919-100720-dd929329",
+      "sequence": 2,
+      "occurredAt": "2026-09-19T18:07:20.885699+08:00",
+      "eventType": "run.claimed",
+      "source": "worker",
+      "channel": null,
+      "summary": "执行机已取得租约",
+      "payload": {
+        "machineId": "node-p-2e7845492c86",
+        "leaseSeconds": 30
+      }
+    },
+    {
+      "id": 13,
+      "runId": "gzrun-20260919-100720-dd929329",
+      "sequence": 3,
+      "occurredAt": "2026-09-19T18:07:20.908107+08:00",
+      "eventType": "run.running",
+      "source": "worker",
+      "channel": null,
+      "summary": "执行器已启动",
+      "payload": {
+        "exitCode": null,
+        "machineId": "node-p-2e7845492c86",
+        "reportedOutcome": "running",
+        "effectiveOutcome": "running"
+      }
+    },
+    {
+      "id": 14,
+      "runId": "gzrun-20260919-100720-dd929329",
+      "sequence": 4,
+      "occurredAt": "2026-09-19T18:07:20.916833+08:00",
+      "eventType": "pdf.extracted",
+      "source": "deterministic-review",
+      "channel": "stdout",
+      "summary": "无控制字符",
+      "payload": {
+        "text": "正常中文",
+        "literal": "\\u0000"
+      }
+    },
+    {
+      "id": 15,
+      "runId": "gzrun-20260919-100720-dd929329",
+      "sequence": 5,
+      "occurredAt": "2026-09-19T18:07:20.927628+08:00",
+      "eventType": "run.succeeded",
+      "source": "worker",
+      "channel": null,
+      "summary": "技术执行已结束，结果等待人工判断",
+      "payload": {
+        "exitCode": 0,
+        "machineId": "node-p-2e7845492c86",
+        "reportedOutcome": "succeeded",
+        "effectiveOutcome": "succeeded"
+      }
+    }
+  ],
+  "output": {
+    "id": "gzrun-20260919-100720-dd929329",
+    "kind": "run",
+    "title": "独立 PDF 交付复核 http-control",
+    "content": "# 普通结果\n\n中文与字面 \\u0000 不变。",
+    "version": "cf1d0f8cc90e3646fafc5f7daa78581948caa7b56b08d2e3f525d43854e5ff33",
+    "runId": "gzrun-20260919-100720-dd929329",
+    "state": "succeeded",
+    "createdAt": "2026-09-19T18:07:20.923859+08:00",
+    "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-dd929329/source",
+    "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-dd929329/assets",
+    "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-dd929329/research-output/download",
+    "storageNote": null,
+    "rawDownloadUrl": null
+  }
+}

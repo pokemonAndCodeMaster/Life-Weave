@@ -1,0 +1,37 @@
+{
+  "date": "2026-09-19",
+  "backend": {
+    "command": "LIFEWEAVE_TEST_DB=1 .venv/bin/python -m pytest",
+    "passed": 66,
+    "failed": 0,
+    "warnings": [
+      "Starlette httpx / anyio deprecation warnings"
+    ]
+  },
+  "frontend": {
+    "commands": [
+      "npm run type-check",
+      "npm test",
+      "npm run build"
+    ],
+    "passed": 29,
+    "failed": 0,
+    "typecheck": "pass",
+    "build": "pass"
+  },
+  "interpretation": "数据库/协议及组件回归，不替代真实模型或独立浏览器证据；包依赖未在字符修复中变更。",
+  "fullRegressionCandidate": "5993005f5a941935fc5e9e9a701b7e7c7cbde506",
+  "candidate": "69ba22f",
+  "focusedRegression": {
+    "command": "LIFEWEAVE_TEST_DB=1 .venv/bin/python -m pytest tests/test_live_database.py tests/test_research_outputs.py",
+    "passed": 21,
+    "failed": 0,
+    "purpose": "新增知识警告合并后复验运行、候选、接受、知识与来源消费者"
+  },
+  "imageLinkRegression": {
+    "command": "LIFEWEAVE_TEST_DB=1 .venv/bin/python -m pytest tests/test_research_outputs.py",
+    "passed": 7,
+    "failed": 0,
+    "note": "最初伪PNG期望400而实际既有asset owner为409；修正测试口径后通过。"
+  }
+}

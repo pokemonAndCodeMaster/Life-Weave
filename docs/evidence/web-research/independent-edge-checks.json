@@ -1,0 +1,28 @@
+[
+  {
+    "name": "响应丢失刷新保留原文与模式",
+    "result": "pass",
+    "detail": "turn-37caf62c0ca5ca6da90b3b17d78ab3bd"
+  },
+  {
+    "name": "未确认请求不带入团队",
+    "result": "pass",
+    "detail": "http://127.0.0.1:8013/lifeweave/team/conversation"
+  },
+  {
+    "name": "未知结果重试同一身份无重复",
+    "result": "pass",
+    "detail": {
+      "turns": 1,
+      "requestId": "4b01bb0a-baf3-4b30-9168-060136ce97f7"
+    }
+  },
+  {
+    "name": "手机首进没有水平溢出",
+    "result": "pass",
+    "detail": {
+      "width": 390,
+      "scroll": 390
+    }
+  }
+]

@@ -1,0 +1,53 @@
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+nul real HTTP worker consumed PASS
+nul worker succeeded PASS
+nul readable projection PASS
+nul original bytes/hash/headers PASS
+normal real HTTP worker consumed PASS
+normal worker succeeded PASS
+normal readable projection PASS
+normal original bytes/hash/headers PASS
+nul output browser warning PASS
+browser original NUL bytes and hash PASS
+readable download content hash PASS
+审查/字符投影.md candidate exact content plus disclosed provenance PASS
+审查/字符投影.md before accepting file unchanged PASS
+NUL candidate retains original source/image map PASS
+nul candidate NUL warning PASS
+nul formal warnings/maps match candidate PASS
+nul accepted original and hash unchanged PASS
+nul original download exact/version PASS
+nul downloaded HTML visible warnings PASS
+nul formal source and image map PASS
+Traceback (most recent call last):
+  File "/home/yyh/project/lifeweave/docs/evidence/web-research/knowledge-notice-final-probe.py", line 144, in <module>
+    data['firstDoc']=accept_and_export(nul,path,candidate,review,'nul',True)
+  File "/home/yyh/project/lifeweave/docs/evidence/web-research/knowledge-notice-final-probe.py", line 131, in accept_and_export
+    sourcepage.wait_for_url('**/source?**')
+  File "/home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/playwright/sync_api/_generated.py", line 10057, in wait_for_url
+    self._sync(
+  File "/home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+  File "/home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/playwright/_impl/_page.py", line 590, in wait_for_url
+    return await self._main_frame.wait_for_url(**locals_to_params(locals()))
+  File "/home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/playwright/_impl/_frame.py", line 289, in wait_for_url
+    async with self.expect_navigation(
+  File "/home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/playwright/_impl/_event_context_manager.py", line 33, in __aexit__
+    await self._future
+  File "/home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/playwright/_impl/_frame.py", line 265, in continuation
+    event = await waiter.result()
+playwright._impl._errors.TimeoutError: Timeout 30000ms exceeded.
+=========================== logs ===========================
+waiting for navigation to "**/source?**" until 'load'
+============================================================
+
+owned server stopped PASS
+owned database removed PASS
+owned temporary root removed PASS
+OVERALL not_proven

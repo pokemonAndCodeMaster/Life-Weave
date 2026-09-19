@@ -1,0 +1,10 @@
+{
+  "port": 8011,
+  "pid": 851221,
+  "database": "test_lifeweave_web_a13e8bebaf",
+  "stopped": true,
+  "databaseDropped": true,
+  "privateArchive": "/home/yyh/project/lifeweave/.runtime/backups/web-research-acceptance",
+  "note": "主隔离库与知识已私有归档；操作脚本和非敏感证据已归档；8011、临时库与整个验收临时目录已回收。日常8010和真实论文保留。",
+  "temporaryRootRemoved": true
+}

@@ -1,0 +1,216 @@
+{
+  "run": {
+    "id": "gzrun-20260919-101651-bce06cd6",
+    "workspace": "personal",
+    "itemId": "item-9fdb4eef54154743",
+    "attempt": 1,
+    "retryOf": null,
+    "state": "succeeded",
+    "instruction": "受控 PDF 字符提取协议结果；不调用真实模型",
+    "engine": "codex",
+    "runtime": "native",
+    "machine": "node-p-714361dbc735",
+    "requestedMachineId": "node-p-714361dbc735",
+    "session": "fixture-gzrun-20260919-101651-bce06cd6",
+    "rev": 1,
+    "contextVersionId": "ctxv-6ff27a7811ca49e6",
+    "capabilityCandidateId": null,
+    "capabilities": [],
+    "image": null,
+    "directory": "/tmp/knowledge-notice-final-image-75lgg5lv/.runtime/executions/personal/gzrun-20260919-101651-bce06cd6/repo",
+    "repositoryPath": null,
+    "repositoryRevision": null,
+    "branch": null,
+    "model": null,
+    "sandbox": "read-only",
+    "exitCode": 0,
+    "error": null,
+    "failureCode": null,
+    "result": "RAW HEADER\n# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n[普通图链接](figure.png)\n\n![图示](figure.png)\n\nRAW END",
+    "resultPayload": {
+      "report": "# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n[普通图链接](figure.png)\n\n![图示](figure.png)\n"
+    },
+    "artifactCandidates": [
+      {
+        "ref": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/artifacts/result",
+        "kind": "executor-result",
+        "version": "sha256:7ccde6ce1468c274bf48a2c08fcea95644da5a756196c7e8357b63c8b29ff192",
+        "mediaType": "text/plain"
+      }
+    ],
+    "evidenceCandidates": [
+      {
+        "kind": "technical-execution",
+        "exitCode": 0,
+        "environmentRef": "sha256:79e3f545b201259752b39893f53d6d41b2f2b8273bbbd5d557d1ebea4e1de2ac",
+        "artifactVersion": "sha256:7ccde6ce1468c274bf48a2c08fcea95644da5a756196c7e8357b63c8b29ff192",
+        "businessAccepted": false,
+        "executorCompleted": true
+      }
+    ],
+    "environmentSnapshot": {
+      "image": null,
+      "runtime": "native",
+      "executor": "codex",
+      "hostname": "yyh-rog",
+      "identity": "sha256:79e3f545b201259752b39893f53d6d41b2f2b8273bbbd5d557d1ebea4e1de2ac",
+      "machineId": "node-p-714361dbc735",
+      "sessionHome": "/tmp/knowledge-notice-final-image-75lgg5lv/.runtime/executions/personal/gzrun-20260919-101651-bce06cd6/home",
+      "requestedImage": null,
+      "selectedInputs": {
+        "methodId": null,
+        "knowledgeRefs": []
+      },
+      "actualDirectory": "/tmp/knowledge-notice-final-image-75lgg5lv/.runtime/executions/personal/gzrun-20260919-101651-bce06cd6/repo",
+      "executorCommand": "independent-fixture",
+      "executorVersion": "v1",
+      "researchSupport": {
+        "personalModel": {
+          "goals": "",
+          "version": 0,
+          "updatedAt": null,
+          "preferences": ""
+        },
+        "previousOutput": null
+      },
+      "feedbackSnapshot": [],
+      "requestedRuntime": "native",
+      "repositoryRevision": null,
+      "inputRecommendations": {
+        "limits": {
+          "methodsPerRun": 1,
+          "documentsPerRun": 10
+        },
+        "methods": [
+          {
+            "id": "method-33b5c0152803d0354a86",
+            "path": "/home/yyh/project/lifeweave/methods/paper-research/SKILL.md",
+            "score": 1,
+            "title": "paper-research",
+            "reason": "标题或正文包含：真实",
+            "version": "2f18e0c3fb6b08f4085592a92250669d675a0d33b2ff64111b450be4ab95d27e",
+            "description": "精读论文、研究方法或技术报告，解释问题、动机、推导、训练数据、实验与局限，并根据成果反馈修订完整解释。用于真实研究委托，不用于只记录想法或普通闲聊。",
+            "matchedTerms": [
+              "真实"
+            ]
+          }
+        ],
+        "boundary": "按当前目标文本匹配初筛，允许调整；不证明方法适用或实际执行。入队时读取来源并固定实际版本。",
+        "strategy": "lexical-v1",
+        "documents": [],
+        "suggested": {
+          "methodId": "method-33b5c0152803d0354a86",
+          "knowledgeRefs": []
+        },
+        "unavailable": [],
+        "contextVersionId": "ctxv-6ff27a7811ca49e6"
+      },
+      "materializedCapabilities": []
+    },
+    "staleContext": false,
+    "currentRev": 1,
+    "businessAccepted": false,
+    "createdAt": "2026-09-19T18:16:51.075567+08:00",
+    "claimedAt": "2026-09-19T18:16:51.098159+08:00",
+    "startedAt": "2026-09-19T18:16:51.131254+08:00",
+    "finishedAt": "2026-09-19T18:16:51.164632+08:00",
+    "updatedAt": "2026-09-19T18:16:51.164774+08:00"
+  },
+  "output": {
+    "id": "gzrun-20260919-101651-bce06cd6",
+    "kind": "run",
+    "title": "知识提示独立复核 normal",
+    "content": "# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n[普通图链接](figure.png)\n\n![图示](figure.png)\n",
+    "version": "890a1a6ad09feb88a1dd5e37ef8e823921aafa7755ff3ef66485aedd11ee51d9",
+    "runId": "gzrun-20260919-101651-bce06cd6",
+    "state": "succeeded",
+    "createdAt": "2026-09-19T18:16:51.164632+08:00",
+    "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/source",
+    "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/assets",
+    "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-101651-bce06cd6/research-output/download",
+    "storageNote": null,
+    "rawDownloadUrl": null
+  },
+  "events": {
+    "items": [
+      {
+        "id": 6,
+        "runId": "gzrun-20260919-101651-bce06cd6",
+        "sequence": 1,
+        "occurredAt": "2026-09-19T18:16:51.075567+08:00",
+        "eventType": "run.queued",
+        "source": "platform",
+        "channel": null,
+        "summary": "委托已进入执行队列",
+        "payload": {
+          "engine": "codex",
+          "itemId": "item-9fdb4eef54154743",
+          "attempt": 1,
+          "runtime": "native",
+          "contextVersionId": "ctxv-6ff27a7811ca49e6",
+          "contextRevisionNo": 1
+        }
+      },
+      {
+        "id": 7,
+        "runId": "gzrun-20260919-101651-bce06cd6",
+        "sequence": 2,
+        "occurredAt": "2026-09-19T18:16:51.098159+08:00",
+        "eventType": "run.claimed",
+        "source": "worker",
+        "channel": null,
+        "summary": "执行机已取得租约",
+        "payload": {
+          "machineId": "node-p-714361dbc735",
+          "leaseSeconds": 30
+        }
+      },
+      {
+        "id": 8,
+        "runId": "gzrun-20260919-101651-bce06cd6",
+        "sequence": 3,
+        "occurredAt": "2026-09-19T18:16:51.137552+08:00",
+        "eventType": "run.running",
+        "source": "worker",
+        "channel": null,
+        "summary": "执行器已启动",
+        "payload": {
+          "exitCode": null,
+          "machineId": "node-p-714361dbc735",
+          "reportedOutcome": "running",
+          "effectiveOutcome": "running"
+        }
+      },
+      {
+        "id": 9,
+        "runId": "gzrun-20260919-101651-bce06cd6",
+        "sequence": 4,
+        "occurredAt": "2026-09-19T18:16:51.152175+08:00",
+        "eventType": "pdf.extracted",
+        "source": "worker",
+        "channel": null,
+        "summary": "正常提取",
+        "payload": {
+          "text": "# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n[普通图链接](figure.png)\n\n![图示](figure.png)\n"
+        }
+      },
+      {
+        "id": 10,
+        "runId": "gzrun-20260919-101651-bce06cd6",
+        "sequence": 5,
+        "occurredAt": "2026-09-19T18:16:51.172320+08:00",
+        "eventType": "run.succeeded",
+        "source": "worker",
+        "channel": null,
+        "summary": "技术执行已结束，结果等待人工判断",
+        "payload": {
+          "exitCode": 0,
+          "machineId": "node-p-714361dbc735",
+          "reportedOutcome": "succeeded",
+          "effectiveOutcome": "succeeded"
+        }
+      }
+    ],
+    "nextSequence": 5
+  }
+}

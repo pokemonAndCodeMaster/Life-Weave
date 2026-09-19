@@ -1,0 +1,27 @@
+{
+  "kind": "controlled-fixture-not-real-AI",
+  "image": {
+    "src": "http://127.0.0.1:5193/api/lifeweave/personal/runs/gzrun-20260919-091538-6071c520/assets?path=figure.png",
+    "complete": true,
+    "width": 320,
+    "height": 120
+  },
+  "formulaCount": 3,
+  "externalImageRequests": [],
+  "browserErrors": [],
+  "expectedMissingImageStatus": 404,
+  "proxy": "Vite frontend API requests forwarded to isolated backend preserving original Host",
+  "feedback": {
+    "runId": "gzrun-20260919-091538-6071c520",
+    "anchor": "gzrun-20260919-091538-6071c520:66ca7b8330d0:样本稀缺时需要说明分布差异。行内公式 $E_i=mc_j^2$。",
+    "body": "引用成果：\n> 样本稀缺时需要说明分布差异。行内公式 $E_i=mc_j^2$。\n\n请补充训练数据的取样边界。"
+  },
+  "knowledge": {
+    "path": "研究/浏览器夹具.md",
+    "version": "368e1baa806a9dc714d6fa8d1f12153440da44adefe00cd05beb3cda56dc1fb7",
+    "content": "# 可复用研究笔记\n\n样本稀缺时需要保留训练分布依据。\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-091538-6071c520/research-output/download) · 事项 `item-2c1717ed790448de` · 运行 `gzrun-20260919-091538-6071c520` · 版本 `66ca7b8330d08f88a60131aa2d6a8b63a86746310bdeaf5e236901f85f99b6c7`\n"
+  },
+  "api": "http://127.0.0.1:8012",
+  "ui": "http://127.0.0.1:5193/w3-verification.html",
+  "database": "disposable, removed after verification"
+}

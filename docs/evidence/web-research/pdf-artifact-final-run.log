@@ -1,0 +1,56 @@
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+service full worker consumed PASS
+service succeeded PASS
+service input provenance PASS
+service lossless event PASS
+service collision and literals PASS
+service lossless final JSON PASS
+service readable projection PASS
+service raw bytes and headers PASS
+service readable bytes and version PASS
+http full worker consumed PASS
+http succeeded PASS
+http input provenance PASS
+http lossless event PASS
+http collision and literals PASS
+http lossless final JSON PASS
+http readable projection PASS
+http raw bytes and headers PASS
+http readable bytes and version PASS
+http-control full worker consumed PASS
+http-control succeeded PASS
+http-control input provenance PASS
+http-control no unrelated note PASS
+http-control raw bytes and headers PASS
+http-control readable bytes and version PASS
+invalid lease events PASS
+invalid lease report PASS
+old metadata cannot restore unrelated result PASS
+forged input provenance protected PASS
+cross workspace /runs/gzrun-20260919-100720-208c1109 PASS
+cross workspace /runs/gzrun-20260919-100720-208c1109/artifacts/result PASS
+cross workspace /items/item-84c7e4c008824124/research-output PASS
+cross workspace worker token PASS
+invalid lease did not append event PASS
+browser output NUL note PASS
+browser raw download exact PASS
+browser readable download exact PASS
+candidate NUL warning API FAIL
+candidate NUL warning browser FAIL
+candidate source mapping and version PASS
+accepted NUL warning API FAIL
+accepted NUL warning browser FAIL
+accepted original file and version PASS
+accepted research mapping unchanged PASS
+accepted browser source href PASS
+accepted source resolves exact fixture PASS
+accepted download version PASS
+browser no uncaught errors PASS
+database removed PASS
+OVERALL fail

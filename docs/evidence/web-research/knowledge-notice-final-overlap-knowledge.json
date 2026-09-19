@@ -1,0 +1,51 @@
+{
+  "candidate": {
+    "id": "revision-ca481b06d02f42ed",
+    "workspace": "personal",
+    "source_id": "local",
+    "path": "审查/字符投影.md",
+    "base_version": "64de78171e5385777791fd672435fe97403c77e481adb3e3bd7dc2232d3c49dc",
+    "before_content": "# PDF提取样本\n\n公式 A␀B。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download) · 事项 `item-67e225a2f9004909` · 运行 `gzrun-20260919-101350-c168e351` · 版本 `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc`\n",
+    "content": "# PDF提取样本\n\n公式 A␀B。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download) · 事项 `item-67e225a2f9004909` · 运行 `gzrun-20260919-101350-c168e351` · 版本 `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc`\n\n\n# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/research-output/download) · 事项 `item-938d60d6aac246e5` · 运行 `gzrun-20260919-101350-2ec12ac5` · 版本 `f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c`\n",
+    "reason": "从研究成果提炼可复用知识",
+    "status": "draft",
+    "created_at": "2026-09-19T18:13:56.047689+08:00",
+    "accepted_at": null,
+    "item_id": "item-938d60d6aac246e5",
+    "run_id": "gzrun-20260919-101350-2ec12ac5",
+    "run_version": "f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c",
+    "references": {
+      "links": {},
+      "images": {},
+      "warnings": [
+        "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。",
+        "多个来源使用相同相对引用 source.md，请从各自来源成果打开；未自动选择其中一次运行。",
+        "多个来源使用相同相对引用 figure.png，请从各自来源成果打开；未自动选择其中一次运行。"
+      ]
+    },
+    "diff": "--- 当前正文\n+++ 建议正文\n@@ -9,3 +9,16 @@\n \n ---\n 来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download) · 事项 `item-67e225a2f9004909` · 运行 `gzrun-20260919-101350-c168e351` · 版本 `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc`\n+\n+\n+# 普通知识样本\n+\n+正常字符、字面 `\\u0000` 和 ␀。\n+\n+[来源文本](source.md)\n+\n+![图示](figure.png)\n+\n+\n+---\n+来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/research-output/download) · 事项 `item-938d60d6aac246e5` · 运行 `gzrun-20260919-101350-2ec12ac5` · 版本 `f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c`\n",
+    "itemId": "item-938d60d6aac246e5",
+    "runId": "gzrun-20260919-101350-2ec12ac5",
+    "runVersion": "f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c",
+    "sourceUrl": "/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/research-output/download"
+  },
+  "document": {
+    "path": "审查/字符投影.md",
+    "sourceId": "local",
+    "sourceTitle": "工作台知识",
+    "writable": true,
+    "content": "# PDF提取样本\n\n公式 A␀B。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-c168e351/research-output/download) · 事项 `item-67e225a2f9004909` · 运行 `gzrun-20260919-101350-c168e351` · 版本 `6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc`\n\n\n# 普通知识样本\n\n正常字符、字面 `\\u0000` 和 ␀。\n\n[来源文本](source.md)\n\n![图示](figure.png)\n\n\n---\n来源：[研究成果](/api/lifeweave/personal/runs/gzrun-20260919-101350-2ec12ac5/research-output/download) · 事项 `item-938d60d6aac246e5` · 运行 `gzrun-20260919-101350-2ec12ac5` · 版本 `f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c`\n",
+    "version": "d619ba3edddfb2d1dfa18863954b7fab26dba2e2e10933ea2a3feff829f97a30",
+    "title": "PDF提取样本",
+    "references": {
+      "links": {},
+      "images": {},
+      "warnings": [
+        "原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。",
+        "多个来源使用相同相对引用 source.md，请从各自来源成果打开；未自动选择其中一次运行。",
+        "多个来源使用相同相对引用 figure.png，请从各自来源成果打开；未自动选择其中一次运行。"
+      ]
+    }
+  },
+  "formalBrowserText": "工作台知识 · 工作台管理\n下载原文\n下载阅读版\n提出修订\n\n原始执行文本含不可显示的 NUL 字符，阅读正文用 ␀ 标出；正文下载与当前阅读版本一致，原始执行文本另行保留，不要把 ␀ 当作论文公式。\n\n多个来源使用相同相对引用 source.md，请从各自来源成果打开；未自动选择其中一次运行。\n\n多个来源使用相同相对引用 figure.png，请从各自来源成果打开；未自动选择其中一次运行。\n\nPDF提取样本\n\n公式 A␀B。\n\n来源文本\n\n图示（未加载外部或不可用图片）\n\n来源：研究成果 · 事项 item-67e225a2f9004909 · 运行 gzrun-20260919-101350-c168e351 · 版本 6184adc790a17d9628f05087d807e2818b501e4ab01afa06e6ac41f91c8547bc\n\n普通知识样本\n\n正常字符、字面 \\u0000 和 ␀。\n\n来源文本\n\n图示（未加载外部或不可用图片）\n\n来源：研究成果 · 事项 item-938d60d6aac246e5 · 运行 gzrun-20260919-101350-2ec12ac5 · 版本 f3f69a294596a60ee76a0e4ed5990a02648e3aa4beb3b368facc36c04ef9b81c\n\n审查/字符投影.md · 版本 d619ba3edddf"
+}

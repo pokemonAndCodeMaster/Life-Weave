@@ -1,0 +1,117 @@
+{
+  "run": {
+    "id": "gzrun-20260919-100720-208c1109",
+    "workspace": "personal",
+    "itemId": "item-84c7e4c008824124",
+    "attempt": 1,
+    "retryOf": null,
+    "state": "succeeded",
+    "instruction": "隔离边界",
+    "engine": "codex",
+    "runtime": "native",
+    "machine": "node-p-a3df312aec81",
+    "requestedMachineId": "node-p-a3df312aec81",
+    "session": null,
+    "rev": 1,
+    "contextVersionId": "ctxv-4d34f833ea88484e",
+    "capabilityCandidateId": null,
+    "capabilities": [],
+    "image": null,
+    "directory": "/tmp/pdf-artifact-final-yszc0tr6/.runtime/runs/personal/gzrun-20260919-100720-208c1109/repo",
+    "repositoryPath": null,
+    "repositoryRevision": null,
+    "branch": null,
+    "model": null,
+    "sandbox": "read-only",
+    "exitCode": 0,
+    "error": null,
+    "failureCode": null,
+    "result": "# clean later result\n\nDifferent actual final result.",
+    "resultPayload": {
+      "report": "# clean later result\n\nDifferent actual final result."
+    },
+    "artifactCandidates": [
+      {
+        "kind": "executor-result",
+        "version": "sha256:beb404119e3f95084ca11228924c1c7129b6d9ac385c5b97ffb98d3b673d4a0e"
+      }
+    ],
+    "evidenceCandidates": [],
+    "environmentSnapshot": {
+      "oldField": "older␀metadata",
+      "requestedImage": null,
+      "selectedInputs": {
+        "methodId": null,
+        "knowledgeRefs": []
+      },
+      "researchSupport": {
+        "personalModel": {
+          "goals": "",
+          "version": 0,
+          "updatedAt": null,
+          "preferences": ""
+        },
+        "previousOutput": null
+      },
+      "feedbackSnapshot": [],
+      "requestedRuntime": "native",
+      "inputRecommendations": {
+        "limits": {
+          "methodsPerRun": 1,
+          "documentsPerRun": 10
+        },
+        "methods": [
+          {
+            "id": "method-33b5c0152803d0354a86",
+            "path": "/home/yyh/project/lifeweave/methods/paper-research/SKILL.md",
+            "score": 1,
+            "title": "paper-research",
+            "reason": "标题或正文包含：数据",
+            "version": "2f18e0c3fb6b08f4085592a92250669d675a0d33b2ff64111b450be4ab95d27e",
+            "description": "精读论文、研究方法或技术报告，解释问题、动机、推导、训练数据、实验与局限，并根据成果反馈修订完整解释。用于真实研究委托，不用于只记录想法或普通闲聊。",
+            "matchedTerms": [
+              "数据"
+            ]
+          }
+        ],
+        "boundary": "按当前目标文本匹配初筛，允许调整；不证明方法适用或实际执行。入队时读取来源并固定实际版本。",
+        "strategy": "lexical-v1",
+        "documents": [],
+        "suggested": {
+          "methodId": "method-33b5c0152803d0354a86",
+          "knowledgeRefs": []
+        },
+        "unavailable": [],
+        "contextVersionId": "ctxv-4d34f833ea88484e"
+      },
+      "_lifeweaveTextStorage": {
+        "note": "PostgreSQL 不支持 NUL；可读正文以 ␀ 显示，原始 JSON 无损保存在 originalJsonBase64。",
+        "format": "original-json-base64-v1",
+        "originalJsonBase64": "eyJsZWFzZV9pZCI6InJ4dVhKaWxGaXhFbDh3aVl0TDJJT251SnpTN3ZZa1I5Iiwib3V0Y29tZSI6InJ1bm5pbmciLCJzZXNzaW9uX2lkIjpudWxsLCJleGl0X2NvZGUiOm51bGwsInJlc3VsdCI6bnVsbCwicmVzdWx0X3BheWxvYWQiOm51bGwsImFydGlmYWN0cyI6W10sImV2aWRlbmNlIjpbXSwiZW52aXJvbm1lbnQiOnsib2xkRmllbGQiOiJvbGRlclx1MDAwMG1ldGFkYXRhIiwic2VsZWN0ZWRJbnB1dHMiOnsiZm9yZ2VkIjp0cnVlfSwicmVzZWFyY2hTdXBwb3J0Ijp7ImZvcmdlZCI6dHJ1ZX19LCJmYWlsdXJlX2NvZGUiOm51bGwsImVycm9yIjpudWxsfQ=="
+      }
+    },
+    "staleContext": false,
+    "currentRev": 1,
+    "businessAccepted": false,
+    "createdAt": "2026-09-19T18:07:20.983228+08:00",
+    "claimedAt": "2026-09-19T18:07:20.997458+08:00",
+    "startedAt": "2026-09-19T18:07:21.013277+08:00",
+    "finishedAt": "2026-09-19T18:07:21.025303+08:00",
+    "updatedAt": "2026-09-19T18:07:21.025363+08:00"
+  },
+  "output": {
+    "id": "gzrun-20260919-100720-208c1109",
+    "kind": "run",
+    "title": "边界及旧存储元数据",
+    "content": "# clean later result\n\nDifferent actual final result.",
+    "version": "beb404119e3f95084ca11228924c1c7129b6d9ac385c5b97ffb98d3b673d4a0e",
+    "runId": "gzrun-20260919-100720-208c1109",
+    "state": "succeeded",
+    "createdAt": "2026-09-19T18:07:21.025303+08:00",
+    "sourceBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-208c1109/source",
+    "assetBase": "/api/lifeweave/personal/runs/gzrun-20260919-100720-208c1109/assets",
+    "downloadUrl": "/api/lifeweave/personal/runs/gzrun-20260919-100720-208c1109/research-output/download",
+    "storageNote": null,
+    "rawDownloadUrl": null
+  }
+}

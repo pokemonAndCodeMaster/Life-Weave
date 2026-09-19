@@ -1,0 +1,77 @@
+[
+  {
+    "name": "事项候选预览保留图片与源文本",
+    "result": "pass",
+    "detail": {
+      "href": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/source?path=research%2Fsource.md",
+      "image": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/assets?path=research%2Ffigure%201.png"
+    }
+  },
+  {
+    "name": "代码块原链接未被当引用改写",
+    "result": "pass",
+    "detail": "[example](relative.md)\n"
+  },
+  {
+    "name": "已接受知识保留图片来源上下文",
+    "result": "pass",
+    "detail": {
+      "links": {
+        "research/source.md": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/source?path=research%2Fsource.md",
+        ".runtime/research/readable.json": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/source?path=.runtime%2Fresearch%2Freadable.json"
+      },
+      "images": {
+        "research/figure%201.png": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/assets?path=research%2Ffigure%201.png"
+      },
+      "warnings": []
+    }
+  },
+  {
+    "name": "知识页source link指回固定run",
+    "result": "pass",
+    "detail": {
+      "status": 200,
+      "href": "/api/lifeweave/personal/runs/gzrun-20260919-093555-c217b5d0/source?path=research%2Fsource.md"
+    }
+  },
+  {
+    "name": "普通相对知识链接仍由知识目录解析",
+    "result": "pass",
+    "detail": "http://127.0.0.1:8013/lifeweave/personal/knowledge?path=%E7%94%9F%E6%B4%BB/%E5%8F%A6%E4%B8%80%E7%AF%87.md&source=local"
+  },
+  {
+    "name": "下载原文不改写",
+    "result": "pass",
+    "detail": {
+      "version": "228ca61b03650b3132c9f2df9d251a4dc4eb4ba847c6fc56dc1b836240f912b5"
+    }
+  },
+  {
+    "name": "HTML阅读版携带固定来源和普通链接",
+    "result": "pass",
+    "detail": {
+      "bytes": 1805
+    }
+  },
+  {
+    "name": "修复前已接受知识原文版本不变且来源可读",
+    "result": "pass",
+    "detail": {
+      "version": "5de064f9225d0e4fba0aace4fcf5e113188f326444637e66edc7c9f471533615",
+      "href": "/api/lifeweave/personal/runs/gzrun-20260919-091738-82581407/source?path=.runtime%2Fresearch%2Fgzrun-20260919-091738-82581407%2Fsources.md",
+      "status": 200
+    }
+  },
+  {
+    "name": "另一运行材料消费者携带固定引用映射",
+    "result": "pass",
+    "detail": {
+      "runId": "gzrun-20260919-093921-0d179a35"
+    }
+  },
+  {
+    "name": "浏览器无脚本错误",
+    "result": "pass",
+    "detail": []
+  }
+]
