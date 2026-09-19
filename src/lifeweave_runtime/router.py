@@ -135,6 +135,16 @@ def run_source(workspace: Workspace, run_id: str, path: str, request: Request, s
             not allowed_parts(relative.parts) or not target.is_relative_to(root) or
             not allowed_parts(target.relative_to(root).parts)):
         raise HTTPException(400, '只提供本次独立工作目录中的普通源文件')
+    # Markdown can cite an image as a normal link, not just an embedded image.
+    # Reuse the asset owner for its byte/type/size checks in every reader.
+    if target.suffix.lower() in {'.png', '.jpg', '.jpeg', '.gif', '.webp'}:
+        try:
+            data, mime = request.app.state.research_outputs.asset(workspace, run_id, path)
+        except Exception as exc:
+            raise _http_error(exc) from exc
+        return Response(data, media_type=mime, headers={
+            'X-Content-Type-Options': 'nosniff', 'Cache-Control': 'private, no-cache',
+        })
     if target.suffix.lower() not in {'.md','.txt','.py','.ts','.js','.vue','.css','.html','.json','.yaml','.yml','.toml','.sql','.sh'}:
         raise HTTPException(400, '此类型不支持在浏览器阅读')
     if run.get('state') not in {'succeeded','failed','cancelled','paused'} or not target.is_file():

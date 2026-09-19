@@ -87,8 +87,9 @@ def test_candidates_are_atomic_retryable_reviewed_and_reusable(output_client):
     assert recorded[0]['anchor']=='训练数据:paragraph-1' and recorded[0]['runId']==run['id']
 
 
-def test_assets_check_scope_paths_bytes_and_missing_files(output_client,tmp_path):
+def test_assets_check_scope_paths_bytes_and_missing_files(output_client,tmp_path,monkeypatch):
     c=output_client
+    monkeypatch.setattr(c.app.state, 'root', c.app.state.research_outputs.root)
     item=post(c,'/items',{'itemType':'research','title':'图片边界'})['id'];run=completed_run(c,item)
     folder=c.app.state.research_outputs.root/'.runtime/executions/personal'/run['id']/'repo'
     folder.mkdir(parents=True)
@@ -102,6 +103,16 @@ def test_assets_check_scope_paths_bytes_and_missing_files(output_client,tmp_path
     for path in ('../outside.png','/etc/passwd','fake.png','escape.png','.git/config'):
         assert c.get(url,params={'path':path}).status_code==409
     assert c.get(url.replace('/personal/','/team/'),params={'path':'figure.png'}).status_code==404
+    # A normal Markdown link to the same figure goes through /source, including
+    # after knowledge acceptance and HTML export. Reuse asset safety checks.
+    source_url=url.removesuffix('/assets')+'/source'
+    linked=c.get(source_url,params={'path':'figure.png'})
+    assert linked.status_code==200 and linked.content==PNG
+    assert linked.headers['content-type']=='image/png' and linked.headers['x-content-type-options']=='nosniff'
+    assert c.get(source_url,params={'path':'missing.png'}).status_code==404
+    for path in ('../outside.png','/etc/passwd','fake.png','escape.png','.git/config'):
+        assert c.get(source_url,params={'path':path}).status_code==400
+    assert c.get(source_url.replace('/personal/','/team/'),params={'path':'figure.png'}).status_code==404
     # A replaced run folder cannot redirect this API to another run's images.
     foreign=folder.parent.parent/'another-run'/'artifacts';foreign.mkdir(parents=True)
     (foreign/'figure.png').write_bytes(PNG)
