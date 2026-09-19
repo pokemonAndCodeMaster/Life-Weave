@@ -122,3 +122,18 @@ def test_source_link_and_review_rollback_share_one_transaction(output_client,mon
         c.app.state.research_outputs.propose_from_run('personal',item,run['id'],'rollback.md','草稿','new','验证','failed-request')
     assert library.db.fetch_one('SELECT count(*) AS n FROM workbench.document_revision')['n']==before
     assert library.db.fetch_one('SELECT count(*) AS n FROM workbench.research_knowledge_candidate WHERE item_id=%s',(item,))['n']==0
+
+
+def test_generated_research_sources_remain_readable_without_opening_private_paths(output_client,tmp_path,monkeypatch):
+    c=output_client
+    monkeypatch.setattr(c.app.state,'root',tmp_path)
+    item=post(c,'/items',{'itemType':'research','title':'来源链接'})['id'];run=completed_run(c,item)
+    root=tmp_path/'.runtime/executions/personal'/run['id']/'repo'
+    research=root/'.runtime/research';research.mkdir(parents=True)
+    (research/'sources.md').write_text('# 已读取来源')
+    (root/'.env').write_text('PRIVATE=not-public')
+    (research/'escape.md').symlink_to(root/'.env')
+    url=f'/api/lifeweave/personal/runs/{run["id"]}/source'
+    assert c.get(url,params={'path':'.runtime/research/sources.md'}).text=='# 已读取来源'
+    for path in ('.env','.runtime/../.env','.runtime/research/../../.env','.runtime/research/.private.md','.runtime/research/escape.md'):
+        assert c.get(url,params={'path':path}).status_code==400
