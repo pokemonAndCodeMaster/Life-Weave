@@ -111,7 +111,7 @@ def test_assets_check_scope_paths_bytes_and_missing_files(output_client,tmp_path
     assert linked.headers['content-type']=='image/png' and linked.headers['x-content-type-options']=='nosniff'
     assert c.get(source_url,params={'path':'missing.png'}).status_code==404
     for path in ('../outside.png','/etc/passwd','fake.png','escape.png','.git/config'):
-        assert c.get(source_url,params={'path':path}).status_code==400
+        assert c.get(source_url,params={'path':path}).status_code==(409 if path=='fake.png' else 400)
     assert c.get(source_url.replace('/personal/','/team/'),params={'path':'figure.png'}).status_code==404
     # A replaced run folder cannot redirect this API to another run's images.
     foreign=folder.parent.parent/'another-run'/'artifacts';foreign.mkdir(parents=True)
