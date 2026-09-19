@@ -22,6 +22,7 @@ from .models import (
     Workspace,
 )
 from .service import LifeWeaveRuntimeService
+from .storage_text import result_text_storage
 
 
 router = APIRouter(prefix="/api/lifeweave/{workspace}", tags=["lifeweave-runtime"])
@@ -109,7 +110,7 @@ def run_result_artifact(workspace: Workspace, run_id: str, service: Service) -> 
     if version:
         headers["ETag"] = f'"{version}"'
     return Response(
-        content=str(run["result"]),
+        content=str(result_text_storage(run)[0]),
         media_type="text/plain; charset=utf-8",
         headers=headers,
     )

@@ -72,6 +72,7 @@ async function sendFeedback(){await action(async(current)=>{
   <div class="lw-between"><h2>当前成果</h2><select v-if="outputs.versions.length" v-model="selectedId" aria-label="成果版本"><option value="">当前成果</option><option v-for="out in outputs.versions" :key="out.id" :value="out.id">{{ out.kind==='manual'?'人工成果':out.state==='succeeded'?'完成的运行':'未完成的运行' }} · {{ new Date(out.createdAt).toLocaleString() }}</option></select></div>
   <p v-if="error" role="alert" class="lw-notice warning">{{ error }}</p><p v-if="message" role="status" class="lw-notice">{{ message }}</p>
   <template v-if="selected">
+   <p v-if="selected.storageNote" class="lw-notice warning">{{ selected.storageNote }} <a v-if="selected.rawDownloadUrl" :href="selected.rawDownloadUrl" download="原始执行文本.txt">下载原始执行文本</a></p>
    <div class="lw-between"><span class="lw-small lw-muted">{{ selected.kind==='manual'?'人工提交':'运行成果' }} · 版本 {{ selected.version.slice(0,12) }}<template v-if="selected.state!=='succeeded'&&selected.kind==='run'"> · {{ selected.state }}，保留的部分结果</template></span><button class="lw-btn sm" @click="downloadText(selected!.content,'研究成果.md','text/markdown;charset=utf-8')">下载正文</button></div>
    <article @mouseup="capture" @keyup="capture"><MarkdownBody :content="selected.content" :source-base="selected.sourceBase??undefined" :asset-base="selected.assetBase??undefined"/></article>
    <div class="lw-stack research-feedback"><p class="lw-small lw-muted">选中正文中的一段文字，留下定位反馈或引用到讨论。</p><blockquote v-if="quote">{{ quote }}</blockquote>

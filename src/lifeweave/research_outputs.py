@@ -10,6 +10,7 @@ from pydantic import Field
 
 from src.lifeweave.models import WireModel, WorkspaceKey
 from src.lifeweave_knowledge.library import fingerprint
+from src.lifeweave_runtime.storage_text import result_text_storage
 from .research_references import references, merge_references
 
 
@@ -45,11 +46,14 @@ class ResearchOutputs:
                 if not content.strip():
                     continue
                 base = f'/api/lifeweave/{workspace}/runs/{quote(run["id"], safe="")}'
+                storage_note = result_text_storage(run)[1]
                 versions.append({'id':run['id'], 'kind':'run', 'title':item['title'],
                     'content':content, 'version':fingerprint(content), 'runId':run['id'],
                     'state':run['state'], 'createdAt':run.get('finished_at') or run['created_at'],
                     'sourceBase':base+'/source', 'assetBase':base+'/assets',
-                    'downloadUrl':base+'/research-output/download'})
+                    'downloadUrl':base+'/research-output/download',
+                    'storageNote':storage_note,
+                    'rawDownloadUrl':base+'/artifacts/result' if storage_note and run.get('result') is not None else None})
             offset += len(runs)
             if offset >= total:
                 break
@@ -101,7 +105,11 @@ class ResearchOutputs:
             run=self.runtime.get_run_snapshot(workspace,row['run_id'])
             original=self._content(run)
             if fingerprint(original)==row['run_version']:
-                groups.append(references(original,workspace,row['run_id']))
+                mapping=references(original,workspace,row['run_id'])
+                storage_note=result_text_storage(run)[1]
+                if storage_note:
+                    mapping['warnings'].append(storage_note)
+                groups.append(mapping)
         return merge_references(groups)
 
     def candidates(self, workspace, item_id):

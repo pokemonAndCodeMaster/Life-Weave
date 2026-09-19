@@ -324,6 +324,7 @@ def test_worker_http_reports_keep_input_provenance_and_retry_uses_current_feedba
 def test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable(dedicated_client, transport):
     import asyncio
     import base64
+    import hashlib
     import json
     from src.lifeweave_runtime.worker import ServiceWorkerClient
 
@@ -371,6 +372,8 @@ def test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable(dedi
               'result': '# 论文\n\n公式 ADEn\0已提取',
               'result_payload': {'report': '# 论文\n\n公式 ADEn\0已提取'},
               'environment': {'reader': 'PDF\0reader', 'selectedInputs': {'forged': True}}}
+    version = 'sha256:'+hashlib.sha256(report['result'].encode()).hexdigest()
+    report['artifacts'] = [{'kind': 'executor-result', 'version': version}]
     send('report', report)
     saved = client.get(base+'/runs/'+run['id']).json()
     assert saved['state'] == 'succeeded' and '␀' in saved['result']
@@ -381,3 +384,10 @@ def test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable(dedi
     assert recovered['result_payload'] == report['result_payload']
     output = client.get(base+'/items/'+item['id']+'/research-output').json()['current']
     assert output['content'] == '# 论文\n\n公式 ADEn␀已提取'
+    assert 'NUL' in output['storageNote'] and output['rawDownloadUrl'].endswith('/artifacts/result')
+    artifact = client.get(output['rawDownloadUrl'])
+    assert artifact.content == report['result'].encode()
+    assert artifact.headers['X-Artifact-Version'] == 'sha256:'+hashlib.sha256(artifact.content).hexdigest()
+    readable = client.get(output['downloadUrl'])
+    assert readable.text == output['content']
+    assert readable.headers['ETag'] == '"'+hashlib.sha256(readable.content).hexdigest()+'"'
