@@ -18,7 +18,7 @@
 | 当前说明 | [LifeWeave · 经纬：名称与适配](#doc-03) | `docs/naming.md` | `99c6b7caa819790699b1debf2ce9ccdad0d797728941f96a380a4571d8b4612d` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-04) | `docs/product.md` | `de862a0ac18104f29ac81dd36155041b1350caabd907157d9af4e6cb0a2ed2b9` |
 | 当前说明 | [架构与关键实现](#doc-05) | `docs/architecture.md` | `f3172cbb5dc7e70386d000526ec9bc3d65627df7f8a92e16328388fed1b4e0d6` |
-| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `b20146c458c17b6fa72d73f879b8cff197204caeee893aaba0ed396c386e40ab` |
+| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `3502e2977b8e67e9b573860831c298e7b51978f24fa95c28df8714a2e8be263a` |
 | 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `b1bc2a6d508529bc8bb2ae9f4f0da329b9c3e2660b535b861ce86e8c46893930` |
 | 当前说明 | [LifeWeave · 经纬](#doc-08) | `LifeWeave_产品定义与首版迭代计划_v1.0_2026-09-19.md` | `7b39f74096b5fb75c02263b5ac4f560e62fec06475d155f9c5c049423890cc19` |
 | 建设方案（含未实现范围） | [LifeWeave：可以跨任务持续使用的工作台](#doc-09) | `workspaces/reviews/lifeweave-next-stage/review.md` | `2b75e430372192a4e18aa41b7019345ced7467a598e086f4fe695b2fdb545f88` |
@@ -29,7 +29,7 @@
 | 历史与验证附录 | [内部命名与工作接续验证](#doc-14) | `docs/evidence/internal-rename/README.md` | `8e6e4ad8eb1bb2fe651af3fa578f4e9ef2cca8cd59468b08f20b22919370c1a7` |
 | 历史与验证附录 | [LifeWeave 改名与文档验证](#doc-15) | `docs/evidence/rename/README.md` | `5f1179f23e012ab60dae12c3aee02ea50d37849b0c0a7b83aa22bd69fac343a9` |
 | 历史与验证附录 | [LifeWeave 改名独立复核](#doc-16) | `docs/evidence/rename/independent-review.md` | `aa4d1cecb3ba48d6f36d027e26bde5dc0ee085be9278cfec209c1140dfa9977c` |
-| 历史与验证附录 | [网页研究可用版验证记录](#doc-17) | `docs/evidence/web-research/README.md` | `7522bed5b42e0c70728c7b2f3845e8d30852b6fe943c533d04137898a2425fd6` |
+| 历史与验证附录 | [网页研究可用版验证记录](#doc-17) | `docs/evidence/web-research/README.md` | `07d541cf52cdb5b17b8d48b521226edd9ace6a4a012329225d1e57c18cc9b9df` |
 | 历史与验证附录 | [受控引用反例](#doc-18) | `docs/evidence/web-research/encoding-final-controlled-original.md` | `5d8ea69327ace72ec9c6c6f2236acf7e72deee05420b7bb6c7d56fbdc058272f` |
 | 历史与验证附录 | [encoding-final-real-original](#doc-19) | `docs/evidence/web-research/encoding-final-real-original.md` | `5de064f9225d0e4fba0aace4fcf5e113188f326444637e66edc7c9f471533615` |
 | 历史与验证附录 | [来源编码修复独立复核：032a029](#doc-20) | `docs/evidence/web-research/encoding-final-review.md` | `79dc236ce7ddb89c6420697f2cc32236f0cb2341dd9f8f058a0aa6cd463f22d8` |
@@ -638,7 +638,7 @@ SQL 006 增加对话、消息与明确方向/偏好；SQL 007 增加成果来源
 
 本轮完整回归在5993005为66项Python（含真实临时数据库）与29项前端通过，类型检查、构建通过；后续知识提示变更21项、图片来源变更7项相关回归通过，前端生产依赖审计无漏洞。图片、公式与知识操作的受控页面证据见 [本轮验证与发现](#doc-17)；受控夹具与真实模型分别记录。
 
-G2 的可用时段/休息约束/未来时间块、受控机会发现、方法修订对照回归尚未实现。当前偏好由用户明确编辑，不自动推断永久偏好；下次讨论时间不会发提醒或占用日历。远程 ChatGPT、多人身份和双向 Linear 同步仍未接通。GSSM 身份未确认仅阻塞第二篇研究。
+G2 的可用时段/休息约束/未来时间块、受控机会发现、方法修订对照回归尚未实现。当前偏好由用户明确编辑，不自动推断永久偏好；下次讨论时间不会发提醒或占用日历。远程 ChatGPT、多人身份和双向 Linear 同步仍未接通。GSSM 身份已由用户确认，第二篇真实研究也已通过日常网页完成：主读 arXiv 2505.13556v5，复用内置论文研究方法，保存14052字符完整正文、固定源码版本、公式小算例和官方函数合成检查。实际浏览器验证1张嵌入图、87处公式及14条本地来源，下载与保存版本一致，原对话可接续。本轮未训练模型、未复现论文完整实验、未接受正式知识。见 [GSSM网页与方法复用证据](evidence/web-research/gssm-reading-verified.json)。
 <!-- source-end: docs/status.md -->
 
 ---
@@ -2027,6 +2027,21 @@ NUL知识说明的关闭见[新的独立复核](#doc-31)：实际网页候选、
 最终相邻复核在69ba22f独立进程完成，实际点击四类消费者的普通图片链接，字节、版本及错误边界均正确，详细范围和清理结果见上述[独立复核报告](#doc-31)的追加章节。日常8010目前运行69ba22f，模型任务已结束；保留真实论文与原始材料，测试环境没有混入日常数据。
 
 原 Linear 项目 Overview 已精确更新并回读，原历史正文保持，状态仍为 In Progress；没有创建评论、通知或把本机文件冒充已上传附件：[线上回读](evidence/web-research/linear-readback.json)。本轮按 `personal-workbench` 的“有实质变化时更新同一份当前正文”执行，记录当前实现、真实论文结果与G2边界，产品定义文档和竞品图片问题未覆盖。
+
+
+<a id="doc-17-line-89"></a>
+
+### 第二篇真实研究：GSSM（2026-09-19）
+
+用户确认论文为 *Learning collision risk proactively from naturalistic driving data at scale* 后，从日常网页新建独立研究事项 `item-de7785d0790445d8`，运行 `gzrun-20260919-130600-2cabbf3e`。解释器自动选中既有 `paper-research`，执行事件确认实际读取该方法；未手工改库、拼接执行结果或修改产品代码。主读 arXiv 2505.13556v5，固定官方源码版本，并通过执行器进行CPU公式算例和官方函数合成检查。
+
+本轮已交付14052字符完整学习正文，内容包括条件间距分布、尾概率与风险的关系、训练目标、数据切分、2591事件筛选、修正后式15、主要实验和实现差异。没有训练完整模型、下载驾驶数据/权重或复现论文实验；未自动接受知识，论文判断与用户学习效果仍待反馈。
+
+[实际请求、方法读取及浏览器证据](evidence/web-research/gssm-reading-verified.json)记录：成果页与原对话均可读，1张嵌入原图解码成功，87处公式无错误，14条本地来源逐条打开（含5张PDF页面图），正文下载和原始结果的SHA-256均为 `2c3510f3a67d50acd49eced4c2ef3467cffb2c6d5bb5c2c4df3b6985cecae480`。截图、完整运行事件和研究原料保留在本机 `.runtime/research-use/gssm/` 及对应执行目录，不把论文正文或第三方原文复制为产品规范。
+
+本机阅读入口：[GSSM研究成果](http://127.0.0.1:8010/lifeweave/personal/items/item-de7785d0790445d8/outputs)。这一结果验证同一方法承接第二篇论文与实际阅读链路，没有增加G2能力，也没有完成完整日常Alpha。
+
+按 `personal-workbench` 更新 Linear 同一项目正文并完整回读，精确补丁一致、其余正文保留、状态仍为 In Progress：[本轮线上回读](evidence/web-research/gssm-linear-readback.json)。
 <!-- source-end: docs/evidence/web-research/README.md -->
 
 ---

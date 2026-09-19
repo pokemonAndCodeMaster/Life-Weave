@@ -1,0 +1,25 @@
+{
+  "id": "0e1cfdbe-a7a3-4f60-8cb6-504595f8e2c1",
+  "url": "https://linear.app/yyhpokemonmaster/project/个人工作台日常使用与持续推进-a2184ae8c325",
+  "updatedAt": "2026-09-19T13:30:59.941Z",
+  "status": "In Progress",
+  "exactPatchReadback": true,
+  "unrelatedBodyPreserved": true,
+  "changes": [
+    {
+      "op": "replace",
+      "old_string": "Qwen-Drive 与待核实身份的 GSSM 研究",
+      "new_string": "Qwen-Drive 与已确认身份的 GSSM 研究"
+    },
+    {
+      "op": "replace",
+      "old_string": "GSSM 的论文身份仍待明确，仅阻塞第二篇。",
+      "new_string": "GSSM 身份已由用户确认（arXiv 2505.13556，Generalised Surrogate Safety Measure），第二篇首轮研究已通过日常网页完成。"
+    },
+    {
+      "op": "insert_before",
+      "anchor": "成果/知识跨消费者的链接编码",
+      "text": "GSSM 作为第二篇独立研究，经网页自动选用同一 paper-research 方法并实际读取，运行 `gzrun-20260919-130600-2cabbf3e` 已成功。交付14052字符完整正文，主读v5并固定官方源码版本，含条件间距分布、尾概率、训练/评测、式15纠错与实现差异，执行CPU小算例及官方函数合成检查。浏览器核查1张嵌入图、87处公式和14条本地来源，原对话接续与下载哈希一致；本机成果入口 `/lifeweave/personal/items/item-de7785d0790445d8/outputs`。没有完整训练/实验复现，没有自动接受知识，报告完成不代表用户已经理解或完整Alpha完成。证据在 `docs/evidence/web-research/gssm-reading-verified.json`，整合项目文档已随状态更新。\n\n"
+    }
+  ]
+}

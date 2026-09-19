@@ -84,3 +84,16 @@ NUL知识说明的关闭见[新的独立复核](knowledge-notice-final-review.md
 最终相邻复核在69ba22f独立进程完成，实际点击四类消费者的普通图片链接，字节、版本及错误边界均正确，详细范围和清理结果见上述[独立复核报告](knowledge-notice-final-review.md)的追加章节。日常8010目前运行69ba22f，模型任务已结束；保留真实论文与原始材料，测试环境没有混入日常数据。
 
 原 Linear 项目 Overview 已精确更新并回读，原历史正文保持，状态仍为 In Progress；没有创建评论、通知或把本机文件冒充已上传附件：[线上回读](linear-readback.json)。本轮按 `personal-workbench` 的“有实质变化时更新同一份当前正文”执行，记录当前实现、真实论文结果与G2边界，产品定义文档和竞品图片问题未覆盖。
+
+
+## 第二篇真实研究：GSSM（2026-09-19）
+
+用户确认论文为 *Learning collision risk proactively from naturalistic driving data at scale* 后，从日常网页新建独立研究事项 `item-de7785d0790445d8`，运行 `gzrun-20260919-130600-2cabbf3e`。解释器自动选中既有 `paper-research`，执行事件确认实际读取该方法；未手工改库、拼接执行结果或修改产品代码。主读 arXiv 2505.13556v5，固定官方源码版本，并通过执行器进行CPU公式算例和官方函数合成检查。
+
+本轮已交付14052字符完整学习正文，内容包括条件间距分布、尾概率与风险的关系、训练目标、数据切分、2591事件筛选、修正后式15、主要实验和实现差异。没有训练完整模型、下载驾驶数据/权重或复现论文实验；未自动接受知识，论文判断与用户学习效果仍待反馈。
+
+[实际请求、方法读取及浏览器证据](gssm-reading-verified.json)记录：成果页与原对话均可读，1张嵌入原图解码成功，87处公式无错误，14条本地来源逐条打开（含5张PDF页面图），正文下载和原始结果的SHA-256均为 `2c3510f3a67d50acd49eced4c2ef3467cffb2c6d5bb5c2c4df3b6985cecae480`。截图、完整运行事件和研究原料保留在本机 `.runtime/research-use/gssm/` 及对应执行目录，不把论文正文或第三方原文复制为产品规范。
+
+本机阅读入口：[GSSM研究成果](http://127.0.0.1:8010/lifeweave/personal/items/item-de7785d0790445d8/outputs)。这一结果验证同一方法承接第二篇论文与实际阅读链路，没有增加G2能力，也没有完成完整日常Alpha。
+
+按 `personal-workbench` 更新 Linear 同一项目正文并完整回读，精确补丁一致、其余正文保留、状态仍为 In Progress：[本轮线上回读](gssm-linear-readback.json)。
