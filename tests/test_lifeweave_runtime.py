@@ -1,4 +1,5 @@
 from __future__ import annotations
+from copy import deepcopy
 
 import asyncio
 import os
@@ -735,3 +736,29 @@ def test_team_worker_never_falls_back_to_personal_auth_or_provider_environment(
     assert (Path(team_env["CODEX_HOME"]) / "auth.json").read_text() == "team-secret"
     assert (Path(personal_env["CODEX_HOME"]) / "auth.json").read_text() == "personal-secret"
     assert team_env["HOME"] != personal_env["HOME"]
+
+
+def test_worker_reports_preserve_fixed_inputs_through_running_finish_and_retry(tmp_path, monkeypatch):
+    runtime, repo, core = service(tmp_path, ShellExecutor())
+    feedback = [{'id':'feedback-original','body':'先讨论证据缺口'}]
+    monkeypatch.setattr(core, 'execution_feedback', lambda *_: feedback)
+    machine = register(runtime)
+    run = runtime.create_run('personal', item_id='P-provenance', instruction='讨论', engine='codex')
+    before = deepcopy(runtime.get_run_snapshot('personal', run['id']))
+    claim = runtime.claim('personal', machine['id'], machine['worker_token'], lease_seconds=30)
+    for outcome in ('running', 'succeeded'):
+        runtime.worker_report('personal', machine['id'], machine['worker_token'], run['id'],
+                              {'lease_id':claim['lease_id'], 'outcome':outcome, 'exit_code':0,
+                               'environment':{'actualDirectory':'/task/result', 'materializedCapabilities':[],
+                                              'feedbackSnapshot':[], 'inputRecommendations':{'forged':True},
+                                              'selectedInputs':{'methodId':'forged'}, 'requestedRuntime':'forged'}})
+        saved = runtime.get_run('personal', run['id'])['environment_snapshot']
+        for key in ('feedbackSnapshot', 'inputRecommendations', 'selectedInputs', 'requestedRuntime'):
+            assert saved[key] == before['environment_snapshot'][key]
+        assert saved['actualDirectory'] == '/task/result'
+    feedback = [{'id':'feedback-later','body':'补充后续问题'}]
+    retry = runtime.retry_run('personal', run['id'], sync_context=False)
+    new = runtime.get_run_snapshot('personal', retry['id'])
+    assert new['environment_snapshot']['feedbackSnapshot'] == feedback
+    assert new['environment_snapshot']['selectedInputs'] == before['environment_snapshot']['selectedInputs']
+    assert runtime.get_run_snapshot('personal', run['id'])['prompt_snapshot'] == before['prompt_snapshot']

@@ -587,10 +587,17 @@ class LifeWeaveRuntimeService:
         if outcome == "succeeded" and report.get("exit_code") not in {None, 0}:
             raise ValueError("非零退出码不能回报 succeeded")
         now = datetime.now(timezone.utc)
+        # Workers report observed execution facts; they cannot replace input
+        # provenance fixed by the control service when the attempt was created.
+        fixed_input_keys = {'feedbackSnapshot', 'inputRecommendations', 'selectedInputs',
+                            'requestedRuntime', 'requestedImage', 'retriedFrom', 'contextSynced'}
+        environment = dict(existing.get('environment_snapshot') or {})
+        environment.update({key: value for key, value in (report.get('environment') or {}).items()
+                            if key not in fixed_input_keys})
         changes: dict[str, Any] = {
             "state": outcome,
             "session_id": report.get("session_id"),
-            "environment_snapshot": report.get("environment") or existing.get("environment_snapshot") or {},
+            "environment_snapshot": environment,
         }
         if outcome == "running":
             changes["started_at"] = now

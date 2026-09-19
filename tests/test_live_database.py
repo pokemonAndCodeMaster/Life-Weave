@@ -265,3 +265,47 @@ def test_discovery_and_recommendations_reuse_accepted_knowledge_without_a_paper_
     assert client.get(path.replace('/personal/','/team/')).status_code == 404
     assert client.get('/api/lifeweave/team/work-discovery?query=阳台').json()['items'] == []
     assert client.get('/api/lifeweave/personal/work-discovery?query=zyxwuniqueunmatched').json()['items'] == []
+
+
+def test_worker_http_reports_keep_input_provenance_and_retry_uses_current_feedback(client):
+    runtime = client.app.state.lifeweave_runtime_service
+    base = '/api/lifeweave/team'
+
+    def send(path, body, status=200, headers=None):
+        response = client.post(base+path, json=body, headers=headers)
+        assert response.status_code == status, response.text
+        return response.json()
+
+    machine = send('/machines/register', {'name':'input provenance regression','capacity':1,
+                   'engines':['codex'],'runtimes':['native']}, 201,
+                   {'X-LifeWeave-Registration-Token':runtime.registration_tokens['team']})
+    auth = {'X-LifeWeave-Worker-Token':machine['workerToken']}
+    item = send('/items', {'itemType':'research','title':'运行全过程保留依据'}, 201)
+    feedback_path = '/items/'+item['id']+'/feedback'
+    first = send(feedback_path, {'body':'先核对依据','requestId':'before-running'}, 201)
+    run = send('/runs', {'itemId':item['id'],'instruction':'核对依据','engine':'codex',
+                        'machineId':machine['id']}, 202)
+    fixed = run['environmentSnapshot']
+    original_prompt = runtime.get_run_snapshot('team', run['id'])['prompt_snapshot']
+    claim = send('/worker/'+machine['id']+'/claim', {'leaseSeconds':30}, headers=auth)
+    assert claim['id'] == run['id']
+    report_path = '/worker/'+machine['id']+'/runs/'+run['id']+'/report'
+    for outcome, environment in (
+        ('running', {'runtime':'native','actualDirectory':'/isolated/task',
+                     'feedbackSnapshot':[], 'selectedInputs':{'forged':True},
+                     'inputRecommendations':{'forged':True}}),
+        ('succeeded', {'exitObserved':True}),
+    ):
+        saved = send(report_path, {'leaseId':claim['lease_id'],'outcome':outcome,
+                                  'exitCode':0,'environment':environment}, headers=auth)
+        actual = saved['environmentSnapshot']
+        for key in ('feedbackSnapshot','selectedInputs','inputRecommendations','requestedRuntime'):
+            assert actual[key] == fixed[key]
+        assert actual['actualDirectory'] == '/isolated/task'
+    current = client.get(base+'/runs/'+run['id']).json()
+    assert current['environmentSnapshot']['feedbackSnapshot'][0]['id'] == first['id']
+    second = send(feedback_path, {'body':'补充第二轮问题','requestId':'after-running','runId':run['id']}, 201)
+    retry = send('/runs/'+run['id']+'/retry', {'syncContext':False}, 202)
+    assert [f['id'] for f in retry['environmentSnapshot']['feedbackSnapshot']] == [first['id'],second['id']]
+    assert retry['environmentSnapshot']['selectedInputs'] == fixed['selectedInputs']
+    assert runtime.get_run_snapshot('team', run['id'])['prompt_snapshot'] == original_prompt
