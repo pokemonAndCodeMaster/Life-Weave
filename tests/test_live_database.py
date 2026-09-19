@@ -10,8 +10,7 @@ from fastapi.testclient import TestClient
 ROOT = Path(__file__).resolve().parents[1]
 
 
-@pytest.fixture(scope='module')
-def client(tmp_path_factory):
+def database_client(tmp_path_factory):
     if os.environ.get('LIFEWEAVE_TEST_DB') != '1':
         pytest.skip('LIFEWEAVE_TEST_DB=1 enables disposable PostgreSQL integration tests')
     from src.api.app import create_app
@@ -35,6 +34,16 @@ def client(tmp_path_factory):
         finally:
             connection.execute(sql.SQL('DROP DATABASE {} WITH (FORCE)').format(sql.Identifier(name)))
             connection.close()
+
+
+@pytest.fixture(scope='module')
+def client(tmp_path_factory):
+    yield from database_client(tmp_path_factory)
+
+
+@pytest.fixture
+def dedicated_client(tmp_path_factory):
+    yield from database_client(tmp_path_factory)
 
 
 def post(client, route, body, status=201):
@@ -309,3 +318,66 @@ def test_worker_http_reports_keep_input_provenance_and_retry_uses_current_feedba
     assert [f['id'] for f in retry['environmentSnapshot']['feedbackSnapshot']] == [first['id'],second['id']]
     assert retry['environmentSnapshot']['selectedInputs'] == fixed['selectedInputs']
     assert runtime.get_run_snapshot('team', run['id'])['prompt_snapshot'] == original_prompt
+
+
+@pytest.mark.parametrize('transport', ['http', 'local'])
+def test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable(dedicated_client, transport):
+    import asyncio
+    import base64
+    import json
+    from src.lifeweave_runtime.worker import ServiceWorkerClient
+
+    client = dedicated_client
+    runtime = client.app.state.lifeweave_runtime_service
+    base = '/api/lifeweave/personal'
+    registered = client.post(base+'/machines/register', json={
+        'name': 'PDF NUL '+transport, 'capacity': 1, 'engines': ['codex'], 'runtimes': ['native'],
+    }, headers={'X-LifeWeave-Registration-Token': runtime.registration_tokens['personal']})
+    assert registered.status_code == 201, registered.text
+    machine = registered.json()
+    auth = {'X-LifeWeave-Worker-Token': machine['workerToken']}
+    prefix = base+'/worker/'+machine['id']
+    local = ServiceWorkerClient(runtime, 'personal', machine['id'], machine['workerToken'])
+    item = post(client, '/items', {'itemType': 'research', 'title': 'PDF 控制字符回归 '+transport})
+    run = post(client, '/runs', {'itemId': item['id'], 'instruction': '读取论文',
+                               'engine': 'codex', 'machineId': machine['id']}, 202)
+    claim = client.post(prefix+'/claim', json={'leaseSeconds': 30}, headers=auth).json()
+    assert claim['id'] == run['id']
+
+    def send(kind, body):
+        if transport == 'local':
+            return asyncio.run(getattr(local, kind)(run['id'], body))
+        response = client.post(prefix+'/runs/'+run['id']+'/'+('events' if kind == 'event' else kind),
+                               json=body, headers=auth)
+        assert response.status_code in (200, 201, 202), response.text
+        return response.json()
+
+    send('report', {'lease_id': claim['lease_id'], 'outcome': 'running'})
+    original_event = {
+        'event_type': 'item.completed', 'source': 'codex', 'channel': 'stdout',
+        'summary': 'PDF 提取\0完成',
+        'payload': {'item': {'text': 'ADEn\0中文\n下一行', 'literal': r'\u0000',
+                             'nested': [{'\0key': '原值', '␀key': '另一个键'}]}},
+    }
+    send('event', {'lease_id': claim['lease_id'], **original_event})
+    events = client.get(base+'/runs/'+run['id']+'/events').json()['items']
+    event = next(entry for entry in events if entry['eventType'] == 'item.completed')
+    assert event['summary'] == 'PDF 提取␀完成'
+    encoded = event['payload']['_lifeweaveTextStorage']['originalJsonBase64']
+    assert json.loads(base64.b64decode(encoded)) == original_event
+    assert event['payload']['item']['literal'] == r'\u0000'
+    assert len(event['payload']['item']['nested'][0]['entries']) == 2
+    report = {'lease_id': claim['lease_id'], 'outcome': 'succeeded', 'exit_code': 0,
+              'result': '# 论文\n\n公式 ADEn\0已提取',
+              'result_payload': {'report': '# 论文\n\n公式 ADEn\0已提取'},
+              'environment': {'reader': 'PDF\0reader', 'selectedInputs': {'forged': True}}}
+    send('report', report)
+    saved = client.get(base+'/runs/'+run['id']).json()
+    assert saved['state'] == 'succeeded' and '␀' in saved['result']
+    assert saved['environmentSnapshot']['selectedInputs'] == run['environmentSnapshot']['selectedInputs']
+    encoded = saved['environmentSnapshot']['_lifeweaveTextStorage']['originalJsonBase64']
+    recovered = json.loads(base64.b64decode(encoded))
+    assert recovered['result'] == report['result']
+    assert recovered['result_payload'] == report['result_payload']
+    output = client.get(base+'/items/'+item['id']+'/research-output').json()['current']
+    assert output['content'] == '# 论文\n\n公式 ADEn␀已提取'

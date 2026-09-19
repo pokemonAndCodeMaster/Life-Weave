@@ -6,6 +6,7 @@ from typing import Any, Iterable
 from psycopg.types.json import Jsonb
 
 from src.database.pg_connector import PGConnector
+from .storage_text import preserve_nul_text
 
 
 RUN_COLUMNS = """
@@ -262,6 +263,12 @@ class LifeWeaveRuntimeRepository:
         machine_id: str | None = None,
         lease_id: str | None = None,
     ) -> dict[str, Any]:
+        readable, encoding = preserve_nul_text({
+            "event_type": event_type, "source": source, "channel": channel,
+            "summary": summary, "payload": payload,
+        })
+        if encoding:
+            readable["payload"]["_lifeweaveTextStorage"] = encoding
         with self._postgres.transaction() as connection:
             connection.execute("SELECT pg_advisory_xact_lock(hashtext(%s::text))", (run_id,))
             with connection.cursor() as cursor:
@@ -285,11 +292,11 @@ class LifeWeaveRuntimeRepository:
                     {
                         "workspace": workspace,
                         "run_id": run_id,
-                        "event_type": event_type,
-                        "source": source,
-                        "channel": channel,
-                        "summary": summary,
-                        "payload": Jsonb(payload),
+                        "event_type": readable["event_type"],
+                        "source": readable["source"],
+                        "channel": readable["channel"],
+                        "summary": readable["summary"],
+                        "payload": Jsonb(readable["payload"]),
                         "machine_id": machine_id,
                         "lease_id": lease_id,
                     },

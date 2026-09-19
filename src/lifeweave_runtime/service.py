@@ -15,6 +15,7 @@ from uuid import uuid4
 from src.agent_runtime import AgentExecutor
 
 from .repository import LifeWeaveRuntimeRepository
+from .storage_text import preserve_nul_text
 
 
 TERMINAL_STATES = {"paused", "cancelled", "succeeded", "failed", "unavailable"}
@@ -586,6 +587,11 @@ class LifeWeaveRuntimeService:
         report: dict[str, Any],
     ) -> dict[str, Any]:
         self.authenticate_worker(workspace, machine_id, token)
+        report, encoding = preserve_nul_text(report)
+        if encoding:
+            report["environment"] = {
+                **(report.get("environment") or {}), "_lifeweaveTextStorage": encoding,
+            }
         existing = self._required_run(workspace, run_id)
         outcome = str(report["outcome"])
         if outcome == "running" and existing["state"] != "claimed":
