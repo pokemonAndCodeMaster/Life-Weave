@@ -11,6 +11,7 @@ OUTPUT = ROOT / 'docs/complete-guide.md'
 CURRENT = ['README.md', 'docs/README.md', 'docs/naming.md', 'docs/product.md',
            'docs/architecture.md', 'docs/status.md', 'docs/development.md']
 HISTORY = ['docs/brief.md', 'docs/rename-request.md', 'docs/delivery.md']
+PLANS = ['workspaces/reviews/lifeweave-next-stage/review.md']
 LINK = re.compile(r'(!?\[[^\]\n]*\]\()([^\s)]+)(\))')
 HEADING = re.compile(r'^(#{1,6}) (.+)$')
 
@@ -34,7 +35,7 @@ def headings(body):
 
 def build():
     available = {p.relative_to(ROOT).as_posix() for p in (ROOT / 'docs').rglob('*.md') if p != OUTPUT}
-    ordered = CURRENT + HISTORY + sorted(available - set(CURRENT + HISTORY))
+    ordered = CURRENT + PLANS + HISTORY + sorted(available - set(CURRENT + HISTORY))
     sources = {path: (ROOT / path).read_text() for path in ordered}
     sections = {path: f'doc-{index + 1:02}' for index, path in enumerate(ordered)}
     anchors = {}
@@ -77,7 +78,7 @@ def build():
     result = [
         '<a id="complete-guide"></a>', '# LifeWeave · 经纬：完整项目说明', '',
         '这是一份可连续阅读的完整汇编：前半部分是当前产品、架构、状态和使用维护说明，后半部分是历史授权、交付与验证文字附录。', '',
-        f'范围为项目根 README 与 docs/ 下全部 {len(sources) - 1} 份 Markdown 来源（不含本汇编自身），共 {len(sources)} 份。'
+        f'范围为项目根 README、docs/ 下全部 Markdown（不含本汇编自身），以及当前建设方案，共 {len(sources)} 份来源。'
         '所有来源正文、表格、代码块、Mermaid 图及历史说明完整保留；重复内容也保留，不做摘要或删节。只调整标题层级、链接位置和文内导航。', '',
         '源码、截图、JSON 运行记录和 API 文档保留可访问的引用，不把它们误作本次需要合并的说明正文。'
         '历史附录中的旧名称、当时状态和旧测试数量按原文保留；当前能力请以“当前完成情况”为准。', '',
@@ -87,7 +88,7 @@ def build():
     ]
     for path, body in sources.items():
         digest = hashlib.sha256(body.encode()).hexdigest()
-        kind = '当前说明' if path in CURRENT else '历史与验证附录'
+        kind = '当前说明' if path in CURRENT else ('建设方案（含未实现范围）' if path in PLANS else '历史与验证附录')
         result.append(f'| {kind} | [{titles[path]}](#{sections[path]}) | `{path}` | `{digest}` |')
     for path, body in sources.items():
         result.extend(['', '---', '', f'<a id="{sections[path]}"></a>',

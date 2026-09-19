@@ -1,0 +1,483 @@
+{
+  "candidate": "4c58afd1e29262c18348ac4fe0751e5cd3f69abe",
+  "checks": [
+    {
+      "name": "真实推荐包含方法与知识",
+      "pass": true,
+      "detail": {
+        "methodId": "method-f619d330b71ee73af16f",
+        "knowledgeRefs": [
+          "local:社区疏散.md"
+        ]
+      }
+    },
+    {
+      "name": "固定反馈与真实选用",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "领取包含完整冻结材料与提示",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "无效凭证租约额外输入均未写入",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "运行报告不能改写或注入固定字段",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "运行详情实际目录消费保留环境",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "结束部分环境保留原实际环境",
+      "pass": true,
+      "detail": {
+        "runtime": "native",
+        "identity": "independent-env",
+        "cliVersion": "test-observed-v1",
+        "exitObserved": true,
+        "requestedImage": null,
+        "selectedInputs": {
+          "methodId": "method-f619d330b71ee73af16f",
+          "knowledgeRefs": [
+            "local:社区疏散.md"
+          ]
+        },
+        "actualDirectory": "/isolated/evacuation",
+        "feedbackSnapshot": [
+          {
+            "id": "feedback-3ba0e31377ac067f0d0de79d749ee21a2bdf88be",
+            "body": "先核对夜间北门状态",
+            "kind": "execution_feedback",
+            "runId": null,
+            "anchor": null,
+            "createdAt": "2026-09-19 14:33:03.441082+08:00",
+            "createdBy": "local-user",
+            "requestId": "independent-initial",
+            "contextVersionId": "ctxv-d009694fb10f41b8"
+          }
+        ],
+        "requestedRuntime": "native",
+        "inputRecommendations": {
+          "limits": {
+            "methodsPerRun": 1,
+            "documentsPerRun": 10
+          },
+          "methods": [
+            {
+              "id": "method-f619d330b71ee73af16f",
+              "path": "/tmp/lifeweave-independent-zg13pipi/methods/evacuation/SKILL.md",
+              "score": 15,
+              "title": "疏散核查",
+              "reason": "标题或正文包含：区疏、散路、核查、疏散、社区、线核、路线",
+              "version": "98f15245d1410dba005b82cb102f3871c02fef4dba8f1b0ddf7f146467dd7b8d",
+              "description": "社区疏散路线核查",
+              "matchedTerms": [
+                "区疏",
+                "散路",
+                "核查",
+                "疏散",
+                "社区",
+                "线核",
+                "路线"
+              ]
+            }
+          ],
+          "boundary": "按当前目标文本匹配初筛，允许调整；不证明方法适用或实际执行。入队时读取来源并固定实际版本。",
+          "strategy": "lexical-v1",
+          "documents": [
+            {
+              "ref": "local:社区疏散.md",
+              "path": "社区疏散.md",
+              "score": 16,
+              "title": "社区疏散",
+              "reason": "标题或正文包含：区疏、材料、疏散、社区",
+              "version": "a9019ff3a202748833f89c1c40b0c08a4def9da34467472fe02db1c00bccceaf",
+              "sourceId": "local",
+              "writable": true,
+              "sourceTitle": "工作台知识",
+              "matchedTerms": [
+                "区疏",
+                "材料",
+                "疏散",
+                "社区"
+              ]
+            }
+          ],
+          "suggested": {
+            "methodId": "method-f619d330b71ee73af16f",
+            "knowledgeRefs": [
+              "local:社区疏散.md"
+            ]
+          },
+          "unavailable": [],
+          "contextVersionId": "ctxv-d009694fb10f41b8"
+        }
+      }
+    },
+    {
+      "name": "结束后固定字段及列表仍可读取",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "跨空间不可读取",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "重试 sync=False 实际领取原材料",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "重试 sync=False 新反馈进入实际提示",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "重试 sync=False 保留推荐选用并正确选择背景",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "重试 sync=False 失败空环境保留依据",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "重试 sync=True 实际领取原材料",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "重试 sync=True 新反馈进入实际提示",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "重试 sync=True 保留推荐选用并正确选择背景",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "重试 sync=True 失败空环境保留依据",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "新反馈新材料重试后旧运行输入原样保存",
+      "pass": true,
+      "detail": null
+    },
+    {
+      "name": "接续消费者仍可读取三轮运行",
+      "pass": true,
+      "detail": null
+    }
+  ],
+  "requests": [
+    {
+      "method": "POST",
+      "path": "/machines/register",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/methods/roots",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/library/revisions",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/library/revisions/revision-1744ad1f2708485c/decision",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/items",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/items/item-d5780ae9e99a4c12/feedback",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/items/item-d5780ae9e99a4c12/input-recommendations",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/runs",
+      "status": 202
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/claim",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-f729f112/report",
+      "status": 403
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-f729f112/report",
+      "status": 403
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-f729f112/report",
+      "status": 422
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-f729f112/report",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/runs/gzrun-20260919-063303-f729f112",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-f729f112/report",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/runs?itemId=item-d5780ae9e99a4c12",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-f729f112/report",
+      "status": 403
+    },
+    {
+      "method": "POST",
+      "path": "/items/item-d5780ae9e99a4c12/feedback",
+      "status": 201
+    },
+    {
+      "method": "GET",
+      "path": "/library/document?path=社区疏散.md",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/library/revisions",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/library/revisions/revision-787bc361a5614c09/decision",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/items/item-d5780ae9e99a4c12/context/proposals",
+      "status": 201
+    },
+    {
+      "method": "POST",
+      "path": "/context-proposals/ctxp-198036dbaa914533/accept",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/runs/gzrun-20260919-063303-f729f112/retry",
+      "status": 202
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/claim",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-69db2546/report",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-69db2546/report",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/runs/gzrun-20260919-063303-f729f112/retry",
+      "status": 202
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/claim",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-9fe64189/report",
+      "status": 200
+    },
+    {
+      "method": "POST",
+      "path": "/worker/node-t-637c72e105b4/runs/gzrun-20260919-063303-9fe64189/report",
+      "status": 200
+    },
+    {
+      "method": "GET",
+      "path": "/items/item-d5780ae9e99a4c12/continuation",
+      "status": 200
+    }
+  ],
+  "initial": {
+    "runId": "gzrun-20260919-063303-f729f112",
+    "feedbackId": "feedback-3ba0e31377ac067f0d0de79d749ee21a2bdf88be",
+    "fixed": {
+      "requestedImage": null,
+      "selectedInputs": {
+        "methodId": "method-f619d330b71ee73af16f",
+        "knowledgeRefs": [
+          "local:社区疏散.md"
+        ]
+      },
+      "feedbackSnapshot": [
+        {
+          "id": "feedback-3ba0e31377ac067f0d0de79d749ee21a2bdf88be",
+          "body": "先核对夜间北门状态",
+          "kind": "execution_feedback",
+          "runId": null,
+          "anchor": null,
+          "createdAt": "2026-09-19 14:33:03.441082+08:00",
+          "createdBy": "local-user",
+          "requestId": "independent-initial",
+          "contextVersionId": "ctxv-d009694fb10f41b8"
+        }
+      ],
+      "requestedRuntime": "native",
+      "inputRecommendations": {
+        "limits": {
+          "methodsPerRun": 1,
+          "documentsPerRun": 10
+        },
+        "methods": [
+          {
+            "id": "method-f619d330b71ee73af16f",
+            "path": "/tmp/lifeweave-independent-zg13pipi/methods/evacuation/SKILL.md",
+            "score": 15,
+            "title": "疏散核查",
+            "reason": "标题或正文包含：区疏、散路、核查、疏散、社区、线核、路线",
+            "version": "98f15245d1410dba005b82cb102f3871c02fef4dba8f1b0ddf7f146467dd7b8d",
+            "description": "社区疏散路线核查",
+            "matchedTerms": [
+              "区疏",
+              "散路",
+              "核查",
+              "疏散",
+              "社区",
+              "线核",
+              "路线"
+            ]
+          }
+        ],
+        "boundary": "按当前目标文本匹配初筛，允许调整；不证明方法适用或实际执行。入队时读取来源并固定实际版本。",
+        "strategy": "lexical-v1",
+        "documents": [
+          {
+            "ref": "local:社区疏散.md",
+            "path": "社区疏散.md",
+            "score": 16,
+            "title": "社区疏散",
+            "reason": "标题或正文包含：区疏、材料、疏散、社区",
+            "version": "a9019ff3a202748833f89c1c40b0c08a4def9da34467472fe02db1c00bccceaf",
+            "sourceId": "local",
+            "writable": true,
+            "sourceTitle": "工作台知识",
+            "matchedTerms": [
+              "区疏",
+              "材料",
+              "疏散",
+              "社区"
+            ]
+          }
+        ],
+        "suggested": {
+          "methodId": "method-f619d330b71ee73af16f",
+          "knowledgeRefs": [
+            "local:社区疏散.md"
+          ]
+        },
+        "unavailable": [],
+        "contextVersionId": "ctxv-d009694fb10f41b8"
+      }
+    },
+    "inputVersions": [
+      [
+        "skill",
+        "98f15245d1410dba005b82cb102f3871c02fef4dba8f1b0ddf7f146467dd7b8d"
+      ],
+      [
+        "knowledge",
+        "a9019ff3a202748833f89c1c40b0c08a4def9da34467472fe02db1c00bccceaf"
+      ]
+    ]
+  },
+  "retries": [
+    {
+      "syncContext": false,
+      "id": "gzrun-20260919-063303-69db2546",
+      "feedbackIds": [
+        "feedback-3ba0e31377ac067f0d0de79d749ee21a2bdf88be",
+        "feedback-2045c8e3d557251a6102e29dca9d12f2465de62c"
+      ],
+      "promptSha256": "8bcd74e99d314317ae9a3281ecee40d45722e2e6adad4023057c0a43675ddd04",
+      "materialVersions": [
+        [
+          "skill",
+          "98f15245d1410dba005b82cb102f3871c02fef4dba8f1b0ddf7f146467dd7b8d"
+        ],
+        [
+          "knowledge",
+          "a9019ff3a202748833f89c1c40b0c08a4def9da34467472fe02db1c00bccceaf"
+        ]
+      ]
+    },
+    {
+      "syncContext": true,
+      "id": "gzrun-20260919-063303-9fe64189",
+      "feedbackIds": [
+        "feedback-3ba0e31377ac067f0d0de79d749ee21a2bdf88be",
+        "feedback-2045c8e3d557251a6102e29dca9d12f2465de62c"
+      ],
+      "promptSha256": "c098fc2e129f50eafb3bb19ff9937918d2256fb8cff43a90e196db95343dfc23",
+      "materialVersions": [
+        [
+          "skill",
+          "98f15245d1410dba005b82cb102f3871c02fef4dba8f1b0ddf7f146467dd7b8d"
+        ],
+        [
+          "knowledge",
+          "a9019ff3a202748833f89c1c40b0c08a4def9da34467472fe02db1c00bccceaf"
+        ]
+      ]
+    }
+  ],
+  "result": "pass",
+  "fixture_cleanup": "completed"
+}

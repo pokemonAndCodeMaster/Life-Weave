@@ -1,0 +1,30 @@
+{
+  "results": [
+    {
+      "workspace": "personal",
+      "id": "gzrun-20260918-163106-819d8bb5",
+      "resultReadable": true,
+      "sha256": "55e0b27a7e22aff4939e6212c4960dc42a338f4fcf718eb8c022601032912f38"
+    },
+    {
+      "workspace": "personal",
+      "id": "gzrun-20260918-162949-b1048d55",
+      "resultReadable": true,
+      "sha256": "55e0b27a7e22aff4939e6212c4960dc42a338f4fcf718eb8c022601032912f38"
+    },
+    {
+      "workspace": "personal",
+      "id": "gzrun-20260918-160526-18eb2f21",
+      "resultReadable": true,
+      "sha256": "a450cd9eb82e0d6398e0d47f286c78cce0ad402da1409d33dbc259b409c23046"
+    },
+    {
+      "workspace": "team",
+      "id": "gzrun-20260918-161832-69ce27e9",
+      "resultReadable": true,
+      "sha256": "b62e6bee8cdb04eefc12faa0043a87bc4fd8e136782f6a0dd68f536828d6df3b"
+    }
+  ],
+  "legacyApiRedirect": "/api/lifeweave/personal/items?limit=1",
+  "historicalSourceReadable": true
+}
