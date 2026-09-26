@@ -43,6 +43,8 @@ const capability = shallowRef<Record<string, any> | null>(null)
 const ideaDetail = shallowRef<Idea | null>(null)
 const runArtifact = shallowRef<{ content: string; version: string } | null>(null)
 const modalError = shallowRef('')
+const skillStarter = '---\nname: new-skill\ndescription: 用一句话说明何时使用。\n---\n\n# 任务\n\n写明适用问题、输入、步骤、输出和停止条件。'
+const generatedCandidateContent = shallowRef<string | null>(null)
 const form = reactive({
   body: '', scope: '个人', title: '', itemType: 'requirement', goal: '', domain: '', owner: '我', due: '',
   topics: [] as string[], domains: [] as string[], resources: [] as string[], source: '', anchor: '',
@@ -71,7 +73,7 @@ const payloadTitle = computed(() => ({
   discussion: '围绕这件事讨论', delegate: '委托一次工作', 'run-detail': `${detailRun.value?.id ?? ''} · 运行与环境`,
   'context-history': '共享上下文版本', artifact: '成果与产物', evidence: '验证证据', 'accept-result': '接受本轮结果',
   'improvement-create': '形成能力改进建议', 'improvement-detail': '能力改进说明', 'capability-create': '准备可试验能力候选', 'agenda-config': '配置会议呈现', 'meeting-note': '把会中决定关联回事项',
-  'knowledge-proposal': '提出知识修订候选', 'capability-detail': '能力改进候选', search: '查找事项、知识与灵感', peek: item.value ? `${item.value.id} · 事项速览` : '事项速览',
+  'knowledge-proposal': '提出知识修订候选', 'capability-detail': '能力候选', search: '查找事项、知识与灵感', peek: item.value ? `${item.value.id} · 事项速览` : '事项速览',
 }[type.value ?? ''] ?? 'LifeWeave'))
 const searchDocuments=shallowRef<{path:string;sourceId:string;title:string}[]>([])
 let searchGeneration=0
@@ -91,7 +93,7 @@ watch(type, async (next, _previous, onCleanup) => {
   recommendations.value = null
   feedbackRequestId = crypto.randomUUID()
   Object.assign(form, { body: '', scope: activeWorkspace.value === 'team' ? '团队' : '个人', title: '', itemType: activeWorkspace.value === 'team' ? 'requirement' : 'research', goal: '', domain: state.value?.domains[0] ?? '', owner: '我', due: '', topics: [], domains: [], resources: [], source: '', anchor: '', instruction: '', engine: activeWorkspace.value === 'team' ? 'opencode' : 'codex', runtime: 'native', image: '', directory: '', branch: '', model: '', permission: 'read-only', capabilityCandidateId: '', methodId: '', knowledgeRefs: [] as string[], targetKind: 'skill', targetRef: '', desiredBehavior: '', validationPlan: '', content: '', runId: '', evidenceId: '', assessment: '', result: 'accepted', reason: '', contextField: 'goal', entityType: 'topic', entityState: '进行中', endCondition: '', uri: '', childKind: 'other' })
-  detailRun.value = null; history.value = []; capability.value = null; ideaDetail.value = null; runArtifact.value = null; modalError.value = ''; taskCandidates.value = []
+  detailRun.value = null; history.value = []; capability.value = null; ideaDetail.value = null; runArtifact.value = null; modalError.value = ''; taskCandidates.value = []; generatedCandidateContent.value = null
   if (next === 'item-create' && idea.value) { form.title = idea.value.title; form.goal = idea.value.body }
   if (next === 'topic-edit' && topic.value) { form.title = topic.value.name; form.goal = topic.value.goal; form.due = topic.value.due ?? ''; form.owner = topic.value.owner; form.entityState = topic.value.state ?? '进行中'; form.endCondition = topic.value.endCondition ?? '' }
   if (next === 'relations' && item.value) { form.owner = item.value.owner; form.due = item.value.due ?? ''; form.topics = [...item.value.topics]; form.domains = [...item.value.domains]; form.resources = [...item.value.assets] }
@@ -122,13 +124,23 @@ watch(type, async (next, _previous, onCleanup) => {
   if (next === 'capability-create') {
     const improvement = modal.payload.improvement as any
     form.title = improvement?.title ?? ''
-    form.targetKind = ['skill', 'agent', 'harness'].includes(improvement?.kind) ? improvement.kind : 'skill'
+    form.targetKind = ['skill', 'agent', 'harness'].includes(improvement?.kind) ? improvement.kind : improvement ? 'skill' : 'agent'
     form.desiredBehavior = improvement?.desiredBehavior ?? ''
     form.validationPlan = improvement?.validationPlan ?? ''
     const description = String(form.desiredBehavior || improvement?.body || '在明确边界内改善下一次工作。').replace(/\n/g, ' ')
     form.content = form.targetKind === 'skill' ? `---\nname: candidate-skill\ndescription: ${description}\n---\n\n# ${form.title || '候选 Skill'}\n\n${improvement?.body ?? ''}` : String(improvement?.body ?? '')
+    generatedCandidateContent.value = form.content
   }
 })
+
+function candidateTargetChanged() {
+  if (form.content !== generatedCandidateContent.value) {
+    notify('已保留您编辑的内容，请确认它适用于新能力类型。')
+    return
+  }
+  form.content = form.targetKind === 'skill' ? skillStarter : String(improvement.value?.body ?? '')
+  generatedCandidateContent.value = form.content
+}
 
 async function submit(action: () => Promise<unknown>) {
   busy.value = true; modalError.value = ''
@@ -185,13 +197,22 @@ function prepareImprovement() {
 }
 
 async function saveCapability() {
-  if (!improvement.value) return
+  if (![form.title, form.content, form.desiredBehavior, form.validationPlan].every(value => value.trim())) {
+    notify('请填齐候选名称、真实内容、期望行为和验证计划。')
+    return
+  }
+  const sourceCandidateId = String(improvement.value?.targetRef ?? '')
+  let predecessorCandidateId: string | undefined
+  if (sourceCandidateId.startsWith('cap-')) {
+    const sourceCandidate = await getCapability(activeWorkspace.value, sourceCandidateId) as { target: string }
+    if (sourceCandidate.target === form.targetKind) predecessorCandidateId = sourceCandidateId
+  }
   const candidate: any = await createCapability(activeWorkspace.value, {
-    title: form.title, target: form.targetKind, content: form.content,
-    desiredBehavior: form.desiredBehavior, validationPlan: form.validationPlan,
-    sourceEntityId: improvement.value.id,
-    sourceItemId: improvement.value.itemId ?? item.value?.id,
-    predecessorCandidateId: String(improvement.value.targetRef ?? '').startsWith('cap-') ? improvement.value.targetRef : undefined,
+    title: form.title.trim(), target: form.targetKind, content: form.content.trim(),
+    desiredBehavior: form.desiredBehavior.trim(), validationPlan: form.validationPlan.trim(),
+    sourceEntityId: improvement.value?.id,
+    sourceItemId: improvement.value?.itemId ?? item.value?.id,
+    predecessorCandidateId,
   })
   window.dispatchEvent(new CustomEvent('lifeweave-capabilities-changed'))
   notify('可试验候选已建立，尚未验证或发布。')
@@ -224,7 +245,7 @@ function meetingSections(): MeetingSectionConfig[] {
     <template v-else-if="type === 'evidence' && evidence"><h3>{{ evidence.name }}</h3><p>{{ evidence.purpose }}</p><MarkdownBody v-if="(evidence as any).payload?.body" :content="(evidence as any).payload.body"/><div class="lw-prop"><span>当前状态</span><StatusBadge :value="evidence.result" /></div><div class="lw-prop"><span>证据引用</span><div>{{ evidence.source }}</div></div><label class="lw-label">审阅原因<textarea v-model="form.reason" class="lw-field"></textarea></label><div class="lw-notice neutral"><LifeWeaveIcon name="shield" /><span>接受证据只确认这份固定产物、环境和范围；不会自动完成事项。</span></div></template>
     <template v-else-if="type === 'accept-result' && item"><h3>{{ item.title }}</h3><p>接受前，服务端会确认至少有一条已人工接受且固定产物版本与环境的证据。</p></template>
     <template v-else-if="type === 'improvement-create' && item"><label class="lw-label">候选名称<input v-model="form.title" class="lw-field" /></label><label class="lw-label">改进哪一层<select v-model="form.targetKind" class="lw-field"><option value="knowledge">知识</option><option value="skill">Skill</option><option value="agent">Agent 配置</option><option value="harness">Harness / 流程</option></select></label><label class="lw-label">问题与修改方向<textarea v-model="form.body" class="lw-field"></textarea></label><label class="lw-label">希望改善的行为<textarea v-model="form.desiredBehavior" class="lw-field"></textarea></label><label class="lw-label">验证方法<textarea v-model="form.validationPlan" class="lw-field"></textarea></label><label class="lw-label">修改对象<input v-model="form.targetRef" class="lw-field" /></label><p class="lw-dialog-note">来源事项 {{ item.id }} 自动关联。保存的是建议，验证与发布另有真实门槛。</p></template>
-    <template v-else-if="type === 'improvement-detail' && improvement"><StatusBadge value="原始改进建议" tone="amber" /><h3 class="lw-mt-15">{{ improvement.title }}</h3><p>{{ improvement.body }}</p><div class="lw-prop"><span>目标层</span><div>{{ improvement.kind }}</div></div><div class="lw-prop"><span>希望改善</span><div>{{ improvement.desiredBehavior || '未填写' }}</div></div><div class="lw-prop"><span>验证计划</span><div>{{ improvement.validationPlan || '未填写' }}</div></div><div class="lw-notice neutral">这条记录尚不是已安装或已发布能力。进入能力候选后仍需实际 Run 与人工接受证据。</div></template><template v-else-if="type === 'capability-create' && improvement"><div class="lw-notice neutral">来源建议 {{ improvement.id }} 会保留。候选创建后还必须实际委托、人工接受证据与验证，才可发布。</div><label class="lw-label">候选名称<input v-model="form.title" class="lw-field" /></label><label class="lw-label">能力类型<select v-model="form.targetKind" class="lw-field"><option value="skill">Skill</option><option value="agent">Agent 配置</option><option value="harness">Harness / 流程</option></select></label><label class="lw-label">真实候选内容<textarea v-model="form.content" class="lw-field lw-large-textarea"></textarea></label><p v-if="form.targetKind === 'skill'" class="lw-dialog-note">请提交完整 SKILL.md，必须含 name 与 description frontmatter。</p><label class="lw-label">希望改善的行为<textarea v-model="form.desiredBehavior" class="lw-field"></textarea></label><label class="lw-label">验证计划<textarea v-model="form.validationPlan" class="lw-field"></textarea></label></template>
+    <template v-else-if="type === 'improvement-detail' && improvement"><StatusBadge value="原始改进建议" tone="amber" /><h3 class="lw-mt-15">{{ improvement.title }}</h3><p>{{ improvement.body }}</p><div class="lw-prop"><span>目标层</span><div>{{ improvement.kind }}</div></div><div class="lw-prop"><span>希望改善</span><div>{{ improvement.desiredBehavior || '未填写' }}</div></div><div class="lw-prop"><span>验证计划</span><div>{{ improvement.validationPlan || '未填写' }}</div></div><div class="lw-notice neutral">这条记录尚不是已安装或已发布能力。进入能力候选后仍需实际 Run 与人工接受证据。</div></template><template v-else-if="type === 'capability-create'"><div class="lw-notice neutral">{{ improvement ? `来源建议 ${improvement.id} 会保留；只有新旧能力类型相同才继承前任候选。` : '先写明能力边界和预期表现。' }}候选创建后还必须实际委托、人工接受证据与评测，才可发布。</div><label class="lw-label">候选名称<input v-model="form.title" class="lw-field" /></label><label class="lw-label">能力类型<select v-model="form.targetKind" class="lw-field" @change="candidateTargetChanged"><option value="skill">Skill</option><option value="agent">Agent 配置</option><option value="harness">Harness / 流程</option></select></label><label class="lw-label">真实候选内容<textarea v-model="form.content" class="lw-field lw-large-textarea" placeholder="适用问题、输入、可用知识与工具、输出要求、停止条件……"></textarea></label><p v-if="form.targetKind === 'skill'" class="lw-dialog-note">请提交完整 SKILL.md，必须含 name 与 description frontmatter。</p><p v-else class="lw-dialog-note">请写实际运行时使用的指令与边界，不能只写候选名称。</p><label class="lw-label">期望行为<textarea v-model="form.desiredBehavior" class="lw-field"></textarea></label><label class="lw-label">验证计划<textarea v-model="form.validationPlan" class="lw-field"></textarea></label></template>
     <template v-else-if="type === 'agenda-config'"><p class="lw-small lw-sub">只配置读取与讲述方式，不复制一份周报事实。</p><details v-for="(entry, index) in agenda" :key="entry.key" class="lw-agenda-edit-row"><summary class="lw-between"><label class="lw-checkline" @click.stop><input v-model="entry.enabled" type="checkbox" />{{ entry.title }}</label><span class="lw-inline"><button class="lw-btn sm" type="button" @click.prevent="moveAgenda(index, -1)">↑</button><button class="lw-btn sm" type="button" @click.prevent="moveAgenda(index, 1)">↓</button></span></summary><div class="lw-form-grid lw-mt-14"><label class="lw-label">只看这些事项 ID<input v-model="entry.itemIdsText" class="lw-field" placeholder="留空使用板块默认规则" /></label><label class="lw-label">按事项字段分组<select v-model="entry.groupBy" class="lw-field"><option :value="null">不分组</option><option value="owner">责任人</option><option value="due">目标时间</option><option value="domains">领域</option></select></label></div><div v-if="entry.key !== 'topics'"><span class="lw-label">事项状态（留空使用板块默认规则）</span><label v-for="status in [{ key: 'open', label: '待确认' }, { key: 'in_progress', label: '进行中' }, { key: 'blocked', label: '已阻塞' }, { key: 'awaiting_acceptance', label: '待验收' }, { key: 'completed', label: '已完成' }]" :key="status.key" class="lw-checkline"><input v-model="entry.filters!.statuses" type="checkbox" :value="status.key" />{{ status.label }}</label><span class="lw-label">显示事项字段</span><label v-for="field in [{ key: 'title', label: '标题' }, { key: 'status', label: '状态' }, { key: 'payload', label: '工作内容' }]" :key="field.key" class="lw-checkline"><input v-model="entry.fields" type="checkbox" :value="field.key" />{{ field.label }}</label><span class="lw-label lw-mt-8">工作内容明细</span><label v-for="field in [{ key: 'goal', label: '目标' }, { key: 'update', label: '最新变化' }, { key: 'owner', label: '责任人' }, { key: 'due', label: '目标时间' }, { key: 'decisions', label: '决定' }]" :key="field.key" class="lw-checkline"><input v-model="entry.payloadFields" type="checkbox" :value="field.key" />{{ field.label }}</label></div><div v-else><span class="lw-label">只看这些专题</span><label v-for="topicRow in state?.topics" :key="topicRow.id" class="lw-checkline"><input v-model="entry.filters!.topicIds" type="checkbox" :value="topicRow.id" />{{ topicRow.name }}</label><span v-if="!state?.topics.length" class="lw-tiny lw-muted">尚无专题；默认会显示全部专题摘要。</span></div></details><div class="lw-notice neutral lw-mt-16"><LifeWeaveIcon name="layers" /><span>完整展开、摘要和语境决定由后端投影统一去重。</span></div></template>
     <template v-else-if="type === 'meeting-note' && item"><p class="lw-small lw-sub">{{ item.id }} · {{ item.title }}</p><label class="lw-label">决定或行动项<textarea v-model="form.body" class="lw-field"></textarea></label><p class="lw-dialog-note">记录会加入原事项活动；共识变化仍需提出上下文修订。</p></template>
     <template v-else-if="type === 'knowledge-proposal' && knowledgeDocument"><div class="lw-notice neutral lw-mb-16">{{ knowledgeDocument.path }} · 当前读取版本 {{ knowledgeDocument.version }}</div><label class="lw-label">候选名称<input v-model="form.title" class="lw-field" /></label><label class="lw-label">建议正文<textarea v-model="form.content" class="lw-field lw-large-textarea"></textarea></label><label class="lw-label">希望改善的行为<textarea v-model="form.desiredBehavior" class="lw-field"></textarea></label><label class="lw-label">验证计划<textarea v-model="form.validationPlan" class="lw-field"></textarea></label></template>
@@ -250,7 +271,7 @@ function meetingSections(): MeetingSectionConfig[] {
       <template v-else-if="type === 'evidence' && evidence && item"><button class="lw-btn" type="button" :disabled="busy || !evidence.id" @click="submit(() => reviewEvidence(item!, String(evidence!.id), 'rejected', form.reason))">拒绝证据</button><button class="lw-btn primary" type="button" :disabled="busy || !evidence.id" @click="submit(() => reviewEvidence(item!, String(evidence!.id), 'accepted', form.reason))">接受证据</button></template>
       <button v-else-if="type === 'accept-result' && item" class="lw-btn primary" type="button" :disabled="busy" @click="submit(() => acceptResult(item!))">确认接受</button>
       <button v-else-if="type === 'improvement-create' && item" class="lw-btn primary" type="button" :disabled="busy" @click="submit(() => createImprovement(item!, { title: form.title, body: form.body, problem: form.body, targetKind: form.targetKind, targetRef: form.targetRef, desiredBehavior: form.desiredBehavior, validationPlan: form.validationPlan }))">保存建议</button>
-      <button v-else-if="type === 'improvement-detail' && improvement" class="lw-btn primary" type="button" @click="prepareImprovement">{{ improvement.kind === 'knowledge' ? '选择知识来源' : '准备试验候选' }}</button><button v-else-if="type === 'capability-create' && improvement" class="lw-btn primary" type="button" :disabled="busy" @click="submit(saveCapability)">建立可试验候选</button><button v-else-if="type === 'agenda-config'" class="lw-btn primary" type="button" :disabled="busy || !agenda.some((entry) => entry.enabled)" @click="submit(() => saveMeetingConfig(meetingSections()))">保存议程</button>
+      <button v-else-if="type === 'improvement-detail' && improvement" class="lw-btn primary" type="button" @click="prepareImprovement">{{ improvement.kind === 'knowledge' ? '选择知识来源' : '准备试验候选' }}</button><button v-else-if="type === 'capability-create'" class="lw-btn primary" type="button" :disabled="busy" @click="submit(saveCapability)">建立可试验候选</button><button v-else-if="type === 'agenda-config'" class="lw-btn primary" type="button" :disabled="busy || !agenda.some((entry) => entry.enabled)" @click="submit(() => saveMeetingConfig(meetingSections()))">保存议程</button>
       <button v-else-if="type === 'meeting-note' && item" class="lw-btn primary" type="button" :disabled="busy" @click="submit(() => addMeetingNote(item!.id, form.body, String(modal.payload.snapshotId || '') || undefined))">保存会中记录</button>
       <button v-else-if="type === 'knowledge-proposal' && knowledgeDocument" class="lw-btn primary" type="button" :disabled="busy" @click="submit(async () => { await createKnowledgeProposal(activeWorkspace, { title: form.title, target: 'knowledge', content: form.content, desiredBehavior: form.desiredBehavior, validationPlan: form.validationPlan, sourcePath: knowledgeDocument!.path, baseVersion: knowledgeDocument!.version }); closeModal(); notify('知识修订候选已保存，正式知识尚未改变。') })">保存候选</button>
       <template v-else-if="type === 'capability-detail' && capability"><button v-if="capability.status !== 'published'" class="lw-btn" type="button" :disabled="busy" @click="submit(async () => { await verifyCapability(activeWorkspace, capability!.id, { runId: form.runId, evidenceId: form.evidenceId, result: form.result, assessment: form.assessment }); capability = await getCapability(activeWorkspace, capability!.id) as any; notify('真实验证结果已记录。') })">记录验证</button><button v-if="capability.status === 'verified'" class="lw-btn primary" type="button" :disabled="busy" @click="submit(async () => { await publishCapability(activeWorkspace, capability!.id, capability!.version); capability = await getCapability(activeWorkspace, capability!.id) as any; notify('当前候选版本已发布。') })">发布此版本</button></template>
