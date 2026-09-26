@@ -13,7 +13,7 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | 创建 Skill/Agent/Harness 候选，围绕事项运行评测、看轨迹和工作样例，并按同标准再评 | 两次内部窄任务真实 Codex 运行；临时数据库和页面验证见[评测证据](evidence/personal-platform-evolution/README.md) | 不能自动创建、优化、合并能力；实施者判定通过不等于用户验收或跨领域有效 |
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |
 | 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](../README.md#在新的本机-agent-会话接续) | 原始命令和输出不上传；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件 |
-| 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [真实 Codex 三阶段执行](evidence/development-agent/README.md)、[开发委托服务](../src/lifeweave/development.py)及数据库/HTTP 回归；前端类型检查和构建通过 | 仅在临时小仓核验了实际执行；复杂工程质量、外部会话自动逐工具采集仍未验证；只有 Codex 路径可选，结果不会自动合入原仓 |
+| 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[临时小仓三阶段执行](evidence/development-agent/README.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量，复杂工程质量、外部会话自动逐工具采集仍未验证；只有 Codex 路径可选，结果不会自动合入原仓 |
 
 执行以本机 Codex CLI 的真实成功记录为依据。OpenCode 已能建立会话，但真实模型调用连续返回内部错误，尚未取得成功结果；原因未定位。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。
 

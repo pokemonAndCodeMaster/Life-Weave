@@ -26,6 +26,7 @@ def main(argv=None):
     p = commands.add_parser('discover', help='find work by topic; empty query lists existing work')
     p.add_argument('query', nargs='?', default='')
     for name, help_text in [('continue', 'read accepted background, proposals, feedback and outcomes'),
+                            ('development-choices', 'read development options without starting execution'),
                             ('recommend', 'find versioned materials and methods for this work')]:
         p = commands.add_parser(name, help=help_text); p.add_argument('item_id')
         if name == 'recommend': p.add_argument('--query', default='')
@@ -86,6 +87,8 @@ def main(argv=None):
             result = call('/work-discovery?' + urlencode({'query': args.query}))
         elif args.command == 'continue':
             result = call(f'/items/{item}/continuation')
+        elif args.command == 'development-choices':
+            result = call(f'/items/{item}/development/choices')
         elif args.command == 'recommend':
             result = call(f'/items/{item}/input-recommendations?' + urlencode({'query': args.query}))
         elif args.command == 'capture':

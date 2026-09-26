@@ -104,6 +104,7 @@ API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`
 python scripts/lifeweave.py --help
 python scripts/lifeweave.py discover '想继续的目标'
 python scripts/lifeweave.py continue item-实际编号
+python scripts/lifeweave.py development-choices item-实际编号
 python scripts/lifeweave.py recommend item-实际编号
 python scripts/lifeweave.py read-knowledge 'local:知识路径.md'
 python scripts/lifeweave.py knowledge --source lifeweave-project
@@ -113,6 +114,8 @@ python scripts/lifeweave.py runs
 python scripts/lifeweave.py capture '先记一个生活想法，暂时不推进'
 python scripts/lifeweave.py feedback item-实际编号 '重点理解错了，先讨论适用范围'
 ```
+
+`development-choices` 只读查询开发选项并打印 JSON，不启动执行。
 
 `capture`、`create`、`discuss`、`feedback` 只保存，不启动 AI。`run` 是显式委托，会采用文本匹配推荐的输入；先查看 `recommend` 的依据，无匹配时不捏造方法，复杂适用性仍由 Agent 判断。网页的“委托 AI”也会预选推荐，可手动调整。推荐、实际输入快照与执行步骤是不同证据。
 

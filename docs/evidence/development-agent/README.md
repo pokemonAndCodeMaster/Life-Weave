@@ -1,5 +1,7 @@
 # 开发 Agent 首条真实执行证据
 
+正式 LifeWeave 仓又通过网页提交了一次有界 CLI 增量，留下独立方案、审阅、实施 Run 与合入检查；见[正式项目执行记录](live-project-run.md)。下文是更早的临时小仓验证，不应与正式仓的产物混为同一运行。
+
 日期：2026-09-26。使用一次性 PostgreSQL 数据库和一个仅有 README 的临时 Git 仓库，运行正式 FastAPI、内置本机 Worker 和已登录的 Codex CLI。测试结束后删除临时数据库及仓库；下列身份来自运行时输出，不是生产事项。
 
 用户任务：在 README 既有句子后新增 `Greeting: hello`，只改这一文件，执行 `grep` 验证。通过 `/api/lifeweave/personal/development` 提交，选择 `reviewMode=independent`。委托 `dev-78f864c7b38f25de0a683bb649b8350f` 从 `planning` → `reviewing` → `implementing` → `awaiting_acceptance`，没有第二次授权按钮。

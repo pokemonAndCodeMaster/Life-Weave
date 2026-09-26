@@ -11,11 +11,11 @@
 
 | 部分 | 章节 | 来源 | 原文 SHA-256 |
 | --- | --- | --- | --- |
-| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `28d553b4a4cbc31f3156cec61faef6752a2c780466fb02f8dca583a8abfa18d7` |
+| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `b9787445f819b79016df7ffe0e10e981ef0671c7361190c51ce23621720b6891` |
 | 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `a3be812cde0d817c4372184d2b6d476a348674976fdbf0da7a6a1648b853ed9c` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-03) | `docs/product.md` | `afacca1738d92bd7e94efe5075b1d76f615ca35ecf4d379022bd60038381f789` |
 | 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `34888c839427db5d552717a6e6e4c2581f113b6c1f15cc59d1b35d2397c5f4b6` |
-| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `a7161f3ce4e57b86f5b075d740901db580fb165e1ea456e21fe59216e1000a18` |
+| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `f8ad8ce1b6fb9293530fb1221a7c0f04443ef0c27d6425b31cce32a7bcd77ec1` |
 | 当前说明 | [当前建设路线](#doc-06) | `docs/roadmap.md` | `28ff40117b7333b8b32694b8fd9d1d64104333990d8abc3e8277d0737a4cad72` |
 | 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `d7a74cc31fe0f3bc0b69d8778f31e080095a73b371403b4c8c1983255df8828f` |
 | 当前说明 | [LifeWeave：名称与适配](#doc-08) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
@@ -145,6 +145,7 @@ API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`
 python scripts/lifeweave.py --help
 python scripts/lifeweave.py discover '想继续的目标'
 python scripts/lifeweave.py continue item-实际编号
+python scripts/lifeweave.py development-choices item-实际编号
 python scripts/lifeweave.py recommend item-实际编号
 python scripts/lifeweave.py read-knowledge 'local:知识路径.md'
 python scripts/lifeweave.py knowledge --source lifeweave-project
@@ -154,6 +155,8 @@ python scripts/lifeweave.py runs
 python scripts/lifeweave.py capture '先记一个生活想法，暂时不推进'
 python scripts/lifeweave.py feedback item-实际编号 '重点理解错了，先讨论适用范围'
 ```
+
+`development-choices` 只读查询开发选项并打印 JSON，不启动执行。
 
 `capture`、`create`、`discuss`、`feedback` 只保存，不启动 AI。`run` 是显式委托，会采用文本匹配推荐的输入；先查看 `recommend` 的依据，无匹配时不捏造方法，复杂适用性仍由 Agent 判断。网页的“委托 AI”也会预选推荐，可手动调整。推荐、实际输入快照与执行步骤是不同证据。
 
@@ -549,7 +552,7 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | 创建 Skill/Agent/Harness 候选，围绕事项运行评测、看轨迹和工作样例，并按同标准再评 | 两次内部窄任务真实 Codex 运行；临时数据库和页面验证见[评测证据](evidence/personal-platform-evolution/README.md) | 不能自动创建、优化、合并能力；实施者判定通过不等于用户验收或跨领域有效 |
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |
 | 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](#doc-01-line-99) | 原始命令和输出不上传；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件 |
-| 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [真实 Codex 三阶段执行](evidence/development-agent/README.md)、[开发委托服务](../src/lifeweave/development.py)及数据库/HTTP 回归；前端类型检查和构建通过 | 仅在临时小仓核验了实际执行；复杂工程质量、外部会话自动逐工具采集仍未验证；只有 Codex 路径可选，结果不会自动合入原仓 |
+| 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[临时小仓三阶段执行](evidence/development-agent/README.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量，复杂工程质量、外部会话自动逐工具采集仍未验证；只有 Codex 路径可选，结果不会自动合入原仓 |
 
 执行以本机 Codex CLI 的真实成功记录为依据。OpenCode 已能建立会话，但真实模型调用连续返回内部错误，尚未取得成功结果；原因未定位。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。
 
