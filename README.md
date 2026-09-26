@@ -5,6 +5,7 @@
 - [LifeWeave 评测入口真实运行检查（2026-09-26）](research/personal/item-36e70781e4c6449b/gzrun-20260926-052339-4fe93525/report.md) · `gzrun-20260926-052339-4fe93525`
 - [阶段 2 自用：交付页提供完整版本复制入口](research/personal/item-62fe9c309d994457/gzrun-20260926-175727-3fdf1da7/report.md) · `gzrun-20260926-175727-3fdf1da7`
 - [阶段 2 自用：交付页提供完整版本复制入口](research/personal/item-62fe9c309d994457/gzrun-20260926-175853-e4492834/report.md) · `gzrun-20260926-175853-e4492834`
+- [阶段 2 自用：交付页提供完整版本复制入口](research/personal/item-62fe9c309d994457/gzrun-20260926-180057-57d27d56/report.md) · `gzrun-20260926-180057-57d27d56`
 - [(内部验证) 指定方法与知识的真实评测](research/personal/item-724331a2968c4420/gzrun-20260926-055416-2343fb31/report.md) · `gzrun-20260926-055416-2343fb31`
 - [Qwen-Drive-1.0 原文核验与持续论文研究](research/personal/item-810217743bbb4be2/gzrun-20260919-095844-49f47906/report.md) · `gzrun-20260919-095844-49f47906`
 - [回归验证只读阶段守卫后 Codex 仍可完成开发](research/personal/item-8891f7cb4f634c8f/gzrun-20260926-152934-e3603670/report.md) · `gzrun-20260926-152934-e3603670`
