@@ -7,7 +7,8 @@ export interface DevelopmentAssignment {
   workingTreeExcluded: boolean; contextVersionId: string; methodId: string | null
   knowledgeRefs: string[]; inputVersions: Array<{ id: string; version: string; sourcePath: string }>
   reviewMode: 'independent' | 'self'; reviewDecision: string | null
-  status: 'planning' | 'reviewing' | 'implementing' | 'awaiting_acceptance' | 'blocked' | 'failed' | 'cancelled'
+  executionScope: 'plan_only' | 'implement'
+  status: 'planning' | 'reviewing' | 'plan_ready' | 'implementing' | 'awaiting_acceptance' | 'delivery_failed' | 'accepted' | 'rejected' | 'blocked' | 'failed' | 'cancelled'
   planRunId: string | null; reviewRunId: string | null; implementationRunId: string | null
   plan: string | null; planSha256: string | null; review: string | null; error: string | null
   createdAt: string; updatedAt: string
@@ -20,7 +21,7 @@ export interface DevelopmentChoices {
 export interface DevelopmentInput {
   requestId: string; itemId: string; instruction: string; repositoryPath: string
   agentId: 'development'; engine: 'codex' | 'opencode'; model?: string | null; methodId?: string | null
-  knowledgeRefs?: string[]; reviewMode: 'independent' | 'self'; acknowledgeExcludedChanges: boolean
+  knowledgeRefs?: string[]; reviewMode: 'independent' | 'self'; executionScope: 'plan_only' | 'implement'; acknowledgeExcludedChanges: boolean
 }
 const root = (workspace: WorkspaceKind) => `/lifeweave/${workspace}`
 export async function developmentChoices(workspace: WorkspaceKind, itemId: string) {
@@ -38,4 +39,23 @@ export async function cancelDevelopment(workspace: WorkspaceKind, id: string) {
 export interface DevelopmentDiff { runId: string; baseRevision: string; files: string[]; fileCount: number; patch: string; truncated: boolean; generatedInputsExcluded: string[]; generatedArtifactsExcluded: string[] }
 export async function getDevelopmentDiff(workspace: WorkspaceKind, id: string) {
   return (await http.get<DevelopmentDiff>(`${root(workspace)}/development/${encodeURIComponent(id)}/diff`)).data
+}
+export interface DevelopmentDelivery {
+  id: string; assignmentId: string; implementationRunId: string; baseRevision: string
+  artifactSha256: string; manifest: { files: Array<{ path: string; status: string; before: { mode: string; oid: string } | null; after: { mode: string; oid: string } | null }>; excludedGenerated: string[]; patchSha256: string; serviceChecks: string[]; verificationBoundary: string }
+  integrationCommit: string | null; integrationCheckedAt: string | null; integrationCurrentHead: boolean | null
+  decision: 'accepted' | 'rejected' | null; decisionScope: 'patch' | 'integrated' | null
+  decisionReason: string | null; decidedAt: string | null
+}
+export async function getDevelopmentDelivery(workspace: WorkspaceKind, id: string) {
+  return (await http.get<DevelopmentDelivery>(`${root(workspace)}/development/${encodeURIComponent(id)}/delivery`)).data
+}
+export async function downloadDevelopmentDelivery(workspace: WorkspaceKind, id: string) {
+  return (await http.get<Blob>(`${root(workspace)}/development/${encodeURIComponent(id)}/delivery.zip`, { responseType: 'blob' })).data
+}
+export async function checkDevelopmentIntegration(workspace: WorkspaceKind, id: string, commit: string) {
+  return (await http.post<DevelopmentDelivery>(`${root(workspace)}/development/${encodeURIComponent(id)}/integration-check`, { commit })).data
+}
+export async function decideDevelopmentDelivery(workspace: WorkspaceKind, id: string, input: { requestId: string; artifactSha256: string; decision: 'accepted' | 'rejected'; scope: 'patch' | 'integrated'; reason: string }) {
+  return (await http.post<DevelopmentDelivery>(`${root(workspace)}/development/${encodeURIComponent(id)}/decision`, input)).data
 }

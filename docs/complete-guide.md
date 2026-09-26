@@ -11,14 +11,14 @@
 
 | 部分 | 章节 | 来源 | 原文 SHA-256 |
 | --- | --- | --- | --- |
-| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `6509d5c9b670e70de3af1cdfa78364e8e94c4da126d4b56f9cf45f9b7a02adbe` |
+| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `76c7c18112bd59980e6f7d97341f55147760f46419a2f7b6812e70f57beb7904` |
 | 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `42aa3af950c45bfc64b698281b62b22be248c0311723bffd68bc1f326a163e0d` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-03) | `docs/product.md` | `afacca1738d92bd7e94efe5075b1d76f615ca35ecf4d379022bd60038381f789` |
 | 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `ba008a360c31c8a7e914e3fe20d77cc26a230ef74e27859532b67ed673ea4e38` |
-| 当前说明 | [插件目录与开发过程：首个可运行切片](#doc-05) | `docs/plugin-system.md` | `92fd93dca02c6666284f2244390ea0c29e8bd5ec069666f60c5258bdc6e18cdf` |
+| 当前说明 | [插件目录与开发过程：首个可运行切片](#doc-05) | `docs/plugin-system.md` | `3a9044c60e081703c0c7a2c83e1779fc33c3f8b0a602e2a96fc1ab2c8dc78483` |
 | 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `57fc8171c07909df2fd76a428941a5b74b33052e0fd8c18110c4ac29fe89b2e2` |
 | 当前说明 | [当前建设路线](#doc-07) | `docs/roadmap.md` | `563c1874c1a6e154c9a16063ea91feec947c489f180ce519ce4bb473f40ddadb` |
-| 当前说明 | [开发与运行维护](#doc-08) | `docs/development.md` | `695564a8c2b7eb9ccc855fc2d0eb7ed8764cf54d8e8871830c911b67d28737e5` |
+| 当前说明 | [开发与运行维护](#doc-08) | `docs/development.md` | `cec311f08f2ff0bc7103723a3856b3ab71982d332c7f7bf8ba8634d0b4d72677` |
 | 当前说明 | [LifeWeave：名称与适配](#doc-09) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
 | 当前说明 | [研究成果归档、离线阅读与跨文章讨论](#doc-10) | `docs/research-archive.md` | `e3d4980ab611ac1c975ce3122f27f6ceb53c57756716fc7003396e52aa77d3f7` |
 
@@ -79,7 +79,7 @@ python scripts/workbench.py start
 6. 在“周回顾 / 组会”配置关注内容、冻结当次内容、记录讨论并导出 Markdown。
 7. 在“维护中心 → 能力与成长”可直接创建 Skill/Agent 候选，或从工作中的改进建议接续；创建不会自动安装或发布。在“评测任务”选择已有事项，写本次任务和通过标准；开始时可选 Git 仓库、方法与知识，所选输入固定到实际 Run。不选仓库时在空隔离目录运行。结束后查看过程、接受证据并记录判断，或把问题关联成改进建议。打开候选可看它及明确前任的工作样例、失败历史和关联委托。评测候选通过后进入已验证状态；当前候选及明确记录的前任候选若有失败，须沿原标准再评通过，才能显式发布。
 
-“能力与评测 → 插件目录”展示当前受管开发能力、方法、执行器和脚本的身份、依赖与空间启停。需求/修复事项的“开发 Agent”可对照固定插件计划与实际调用；原方案、Run 事件和代码差异继续保留。具体观测范围及未接入能力见[插件目录与开发过程](#doc-05)。
+“能力与评测 → 插件目录”展示当前受管开发能力、方法、执行器和脚本的身份、依赖与空间启停。需求/修复事项的“开发 Agent”默认先做只读方案；明确允许实施后，可对照固定插件计划与实际调用，下载完整代码交付包，核对目标提交并对该交付作接受或修改决定。具体范围见[插件目录与开发过程](#doc-05)和[开发使用步骤](#doc-08-line-154)。
 
 “就地讨论”会打开关联当前事项的 AI 对话；展开“附带其他研究成果”，可明确选入其他论文。已有知识另按问题匹配读取，实际来源及版本显示在回复下方。
 
@@ -194,7 +194,7 @@ LifeWeave 希望帮助个人与协作中的人，把工作、学习、爱好和�
 | 插件目录、固定计划与受管调用怎样使用 | [插件目录与开发过程](#doc-05) |
 | 现在能做什么、哪些还不能依赖 | [当前完成情况](#doc-06) |
 | 怎样启动、修改、验证和维护 | [开发与运行维护](#doc-08) |
-| 怎样用当前项目知识发起开发、核对固定版本与 Notion 镜像 | [网页开发操作步骤](#doc-08-line-162) |
+| 怎样用当前项目知识发起开发、核对固定版本与 Notion 镜像 | [网页开发操作步骤](#doc-08-line-166) |
 | 为什么叫 LifeWeave、哪些名称已适配 | [命名与兼容](#doc-09) |
 | 亲自打开应用并完成第一项工作 | [项目首页与使用步骤](#doc-01) |
 
@@ -545,7 +545,7 @@ GitHub 以分支提交回读确认；Notion 以 Markdown 全文回读、来源�
 
 ## 插件目录与开发过程：首个可运行切片
 
-日期：2026-09-27。设计依据是 [Notion 阶段计划](https://app.notion.com/p/3e7af682864481d6a5f3c7f7b8542bc0)与[阶段 1 施工方案](../workspaces/reviews/plugin-foundation-stage1/review.md)。本文只描述当前代码已经接入的边界；后续阶段仍按该方案推进。
+日期：2026-09-27。设计依据是 [Notion 阶段计划](https://app.notion.com/p/3e7af682864481d6a5f3c7f7b8542bc0)、[阶段 1 施工方案](../workspaces/reviews/plugin-foundation-stage1/review.md)与[阶段 2 交付方案](../workspaces/reviews/plugin-stage2/review.md)。本文描述当前代码已接入的边界；完整使用步骤见[开发与运行维护](#doc-08)。
 
 <a id="doc-05-line-5"></a>
 
@@ -559,18 +559,20 @@ GitHub 以分支提交回读确认；Notion 以 Markdown 全文回读、来源�
 
 在需求或修复事项的“开发 Agent”页发起委托后，展开“插件计划与实际调用”。计划与绑定在委托创建时固定，实际调用只由服务端真正进入对应操作或受信任执行机进入 `executor.run` 边界时记下。一个条目有计划但没有调用，页面显示“尚无实际调用”，不推断执行器内部发生了什么。旧委托没有插件计划，会明确显示历史边界。开发页继续使用原 Run 和原生事件；插件过程接口故障时不遮断原有记录。
 
+新委托默认只形成只读方案；选择允许实施才在审阅通过后建立可写 Run。允许实施且产生文件变化时，服务固定完整补丁与文件清单，回放核对后提供 ZIP。目标仓提交核对、交付接受与原 Run 成功分别记录；接受对应的证据引用同一实施 Run 和包版本，不自动合入、推送或部署代码。旧委托保留旧状态，不反推已有固定交付。
+
 目前可见的组合是 `lifeweave.development` → `lifeweave.context` → `lifeweave.knowledge` 的推荐和选定正文读取、`lifeweave.method.<原方法ID>` 的版本固定，以及 `lifeweave.execution.codex` 和 `lifeweave.checks.repository`。方法的“已绑定”仅证明材料被选入快照，不证明模型遵循全部步骤。Run 环境中的 `contextPack` 含编译器版本、背景版本、来源版本和最终提示词 SHA-256；提示词正文仍由原 Run 快照保存。推荐会扫描受管来源并记录候选引用；选中的正文另存于原能力快照。
 
-<a id="doc-05-line-17"></a>
+<a id="doc-05-line-19"></a>
 
 ### 实现与数据归属
 
 - [core.py](../src/lifeweave_plugins/core.py) 管内置描述、依赖校验、实现摘要与调用边界；[service.py](../src/lifeweave_plugins/service.py) 管空间状态、固定计划、绑定核验和计划／实际投影。
-- [013_plugin_foundation.sql](../migrations/013_plugin_foundation.sql) 新增固定计划、调用与空间启停三张表；[014_plugin_evaluations.sql](../migrations/014_plugin_evaluations.sql) 让原评测表按真实插件调用记录判断，并允许同一 Run 有多个评测目标；[015_development_call_completion.sql](../migrations/015_development_call_completion.sql) 用旧委托的终态与实际阶段进展保守补齐组合调用结果。既有事项、开发委托、Run、事件和知识正文仍由原模块负责。项目知识原文继续在 Git，本地知识原文继续在 Markdown，Notion 仍是镜像。
+- [013_plugin_foundation.sql](../migrations/013_plugin_foundation.sql) 新增固定计划、调用与空间启停三张表；[014_plugin_evaluations.sql](../migrations/014_plugin_evaluations.sql) 让原评测表按真实插件调用记录判断，并允许同一 Run 有多个评测目标；[015_development_call_completion.sql](../migrations/015_development_call_completion.sql) 保守补齐组合调用结果；[016_development_scope.sql](../migrations/016_development_scope.sql) 增加只读方案范围；[017_development_delivery.sql](../migrations/017_development_delivery.sql) 记录固定交付、集成核对和决定。既有事项、Run、事件和知识正文仍由原模块负责。项目知识原文继续在 Git，本地知识原文继续在 Markdown，Notion 仍是镜像。
 - [development.py](../src/lifeweave/development.py) 仍决定方案、审阅、自检、实施与只读检查何时推进；插件绑定不接管业务状态机。[Runtime](../src/lifeweave_runtime/service.py) 在创建 Run 时固定上下文和真实所选材料；[Worker](../src/lifeweave_runtime/worker.py) 紧贴执行器调用上报开始／结束事件。受信任租约、Run 事件和插件调用记录共同构成受管边界证据。
 - `GET /api/lifeweave/{space}/plugins`、`GET /plugins/{id}`、`PUT /plugins/{id}/enabled`、`GET /plugins/{id}/calls` 与 `GET /items/{itemId}/plugin-process` 是读取和控制入口。插件评测沿用 `POST /evaluations`、`POST /evaluations/{id}/assess`，并由 `GET /plugins/{id}/evaluations` 反查。启停请求带期望配置版本；版本冲突返回 409。没有任意插件代码安装或通用执行 POST。
 
-<a id="doc-05-line-24"></a>
+<a id="doc-05-line-26"></a>
 
 ### 当前边界与后续验收
 
@@ -841,22 +843,28 @@ python scripts/workbench.py start
 
 ### 开发 Agent 的受管委托
 
-在需求或修复事项中打开“开发 Agent”，写明交付目标并选择 Git 目录。先检查当前仓库提交；未提交内容不会进入隔离工作树，必须显式勾选确认才能在脏工作树上委托。平台固定事项背景、所选方法与知识版本，依次执行只读方案、独立只读审阅（或小改动自检）和可写实施。只有审阅明确通过且原提交、背景及知识版本未改变时才进入实施。各阶段有独立 Run、真实事件和错误；结果页可读隔离工作树的 Git 差异，但不会自动合入原仓。
+在需求或修复事项中打开“开发 Agent”，写明交付目标并选择 Git 目录。先检查当前仓库提交；未提交内容不会进入隔离工作树，必须显式勾选确认才能在脏工作树上委托。网页默认“仅形成方案并审阅”，服务端会在 `plan_ready` 停止，不建立可写 Run。明确选择“审阅通过后允许实施”才进入可写阶段；方案与审阅仍分别做只读检查，并在原提交、背景及知识版本变化时阻断。仅方案完成后如需实施，重新发起委托以固定最新输入，不在旧方案上偷偷升级权限。
+
+可写实施成功后，服务在 `.runtime/development-deliveries/` 冻结一份 ZIP，其中有完整二进制 Git 补丁、文件清单、基线与固定输入、补丁哈希及实施报告。服务核对 `git diff --check`，并在原基线回放补丁、比较文件树；不能生成完整包时显示“交付包生成失败”，不把实施 Run 冒充为已交付。网页可下载固定包；原“查看实际 Git 差异”仍是现场、截断的预览。交付包只保存于本机运行目录，需按运行产物另行备份。
+
+集成代码仍由开发者核对并按 Git 流程完成，工作台不会自动合并或推送。可以在交付区填完整目标提交 ID，服务只读比较这份交付涉及的全部文件内容与模式，再显示核对时是否为目标仓 HEAD；这不等于已推 GitHub 或已部署。用户随后可分别选择“仅接受补丁交付”或“接受已核对的目标仓结果”，也可写明需要修改的原因。决定绑定固定包 SHA-256、实施 Run 和同一事项，并形成对应证据；不会自动完成整项事项。正式用户尚未接受时，技术验证或集成不能代替其判断。旧委托没有固定包时保留原 Run 与差异阅读，不补造历史交付。
 
 网页对话中的明确开发委托若提供项目目录，会自动建立同样的方案 Run；没提供目录时只登记事项并提示到“开发 Agent”补齐目录。单纯讨论、记录和研究保持原路径。本机 Codex 直接开发时，使用上述 `external-start` / `external-report` 关联同一事项；当前只能主动上报阶段和服务观测 Git，尚不能自动捕获该会话每条工具命令。
 
 开发页当前默认且只开放 Codex。OpenCode 曾在当前空间完成一次指定模型小仓开发，但随后发现只读方案中的子代理能修改隔离工作树，故开发入口临时关闭；修正后的权限与阶段 Git 检查正在回归。通用 AI 委托的执行器设置与开发链开放状态分别判断，不能用一次成功证明模型长期可用。这不是 API Key 配置、团队空间或复杂项目质量的验收。全过程见[OpenCode 成功记录与反例](evidence/development-agent/opencode-chain.md)。
 
-<a id="doc-08-line-162"></a>
+<a id="doc-08-line-166"></a>
 
 ### 在网页中使用当前项目知识开发
 
 接手开发时，沿同一需求事项核对输入、调用与结果；插件记录的详细边界见[插件目录与开发过程](#doc-05)。以下步骤对应当前网页入口。
 
 1. **找到事项与当前知识。** 在对应的个人或团队空间打开需求事项，进入“开发 Agent”。需要了解项目时，先到“知识与材料”，在“知识范围”选择“LifeWeave 项目”，阅读相关正文，核对正文下方的路径与版本。这里打开文章只用于阅读，不会改变开发委托输入；读完回到原事项。
-2. **核对默认材料并发起委托。** 填写“这次要交付什么”，检查“项目 Git 目录”、表单下方的“固定方法”和“本轮默认项目知识”数量。当前开发页没有逐篇知识选择框：保持推荐目录时，默认带入 `docs/product.md`、`docs/architecture.md`、`docs/status.md`、`docs/development.md` 四篇；改成其他目录后默认零篇，不能把在知识页读过的文章当作已选入。核对仓库当前提交及未提交改动排除提示，确认复选框所述边界，选择“方案检查”中的“独立审阅（复杂改动）”或“方案自检（小改动）”，再点“开始开发委托”。运行从当前提交创建隔离工作树，未提交正文不会作为代码改动带入。
+2. **核对默认材料并发起委托。** 填写“这次要交付什么”，检查“项目 Git 目录”、表单下方的“固定方法”和“本轮默认项目知识”数量。当前开发页没有逐篇知识选择框：保持推荐目录时，默认带入 `docs/product.md`、`docs/architecture.md`、`docs/status.md`、`docs/development.md` 四篇；改成其他目录后默认零篇，不能把在知识页读过的文章当作已选入。核对仓库当前提交及未提交改动排除提示，确认复选框所述边界，选择“本次允许做到哪一步”与“方案检查”。默认只生成并审阅方案；选择允许实施后，审阅通过会自动进入可写隔离运行。运行从当前提交创建隔离工作树，未提交正文不会作为代码改动带入。
 3. **核对本轮固定版本。** 在“本事项的开发委托”找到刚创建的记录，查看 `Git` 提交、上下文版本及审阅方式；展开“固定输入与版本”，逐项核对方法、知识来源路径与版本。此处 Git 和材料版本显示哈希前 12 位。需要完整值时，可在浏览器开发者工具的网络响应中查看 `GET /api/lifeweave/{space}/items/{itemId}/development` 返回的 `repositoryRevision`、`contextVersionId` 和 `inputVersions`（`space` 为 `personal` 或 `team`）。项目提交和知识正文版本分别固定，不能假定知识一定来自该提交；后续修改原文也不会改写已创建 Run 的输入。
 4. **对照计划与实际调用。** 展开“插件计划与实际调用”，再展开相应阶段的调用，查看状态、输入／输出引用、固定插件版本、实现摘要和“绑定核对”。计划列出预期步骤；调用记录说明实际进入过操作，单凭记录出现不能认定操作完成。按下表判断材料到了哪一步。
+
+实施结束后打开“固定代码交付”，下载 ZIP 并核对文件清单、实施 Run、原始提交和服务核验范围。`changes.patch` 可在原基线检出中用 `git apply --binary` 回放；若已集成，填目标仓完整提交 ID 作只读核对。用户最终在该区对固定版本作接受或需要修改的决定。页面的测试文字来自实施 Run 报告，需结合原始测试输出、实际页面或接口进一步判断；包内校验只证明补丁完整与可回放。
 
 | 调用或记录 | 可以确认的事实 |
 | --- | --- |

@@ -179,6 +179,9 @@ class LifeWeaveRepository:
         return [self._camel(r) for r in self._postgres.fetch_all(f'SELECT * FROM {self.evidence} WHERE workspace_key=%(workspace)s AND item_id=%(item)s ORDER BY created_at DESC',{'workspace':workspace,'item':item_id})]
 
     def review_evidence(self,workspace:str,evidence_id:str,status:str,reason:str|None,actor:str)->dict[str,Any]:
+        existing=self._one(f'SELECT * FROM {self.evidence} WHERE id=%(id)s AND workspace_key=%(workspace)s',{'id':evidence_id,'workspace':workspace})
+        if existing and existing.get('payload',{}).get('provenance')=='development_delivery':
+            raise ValueError('开发交付证据只能从对应委托的固定交付决定入口处理')
         count=self._postgres.execute(f'UPDATE {self.evidence} SET status=%(status)s,reviewed_by=%(actor)s,reviewed_at=now(),review_reason=%(reason)s WHERE id=%(id)s AND workspace_key=%(workspace)s',{'status':status,'actor':actor,'reason':reason,'id':evidence_id,'workspace':workspace})
         if count!=1: raise KeyError(evidence_id)
         return self._one(f'SELECT * FROM {self.evidence} WHERE id=%(id)s AND workspace_key=%(workspace)s',{'id':evidence_id,'workspace':workspace}) or (_ for _ in ()).throw(RuntimeError('evidence readback failed'))

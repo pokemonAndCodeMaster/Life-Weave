@@ -16,6 +16,7 @@ from typing import Any
 
 from psycopg.types.json import Jsonb
 from src.agent_runtime.tree_snapshot import tree_sha256
+from .development_delivery import _git as delivery_git, _tree_entries, freeze_delivery
 
 
 ACTIVE = {"planning", "reviewing", "implementing"}
@@ -107,11 +108,14 @@ class DevelopmentService:
                model: str | None = None, method_id: str | None = None,
                knowledge_refs: list[str] | None = None,
                review_mode: str = "independent",
+               execution_scope: str = "plan_only",
                acknowledge_excluded_changes: bool = False) -> dict[str, Any]:
         if engine not in {"codex", "opencode"}:
             raise ValueError("执行器必须是 Codex 或 OpenCode")
         if review_mode not in {"independent", "self"}:
             raise ValueError("审查方式只能是独立审阅或轻量自检")
+        if execution_scope not in {"plan_only", "implement"}:
+            raise ValueError("执行范围必须是仅方案或允许实施")
         if engine == "opencode":
             option = self.choices(workspace, item_id)["executors"]["opencode"]
             if not option["available"]:
@@ -125,6 +129,7 @@ class DevelopmentService:
             "instruction": instruction, "repositoryPath": str(Path(repository_path).expanduser().resolve()),
             "engine": engine, "model": model, "methodId": method_id,
             "knowledgeRefs": knowledge_refs, "reviewMode": review_mode,
+            "executionScope": execution_scope,
         }, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
         existing = self.db.fetch_one("SELECT * FROM workbench.lifeweave_development_assignment "
                                      "WHERE workspace=%s AND item_id=%s AND request_id=%s",
@@ -167,12 +172,12 @@ class DevelopmentService:
             row = conn.execute("INSERT INTO workbench.lifeweave_development_assignment "
                                "(id,workspace,item_id,request_id,request_fingerprint,instruction,agent_id,agent_version,"
                                "engine,model,repository_path,repository_revision,working_tree_excluded,context_version_id,"
-                               "method_id,knowledge_refs,input_versions,review_mode,status) "
-                               "VALUES (%s,%s,%s,%s,%s,%s,'development',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'planning') RETURNING *",
+                               "method_id,knowledge_refs,input_versions,review_mode,execution_scope,status) "
+                               "VALUES (%s,%s,%s,%s,%s,%s,'development',%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'planning') RETURNING *",
                                (identity, workspace, item_id, request_id, fingerprint, instruction,
                                 next((entry["version"] for entry in versions if entry["id"] == method_id), "unknown"),
                                 engine, model, root, revision, dirty, context["versionId"], method_id,
-                                Jsonb(refs), Jsonb(versions), review_mode)).fetchone()
+                                Jsonb(refs), Jsonb(versions), review_mode, execution_scope)).fetchone()
             self.plugins.create_development_plan(conn, row)
             run = self._stage_run(row, "plan", instruction)
             row = conn.execute("UPDATE workbench.lifeweave_development_assignment "
@@ -310,8 +315,19 @@ class DevelopmentService:
                     complete("failed")
                     return
             if status == "implementing":
-                conn.execute("UPDATE workbench.lifeweave_development_assignment "
-                             "SET status='awaiting_acceptance',updated_at=now() WHERE id=%s", (identity,))
+                try:
+                    manifest, digest = freeze_delivery(self.project_root, row, run)
+                    conn.execute("INSERT INTO workbench.lifeweave_development_delivery "
+                                 "(id,workspace,assignment_id,run_id,base_revision,artifact_sha256,manifest) "
+                                 "VALUES (%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (assignment_id) DO NOTHING",
+                                 ("delivery-" + identity[4:], row["workspace"], identity, run_id,
+                                  row["repository_revision"], digest, Jsonb(manifest)))
+                    conn.execute("UPDATE workbench.lifeweave_development_assignment "
+                                 "SET status='awaiting_acceptance',error=NULL,updated_at=now() WHERE id=%s", (identity,))
+                except (ValueError, OSError, subprocess.SubprocessError) as exc:
+                    conn.execute("UPDATE workbench.lifeweave_development_assignment "
+                                 "SET status='delivery_failed',error=%s,updated_at=now() WHERE id=%s",
+                                 (f"实施已结束，但交付包生成失败：{str(exc)[:1200]}", identity))
                 complete("succeeded")
                 return
             result = str(run.get("result") or "").strip()
@@ -369,6 +385,11 @@ class DevelopmentService:
                 row = conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                    "SET review='方案阶段自检（非独立审阅）',review_decision='self_checked',"
                                    "updated_at=now() WHERE id=%s RETURNING *", (identity,)).fetchone()
+            if row["execution_scope"] == "plan_only":
+                conn.execute("UPDATE workbench.lifeweave_development_assignment "
+                             "SET status='plan_ready',updated_at=now() WHERE id=%s", (identity,))
+                complete("succeeded")
+                return
             implementation = self._stage_run(row, "implementation", row["instruction"])
             conn.execute("UPDATE workbench.lifeweave_development_assignment "
                          "SET status='implementing',implementation_run_id=%s,updated_at=now() WHERE id=%s",
@@ -401,6 +422,111 @@ class DevelopmentService:
         if not row:
             raise KeyError(identity)
         return self._wire(row)
+
+    def delivery(self, workspace: str, identity: str) -> dict[str, Any] | None:
+        self.get(workspace, identity)
+        row = self.db.fetch_one("SELECT * FROM workbench.lifeweave_development_delivery "
+                                "WHERE workspace=%s AND assignment_id=%s", (workspace, identity))
+        if not row:
+            return None
+        return {"id": row["id"], "assignmentId": identity, "implementationRunId": row["run_id"],
+                "baseRevision": row["base_revision"], "artifactSha256": row["artifact_sha256"],
+                "manifest": row["manifest"], "integrationCommit": row["integration_commit"],
+                "integrationCheckedAt": row["integration_checked_at"],
+                "integrationCurrentHead": row["integration_current_head"],
+                "decision": row["decision"], "decisionScope": row["decision_scope"],
+                "decisionReason": row["decision_reason"], "decisionRequestId": row["decision_request_id"],
+                "decidedBy": row["decided_by"],
+                "decidedAt": row["decided_at"], "createdAt": row["created_at"]}
+
+    def delivery_bytes(self, workspace: str, identity: str) -> bytes:
+        row = self.delivery(workspace, identity)
+        if not row:
+            raise ValueError("此委托尚无固定交付包")
+        path = self.project_root / ".runtime" / "development-deliveries" / f"{identity}.zip"
+        content = path.read_bytes()
+        if hashlib.sha256(content).hexdigest() != row["artifactSha256"]:
+            raise ValueError("固定交付包校验失败")
+        return content
+
+    def verify_integration(self, workspace: str, identity: str, commit: str) -> dict[str, Any]:
+        if not re.fullmatch(r"[0-9a-fA-F]{40,64}", commit):
+            raise ValueError("请输入完整的目标 Git 提交 ID")
+        assignment = self.get(workspace, identity)
+        delivery = self.delivery(workspace, identity)
+        if not delivery or assignment["status"] not in {"awaiting_acceptance", "accepted", "rejected"}:
+            raise ValueError("此委托没有可核对的固定交付")
+        self.delivery_bytes(workspace, identity)
+        root = Path(assignment["repositoryPath"]).resolve()
+        if root != Path(self._git("rev-parse", "--show-toplevel", cwd=root)).resolve():
+            raise ValueError("目标仓目录已经变化")
+        resolved = delivery_git(root, "rev-parse", "--verify", f"{commit}^{{commit}}").decode().strip()
+        if delivery["integrationCommit"] and delivery["integrationCommit"] != resolved:
+            raise ValueError("此交付已有固定的目标提交核对记录")
+        files = delivery["manifest"]["files"]
+        actual = _tree_entries(delivery_git(root, "ls-tree", "-r", "-z", resolved, "--",
+                                            *(entry["path"] for entry in files)))
+        mismatches = [entry["path"] for entry in files if actual.get(entry["path"]) != entry["after"]]
+        if mismatches:
+            raise ValueError("目标提交与固定交付文件不一致：" + ", ".join(mismatches[:8]))
+        current_head = delivery_git(root, "rev-parse", "HEAD").decode().strip() == resolved
+        with self.db.atomic() as conn:
+            row = conn.execute("SELECT * FROM workbench.lifeweave_development_delivery "
+                               "WHERE workspace=%s AND assignment_id=%s FOR UPDATE", (workspace, identity)).fetchone()
+            if row["integration_commit"] and row["integration_commit"] != resolved:
+                raise ValueError("此交付已有固定的目标提交核对记录")
+            if not row["integration_commit"]:
+                conn.execute("UPDATE workbench.lifeweave_development_delivery SET "
+                             "integration_commit=%s,integration_checked_at=now(),integration_current_head=%s "
+                             "WHERE id=%s", (resolved, current_head, row["id"]))
+        return self.delivery(workspace, identity)
+
+    def decide_delivery(self, workspace: str, identity: str, *, artifact_sha256: str,
+                        decision: str, scope: str, reason: str, request_id: str,
+                        actor_id: str) -> dict[str, Any]:
+        if decision not in {"accepted", "rejected"} or scope not in {"patch", "integrated"}:
+            raise ValueError("交付决定或接受范围无效")
+        if decision == "rejected" and not reason.strip():
+            raise ValueError("需要修改时请说明原因")
+        with self.db.atomic() as conn:
+            assignment = conn.execute("SELECT * FROM workbench.lifeweave_development_assignment "
+                                      "WHERE workspace=%s AND id=%s FOR UPDATE", (workspace, identity)).fetchone()
+            if not assignment:
+                raise KeyError(identity)
+            row = conn.execute("SELECT * FROM workbench.lifeweave_development_delivery "
+                               "WHERE workspace=%s AND assignment_id=%s FOR UPDATE", (workspace, identity)).fetchone()
+            if not row or row["artifact_sha256"] != artifact_sha256:
+                raise ValueError("交付版本已经变化，请刷新后再决定")
+            if row["run_id"] != assignment["implementation_run_id"]:
+                raise ValueError("交付与本次实施运行不匹配")
+            self.delivery_bytes(workspace, identity)
+            if row["decision"]:
+                if (row["decision_request_id"] == request_id and row["decision"] == decision and
+                        row["decision_scope"] == scope and (row["decision_reason"] or "") == reason):
+                    return self.delivery(workspace, identity)
+                raise ValueError("此交付已经作出决定；请从同一事项发起新的委托")
+            if assignment["status"] != "awaiting_acceptance":
+                raise ValueError("此委托尚未进入可接受状态")
+            if decision == "accepted" and scope == "integrated" and not row["integration_commit"]:
+                raise ValueError("接受目标仓结果前，需要先核对匹配的目标提交")
+            evidence_id = "evidence-" + identity[4:]
+            conn.execute("INSERT INTO workbench.t_lifeweave_evidence "
+                         "(id,workspace_key,item_id,artifact_ref,artifact_version,environment_ref,summary,status,run_id,payload,created_by,reviewed_by,reviewed_at,review_reason) "
+                         "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,now(),%s)",
+                         (evidence_id, workspace, assignment["item_id"],
+                          f"lifeweave-development:{identity}", artifact_sha256,
+                          f"git:{row['integration_commit'] or row['base_revision']}",
+                          "固定代码交付；接受范围：" + ("目标仓结果" if scope == "integrated" else "补丁"),
+                          decision, row["run_id"],
+                          Jsonb({"provenance": "development_delivery", "assignmentId": identity,
+                                 "deliveryId": row["id"], "decisionScope": scope}), actor_id, actor_id, reason))
+            conn.execute("UPDATE workbench.lifeweave_development_delivery SET "
+                         "decision=%s,decision_scope=%s,decision_reason=%s,decision_request_id=%s,"
+                         "decided_by=%s,decided_at=now() WHERE id=%s",
+                         (decision, scope, reason, request_id, actor_id, row["id"]))
+            conn.execute("UPDATE workbench.lifeweave_development_assignment "
+                         "SET status=%s,updated_at=now() WHERE id=%s", (decision, identity))
+        return self.delivery(workspace, identity)
 
     def diff(self, workspace: str, identity: str) -> dict[str, Any]:
         assignment = self.get(workspace, identity)
@@ -485,9 +611,10 @@ class DevelopmentService:
                  "plan_sha256": "planSha256", "created_at": "createdAt", "updated_at": "updatedAt",
                  "knowledge_refs": "knowledgeRefs", "input_versions": "inputVersions",
                  "context_version_id": "contextVersionId", "method_id": "methodId"}
+        names["execution_scope"] = "executionScope"
         visible = {"id", "item_id", "instruction", "agent_id", "agent_version", "engine", "model",
                    "repository_path", "repository_revision", "working_tree_excluded", "review_mode",
                    "review_decision", "status", "plan_run_id", "review_run_id", "implementation_run_id",
                    "plan", "plan_sha256", "review", "error", "created_at", "updated_at",
-                   "knowledge_refs", "input_versions", "context_version_id", "method_id"}
+                   "knowledge_refs", "input_versions", "context_version_id", "method_id", "execution_scope"}
         return {names.get(key, key): value for key, value in row.items() if key in visible}

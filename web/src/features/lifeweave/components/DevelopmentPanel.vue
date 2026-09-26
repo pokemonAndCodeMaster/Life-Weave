@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { onBeforeUnmount, reactive, shallowRef, watch } from 'vue'
 import { apiError, getRun, getRunEvents } from '../api/lifeweave'
-import { cancelDevelopment, createDevelopment, developmentChoices, getDevelopmentDiff, listDevelopment } from '../api/development'
-import type { DevelopmentAssignment, DevelopmentChoices, DevelopmentDiff } from '../api/development'
+import { cancelDevelopment, createDevelopment, developmentChoices, getDevelopmentDelivery, getDevelopmentDiff, listDevelopment } from '../api/development'
+import type { DevelopmentAssignment, DevelopmentChoices, DevelopmentDelivery as DevelopmentDeliveryValue, DevelopmentDiff } from '../api/development'
 import { pluginProcess } from '../api/plugins'
 import type { PluginProcess as PluginProcessValue } from '../api/plugins'
 import type { LifeWeaveRun, RunEvent, WorkspaceKind } from '../types'
 import MarkdownBody from './MarkdownBody.vue'
 import RunTrace from './RunTrace.vue'
 import PluginProcess from './PluginProcess.vue'
+import DevelopmentDelivery from './DevelopmentDelivery.vue'
 
 const props = defineProps<{ workspace: WorkspaceKind; itemId: string; initialInstruction?: string }>()
 const choices = shallowRef<DevelopmentChoices | null>(null)
@@ -16,12 +17,13 @@ const assignments = shallowRef<DevelopmentAssignment[]>([])
 const runs = shallowRef<Record<string, LifeWeaveRun>>({})
 const events = shallowRef<Record<string, RunEvent[]>>({})
 const diffs = shallowRef<Record<string, DevelopmentDiff>>({})
+const deliveries = shallowRef<Record<string, DevelopmentDeliveryValue>>({})
 const process = shallowRef<PluginProcessValue | null>(null)
 const processError = shallowRef('')
 const error = shallowRef('')
 const busy = shallowRef(false)
 const requestId = shallowRef(crypto.randomUUID())
-const form = reactive({ instruction: '', repositoryPath: '', engine: 'codex' as 'codex' | 'opencode', model: '', reviewMode: 'independent' as 'independent' | 'self', acknowledgeExcludedChanges: false })
+const form = reactive({ instruction: '', repositoryPath: '', engine: 'codex' as 'codex' | 'opencode', model: '', reviewMode: 'independent' as 'independent' | 'self', executionScope: 'plan_only' as 'plan_only' | 'implement', acknowledgeExcludedChanges: false })
 watch(() => form.engine, engine => { form.model = engine === 'opencode' ? (choices.value?.executors.opencode.verifiedModel || '') : '' })
 let generation = 0
 let timer: ReturnType<typeof setTimeout> | undefined
@@ -34,6 +36,12 @@ async function refresh(ticket = generation) {
     if (rowsResult.status === 'rejected') throw rowsResult.reason
     const rows = rowsResult.value
     assignments.value = rows
+    const deliveryRows = await Promise.all(rows.filter(row => ['awaiting_acceptance', 'accepted', 'rejected'].includes(row.status)).map(async row => {
+      try { return { id: row.id, delivery: await getDevelopmentDelivery(props.workspace, row.id) } }
+      catch { return null }
+    }))
+    if (ticket !== generation) return
+    deliveries.value = Object.fromEntries(deliveryRows.filter((row): row is { id: string; delivery: DevelopmentDeliveryValue } => !!row).map(row => [row.id, row.delivery]))
     process.value = pluginResult.status === 'fulfilled' ? pluginResult.value : null
     processError.value = pluginResult.status === 'rejected' ? apiError(pluginResult.reason).message : ''
     const runIds = rows.flatMap(row => [row.planRunId, row.reviewRunId, row.implementationRunId]).filter((id): id is string => !!id)
@@ -47,8 +55,8 @@ async function refresh(ticket = generation) {
 }
 watch(() => [props.workspace, props.itemId], async () => {
   const ticket = ++generation
-  clearTimeout(timer); assignments.value = []; runs.value = {}; events.value = {}; diffs.value = {}; process.value = null; processError.value = ''; choices.value = null; error.value = ''
-  form.instruction = props.initialInstruction || ''; form.repositoryPath = ''; form.engine = 'codex'; form.model = ''
+  clearTimeout(timer); assignments.value = []; runs.value = {}; events.value = {}; diffs.value = {}; deliveries.value = {}; process.value = null; processError.value = ''; choices.value = null; error.value = ''
+  form.instruction = props.initialInstruction || ''; form.repositoryPath = ''; form.engine = 'codex'; form.model = ''; form.executionScope = 'plan_only'
   try {
     const value = await developmentChoices(props.workspace, props.itemId)
     if (ticket !== generation) return
@@ -67,7 +75,7 @@ async function submit() {
       repositoryPath: form.repositoryPath.trim(), agentId: 'development', engine: form.engine, model: form.model.trim() || null,
       methodId: choices.value?.methodId,
       knowledgeRefs: form.repositoryPath.trim() === choices.value?.recommendedRepositoryPath ? choices.value?.knowledgeRefs : [],
-      reviewMode: form.reviewMode, acknowledgeExcludedChanges: form.acknowledgeExcludedChanges,
+      reviewMode: form.reviewMode, executionScope: form.executionScope, acknowledgeExcludedChanges: form.acknowledgeExcludedChanges,
     })
     requestId.value = crypto.randomUUID(); form.instruction = ''; clearTimeout(timer); await refresh()
   } catch (caught) { error.value = apiError(caught).message }
@@ -96,6 +104,7 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
       <label class="lw-label">这次要交付什么<textarea v-model="form.instruction" class="lw-field" rows="4" required maxlength="100000" placeholder="描述具体用户结果、限制和验收方式"></textarea></label>
       <label class="lw-label">项目 Git 目录<input v-model="form.repositoryPath" class="lw-field" required autocomplete="off" /></label>
       <div class="lw-form-grid">
+        <label class="lw-label">本次允许做到哪一步<select v-model="form.executionScope" class="lw-field"><option value="plan_only">仅形成方案并审阅，不修改代码</option><option value="implement">审阅通过后允许实施</option></select></label>
         <label class="lw-label">执行器<select v-model="form.engine" class="lw-field"><option value="codex" :disabled="!choices?.executors.codex.available">开发 Agent · Codex</option><option value="opencode" :disabled="!choices?.executors.opencode.available">开发 Agent · OpenCode{{ choices?.executors.opencode.available ? ` (${choices.executors.opencode.verifiedModel})` : ' (尚不可用)' }}</option></select></label>
         <label class="lw-label">{{ form.engine === 'codex' ? 'Codex 模型（可选）' : 'OpenCode 模型参数（近期成功）' }}<input v-model="form.model" class="lw-field" maxlength="256" autocomplete="off" :readonly="form.engine === 'opencode'" :placeholder="form.engine === 'codex' ? '留空使用本机 Codex 默认模型' : '先完成指定模型的成功运行'" /></label>
         <label class="lw-label">方案检查<select v-model="form.reviewMode" class="lw-field"><option value="independent">独立审阅（复杂改动）</option><option value="self">方案自检（小改动）</option></select></label>
@@ -104,7 +113,7 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
       <label class="lw-small"><input v-model="form.acknowledgeExcludedChanges" type="checkbox" /> 我知道仓库未提交改动不会进入受管运行；运行从上方目录的当前提交创建隔离工作树。</label>
       <p class="lw-tiny lw-muted">固定方法：{{ choices?.methodId || '加载中' }} · 本轮默认项目知识 {{ form.repositoryPath.trim() === choices?.recommendedRepositoryPath ? choices?.knowledgeRefs.length || 0 : 0 }} 篇。执行结果留在隔离工作树，需核对后合入项目。</p>
       <p v-if="form.engine === 'opencode'" class="lw-tiny lw-muted">{{ choices?.executors.opencode.reason }}。本轮固定 CLI 模型参数，尚无上游模型身份回执；每一阶段的结果仍需核对。</p>
-      <button class="lw-btn primary" type="submit" :disabled="busy || !choices?.agents.find(agent => agent.id === 'development')?.available || !choices?.executors[form.engine].available">{{ busy ? '正在登记…' : '开始开发委托' }}</button>
+      <button class="lw-btn primary" type="submit" :disabled="busy || !choices?.agents.find(agent => agent.id === 'development')?.available || !choices?.executors[form.engine].available">{{ busy ? '正在登记…' : form.executionScope === 'plan_only' ? '生成并审阅方案' : '开始开发委托' }}</button>
     </form>
     <div v-if="assignments.length" class="development-history">
       <h3>本事项的开发委托</h3>
@@ -114,7 +123,11 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
         <p v-if="assignment.workingTreeExcluded" class="lw-small">开始时仓库存在未提交改动，本轮输入不包含它们。</p>
         <p v-if="assignment.error" class="lw-notice warning">{{ assignment.error }}</p>
         <button v-if="['planning','reviewing','implementing'].includes(assignment.status)" class="lw-btn ghost sm" type="button" :disabled="busy" @click="cancel(assignment.id)">停止委托</button>
-        <p v-if="assignment.status === 'awaiting_acceptance'" class="lw-small">实施运行已结束。请核对结果、运行事件和隔离工作树；代码是否已合入目标仓以目标仓当前 Git 状态为准，业务接受仍待确认。</p>
+        <p v-if="assignment.status === 'plan_ready'" class="lw-small">方案与审阅已完成。本次仅授权方案，未建立可写实施运行。若要实施，请发起新的委托以重新核对当前源码、事项背景和知识版本。</p>
+        <p v-if="assignment.status === 'delivery_failed'" class="lw-notice warning">实施运行已结束，但固定交付包未生成：{{ assignment.error }}</p>
+        <p v-if="assignment.status === 'awaiting_acceptance'" class="lw-small">实施运行已结束。请核对结果、运行事件与固定交付包；业务接受仍待确认。</p>
+        <DevelopmentDelivery v-if="deliveries[assignment.id]" :workspace="workspace" :delivery="deliveries[assignment.id]!" @updated="refresh()" />
+        <p v-else-if="assignment.status === 'awaiting_acceptance'" class="lw-small lw-muted">此历史委托没有固定交付包；请核对原始 Run 与 Git 差异，不能在这里直接接受。</p>
         <div v-if="assignment.implementationRunId"><button class="lw-btn ghost sm" type="button" @click="showDiff(assignment.id)">查看实际 Git 差异</button><details v-if="diffs[assignment.id]" open><summary>实际改动 {{ diffs[assignment.id]!.fileCount }} 个文件{{ diffs[assignment.id]!.truncated ? ' · 页面已截断' : '' }}</summary><p class="lw-tiny lw-muted">基于提交 {{ diffs[assignment.id]!.baseRevision.slice(0, 12) }}。执行输入文件已从差异中排除；受管运行本身不会自动合入目标仓。</p><p v-if="diffs[assignment.id]!.generatedArtifactsExcluded.length" class="lw-tiny lw-muted">已排除 {{ diffs[assignment.id]!.generatedArtifactsExcluded.length }} 个未跟踪的测试缓存文件；它们未计入改动数。</p><pre class="development-diff">{{ diffs[assignment.id]!.patch || '没有代码差异' }}</pre></details></div>
         <details v-if="assignment.inputVersions.length"><summary>固定输入与版本</summary><ul><li v-for="entry in assignment.inputVersions" :key="entry.id">{{ entry.id }} · {{ entry.version.slice(0, 12) }} · {{ entry.sourcePath }}</li></ul></details>
         <PluginProcess :process="process" :assignment-id="assignment.id" :error="processError" />

@@ -4,7 +4,7 @@
     {
       "sourceId": "lifeweave-project",
       "sourcePath": "docs/plugin-system.md",
-      "sourceVersion": "92fd93dca02c6666284f2244390ea0c29e8bd5ec069666f60c5258bdc6e18cdf",
+      "sourceVersion": "3a9044c60e081703c0c7a2c83e1779fc33c3f8b0a602e2a96fc1ab2c8dc78483",
       "relation": "implemented_by",
       "targetPath": "src/lifeweave_plugins/core.py",
       "targetVersion": "ded429d29557742667e62638ed8f192d56bd55f6592dfbe94ee55f6b819432a3",
@@ -13,10 +13,10 @@
     {
       "sourceId": "lifeweave-project",
       "sourcePath": "docs/plugin-system.md",
-      "sourceVersion": "92fd93dca02c6666284f2244390ea0c29e8bd5ec069666f60c5258bdc6e18cdf",
+      "sourceVersion": "3a9044c60e081703c0c7a2c83e1779fc33c3f8b0a602e2a96fc1ab2c8dc78483",
       "relation": "verified_by",
       "targetPath": "tests/test_plugins.py",
-      "targetVersion": "ff0eb3220ef18f0b59041b2c98ff68ecd81afa64362f9c4b3c5d7bfc7ced837a",
+      "targetVersion": "16e244e8d265b6cd9c5f0bfdf4051cd6c8add5bce0e1bd014a2b17651187ce74",
       "evidenceQuote": "回归使用一次性 PostgreSQL 测试库检查旧入口"
     }
   ]

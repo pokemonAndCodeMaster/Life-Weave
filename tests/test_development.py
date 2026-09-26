@@ -1,6 +1,9 @@
 """The web development chain advances only from real persisted Run results."""
 import json
 import subprocess
+import hashlib
+import io
+import zipfile
 from types import SimpleNamespace
 import pytest
 from psycopg.types.json import Jsonb
@@ -45,6 +48,13 @@ def readonly_checkout(client, tmp_path, source, run_id):
     return target
 
 
+def implementation_checkout(client, tmp_path, source, run_id):
+    target = readonly_checkout(client, tmp_path, source, run_id)
+    (target / 'README.md').write_text('# Delivered\n')
+    (target / 'new.bin').write_bytes(b'\x00\x01\xff')
+    return target
+
+
 def test_development_plan_review_implementation_and_idempotence(dedicated_client, tmp_path):
     client = dedicated_client
     root = repository(tmp_path)
@@ -54,7 +64,8 @@ def test_development_plan_review_implementation_and_idempotence(dedicated_client
     assert choices['recommendedAgentId'] == 'development'
     payload = {'requestId': 'test-1', 'itemId': item['id'], 'instruction': 'Add one useful feature and verify it',
                'repositoryPath': str(root), 'agentId': 'development', 'engine': 'codex',
-               'methodId': choices['methodId'], 'knowledgeRefs': [], 'reviewMode': 'independent'}
+               'methodId': choices['methodId'], 'knowledgeRefs': [], 'reviewMode': 'independent',
+               'executionScope': 'implement'}
     created = client.post(f'{path}/development', json=payload)
     assert created.status_code == 202, created.text
     first = created.json()
@@ -74,10 +85,54 @@ def test_development_plan_review_implementation_and_idempotence(dedicated_client
     service.advance(first['id'])
     implementing = service.get('personal', first['id'])
     assert implementing['status'] == 'implementing' and implementing['implementationRunId']
+    implementation_checkout(client, tmp_path, root, implementing['implementationRunId'])
     finish(client, implementing['implementationRunId'], 'Changed README; test command passed.')
     service.advance(first['id'])
     done = service.get('personal', first['id'])
     assert done['status'] == 'awaiting_acceptance'
+    frozen = client.get(f'{path}/development/{done["id"]}/delivery')
+    assert frozen.status_code == 200, frozen.text
+    delivery = frozen.json()
+    assert delivery['manifest']['implementationRunId'] == done['implementationRunId']
+    assert {entry['path'] for entry in delivery['manifest']['files']} == {'README.md', 'new.bin'}
+    bundle = client.get(f'{path}/development/{done["id"]}/delivery.zip')
+    assert bundle.status_code == 200
+    assert hashlib.sha256(bundle.content).hexdigest() == delivery['artifactSha256']
+    with zipfile.ZipFile(io.BytesIO(bundle.content)) as archive:
+        patch = archive.read('changes.patch')
+        assert b'GIT binary patch' in patch and b'+# Delivered' in patch
+        assert json.loads(archive.read('manifest.json'))['patchSha256'] == hashlib.sha256(patch).hexdigest()
+    checkout = tmp_path / 'replay'
+    subprocess.run(['git', 'clone', '-q', str(root), str(checkout)], check=True)
+    subprocess.run(['git', 'apply', '--binary', '-'], cwd=checkout, input=patch, check=True)
+    assert (checkout / 'README.md').read_text() == '# Delivered\n'
+    assert (checkout / 'new.bin').read_bytes() == b'\x00\x01\xff'
+    assert client.post(f'{path}/development/{done["id"]}/integration-check',
+                       json={'commit': done['repositoryRevision']}).status_code == 409
+    subprocess.run(['git', 'apply', '--binary', '-'], cwd=root, input=patch, check=True)
+    subprocess.run(['git', 'add', '-A'], cwd=root, check=True)
+    subprocess.run(['git', 'commit', '-qm', 'integrate delivery'], cwd=root, check=True)
+    integrated_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=root, text=True).strip()
+    integration = client.post(f'{path}/development/{done["id"]}/integration-check',
+                              json={'commit': integrated_commit})
+    assert integration.status_code == 200, integration.text
+    assert integration.json()['integrationCurrentHead'] is True
+    assert client.post(f'{path}/development/{done["id"]}/decision', json={
+        'requestId': 'wrong-version', 'artifactSha256': '0' * 64,
+        'decision': 'accepted', 'scope': 'integrated'}).status_code == 409
+    decision = {'requestId': 'accept-one', 'artifactSha256': delivery['artifactSha256'],
+                'decision': 'accepted', 'scope': 'integrated', 'reason': 'Checked the delivered files'}
+    accepted = client.post(f'{path}/development/{done["id"]}/decision', json=decision)
+    assert accepted.status_code == 200, accepted.text
+    assert accepted.json()['decision'] == 'accepted'
+    assert client.post(f'{path}/development/{done["id"]}/decision', json=decision).status_code == 200
+    assert client.post(f'{path}/development/{done["id"]}/decision', json={**decision,
+                       'requestId': 'different'}).status_code == 409
+    evidence_id = 'evidence-' + done['id'][4:]
+    assert client.post(f'{path}/evidence/{evidence_id}/review', json={
+        'status': 'rejected', 'reason': 'bypass'}).status_code == 400
+    assert service.get('personal', done['id'])['status'] == 'accepted'
+    assert hashlib.sha256(client.get(f'{path}/development/{done["id"]}/delivery.zip').content).hexdigest() == delivery['artifactSha256']
     assert len({done['planRunId'], done['reviewRunId'], done['implementationRunId']}) == 3
     stage_calls = client.app.state.database_manager.postgres().fetch_all(
         "SELECT operation,state,run_id,output_ref FROM workbench.lifeweave_plugin_call "
@@ -131,6 +186,36 @@ def test_development_plan_review_implementation_and_idempotence(dedicated_client
     assert 'generated input' not in diff['patch']
 
 
+def test_plan_only_stops_before_writable_run(dedicated_client, tmp_path):
+    client = dedicated_client
+    root = repository(tmp_path)
+    item = post(client, '/items', {'itemType': 'requirement', 'title': 'Plan a change'})
+    path = '/api/lifeweave/personal'
+    payload = {'requestId': 'plan-only', 'itemId': item['id'],
+               'instruction': 'First make a plan for editing README; do not edit files yet.',
+               'repositoryPath': str(root), 'reviewMode': 'independent'}
+    created_response = client.post(f'{path}/development', json=payload)
+    assert created_response.status_code == 202, created_response.text
+    created = created_response.json()
+    assert created['executionScope'] == 'plan_only'
+    assert client.post(f'{path}/development', json={**payload, 'executionScope': 'implement'}).status_code == 409
+    readonly_checkout(client, tmp_path, root, created['planRunId'])
+    finish(client, created['planRunId'], 'Plan: read README, edit one line, run a relevant check, and review the diff. Risk is limited. 自检: verify the result.')
+    service = client.app.state.development
+    service.advance(created['id'])
+    review = service.get('personal', created['id'])
+    assert review['status'] == 'reviewing'
+    readonly_checkout(client, tmp_path, root, review['reviewRunId'])
+    finish(client, review['reviewRunId'], 'The change is bounded and checkable.\nREVIEW_DECISION: PASS')
+    service.advance(created['id'])
+    service.scan()
+    ready = service.get('personal', created['id'])
+    assert ready['status'] == 'plan_ready' and ready['implementationRunId'] is None
+    plan = client.get(f'{path}/items/{item["id"]}/plugin-process').json()['plans'][0]
+    assert not any(step['stage'] == 'implementing' for step in plan['steps'])
+    assert (root / 'README.md').read_text() == '# Fixture\n'
+
+
 def test_development_review_failure_blocks_implementation(dedicated_client, tmp_path):
     client = dedicated_client
     root = repository(tmp_path)
@@ -138,7 +223,7 @@ def test_development_review_failure_blocks_implementation(dedicated_client, tmp_
     path = '/api/lifeweave/personal'
     created = client.post(f'{path}/development', json={
         'requestId': 'test-block', 'itemId': item['id'], 'instruction': 'Fix the bug',
-        'repositoryPath': str(root), 'reviewMode': 'independent'}).json()
+        'repositoryPath': str(root), 'reviewMode': 'independent', 'executionScope': 'implement'}).json()
     service = client.app.state.development
     readonly_checkout(client, tmp_path, root, created['planRunId'])
     finish(client, created['planRunId'], 'Plan a precise fix with checks. This is more than eighty characters so the planning gate can proceed. 自检 done.')
@@ -157,7 +242,7 @@ def test_readonly_stage_change_blocks_next_stage(dedicated_client, tmp_path):
     item = post(client, '/items', {'itemType': 'fix', 'title': 'A read-only stage must stay read-only'})
     created = client.post('/api/lifeweave/personal/development', json={
         'requestId': 'test-readonly-bypass', 'itemId': item['id'], 'instruction': 'Update the README',
-        'repositoryPath': str(root), 'reviewMode': 'self'}).json()
+        'repositoryPath': str(root), 'reviewMode': 'self', 'executionScope': 'implement'}).json()
     checkout = readonly_checkout(client, tmp_path, root, created['planRunId'])
     (checkout / 'README.md').write_text('# Mutated during planning\n')
     finish(client, created['planRunId'], 'The intended change is a README update. The plan identifies the current content, one-file scope, and a verification. 自检 done.')
@@ -178,7 +263,7 @@ def test_readonly_stage_ignored_file_blocks_next_stage(dedicated_client, tmp_pat
     item = post(client, '/items', {'itemType': 'fix', 'title': 'A read-only stage must not create ignored files'})
     created = client.post('/api/lifeweave/personal/development', json={
         'requestId': 'test-readonly-ignored', 'itemId': item['id'], 'instruction': 'Update the README',
-        'repositoryPath': str(root), 'reviewMode': 'self'}).json()
+        'repositoryPath': str(root), 'reviewMode': 'self', 'executionScope': 'implement'}).json()
     checkout = readonly_checkout(client, tmp_path, root, created['planRunId'])
     cache = checkout / 'cache/changed.txt'
     cache.parent.mkdir()
@@ -198,7 +283,7 @@ def test_readonly_snapshot_catches_git_metadata_bypass(dedicated_client, tmp_pat
     item = post(client, '/items', {'itemType': 'fix', 'title': 'Git metadata must not hide a read-only edit'})
     created = client.post('/api/lifeweave/personal/development', json={
         'requestId': f'test-readonly-{bypass}', 'itemId': item['id'], 'instruction': 'Update the README',
-        'repositoryPath': str(root), 'reviewMode': 'self'}).json()
+        'repositoryPath': str(root), 'reviewMode': 'self', 'executionScope': 'implement'}).json()
     checkout = readonly_checkout(client, tmp_path, root, created['planRunId'])
     (checkout / 'README.md').write_text('# Mutated during planning\n')
     if bypass == 'assume-unchanged':
@@ -224,7 +309,7 @@ def test_opencode_requires_recent_successful_explicit_model_in_same_workspace(de
     path = '/api/lifeweave/personal'
     payload = {'requestId': 'opencode-1', 'itemId': item['id'], 'instruction': 'Update the fixture README',
                'repositoryPath': str(root), 'engine': 'opencode', 'model': 'opencode/mimo-v2.5-free',
-               'reviewMode': 'self'}
+               'reviewMode': 'self', 'executionScope': 'implement'}
     assert not client.get(f'{path}/items/{item["id"]}/development/choices').json()['executors']['opencode']['available']
     assert client.post(f'{path}/development', json=payload).status_code == 409
     run = client.app.state.development.runtime.create_run('personal', item_id=item['id'], instruction='probe',

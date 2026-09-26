@@ -33,7 +33,7 @@ def test_development_process_shows_plan_then_actual_worker_call(dedicated_client
 
     created = client.post(f"{base}/development", json={
         "requestId": "plugin-process-1", "itemId": item["id"], "instruction": "Inspect the README and propose a change",
-        "repositoryPath": str(root), "reviewMode": "self",
+        "repositoryPath": str(root), "reviewMode": "self", "executionScope": "implement",
     })
     assert created.status_code == 202, created.text
     assignment = created.json()
@@ -79,7 +79,7 @@ def test_development_process_shows_plan_then_actual_worker_call(dedicated_client
                     if row["id"] == "lifeweave.development")["runnable"]
     assert client.post(f"{base}/development", json={
         "requestId": "plugin-process-disabled", "itemId": item["id"], "instruction": "Another request",
-        "repositoryPath": str(root), "reviewMode": "self",
+        "repositoryPath": str(root), "reviewMode": "self", "executionScope": "implement",
     }).status_code == 409
     with pytest.raises(ValueError, match="不可用"):
         runtime.worker_report("personal", machine["id"], machine["worker_token"], run_id,
@@ -117,7 +117,7 @@ def test_development_process_shows_plan_then_actual_worker_call(dedicated_client
     second = client.post(f"{base}/development", json={
         "requestId": "plugin-process-lost-end", "itemId": item["id"],
         "instruction": "Propose a second change", "repositoryPath": str(root),
-        "reviewMode": "self",
+        "reviewMode": "self", "executionScope": "implement",
     })
     assert second.status_code == 202, second.text
     second_run = second.json()["planRunId"]

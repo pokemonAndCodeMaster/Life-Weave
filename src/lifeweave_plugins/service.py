@@ -227,6 +227,8 @@ class PluginService:
             {"id": "implement.knowledge", "stage": "implementing", "pluginId": "lifeweave.knowledge", "operation": "read", "required": bool(row["knowledge_refs"]), "condition": "selected-knowledge"},
             {"id": "implement.codex", "stage": "implementing", "pluginId": executor_id, "operation": "run", "required": True},
         ]
+        if row["execution_scope"] == "plan_only":
+            steps = [step for step in steps if step["stage"] != "implementing"]
         identity = "pplan-" + row["id"][4:]
         conn.execute("INSERT INTO workbench.lifeweave_plugin_plan "
                      "(id,workspace,item_id,assignment_id,version,steps,bindings) VALUES (%s,%s,%s,%s,1,%s,%s)",

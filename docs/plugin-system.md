@@ -1,6 +1,6 @@
 # 插件目录与开发过程：首个可运行切片
 
-日期：2026-09-27。设计依据是 [Notion 阶段计划](https://app.notion.com/p/3e7af682864481d6a5f3c7f7b8542bc0)与[阶段 1 施工方案](../workspaces/reviews/plugin-foundation-stage1/review.md)。本文只描述当前代码已经接入的边界；后续阶段仍按该方案推进。
+日期：2026-09-27。设计依据是 [Notion 阶段计划](https://app.notion.com/p/3e7af682864481d6a5f3c7f7b8542bc0)、[阶段 1 施工方案](../workspaces/reviews/plugin-foundation-stage1/review.md)与[阶段 2 交付方案](../workspaces/reviews/plugin-stage2/review.md)。本文描述当前代码已接入的边界；完整使用步骤见[开发与运行维护](development.md)。
 
 ## 使用者怎样看
 
@@ -12,12 +12,14 @@
 
 在需求或修复事项的“开发 Agent”页发起委托后，展开“插件计划与实际调用”。计划与绑定在委托创建时固定，实际调用只由服务端真正进入对应操作或受信任执行机进入 `executor.run` 边界时记下。一个条目有计划但没有调用，页面显示“尚无实际调用”，不推断执行器内部发生了什么。旧委托没有插件计划，会明确显示历史边界。开发页继续使用原 Run 和原生事件；插件过程接口故障时不遮断原有记录。
 
+新委托默认只形成只读方案；选择允许实施才在审阅通过后建立可写 Run。允许实施且产生文件变化时，服务固定完整补丁与文件清单，回放核对后提供 ZIP。目标仓提交核对、交付接受与原 Run 成功分别记录；接受对应的证据引用同一实施 Run 和包版本，不自动合入、推送或部署代码。旧委托保留旧状态，不反推已有固定交付。
+
 目前可见的组合是 `lifeweave.development` → `lifeweave.context` → `lifeweave.knowledge` 的推荐和选定正文读取、`lifeweave.method.<原方法ID>` 的版本固定，以及 `lifeweave.execution.codex` 和 `lifeweave.checks.repository`。方法的“已绑定”仅证明材料被选入快照，不证明模型遵循全部步骤。Run 环境中的 `contextPack` 含编译器版本、背景版本、来源版本和最终提示词 SHA-256；提示词正文仍由原 Run 快照保存。推荐会扫描受管来源并记录候选引用；选中的正文另存于原能力快照。
 
 ## 实现与数据归属
 
 - [core.py](../src/lifeweave_plugins/core.py) 管内置描述、依赖校验、实现摘要与调用边界；[service.py](../src/lifeweave_plugins/service.py) 管空间状态、固定计划、绑定核验和计划／实际投影。
-- [013_plugin_foundation.sql](../migrations/013_plugin_foundation.sql) 新增固定计划、调用与空间启停三张表；[014_plugin_evaluations.sql](../migrations/014_plugin_evaluations.sql) 让原评测表按真实插件调用记录判断，并允许同一 Run 有多个评测目标；[015_development_call_completion.sql](../migrations/015_development_call_completion.sql) 用旧委托的终态与实际阶段进展保守补齐组合调用结果。既有事项、开发委托、Run、事件和知识正文仍由原模块负责。项目知识原文继续在 Git，本地知识原文继续在 Markdown，Notion 仍是镜像。
+- [013_plugin_foundation.sql](../migrations/013_plugin_foundation.sql) 新增固定计划、调用与空间启停三张表；[014_plugin_evaluations.sql](../migrations/014_plugin_evaluations.sql) 让原评测表按真实插件调用记录判断，并允许同一 Run 有多个评测目标；[015_development_call_completion.sql](../migrations/015_development_call_completion.sql) 保守补齐组合调用结果；[016_development_scope.sql](../migrations/016_development_scope.sql) 增加只读方案范围；[017_development_delivery.sql](../migrations/017_development_delivery.sql) 记录固定交付、集成核对和决定。既有事项、Run、事件和知识正文仍由原模块负责。项目知识原文继续在 Git，本地知识原文继续在 Markdown，Notion 仍是镜像。
 - [development.py](../src/lifeweave/development.py) 仍决定方案、审阅、自检、实施与只读检查何时推进；插件绑定不接管业务状态机。[Runtime](../src/lifeweave_runtime/service.py) 在创建 Run 时固定上下文和真实所选材料；[Worker](../src/lifeweave_runtime/worker.py) 紧贴执行器调用上报开始／结束事件。受信任租约、Run 事件和插件调用记录共同构成受管边界证据。
 - `GET /api/lifeweave/{space}/plugins`、`GET /plugins/{id}`、`PUT /plugins/{id}/enabled`、`GET /plugins/{id}/calls` 与 `GET /items/{itemId}/plugin-process` 是读取和控制入口。插件评测沿用 `POST /evaluations`、`POST /evaluations/{id}/assess`，并由 `GET /plugins/{id}/evaluations` 反查。启停请求带期望配置版本；版本冲突返回 409。没有任意插件代码安装或通用执行 POST。
 
