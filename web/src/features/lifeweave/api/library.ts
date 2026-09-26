@@ -1,12 +1,12 @@
 import { http } from '@/shared/api/http'
 import type { WorkspaceKind } from '../types'
-export interface Source { id: string; title: string; root: string; writable: boolean }
+export interface Source { id: string; title: string; root: string; writable: boolean; includedPaths?: string[]; archiveBaseUrl?: string | null }
 export interface ReferenceMap { links: Record<string,string>; images: Record<string,string>; warnings: string[] }
 export interface Document { path: string; sourceId: string; title: string; content: string; version: string; writable: boolean; sourceTitle: string; references?: ReferenceMap|null }
 export interface Revision { id: string; source_id: string; path: string; content: string; before_content: string; diff: string; reason: string; status: 'draft'|'accepted'|'rejected'; created_at: string; references?: ReferenceMap|null }
 export interface KnowledgeRelations {
   sourceId: string; path: string; version: string; scannedDocuments: number
-  outgoing: Array<{ sourceId: string; path: string | null; label: string; href: string; status: 'valid' | 'missing' | 'blocked'; count: number }>
+  outgoing: Array<{ sourceId: string; path: string | null; label: string; href: string; status: 'valid' | 'missing' | 'blocked' | 'archived'; externalUrl?: string | null; count: number }>
   backlinks: Array<{ sourceId: string; path: string; title: string; label: string; count: number }>
   unavailableSources: string[]; unavailableDocuments: Array<{ path: string; reason: string }>
 }

@@ -38,7 +38,17 @@ function follow(event:MouseEvent) {
  const href=anchor.getAttribute('href')??''
  if(href.startsWith('#')||href.startsWith('/api/'))return
  if(/^[a-z]+:/i.test(href)){anchor.target='_blank';anchor.rel='noopener noreferrer';return}
- if(href.split('#')[0]?.endsWith('.md')) { event.preventDefault();const path=resolveKnowledgePath(selected.value.path,href);if(path)void read({path,sourceId:selected.value.sourceId});else error.value='此链接超出了所选知识目录。' }
+ if(href.split('#')[0]?.endsWith('.md')) {
+  const path=resolveKnowledgePath(selected.value.path,href)
+  if(!path){event.preventDefault();error.value='此链接超出了所选知识目录。';return}
+  const source=availableSources.value.find(row=>row.id===selected.value?.sourceId)
+  const archivePath=path.startsWith('docs/history/')||path.startsWith('docs/evidence/')
+  if(source?.archiveBaseUrl && source.includedPaths && !source.includedPaths.includes(path) && archivePath){
+   anchor.href=`${source.archiveBaseUrl.replace(/\/$/,'')}/${path.split('/').map(encodeURIComponent).join('/')}`
+   anchor.target='_blank';anchor.rel='noopener noreferrer';return
+  }
+  event.preventDefault();void read({path,sourceId:selected.value.sourceId})
+ }
 }
 watch(activeWorkspace,()=>{sourceFilter.value='all'})
 watch([activeWorkspace,()=>route.query.path,()=>route.query.source],()=> { selected.value=null;selectedChange.value=null;editing.value=false;void action(async()=> { await refresh();const path=String(route.query.path??'');if(path) selected.value=await library.document(activeWorkspace.value,path,String(route.query.source??'local')) }) },{immediate:true})

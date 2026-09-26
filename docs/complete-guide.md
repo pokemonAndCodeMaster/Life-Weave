@@ -15,7 +15,7 @@
 | 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `a3be812cde0d817c4372184d2b6d476a348674976fdbf0da7a6a1648b853ed9c` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-03) | `docs/product.md` | `4d58806aae1a75847c52c96a41b3537d0a6b484669f6e8670db7909e40ea713f` |
 | 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `659515ea3a46ec97e235599b05ba8169e8b66e12968913a13b37a529db80c5f3` |
-| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `591f5ec184cbd4f4d7859708e21cdc48317168f9c1452c5fac40d3a26ca082d0` |
+| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `31bdee347abc27568dde2c3fab586d4fab3c56165eabbc14248ec877d0c7280e` |
 | 当前说明 | [当前建设路线](#doc-06) | `docs/roadmap.md` | `af82f9d3c4269be77228e1fd68e2cfb4e36ddbc1e07595296448997e12c84e6e` |
 | 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `5b3cdaa389c34140b8f0cce5553ff749994b021cfe6b841a7c349cc71edc8dd7` |
 | 当前说明 | [LifeWeave：名称与适配](#doc-08) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
@@ -538,7 +538,7 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | --- | --- | --- |
 | 在网页记录、讨论、安排和继续事项，保存背景、反馈与成果 | 两篇论文研究经过真实网页与 Codex 运行；[研究证据](evidence/web-research/README.md) | 自主多 Agent 编排、可靠长期排程与自动提醒 |
 | 阅读研究正文、公式、图片和引用；下载含资产的 ZIP；继续讨论两篇研究 | [归档与跨文章证据](evidence/research-archive/README.md) | 报告成功不等于论文结论正确或用户已接受；所有事项与知识并未同步到远端 |
-| 只读阅读项目当前文档，按来源筛选、阅读全文并在委托中固定实际选用版本 | 项目规范清单见 [当前来源](current-sources.json)；[候选环境实际阅读](evidence/project-development/README.md) | 历史正文不在当前知识入口内；没有自动事实本体、跨来源知识图或大规模语义索引 |
+| 只读阅读项目当前文档，按来源筛选、阅读全文并在委托中固定实际选用版本 | 项目规范清单见 [当前来源](current-sources.json)；历史引用可跳转 GitHub 仓库档案；[候选环境实际阅读](evidence/project-development/README.md) | 历史正文不作为当前知识搜索结果；没有自动事实本体、跨来源知识图或大规模语义索引 |
 | 管理本地 Markdown、提交修订、比较和接受；查看同源 Markdown 引用 | [知识关系证据](evidence/personal-platform-evolution/README.md) | 外部来源的修订不能直接在产品里覆盖原仓正文 |
 | 创建 Skill/Agent/Harness 候选，围绕事项运行评测、看轨迹和工作样例，并按同标准再评 | 两次内部窄任务真实 Codex 运行；临时数据库和页面验证见[评测证据](evidence/personal-platform-evolution/README.md) | 不能自动创建、优化、合并能力；实施者判定通过不等于用户验收或跨领域有效 |
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |

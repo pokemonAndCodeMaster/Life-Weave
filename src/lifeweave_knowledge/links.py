@@ -6,6 +6,7 @@ from pathlib import Path
 from threading import RLock
 from typing import Any
 from urllib.parse import unquote, urlsplit
+from urllib.parse import quote
 
 import mistune
 
@@ -37,15 +38,25 @@ class KnowledgeLinks:
                         if decoded.lower().endswith('.md'):
                             target = posixpath.normpath(posixpath.join(posixpath.dirname(path), decoded))
                             status = 'valid'
+                            external_url = None
                             try:
                                 self.library.file(workspace, source_id, target)
                             except (ValueError, KeyError, OSError):
                                 status = 'blocked'
+                                source = self.library.source(workspace, source_id)
+                                root = Path(source['root']).resolve()
+                                archived = (root / target).resolve()
+                                if (source.get('archiveBaseUrl') and
+                                        target.startswith(('docs/history/', 'docs/evidence/')) and
+                                        archived.is_relative_to(root) and archived.is_file() and
+                                        archived.suffix.lower() == '.md'):
+                                    status = 'archived'
+                                    external_url = source['archiveBaseUrl'].rstrip('/') + '/' + quote(target, safe='/')
                             key = (target if status == 'valid' else href, status)
                             if key not in found:
                                 found[key] = {'label': _label(token).strip() or Path(decoded).stem,
                                               'href': href, 'path': target if status == 'valid' else None,
-                                              'status': status, 'count': 0}
+                                              'status': status, 'externalUrl': external_url, 'count': 0}
                             found[key]['count'] += 1
                 walk(token.get('children', []))
 

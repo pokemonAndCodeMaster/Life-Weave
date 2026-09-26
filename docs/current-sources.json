@@ -1,6 +1,7 @@
 {
   "id": "lifeweave-project",
   "title": "LifeWeave 项目",
+  "archiveBaseUrl": "https://github.com/pokemonAndCodeMaster/Life-Weave/blob/main",
   "paths": [
     "README.md",
     "docs/README.md",

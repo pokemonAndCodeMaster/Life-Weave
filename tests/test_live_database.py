@@ -63,11 +63,12 @@ def test_current_project_knowledge_uses_one_read_only_source_and_live_versions(d
     (project / 'docs/history').mkdir(parents=True)
     (project / 'docs/current-sources.json').write_text(json.dumps({
         'id': 'lifeweave-project', 'title': 'LifeWeave 项目',
+        'archiveBaseUrl': 'https://example.test/repository/blob/main',
         'paths': ['README.md', 'docs/status.md'],
     }), encoding='utf-8')
     (project / 'README.md').write_text('# LifeWeave\n[状态](docs/status.md)', encoding='utf-8')
     status = project / 'docs/status.md'
-    status.write_text('# 当前状态\n开发事项可接续。', encoding='utf-8')
+    status.write_text('# 当前状态\n开发事项可接续。\n[历史](history/old.md)', encoding='utf-8')
     (project / 'docs/history/old.md').write_text('# 旧状态\n过期判断', encoding='utf-8')
     client.app.state.library.project_root = project
     base = '/api/lifeweave/personal/library'
@@ -78,13 +79,17 @@ def test_current_project_knowledge_uses_one_read_only_source_and_live_versions(d
     assert client.get(base + '/documents', params={'sourceId': 'nonexistent'}).status_code == 404
     assert client.get(base + '/document', params={'sourceId': 'lifeweave-project',
                                                   'path': 'docs/history/old.md'}).status_code == 409
+    outgoing = client.get(base + '/links', params={'sourceId': 'lifeweave-project',
+                                                   'path': 'docs/status.md'}).json()['outgoing']
+    assert outgoing[0]['status'] == 'archived'
+    assert outgoing[0]['externalUrl'] == 'https://example.test/repository/blob/main/docs/history/old.md'
     first = client.get(base + '/document', params={'sourceId': 'lifeweave-project',
                                                    'path': 'docs/status.md'}).json()
     first_snapshot = client.app.state.task_sources.snapshot('personal', None,
                                                              ['lifeweave-project:docs/status.md'])[0]
     assert first_snapshot['content'] == first['content']
     assert first_snapshot['version'] == first['version']
-    status.write_text('# 当前状态\n开发事项和知识更新可接续。', encoding='utf-8')
+    status.write_text('# 当前状态\n开发事项和知识更新可接续。\n[历史](history/old.md)', encoding='utf-8')
     updated = client.get(base + '/document', params={'sourceId': 'lifeweave-project',
                                                      'path': 'docs/status.md'}).json()
     assert updated['version'] != first['version']

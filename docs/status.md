@@ -8,7 +8,7 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | --- | --- | --- |
 | 在网页记录、讨论、安排和继续事项，保存背景、反馈与成果 | 两篇论文研究经过真实网页与 Codex 运行；[研究证据](evidence/web-research/README.md) | 自主多 Agent 编排、可靠长期排程与自动提醒 |
 | 阅读研究正文、公式、图片和引用；下载含资产的 ZIP；继续讨论两篇研究 | [归档与跨文章证据](evidence/research-archive/README.md) | 报告成功不等于论文结论正确或用户已接受；所有事项与知识并未同步到远端 |
-| 只读阅读项目当前文档，按来源筛选、阅读全文并在委托中固定实际选用版本 | 项目规范清单见 [当前来源](current-sources.json)；[候选环境实际阅读](evidence/project-development/README.md) | 历史正文不在当前知识入口内；没有自动事实本体、跨来源知识图或大规模语义索引 |
+| 只读阅读项目当前文档，按来源筛选、阅读全文并在委托中固定实际选用版本 | 项目规范清单见 [当前来源](current-sources.json)；历史引用可跳转 GitHub 仓库档案；[候选环境实际阅读](evidence/project-development/README.md) | 历史正文不作为当前知识搜索结果；没有自动事实本体、跨来源知识图或大规模语义索引 |
 | 管理本地 Markdown、提交修订、比较和接受；查看同源 Markdown 引用 | [知识关系证据](evidence/personal-platform-evolution/README.md) | 外部来源的修订不能直接在产品里覆盖原仓正文 |
 | 创建 Skill/Agent/Harness 候选，围绕事项运行评测、看轨迹和工作样例，并按同标准再评 | 两次内部窄任务真实 Codex 运行；临时数据库和页面验证见[评测证据](evidence/personal-platform-evolution/README.md) | 不能自动创建、优化、合并能力；实施者判定通过不等于用户验收或跨领域有效 |
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |

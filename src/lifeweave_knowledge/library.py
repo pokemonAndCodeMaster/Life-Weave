@@ -25,7 +25,8 @@ class Library:
     def project_source(self):
         manifest = json.loads((self.project_root / 'docs/current-sources.json').read_text(encoding='utf-8'))
         return {'id': manifest['id'], 'title': manifest['title'], 'root': str(self.project_root),
-                'writable': False, 'includedPaths': manifest['paths']}
+                'writable': False, 'includedPaths': manifest['paths'],
+                'archiveBaseUrl': manifest.get('archiveBaseUrl')}
 
     def sources(self, workspace: str):
         if workspace not in self.roots:
