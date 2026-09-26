@@ -14,14 +14,14 @@ const { activeWorkspace, state, loading, error, toast, rootItems, load, loadRunt
 const navOpen = shallowRef(false)
 const initialized = shallowRef(false)
 const allowedWorkspaces = shallowRef<WorkspaceKind[]>(['personal', 'team'])
-const pageLabels: Record<string, string> = { conversation: '与 AI 对话', plan: '计划与优先级', settings: '设置与连接', connections: 'Linear 事项', runs: 'AI 委托', home: '我的日常', items: '工作事项', ideas: '灵感与讨论', knowledge: '知识', meeting: '组会 / 回顾', maintenance: '维护中心', 'item-detail': '事项' }
+const pageLabels: Record<string, string> = { conversation: '与 AI 对话', plan: '计划与优先级', settings: '设置与连接', connections: 'Linear 历史', runs: 'AI 委托', home: '我的日常', items: '工作事项', ideas: '灵感与讨论', knowledge: '知识', meeting: '组会 / 回顾', maintenance: '维护中心', 'item-detail': '事项' }
 const workspace = computed(() => activeWorkspace.value)
 const isTeam = computed(() => workspace.value === 'team')
 const pageLabel = computed(() => pageLabels[String(route.name)] ?? 'LifeWeave')
 const nav = computed(() => [
   { name: 'conversation', label: '与 AI 对话', icon: 'message' },
   { name: 'home', label: '我的日常', icon: 'home' }, { name: 'items', label: '工作事项', icon: 'work' },
-  { name: 'plan', label: '计划与优先级', icon: 'flag' }, { name: 'runs', label: 'AI 委托', icon: 'spark' }, { name: 'maintenance', label: '能力与评测', icon: 'layers' }, { name: 'connections', label: 'Linear 事项', icon: 'link' }, { name: 'ideas', label: '灵感与讨论', icon: 'idea' }, { name: 'knowledge', label: '知识', icon: 'book' },
+  { name: 'plan', label: '计划与优先级', icon: 'flag' }, { name: 'runs', label: 'AI 委托', icon: 'spark' }, { name: 'maintenance', label: '能力与评测', icon: 'layers' }, { name: 'connections', label: 'Linear 历史', icon: 'link' }, { name: 'ideas', label: '灵感与讨论', icon: 'idea' }, { name: 'knowledge', label: '知识', icon: 'book' },
 ])
 
 function path(name: string) { return `/lifeweave/${workspace.value}/${name}` }

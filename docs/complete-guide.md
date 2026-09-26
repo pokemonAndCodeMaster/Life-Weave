@@ -11,13 +11,13 @@
 
 | 部分 | 章节 | 来源 | 原文 SHA-256 |
 | --- | --- | --- | --- |
-| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `b9787445f819b79016df7ffe0e10e981ef0671c7361190c51ce23621720b6891` |
+| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `8408e2860030fd8990869418b9bb3bbeb77e3d4969bdd0a367876c00cd185322` |
 | 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `a3be812cde0d817c4372184d2b6d476a348674976fdbf0da7a6a1648b853ed9c` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-03) | `docs/product.md` | `afacca1738d92bd7e94efe5075b1d76f615ca35ecf4d379022bd60038381f789` |
 | 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `34888c839427db5d552717a6e6e4c2581f113b6c1f15cc59d1b35d2397c5f4b6` |
-| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `f8ad8ce1b6fb9293530fb1221a7c0f04443ef0c27d6425b31cce32a7bcd77ec1` |
-| 当前说明 | [当前建设路线](#doc-06) | `docs/roadmap.md` | `28ff40117b7333b8b32694b8fd9d1d64104333990d8abc3e8277d0737a4cad72` |
-| 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `d7a74cc31fe0f3bc0b69d8778f31e080095a73b371403b4c8c1983255df8828f` |
+| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `9311a4a2c2e4942a3909cd1c22fbfb77ab648d2ed7b3a9ea1328120a0e4a47a3` |
+| 当前说明 | [当前建设路线](#doc-06) | `docs/roadmap.md` | `563c1874c1a6e154c9a16063ea91feec947c489f180ce519ce4bb473f40ddadb` |
+| 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `711ddbeac9fe0e883528e0376affad195746dc79869911ec6d294d3c56b49d08` |
 | 当前说明 | [LifeWeave：名称与适配](#doc-08) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
 | 当前说明 | [研究成果归档、离线阅读与跨文章讨论](#doc-09) | `docs/research-archive.md` | `e3d4980ab611ac1c975ce3122f27f6ceb53c57756716fc7003396e52aa77d3f7` |
 
@@ -82,7 +82,7 @@ python scripts/workbench.py start
 
 在“设置与连接 → 研究成果自动归档”启用后，新成功报告会自动写入 GitHub 的 `research-archive` 分支；配置 Notion 后，正文也会进入单向镜像。两个目标分别显示回读状态，失败保留本地并重试；以前的成果可点“立即归档 / 重试”。[当前两篇 GitHub 归档](https://github.com/pokemonAndCodeMaster/Life-Weave/tree/research-archive)在本机关机后仍能访问。原有 Linear 文档仅作历史只读，不再接收新报告。代码在同仓 `main`；归档范围是成果与引用材料，不是整套运行数据库或自动采纳正式知识。详见 [归档与跨文章讨论](#doc-09)。
 
-本机首次交付已实际跑通 Codex。OpenCode 可建立会话，但当前配置下的真实调用连续返回执行器内部错误，暂建议选 Codex；具体记录见交付说明。重试是关联到原委托的新尝试，不是恢复原生 CLI 会话。
+本机 Codex 已在正式 LifeWeave 仓的网页开发委托中跑通。OpenCode 指定模型曾完成一次三阶段小仓任务，但后续浏览器委托发现其只读方案可通过子代理写入隔离树；该委托已取消，网页 OpenCode 开发选项暂时关闭，直到权限与阶段检查通过真实回归。见[第二执行器实测与反例](evidence/development-agent/opencode-chain.md)。重试是关联到原委托的新尝试，不是恢复原生 CLI 会话。
 
 本轮已通过工作台完成 [Qwen-Drive 第一轮研究](http://127.0.0.1:8010/lifeweave/personal/items/item-810217743bbb4be2/outputs)。该入口属于当前本机安装；新安装不会预置这份个人事项。研究可用版的证据、明确边界和后续日常 Alpha 计划见 [当前完成情况](#doc-05)。
 
@@ -552,11 +552,11 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | 创建 Skill/Agent/Harness 候选，围绕事项运行评测、看轨迹和工作样例，并按同标准再评 | 两次内部窄任务真实 Codex 运行；临时数据库和页面验证见[评测证据](evidence/personal-platform-evolution/README.md) | 不能自动创建、优化、合并能力；实施者判定通过不等于用户验收或跨领域有效 |
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |
 | 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](#doc-01-line-99) | 原始命令和输出不上传；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件 |
-| 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[临时小仓三阶段执行](evidence/development-agent/README.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量，复杂工程质量、外部会话自动逐工具采集仍未验证；只有 Codex 路径可选，结果不会自动合入原仓 |
+| 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[Codex 小仓执行](evidence/development-agent/README.md)、[OpenCode 小仓成功及后续反例](evidence/development-agent/opencode-chain.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量；OpenCode 后续只读阶段被发现写入隔离树，现已从开发页暂停，待修复回归；复杂工程质量、外部会话自动逐工具采集仍未验证，结果不会自动合入原仓 |
 
-执行以本机 Codex CLI 的真实成功记录为依据。OpenCode 已能建立会话，但真实模型调用连续返回内部错误，尚未取得成功结果；原因未定位。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。
+Codex 已有正式仓的真实成功记录。OpenCode 曾用 `--model opencode/mimo-v2.5-free` 和本机账号副本完成小仓三阶段及 7 项 unittest，但下一次只读方案的子代理写入了隔离树，故该开发选项当前暂停；成功一次不代表权限边界可靠。执行快照记录的是传给 CLI 的模型参数，尚无来自上游提供方的模型身份回执。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。
 
-启用后的新研究报告继续自动归档到 GitHub；Linear 仅保留历史只读。Notion 单向镜像已实现配置、项目文档逐篇扫描、报告投递与 Markdown 回读；同版本复查也读取远端并检查冲突。但后台令牌及根页面尚未配置，故没有真实 Notion 镜像完成证据。用户完成浏览器授权后，本机 Codex 新会话通过 Notion 应用连接器实际读出项目入口标题；这与后台镜像授权不同，也未单独证明直连 `mcp.notion.com`。本机停机时不能生成或上传新报告。飞书入口、远程 ChatGPT、多成员身份、各自模型连接、时间容量与日历、周期评测及正式自动知识回写均未实现。[归档维护说明](#doc-09)区分远端已确认版本与本地待传状态。
+启用后的新研究报告继续自动归档到 GitHub；Linear 仅保留历史只读。Notion 单向镜像已实现配置、项目文档逐篇扫描、报告投递与 Markdown 回读；同版本复查也读取远端并检查冲突。但后台令牌及根页面尚未配置，故没有真实 Notion 自动镜像完成证据。用户完成浏览器授权后，本机 Codex 新会话通过直接的 `mcp__notion__notion_fetch` 读出项目入口标题；[读取记录](evidence/development-agent/notion-mcp-smoke.md)证明交互式 Notion MCP 可用，与后台镜像授权不同。本机停机时不能生成或上传新报告。飞书入口、远程 ChatGPT、多成员身份、各自模型连接、时间容量与日历、周期评测及正式自动知识回写均未实现。[归档维护说明](#doc-09)区分远端已确认版本与本地待传状态。
 
 当前服务已让项目知识可找、可读，原文变更后的新版本能被下一次读取；外部开发报告也能通过同一事项接续。[正式服务的桌面与手机核查](evidence/project-development/README.md)覆盖这两条阅读路径。正式事项 `item-58363ef3851142d8` 已记录 GitHub 提交、测试、页面证据和后续档案导航修复，目前待用户使用验收。本轮以后绑定的 Codex 会话可以用受信任 Hook 记录支持的事件；更早的代码改动只有 Git 差异与主动上报，无法补造实时 trace。后续重点是在真实复杂开发中从任务起点绑定、核对工具覆盖和验证反馈怎样改善下一轮。阶段和验收条件见[建设路线](#doc-06)。
 <!-- source-end: docs/status.md -->
@@ -579,7 +579,7 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 
 接着用一个真实 LifeWeave 改进事项检验：原始目标、所读文档与代码、实施方案、执行动作、代码差异、验证结果和知识变化都能从同一事项找回。平台发起的工作可以记录 Run；直接在已有 Codex 会话开发时，只有通过正式入口实际提交的阶段与产物才可见，不能事后伪造完整实时 trace。普通咨询、只记录以及非开发事项仍走轻路径。
 
-已先用临时小仓跑通网页开发委托的只读方案、独立审阅和隔离实施；[真实执行记录](evidence/development-agent/README.md)仅证明这条窄路径。下一步用真实 LifeWeave 事项核对复杂修改中的方案质量、过程事件、测试证据和反馈接续；再为本机 Codex 会话增加受支持的自动事件采集。Notion 后台凭据和根页面授权就绪后，先对一篇当前文档及一篇带图报告做上传、回读和实际页面显示验收，再批量镜像。
+已用 Codex 在[临时小仓](evidence/development-agent/README.md)和[正式 LifeWeave 仓的有界任务](evidence/development-agent/live-project-run.md)跑通三阶段开发；OpenCode 指定模型曾完成小仓任务，但后续[只读越权反例](evidence/development-agent/opencode-chain.md)要求先修复并真实复测，再开放网页开发入口。然后用真实 LifeWeave 复杂事项核对方案质量、背景冲突、过程事件、测试证据和反馈接续，并继续验证本机 Codex Hook 在受信任会话中的覆盖率。Notion 后台凭据和根页面授权就绪后，先对一篇当前文档及一篇带图报告做上传、回读和实际页面显示验收，再批量镜像。
 
 验收包括：从全新页面和新会话查找并打开正确规范；所选方法和最多十篇知识的版本随运行固定；修改后再次读取看到新正文；同一事项能定位可复查的代码与测试结果；无仓库时明确无法核验源码。日常服务保持稳定，候选在隔离环境验证。[开发与运维](#doc-07)说明正式命令和环境。
 
@@ -791,7 +791,9 @@ python scripts/workbench.py start
 
 在需求或修复事项中打开“开发 Agent”，写明交付目标并选择 Git 目录。先检查当前仓库提交；未提交内容不会进入隔离工作树，必须显式勾选确认才能在脏工作树上委托。平台固定事项背景、所选方法与知识版本，依次执行只读方案、独立只读审阅（或小改动自检）和可写实施。只有审阅明确通过且原提交、背景及知识版本未改变时才进入实施。各阶段有独立 Run、真实事件和错误；结果页可读隔离工作树的 Git 差异，但不会自动合入原仓。
 
-网页对话中的明确开发委托若提供项目目录，会自动建立同样的方案 Run；没提供目录时只登记事项并提示到“开发 Agent”补齐目录。单纯讨论、记录和研究保持原路径。本机 Codex 直接开发时，使用上述 `external-start` / `external-report` 关联同一事项；当前只能主动上报阶段和服务观测 Git，尚不能自动捕获该会话每条工具命令。OpenCode 仍显示为不可用，不能把已安装当作真实可调用。
+网页对话中的明确开发委托若提供项目目录，会自动建立同样的方案 Run；没提供目录时只登记事项并提示到“开发 Agent”补齐目录。单纯讨论、记录和研究保持原路径。本机 Codex 直接开发时，使用上述 `external-start` / `external-report` 关联同一事项；当前只能主动上报阶段和服务观测 Git，尚不能自动捕获该会话每条工具命令。
+
+开发页当前默认且只开放 Codex。OpenCode 曾在当前空间完成一次指定模型小仓开发，但随后发现只读方案中的子代理能修改隔离工作树，故开发入口临时关闭；修正后的权限与阶段 Git 检查正在回归。通用 AI 委托的执行器设置与开发链开放状态分别判断，不能用一次成功证明模型长期可用。这不是 API Key 配置、团队空间或复杂项目质量的验收。全过程见[OpenCode 成功记录与反例](evidence/development-agent/opencode-chain.md)。
 <!-- source-end: docs/development.md -->
 
 ---

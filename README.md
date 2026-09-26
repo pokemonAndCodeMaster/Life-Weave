@@ -49,7 +49,7 @@ python scripts/workbench.py start
 
 在“设置与连接 → 研究成果自动归档”启用后，新成功报告会自动写入 GitHub 的 `research-archive` 分支；配置 Notion 后，正文也会进入单向镜像。两个目标分别显示回读状态，失败保留本地并重试；以前的成果可点“立即归档 / 重试”。[当前两篇 GitHub 归档](https://github.com/pokemonAndCodeMaster/Life-Weave/tree/research-archive)在本机关机后仍能访问。原有 Linear 文档仅作历史只读，不再接收新报告。代码在同仓 `main`；归档范围是成果与引用材料，不是整套运行数据库或自动采纳正式知识。详见 [归档与跨文章讨论](docs/research-archive.md)。
 
-本机首次交付已实际跑通 Codex。OpenCode 可建立会话，但当前配置下的真实调用连续返回执行器内部错误，暂建议选 Codex；具体记录见交付说明。重试是关联到原委托的新尝试，不是恢复原生 CLI 会话。
+本机 Codex 已在正式 LifeWeave 仓的网页开发委托中跑通。OpenCode 指定模型曾完成一次三阶段小仓任务，但后续浏览器委托发现其只读方案可通过子代理写入隔离树；该委托已取消，网页 OpenCode 开发选项暂时关闭，直到权限与阶段检查通过真实回归。见[第二执行器实测与反例](docs/evidence/development-agent/opencode-chain.md)。重试是关联到原委托的新尝试，不是恢复原生 CLI 会话。
 
 本轮已通过工作台完成 [Qwen-Drive 第一轮研究](http://127.0.0.1:8010/lifeweave/personal/items/item-810217743bbb4be2/outputs)。该入口属于当前本机安装；新安装不会预置这份个人事项。研究可用版的证据、明确边界和后续日常 Alpha 计划见 [当前完成情况](docs/status.md)。
 

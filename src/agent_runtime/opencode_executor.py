@@ -21,34 +21,6 @@ from .executor import (
 EventCallback = Callable[[dict[str, Any]], Awaitable[None]]
 
 
-READ_ONLY_BASH_PERMISSION = {
-    "*": "deny",
-    "pwd": "allow",
-    "ls": "allow",
-    "ls *": "allow",
-    "find *": "allow",
-    "rg *": "allow",
-    "grep *": "allow",
-    "git status": "allow",
-    "git status *": "allow",
-    "git diff": "allow",
-    "git diff *": "allow",
-    "git log": "allow",
-    "git log *": "allow",
-    "git show *": "allow",
-    "git rev-parse *": "allow",
-    ".venv/bin/pytest *": "allow",
-    "cd apps/quality-platform && .venv/bin/pytest *": "allow",
-    "python -m pytest *": "allow",
-    "python -m compileall *": "allow",
-    "npm test *": "allow",
-    "npm run type-check *": "allow",
-    "npm run build *": "allow",
-    "cd apps/quality-platform/src/frontend && npm test *": "allow",
-    "cd apps/quality-platform/src/frontend && npm run type-check *": "allow",
-    "cd apps/quality-platform/src/frontend && npm run build *": "allow",
-}
-
 WRITE_BASH_PERMISSION = {
     "*": "allow",
     "git push*": "deny",
@@ -149,6 +121,7 @@ class OpenCodeExecutor:
         argv = [
             *request.command_prefix,
             self.command,
+            *(("--pure",) if request.sandbox == "read-only" else ()),
             "run",
             "--format",
             "json",
@@ -192,12 +165,17 @@ class OpenCodeExecutor:
             permission = {
                 "edit": "allow",
                 "bash": WRITE_BASH_PERMISSION,
+                "task": "deny",
                 "external_directory": "deny",
             }
         else:
             permission = {
                 "edit": "deny",
-                "bash": READ_ONLY_BASH_PERMISSION,
+                # Subagents have their own effective permissions. The Task tool
+                # let one write during a read-only planning Run, so both task
+                # delegation and shell execution are unavailable in this stage.
+                "bash": "deny",
+                "task": "deny",
                 "external_directory": "deny",
             }
         env["OPENCODE_CONFIG_CONTENT"] = json.dumps(

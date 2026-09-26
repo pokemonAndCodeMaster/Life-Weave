@@ -21,6 +21,7 @@ from typing import Any, Protocol
 
 from src.agent_runtime import CodexExecutor, ExecutorRequest, OpenCodeExecutor
 from src.agent_runtime.executor import AgentExecutor, terminate_process
+from src.agent_runtime.tree_snapshot import tree_sha256
 
 
 class WorkerClient(Protocol):
@@ -473,6 +474,7 @@ class LifeWeaveWorker:
                 raise FileNotFoundError(health.reason or f"执行器不可用：{run['engine']}")
             worktree, artifacts, home = self._prepare_worktree(run)
             materialized, materialized_files = self._materialize_capabilities(run, worktree)
+            readonly_tree_sha256 = tree_sha256(worktree) if run.get("sandbox") == "read-only" else None
             environment, inherit_environment = self._isolated_environment(
                 home,
                 workspace=str(run["workspace"]),
@@ -512,6 +514,7 @@ class LifeWeaveWorker:
                 "sessionHome": str(home),
                 "materializedCapabilities": materialized,
                 "materializedInputFiles": materialized_files,
+                "readonlyTreeSha256": readonly_tree_sha256,
             }
             environment_snapshot["identity"] = self._environment_identity(environment_snapshot)
             initial_heartbeat = await self.client.heartbeat(

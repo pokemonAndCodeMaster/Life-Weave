@@ -13,10 +13,10 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | 创建 Skill/Agent/Harness 候选，围绕事项运行评测、看轨迹和工作样例，并按同标准再评 | 两次内部窄任务真实 Codex 运行；临时数据库和页面验证见[评测证据](evidence/personal-platform-evolution/README.md) | 不能自动创建、优化、合并能力；实施者判定通过不等于用户验收或跨领域有效 |
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |
 | 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](../README.md#在新的本机-agent-会话接续) | 原始命令和输出不上传；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件 |
-| 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[临时小仓三阶段执行](evidence/development-agent/README.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量，复杂工程质量、外部会话自动逐工具采集仍未验证；只有 Codex 路径可选，结果不会自动合入原仓 |
+| 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[Codex 小仓执行](evidence/development-agent/README.md)、[OpenCode 小仓成功及后续反例](evidence/development-agent/opencode-chain.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量；OpenCode 后续只读阶段被发现写入隔离树，现已从开发页暂停，待修复回归；复杂工程质量、外部会话自动逐工具采集仍未验证，结果不会自动合入原仓 |
 
-执行以本机 Codex CLI 的真实成功记录为依据。OpenCode 已能建立会话，但真实模型调用连续返回内部错误，尚未取得成功结果；原因未定位。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。
+Codex 已有正式仓的真实成功记录。OpenCode 曾用 `--model opencode/mimo-v2.5-free` 和本机账号副本完成小仓三阶段及 7 项 unittest，但下一次只读方案的子代理写入了隔离树，故该开发选项当前暂停；成功一次不代表权限边界可靠。执行快照记录的是传给 CLI 的模型参数，尚无来自上游提供方的模型身份回执。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。
 
-启用后的新研究报告继续自动归档到 GitHub；Linear 仅保留历史只读。Notion 单向镜像已实现配置、项目文档逐篇扫描、报告投递与 Markdown 回读；同版本复查也读取远端并检查冲突。但后台令牌及根页面尚未配置，故没有真实 Notion 镜像完成证据。用户完成浏览器授权后，本机 Codex 新会话通过 Notion 应用连接器实际读出项目入口标题；这与后台镜像授权不同，也未单独证明直连 `mcp.notion.com`。本机停机时不能生成或上传新报告。飞书入口、远程 ChatGPT、多成员身份、各自模型连接、时间容量与日历、周期评测及正式自动知识回写均未实现。[归档维护说明](research-archive.md)区分远端已确认版本与本地待传状态。
+启用后的新研究报告继续自动归档到 GitHub；Linear 仅保留历史只读。Notion 单向镜像已实现配置、项目文档逐篇扫描、报告投递与 Markdown 回读；同版本复查也读取远端并检查冲突。但后台令牌及根页面尚未配置，故没有真实 Notion 自动镜像完成证据。用户完成浏览器授权后，本机 Codex 新会话通过直接的 `mcp__notion__notion_fetch` 读出项目入口标题；[读取记录](evidence/development-agent/notion-mcp-smoke.md)证明交互式 Notion MCP 可用，与后台镜像授权不同。本机停机时不能生成或上传新报告。飞书入口、远程 ChatGPT、多成员身份、各自模型连接、时间容量与日历、周期评测及正式自动知识回写均未实现。[归档维护说明](research-archive.md)区分远端已确认版本与本地待传状态。
 
 当前服务已让项目知识可找、可读，原文变更后的新版本能被下一次读取；外部开发报告也能通过同一事项接续。[正式服务的桌面与手机核查](evidence/project-development/README.md)覆盖这两条阅读路径。正式事项 `item-58363ef3851142d8` 已记录 GitHub 提交、测试、页面证据和后续档案导航修复，目前待用户使用验收。本轮以后绑定的 Codex 会话可以用受信任 Hook 记录支持的事件；更早的代码改动只有 Git 差异与主动上报，无法补造实时 trace。后续重点是在真实复杂开发中从任务起点绑定、核对工具覆盖和验证反馈怎样改善下一轮。阶段和验收条件见[建设路线](roadmap.md)。

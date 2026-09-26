@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from psycopg.types.json import Jsonb
+from src.agent_runtime.tree_snapshot import tree_sha256
 
 
 ACTIVE = {"planning", "reviewing", "implementing"}
@@ -25,6 +26,9 @@ DEFAULT_PROJECT_REFS = [
     "lifeweave-project:docs/status.md",
     "lifeweave-project:docs/development.md",
 ]
+# Re-enable only after the read-only stage bypass found in the browser run is
+# prevented and a fresh end-to-end assignment verifies the guard.
+OPENCODE_DEVELOPMENT_ENABLED = False
 
 
 class DevelopmentService:
@@ -54,20 +58,41 @@ class DevelopmentService:
         method = next((row for row in self.sources.catalog(workspace)["items"]
                        if row["title"] == "lifeweave-development"), None)
         codex = self.runtime.executors["codex"].health()
+        opencode = self.runtime.executors["opencode"].health()
+        # A binary on PATH is insufficient evidence that an account can call a
+        # model. Offer only the explicit model most recently completed by the
+        # actual worker in this workspace, and require a fresh result.
+        tested = (self.db.fetch_one(
+            "SELECT model,finished_at FROM workbench.t_lifeweave_run "
+            "WHERE workspace=%s AND engine='opencode' AND state='succeeded' "
+            "AND model IS NOT NULL AND model<>'' AND exit_code=0 AND length(btrim(result))>0 "
+            "AND environment_snapshot->>'effectiveModel'=model "
+            "AND finished_at>now()-interval '7 days' "
+            "ORDER BY finished_at DESC LIMIT 1", (workspace,))
+            if OPENCODE_DEVELOPMENT_ENABLED and opencode.available else None)
+        opencode_ready = bool(OPENCODE_DEVELOPMENT_ENABLED and opencode.available and tested)
+        if not OPENCODE_DEVELOPMENT_ENABLED:
+            opencode_reason = "只读越权反例和隔离账号调用失败待回归，OpenCode 开发委托暂不可选"
+        elif opencode_ready:
+            opencode_reason = "仅开放近七天实际成功的指定模型；开发链仍需逐次审阅"
+        else:
+            opencode_reason = "当前空间没有近七天指定模型的真实成功运行，或 OpenCode CLI 不可用"
         return {
             "itemId": item_id,
             "recommendedRepositoryPath": str(self.project_root),
             "agents": [
                 {"id": "development", "title": "开发 Agent", "version": method["id"] if method else "builtin-v1",
-                 "available": bool(method and codex.available), "reason": "适用于代码项目的方案、审查、实施和验证"},
+                 "available": bool(method and (codex.available or opencode_ready)), "reason": "适用于代码项目的方案、审查、实施和验证"},
                 {"id": "general", "title": "通用助理", "version": "conversation-v1", "available": True,
                  "reason": "适用于讨论、研究与记录，不自动修改代码"},
             ],
             "recommendedAgentId": "development" if item.get("itemType") in {"requirement", "fix"} else "general",
             "executors": {"codex": {"available": codex.available, "version": codex.version,
                                     "reason": codex.reason},
-                          "opencode": {"available": False,
-                                       "reason": "真实模型调用尚未验证成功，暂不用于自动开发链"}},
+                          "opencode": {"available": opencode_ready, "version": opencode.version,
+                                       "verifiedModel": tested["model"] if opencode_ready else None,
+                                       "lastSucceededAt": tested["finished_at"].isoformat() if opencode_ready else None,
+                                       "reason": opencode_reason}},
             "methodId": method["id"] if method else None,
             "knowledgeRefs": DEFAULT_PROJECT_REFS,
         }
@@ -83,11 +108,17 @@ class DevelopmentService:
                knowledge_refs: list[str] | None = None,
                review_mode: str = "independent",
                acknowledge_excluded_changes: bool = False) -> dict[str, Any]:
-        if engine != "codex":
-            raise ValueError("开发工作链先使用已验证的 Codex；OpenCode 尚无成功模型调用")
+        if engine not in {"codex", "opencode"}:
+            raise ValueError("执行器必须是 Codex 或 OpenCode")
         if review_mode not in {"independent", "self"}:
             raise ValueError("审查方式只能是独立审阅或轻量自检")
-        if not self.runtime.executors["codex"].health().available:
+        if engine == "opencode":
+            option = self.choices(workspace, item_id)["executors"]["opencode"]
+            if not option["available"]:
+                raise ValueError(option["reason"])
+            if not model or model != option["verifiedModel"]:
+                raise ValueError("OpenCode 只能使用当前空间近七天实际运行成功的指定模型；请先检查执行器和模型")
+        elif not self.runtime.executors["codex"].health().available:
             raise ValueError("Codex CLI 不可用，请先检查本机执行设置")
         self.work.get_item(workspace, item_id)
         fingerprint = hashlib.sha256(json.dumps({
@@ -186,6 +217,41 @@ class DevelopmentService:
         if self._input_versions(row["workspace"], row["method_id"], row["knowledge_refs"]) != row["input_versions"]:
             raise ValueError("所选方法或知识版本已变化；请重新形成方案")
 
+    def _assert_readonly_clean(self, run: dict[str, Any], base: str) -> None:
+        environment = run.get("environment_snapshot") or {}
+        actual = environment.get("actualDirectory")
+        if not actual:
+            raise ValueError("只读阶段缺少执行目录，无法核对是否修改过代码")
+        directory = Path(actual).resolve()
+        if not directory.is_relative_to(self.project_root / ".runtime" / "executions") or not directory.is_dir():
+            raise ValueError("只读阶段执行目录不可核对")
+        expected_tree = environment.get("readonlyTreeSha256")
+        if not isinstance(expected_tree, str) or len(expected_tree) != 64:
+            raise ValueError("只读阶段缺少运行前文件快照，无法核对是否修改过代码")
+        if tree_sha256(directory) != expected_tree:
+            raise ValueError("只读阶段修改了隔离工作树，已阻止进入下一阶段")
+        if self._git("rev-parse", "HEAD", cwd=directory) != base:
+            raise ValueError("只读阶段改变了 Git 提交，已阻止进入下一阶段")
+        generated = set(environment.get("materializedInputFiles") or
+                        environment.get("materializedCapabilities") or [])
+        if generated:
+            generated.add(".lifeweave/capability-manifest.json")
+        tracked = subprocess.run(["git", "-C", str(directory), "diff", "--name-only", "-z", base],
+                                 capture_output=True, timeout=10, check=False)
+        untracked = subprocess.run(["git", "-C", str(directory), "ls-files", "--others", "--exclude-standard", "-z"],
+                                   capture_output=True, timeout=10, check=False)
+        # `git status` omits ignored outputs, but a read-only stage may still
+        # write them. Check those too before allowing the next stage.
+        ignored = subprocess.run(["git", "-C", str(directory), "ls-files", "--others", "--ignored",
+                                  "--exclude-standard", "-z"], capture_output=True, timeout=10, check=False)
+        if tracked.returncode or untracked.returncode or ignored.returncode:
+            raise ValueError("只读阶段的 Git 差异无法核对")
+        paths = [part.decode("utf-8", "replace") for part in
+                 (tracked.stdout + untracked.stdout + ignored.stdout).split(b"\0") if part]
+        changed = [path for path in paths if path not in generated]
+        if changed:
+            raise ValueError("只读阶段修改了隔离工作树，已阻止进入下一阶段：" + ", ".join(changed[:8]))
+
     def advance(self, identity: str) -> None:
         with self.db.atomic() as conn:
             row = conn.execute("SELECT * FROM workbench.lifeweave_development_assignment "
@@ -206,6 +272,14 @@ class DevelopmentService:
                              "SET status=%s,error=%s,updated_at=now() WHERE id=%s",
                              (target, f"{status} 阶段 {run['state']}：{str(run.get('error') or '')[:1500]}", identity))
                 return
+            if status in {"planning", "reviewing"}:
+                try:
+                    self._assert_readonly_clean(run, row["repository_revision"])
+                except (ValueError, OSError, subprocess.SubprocessError) as exc:
+                    conn.execute("UPDATE workbench.lifeweave_development_assignment "
+                                 "SET status='blocked',error=%s,updated_at=now() WHERE id=%s",
+                                 (str(exc), identity))
+                    return
             if status == "implementing":
                 conn.execute("UPDATE workbench.lifeweave_development_assignment "
                              "SET status='awaiting_acceptance',updated_at=now() WHERE id=%s", (identity,))
@@ -311,9 +385,15 @@ class DevelopmentService:
         if generated:
             generated.add('.lifeweave/capability-manifest.json')
         untracked_paths = [part.decode('utf-8', 'replace') for part in untracked.stdout.split(b'\0') if part]
+        def generated_artifact(path: str) -> bool:
+            parts = Path(path).parts
+            return (bool(set(parts) & {'__pycache__', '.pytest_cache', '.mypy_cache', '.ruff_cache'})
+                    or path.endswith(('.pyc', '.pyo')) or path == '.coverage')
+
+        artifacts = [path for path in untracked_paths if generated_artifact(path)]
         paths = list(dict.fromkeys([part.decode('utf-8', 'replace') for part in changed.stdout.split(b'\0') if part] +
                                    untracked_paths))
-        paths = [path for path in paths if path not in generated]
+        paths = [path for path in paths if path not in generated and path not in artifacts]
         patch = ''
         if paths:
             output = subprocess.run(['git', '-C', str(directory), 'diff', '--no-ext-diff', base, '--', *paths],
@@ -323,7 +403,7 @@ class DevelopmentService:
                 raise ValueError('Git 差异读取失败')
             patch = output.stdout.decode('utf-8', 'replace')
         for relative in untracked_paths:
-            if relative in generated:
+            if relative in generated or relative in artifacts:
                 continue
             file = directory / relative
             if not file.is_file() or file.is_symlink() or file.stat().st_size > 100_000:
@@ -336,6 +416,7 @@ class DevelopmentService:
                          fromfile='/dev/null', tofile='b/' + relative))
         return {'runId': run_id, 'baseRevision': assignment['repositoryRevision'],
                 'files': paths[:100], 'fileCount': len(paths), 'generatedInputsExcluded': sorted(generated),
+                'generatedArtifactsExcluded': artifacts[:100],
                 'patch': patch[:200_000], 'truncated': len(paths) > 100 or len(patch) > 200_000}
 
     def cancel(self, workspace: str, identity: str) -> dict[str, Any]:

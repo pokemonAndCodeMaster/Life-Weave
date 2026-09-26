@@ -15,11 +15,11 @@ export interface DevelopmentAssignment {
 export interface DevelopmentChoices {
   itemId: string; recommendedAgentId: string; recommendedRepositoryPath: string; methodId: string | null; knowledgeRefs: string[]
   agents: Array<{ id: string; title: string; version: string; available: boolean; reason: string }>
-  executors: Record<string, { available: boolean; version?: string; reason?: string }>
+  executors: Record<'codex' | 'opencode', { available: boolean; version?: string; reason?: string; verifiedModel?: string | null; lastSucceededAt?: string | null }>
 }
 export interface DevelopmentInput {
   requestId: string; itemId: string; instruction: string; repositoryPath: string
-  agentId: 'development'; engine: 'codex'; model?: string | null; methodId?: string | null
+  agentId: 'development'; engine: 'codex' | 'opencode'; model?: string | null; methodId?: string | null
   knowledgeRefs?: string[]; reviewMode: 'independent' | 'self'; acknowledgeExcludedChanges: boolean
 }
 const root = (workspace: WorkspaceKind) => `/lifeweave/${workspace}`
@@ -35,7 +35,7 @@ export async function createDevelopment(workspace: WorkspaceKind, input: Develop
 export async function cancelDevelopment(workspace: WorkspaceKind, id: string) {
   return (await http.post<DevelopmentAssignment>(`${root(workspace)}/development/${encodeURIComponent(id)}/cancel`, {})).data
 }
-export interface DevelopmentDiff { runId: string; baseRevision: string; files: string[]; fileCount: number; patch: string; truncated: boolean; generatedInputsExcluded: string[] }
+export interface DevelopmentDiff { runId: string; baseRevision: string; files: string[]; fileCount: number; patch: string; truncated: boolean; generatedInputsExcluded: string[]; generatedArtifactsExcluded: string[] }
 export async function getDevelopmentDiff(workspace: WorkspaceKind, id: string) {
   return (await http.get<DevelopmentDiff>(`${root(workspace)}/development/${encodeURIComponent(id)}/diff`)).data
 }

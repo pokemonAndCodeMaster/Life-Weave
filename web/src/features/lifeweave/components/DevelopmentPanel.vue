@@ -16,7 +16,8 @@ const diffs = shallowRef<Record<string, DevelopmentDiff>>({})
 const error = shallowRef('')
 const busy = shallowRef(false)
 const requestId = shallowRef(crypto.randomUUID())
-const form = reactive({ instruction: '', repositoryPath: '', model: '', reviewMode: 'independent' as 'independent' | 'self', acknowledgeExcludedChanges: false })
+const form = reactive({ instruction: '', repositoryPath: '', engine: 'codex' as 'codex' | 'opencode', model: '', reviewMode: 'independent' as 'independent' | 'self', acknowledgeExcludedChanges: false })
+watch(() => form.engine, engine => { form.model = engine === 'opencode' ? (choices.value?.executors.opencode.verifiedModel || '') : '' })
 let generation = 0
 let timer: ReturnType<typeof setTimeout> | undefined
 async function refresh(ticket = generation) {
@@ -36,11 +37,12 @@ async function refresh(ticket = generation) {
 watch(() => [props.workspace, props.itemId], async () => {
   const ticket = ++generation
   clearTimeout(timer); assignments.value = []; runs.value = {}; events.value = {}; diffs.value = {}; choices.value = null; error.value = ''
-  form.instruction = props.initialInstruction || ''; form.repositoryPath = ''
+  form.instruction = props.initialInstruction || ''; form.repositoryPath = ''; form.engine = 'codex'; form.model = ''
   try {
     const value = await developmentChoices(props.workspace, props.itemId)
     if (ticket !== generation) return
     choices.value = value; form.repositoryPath = value.recommendedRepositoryPath
+    if (!value.executors.codex.available && value.executors.opencode.available) form.engine = 'opencode'
   } catch (caught) { if (ticket === generation) error.value = apiError(caught).message }
   if (ticket === generation) void refresh(ticket)
 }, { immediate: true })
@@ -51,8 +53,9 @@ async function submit() {
   try {
     await createDevelopment(props.workspace, {
       requestId: requestId.value, itemId: props.itemId, instruction: form.instruction.trim(),
-      repositoryPath: form.repositoryPath.trim(), agentId: 'development', engine: 'codex', model: form.model.trim() || null,
-      methodId: choices.value?.methodId, knowledgeRefs: choices.value?.knowledgeRefs,
+      repositoryPath: form.repositoryPath.trim(), agentId: 'development', engine: form.engine, model: form.model.trim() || null,
+      methodId: choices.value?.methodId,
+      knowledgeRefs: form.repositoryPath.trim() === choices.value?.recommendedRepositoryPath ? choices.value?.knowledgeRefs : [],
       reviewMode: form.reviewMode, acknowledgeExcludedChanges: form.acknowledgeExcludedChanges,
     })
     requestId.value = crypto.randomUUID(); form.instruction = ''; clearTimeout(timer); await refresh()
@@ -76,19 +79,21 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
 
 <template>
   <section class="lw-panel pad development-panel" aria-label="开发 Agent">
-    <div class="lw-between"><div><h2>开发 Agent</h2><p class="lw-small lw-sub">同一事项记录固定背景、方案、审阅、实施和实际验证。推荐使用 Codex；当前阶段只执行已验证的 Codex 链路。</p></div><button class="lw-btn ghost sm" type="button" @click="refresh()">刷新</button></div>
+    <div class="lw-between"><div><h2>开发 Agent</h2><p class="lw-small lw-sub">同一事项记录固定背景、方案、审阅、实施和实际验证。默认使用 Codex；其他执行器以当前可用状态为准。</p></div><button class="lw-btn ghost sm" type="button" @click="refresh()">刷新</button></div>
     <p v-if="error" class="lw-notice warning" role="alert">{{ error }}</p>
     <form class="lw-stack" @submit.prevent="submit">
       <label class="lw-label">这次要交付什么<textarea v-model="form.instruction" class="lw-field" rows="4" required maxlength="100000" placeholder="描述具体用户结果、限制和验收方式"></textarea></label>
       <label class="lw-label">项目 Git 目录<input v-model="form.repositoryPath" class="lw-field" required autocomplete="off" /></label>
       <div class="lw-form-grid">
-        <label class="lw-label">Agent / 执行器<input class="lw-field" value="开发 Agent · Codex" readonly /></label>
-        <label class="lw-label">Codex 模型（可选）<input v-model="form.model" class="lw-field" maxlength="256" autocomplete="off" placeholder="留空使用本机 Codex 默认模型" /></label>
+        <label class="lw-label">执行器<select v-model="form.engine" class="lw-field"><option value="codex" :disabled="!choices?.executors.codex.available">开发 Agent · Codex</option><option value="opencode" :disabled="!choices?.executors.opencode.available">开发 Agent · OpenCode{{ choices?.executors.opencode.available ? ` (${choices.executors.opencode.verifiedModel})` : ' (尚不可用)' }}</option></select></label>
+        <label class="lw-label">{{ form.engine === 'codex' ? 'Codex 模型（可选）' : 'OpenCode 模型参数（近期成功）' }}<input v-model="form.model" class="lw-field" maxlength="256" autocomplete="off" :readonly="form.engine === 'opencode'" :placeholder="form.engine === 'codex' ? '留空使用本机 Codex 默认模型' : '先完成指定模型的成功运行'" /></label>
         <label class="lw-label">方案检查<select v-model="form.reviewMode" class="lw-field"><option value="independent">独立审阅（复杂改动）</option><option value="self">方案自检（小改动）</option></select></label>
       </div>
+      <p v-if="choices && !choices.executors.opencode.available" class="lw-tiny lw-muted">OpenCode：{{ choices.executors.opencode.reason }}</p>
       <label class="lw-small"><input v-model="form.acknowledgeExcludedChanges" type="checkbox" /> 我知道仓库未提交改动不会进入受管运行；运行从上方目录的当前提交创建隔离工作树。</label>
-      <p class="lw-tiny lw-muted">固定方法：{{ choices?.methodId || '加载中' }} · 默认项目知识 {{ choices?.knowledgeRefs.length || 0 }} 篇。执行结果留在隔离工作树，需核对后合入项目。</p>
-      <button class="lw-btn primary" type="submit" :disabled="busy || !choices?.agents.find(agent => agent.id === 'development')?.available">{{ busy ? '正在登记…' : '开始开发委托' }}</button>
+      <p class="lw-tiny lw-muted">固定方法：{{ choices?.methodId || '加载中' }} · 本轮默认项目知识 {{ form.repositoryPath.trim() === choices?.recommendedRepositoryPath ? choices?.knowledgeRefs.length || 0 : 0 }} 篇。执行结果留在隔离工作树，需核对后合入项目。</p>
+      <p v-if="form.engine === 'opencode'" class="lw-tiny lw-muted">{{ choices?.executors.opencode.reason }}。本轮固定 CLI 模型参数，尚无上游模型身份回执；每一阶段的结果仍需核对。</p>
+      <button class="lw-btn primary" type="submit" :disabled="busy || !choices?.agents.find(agent => agent.id === 'development')?.available || !choices?.executors[form.engine].available">{{ busy ? '正在登记…' : '开始开发委托' }}</button>
     </form>
     <div v-if="assignments.length" class="development-history">
       <h3>本事项的开发委托</h3>
@@ -99,7 +104,7 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
         <p v-if="assignment.error" class="lw-notice warning">{{ assignment.error }}</p>
         <button v-if="['planning','reviewing','implementing'].includes(assignment.status)" class="lw-btn ghost sm" type="button" :disabled="busy" @click="cancel(assignment.id)">停止委托</button>
         <p v-if="assignment.status === 'awaiting_acceptance'" class="lw-small">实施运行已结束。请核对结果、运行事件和隔离工作树；代码是否已合入目标仓以目标仓当前 Git 状态为准，业务接受仍待确认。</p>
-        <div v-if="assignment.implementationRunId"><button class="lw-btn ghost sm" type="button" @click="showDiff(assignment.id)">查看实际 Git 差异</button><details v-if="diffs[assignment.id]" open><summary>实际改动 {{ diffs[assignment.id]!.fileCount }} 个文件{{ diffs[assignment.id]!.truncated ? ' · 页面已截断' : '' }}</summary><p class="lw-tiny lw-muted">基于提交 {{ diffs[assignment.id]!.baseRevision.slice(0, 12) }}。执行输入文件已从差异中排除；受管运行本身不会自动合入目标仓。</p><pre class="development-diff">{{ diffs[assignment.id]!.patch || '没有代码差异' }}</pre></details></div>
+        <div v-if="assignment.implementationRunId"><button class="lw-btn ghost sm" type="button" @click="showDiff(assignment.id)">查看实际 Git 差异</button><details v-if="diffs[assignment.id]" open><summary>实际改动 {{ diffs[assignment.id]!.fileCount }} 个文件{{ diffs[assignment.id]!.truncated ? ' · 页面已截断' : '' }}</summary><p class="lw-tiny lw-muted">基于提交 {{ diffs[assignment.id]!.baseRevision.slice(0, 12) }}。执行输入文件已从差异中排除；受管运行本身不会自动合入目标仓。</p><p v-if="diffs[assignment.id]!.generatedArtifactsExcluded.length" class="lw-tiny lw-muted">已排除 {{ diffs[assignment.id]!.generatedArtifactsExcluded.length }} 个未跟踪的测试缓存文件；它们未计入改动数。</p><pre class="development-diff">{{ diffs[assignment.id]!.patch || '没有代码差异' }}</pre></details></div>
         <details v-if="assignment.inputVersions.length"><summary>固定输入与版本</summary><ul><li v-for="entry in assignment.inputVersions" :key="entry.id">{{ entry.id }} · {{ entry.version.slice(0, 12) }} · {{ entry.sourcePath }}</li></ul></details>
         <details v-for="stage in stages" :key="stage.key" :open="stage.key === 'implementationRunId' && assignment.status === 'awaiting_acceptance'">
           <summary>{{ stage.title }} · {{ assignment[stage.key] ? (runs[assignment[stage.key]!]?.state || '读取中') : '尚未开始' }}</summary>
