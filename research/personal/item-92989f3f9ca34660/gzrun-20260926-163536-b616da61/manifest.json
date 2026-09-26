@@ -1,0 +1,15 @@
+{
+  "workspace": "personal",
+  "itemId": "item-92989f3f9ca34660",
+  "runId": "gzrun-20260926-163536-b616da61",
+  "title": "开发 Agent 双入口与 Notion 知识联动",
+  "version": "e61a838df00433015b17c7ad229a84f84e924b1fe63c6e08c510d7aeb59bb0d6",
+  "files": [],
+  "warnings": [
+    "未打包本机绝对或网页路径：/tmp/lifeweave-plugin-process.patch",
+    "未打包本机绝对或网页路径：/tmp/lifeweave-plugin-tests.log",
+    "未打包本机绝对或网页路径：/tmp/lifeweave-plugin-browser.log",
+    "未打包本机绝对或网页路径：/tmp/lifeweave-plugin-run-mobile.png"
+  ],
+  "boundary": "研究成果归档，不代表已接受的正式知识。外部网址仍需联网。"
+}
