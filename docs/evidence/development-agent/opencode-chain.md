@@ -26,4 +26,6 @@
 
 只读阶段的第一版 Git 守卫先被独立复核发现漏看 `.gitignore` 忽略的路径；补查 ignored 文件后，又被发现可通过 Git 索引的 `assume-unchanged` 或把 `core.worktree` 指向另一棵干净目录，令 Git 命令看不到隔离目录的真实改动。最终修正由可信 Worker 在模型启动前对整个隔离目录计算文件内容、目录、权限和符号链接的 SHA-256，服务在方案及审阅结束后直接重新计算；不再以可被模型改变的 Git 配置或索引作为唯一依据。数据库/HTTP 回归分别注入 README 改动、ignored 文件和两种 Git 元数据绕过，均要求委托 `blocked` 且不能进入实施。OpenCode 仍关闭，等待这版修正后的真实模型回归；一次静态/受控回归不能证明过程中绝无短暂写入，也不证明隔离目录之外不可写。
 
-正式服务上的 Codex 委托 `dev-98f64f30a737b4c0ab18d2062c313bd8` 从同一小仓提交出发，方案 Run `gzrun-20260926-152934-e3603670` 保持 Git 差异为空，进入实施 Run `gzrun-20260926-153025-90502cb1` 后状态为 `awaiting_acceptance`。实施服务差异仅有 README 一文件，独立执行 `grep -nFx 'Smoke: codex-guard' README.md` 得到第 4 行，`git diff --check` 通过。这次 Codex 实测发生在文件指纹守卫启用前；修正后的 Codex 实测仍需补做。
+正式服务上的 Codex 委托 `dev-98f64f30a737b4c0ab18d2062c313bd8` 从同一小仓提交出发，方案 Run `gzrun-20260926-152934-e3603670` 保持 Git 差异为空，进入实施 Run `gzrun-20260926-153025-90502cb1` 后状态为 `awaiting_acceptance`。实施服务差异仅有 README 一文件，独立执行 `grep -nFx 'Smoke: codex-guard' README.md` 得到第 4 行，`git diff --check` 通过。
+
+文件指纹守卫启用后，再以正式服务委托 `dev-f769ccffdc913e618c4e6b4052dd45c0` 做 Codex 小仓回归：方案 Run `gzrun-20260926-154932-3771002b` 成功，环境快照含运行前树指纹 `b708c0faa0058dfa04ddfbd81894d272a5a47b729ea19b6332ae6a048c9c6386`，结束后独立重算相同；委托随后进入实施 Run `gzrun-20260926-155058-e016397c` 并达到 `awaiting_acceptance`。服务实际差异仅 README 新增一行 `Smoke: snapshot-guard`，独立 `grep -nFx` 得到第 4 行，`git diff --check` 通过。它证明守卫未阻断这个有界 Codex 任务；OpenCode 修正后的模型级回归仍未完成。
