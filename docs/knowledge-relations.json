@@ -4,7 +4,7 @@
     {
       "sourceId": "lifeweave-project",
       "sourcePath": "docs/plugin-system.md",
-      "sourceVersion": "80e15a511db4fbaf6cce8daead7aaa67129a8a676e6adbd58c2d29a5d9b47f2a",
+      "sourceVersion": "92fd93dca02c6666284f2244390ea0c29e8bd5ec069666f60c5258bdc6e18cdf",
       "relation": "implemented_by",
       "targetPath": "src/lifeweave_plugins/core.py",
       "targetVersion": "ded429d29557742667e62638ed8f192d56bd55f6592dfbe94ee55f6b819432a3",
@@ -13,7 +13,7 @@
     {
       "sourceId": "lifeweave-project",
       "sourcePath": "docs/plugin-system.md",
-      "sourceVersion": "80e15a511db4fbaf6cce8daead7aaa67129a8a676e6adbd58c2d29a5d9b47f2a",
+      "sourceVersion": "92fd93dca02c6666284f2244390ea0c29e8bd5ec069666f60c5258bdc6e18cdf",
       "relation": "verified_by",
       "targetPath": "tests/test_plugins.py",
       "targetVersion": "ff0eb3220ef18f0b59041b2c98ff68ecd81afa64362f9c4b3c5d7bfc7ced837a",
