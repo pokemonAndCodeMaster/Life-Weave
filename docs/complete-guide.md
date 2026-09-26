@@ -17,7 +17,7 @@
 | 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `ba008a360c31c8a7e914e3fe20d77cc26a230ef74e27859532b67ed673ea4e38` |
 | 当前说明 | [插件目录与开发过程：首个可运行切片](#doc-05) | `docs/plugin-system.md` | `3a9044c60e081703c0c7a2c83e1779fc33c3f8b0a602e2a96fc1ab2c8dc78483` |
 | 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `036778a138d900c9becea333e3e2062a49a725f56c9d83cac4f6a4d039a55472` |
-| 当前说明 | [当前建设路线](#doc-07) | `docs/roadmap.md` | `a3040262e0897ab5daaa53baf9d289f05b6a62020990c5d823273bbec3aa5398` |
+| 当前说明 | [当前建设路线](#doc-07) | `docs/roadmap.md` | `93843a360b834687161282d0e56ba7d247d80a9a7bd9c62798190b1cd2fe75f7` |
 | 当前说明 | [开发与运行维护](#doc-08) | `docs/development.md` | `b5c54c41bc68a8ff48a9847aa7ee506e0dcea5d947f2995c7ffc9a28c788d555` |
 | 当前说明 | [LifeWeave：名称与适配](#doc-09) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
 | 当前说明 | [研究成果归档、离线阅读与跨文章讨论](#doc-10) | `docs/research-archive.md` | `e3d4980ab611ac1c975ce3122f27f6ceb53c57756716fc7003396e52aa77d3f7` |
@@ -624,7 +624,7 @@ Codex 已有正式仓的真实成功记录。OpenCode 曾用 `--model opencode/m
 
 ## 当前建设路线
 
-核对日期：2026-09-27。LifeWeave 面向工作、学习、生活和爱好，开发工作是近期验证共用底座的一类真实事项，并非产品唯一用途。正式阶段与验收口径见 [Notion 建设计划](https://app.notion.com/p/3e7af682864481d6a5f3c7f7b8542bc0)，本页说明本地工程如何接续；已实现范围以[当前状态](#doc-06)和实际事项为准。各阶段按用户能完成的事验收，不按页面数或测试数计算百分比。
+核对日期：2026-09-27。LifeWeave 面向工作、学习、生活和爱好，开发工作是近期验证共用底座的一类真实事项，并非产品唯一用途。正式阶段与验收口径见 [Notion 建设计划](https://app.notion.com/p/3e7af682864481d6a5f3c7f7b8542bc0)，对应[可执行建设计划](../workspaces/reviews/plugin-roadmap/execution-plan.md)按当前代码和证据拆成工作包；本页说明本地工程如何接续。已实现范围以[当前状态](#doc-06)和实际事项为准。各阶段按用户能完成的事验收，不按页面数或测试数计算百分比。
 
 | 阶段 | 当前工程判断 | 下一项验收重点 |
 | --- | --- | --- |
