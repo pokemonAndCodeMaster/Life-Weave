@@ -1,0 +1,13 @@
+{
+  "workspace": "personal",
+  "itemId": "item-62fe9c309d994457",
+  "runId": "gzrun-20260926-180338-933231d9",
+  "title": "阶段 2 自用：交付页提供完整版本复制入口",
+  "version": "551f119536299c808a699df846d5178c61c52bf7a69407919831f5673d42f54f",
+  "files": [],
+  "warnings": [
+    "未打包本机绝对或网页路径：/home/yyh/project/lifeweave/.runtime/executions/personal/gzrun-20260926-180338-933231d9/repo/.runtime/verification/changes.patch",
+    "未打包本机绝对或网页路径：/home/yyh/project/lifeweave/.runtime/executions/personal/gzrun-20260926-180338-933231d9/repo/.runtime/verification/README.md"
+  ],
+  "boundary": "研究成果归档，不代表已接受的正式知识。外部网址仍需联网。"
+}
