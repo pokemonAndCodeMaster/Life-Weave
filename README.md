@@ -22,3 +22,4 @@
 - [GSSM v5 原文与代码核验及持续论文研究](research/personal/item-de7785d0790445d8/gzrun-20260919-130600-2cabbf3e/report.md) · `gzrun-20260919-130600-2cabbf3e`
 - [补齐开发任务使用当前项目知识的操作说明](research/personal/item-e044cf4e1af64b0c/gzrun-20260926-172328-9706ccec/report.md) · `gzrun-20260926-172328-9706ccec`
 - [补齐开发任务使用当前项目知识的操作说明](research/personal/item-e044cf4e1af64b0c/gzrun-20260926-172527-abab3301/report.md) · `gzrun-20260926-172527-abab3301`
+- [补齐开发任务使用当前项目知识的操作说明](research/personal/item-e044cf4e1af64b0c/gzrun-20260926-172650-784859ce/report.md) · `gzrun-20260926-172650-784859ce`
