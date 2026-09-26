@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue'
+import { onBeforeUnmount, shallowRef, watch } from 'vue'
 import { apiError } from '../api/lifeweave'
 import { checkDevelopmentIntegration, decideDevelopmentDelivery, downloadDevelopmentDelivery } from '../api/development'
 import type { DevelopmentDelivery } from '../api/development'
@@ -13,6 +13,41 @@ const reason = shallowRef('')
 const requestId = shallowRef(crypto.randomUUID())
 const busy = shallowRef(false)
 const error = shallowRef('')
+const copyFields = [
+  { key: 'baseRevision', label: 'Git 基线提交', action: '复制完整基线' },
+  { key: 'artifactSha256', label: '交付 ZIP SHA-256', action: '复制 ZIP 哈希' },
+] as const
+const copying = shallowRef<(typeof copyFields)[number]['key'] | null>(null)
+const copyMessage = shallowRef('')
+let copyRequest = 0
+
+function invalidateCopy() {
+  copyRequest += 1
+  copyMessage.value = ''
+  // A clipboard write already accepted by the browser cannot be cancelled.
+  // Keep both buttons disabled until it settles, even across delivery changes.
+}
+watch([() => props.workspace, () => props.delivery.id, () => props.delivery.assignmentId,
+  () => props.delivery.implementationRunId, () => props.delivery.baseRevision, () => props.delivery.artifactSha256],
+invalidateCopy, { flush: 'sync' })
+onBeforeUnmount(invalidateCopy)
+
+async function copyVersion(field: (typeof copyFields)[number]) {
+  if (copying.value) return
+  const request = ++copyRequest
+  const value = props.delivery[field.key]
+  copying.value = field.key
+  copyMessage.value = `正在复制${field.label}…`
+  try {
+    if (!navigator.clipboard?.writeText) throw new Error('Clipboard unavailable')
+    await navigator.clipboard.writeText(value)
+    if (request === copyRequest) copyMessage.value = `已复制${field.label}`
+  } catch {
+    if (request === copyRequest) copyMessage.value = `${field.label}：无法自动复制，请选中完整值手动复制`
+  } finally {
+    copying.value = null
+  }
+}
 
 async function download() {
   busy.value = true; error.value = ''
@@ -49,8 +84,15 @@ async function decide(decision: 'accepted' | 'rejected') {
 
 <template>
   <section class="delivery" aria-label="固定代码交付">
-    <div class="lw-between"><strong>固定代码交付</strong><span class="lw-tiny lw-mono">{{ delivery.artifactSha256.slice(0, 12) }}</span></div>
-    <p class="lw-small">{{ delivery.manifest.files.length }} 个文件，基于 Git {{ delivery.baseRevision.slice(0, 12) }}。下载包含完整二进制补丁、文件清单和实施报告；页面实时差异仅供预览。</p>
+    <strong>固定代码交付</strong>
+    <dl class="delivery-versions">
+      <div v-for="field in copyFields" :key="field.key" class="delivery-version">
+        <dt class="lw-small">{{ field.label }}</dt>
+        <dd><code class="lw-mono">{{ delivery[field.key] }}</code><button class="lw-btn ghost sm" type="button" :disabled="copying !== null" @click="copyVersion(field)">{{ field.action }}</button></dd>
+      </div>
+    </dl>
+    <p class="copy-feedback lw-small" role="status" aria-live="polite" aria-atomic="true">{{ copyMessage }}</p>
+    <p class="lw-small">{{ delivery.manifest.files.length }} 个文件。下载包含完整二进制补丁、文件清单和实施报告；页面实时差异仅供预览。</p>
     <button class="lw-btn ghost sm" type="button" :disabled="busy" @click="download">下载完整交付 ZIP</button>
     <details><summary>交付文件与核验范围</summary><ul><li v-for="file in delivery.manifest.files" :key="file.path">{{ file.status }} · {{ file.path }}</li></ul><p class="lw-tiny lw-muted">服务已核对：差异格式、原基线补丁回放与文件树一致、采集期间工作树稳定。测试和页面结果仍需按实施 Run 的原始证据复核。</p><p class="lw-tiny lw-muted">{{ delivery.manifest.verificationBoundary }}</p><p v-if="delivery.manifest.excludedGenerated.length" class="lw-tiny lw-muted">已排除生成文件：{{ delivery.manifest.excludedGenerated.join('、') }}</p></details>
     <p v-if="delivery.integrationCommit" class="lw-small">目标提交 {{ delivery.integrationCommit.slice(0, 12) }} 的交付文件已核对{{ delivery.integrationCurrentHead ? '，核对时也是目标仓 HEAD' : '；核对时不是目标仓 HEAD' }}。这不代表远端已推送或当前服务已部署。</p>
@@ -63,6 +105,12 @@ async function decide(decision: 'accepted' | 'rejected') {
 
 <style scoped>
 .delivery { display: grid; gap: 10px; border: 1px solid var(--lw-line, #dededb); border-radius: 10px; padding: 14px; min-width: 0; }
+.delivery-versions { display: grid; gap: 12px; margin: 0; min-width: 0; }
+.delivery-version { min-width: 0; }
+.delivery-version dd { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 4px 0 0; min-width: 0; }
+.delivery-version code { flex: 1 1 32ch; min-width: 0; overflow-wrap: anywhere; white-space: normal; user-select: text; }
+.delivery-version button { flex: 0 0 auto; max-width: 100%; white-space: normal; }
+.copy-feedback { min-height: 1.4em; margin: 0; overflow-wrap: anywhere; }
 .delivery details { min-width: 0; }
 .delivery summary { cursor: pointer; }
 .delivery ul { padding-left: 18px; overflow-wrap: anywhere; }
