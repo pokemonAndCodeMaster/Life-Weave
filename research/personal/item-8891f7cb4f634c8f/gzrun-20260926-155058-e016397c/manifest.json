@@ -1,0 +1,12 @@
+{
+  "workspace": "personal",
+  "itemId": "item-8891f7cb4f634c8f",
+  "runId": "gzrun-20260926-155058-e016397c",
+  "title": "回归验证只读阶段守卫后 Codex 仍可完成开发",
+  "version": "df8baf7f1fb3714801d2f91710c81b9856d696add0cfa654e070cd2cb25ca433",
+  "files": [],
+  "warnings": [
+    "未打包本机绝对或网页路径：/home/yyh/project/lifeweave/.runtime/executions/personal/gzrun-20260926-155058-e016397c/repo/README.md"
+  ],
+  "boundary": "研究成果归档，不代表已接受的正式知识。外部网址仍需联网。"
+}
