@@ -186,7 +186,7 @@ class LifeWeaveRuntimeService:
             for entry in capabilities
         ) or "（没有发布能力附加材料）"
         return (
-            "# 经纬委托的不可变运行输入\n\n"
+            "# LifeWeave 委托的不可变运行输入\n\n"
             f"工作事项：{item.get('id') or item.get('itemId')}\n"
             f"事项快照：\n```json\n{json.dumps(item, ensure_ascii=False, indent=2, default=str)}\n```\n\n"
             f"已接受上下文版本：{context.get('versionId')} / v{context.get('revisionNo')}\n"
@@ -440,11 +440,13 @@ class LifeWeaveRuntimeService:
         limit: int,
         offset: int,
         item_id: str | None = None,
+        candidate_id: str | None = None,
         states: tuple[str, ...] = (),
     ) -> tuple[list[dict[str, Any]], int]:
         workspace = self._workspace(workspace)
         rows, total = self.repository.list_runs(
-            workspace, limit=limit, offset=offset, item_id=item_id, states=states
+            workspace, limit=limit, offset=offset, item_id=item_id,
+            candidate_id=candidate_id, states=states
         )
         return [self.format_run(row) for row in rows], total
 

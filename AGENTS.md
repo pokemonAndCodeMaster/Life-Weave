@@ -1,8 +1,8 @@
-# LifeWeave · 经纬
+# LifeWeave
 
 这是个人/团队工作台的独立产品仓。2026-09-18 用户明确要求新目录、新 Git 仓，并授权持续自主实现。Omni-Brain 是已复用代码、知识和 Skills 的来源，不再决定本仓的物理落点。
 
-2026-09-19 用户要求重新命名并说明项目。当前产品为 **LifeWeave · 经纬**，实际工程目录为 `/home/yyh/project/lifeweave`。产品目标见 `docs/product.md`，当前实现见 `docs/architecture.md`，完成范围见 `docs/status.md`，运维见 `docs/development.md`。旧目录仅为已有成果路径的兼容链接。现行内部模块、组件、默认数据库和表名均使用 LifeWeave；历史迁移和用户数据不批量改写。
+2026-09-19 用户要求重新命名并说明项目；后续明确不使用中文产品名，英文新名尚未选定，当前以 **LifeWeave** 展示。实际工程目录为 `/home/yyh/project/lifeweave`。产品目标见 `docs/product.md`，当前实现见 `docs/architecture.md`，完成范围见 `docs/status.md`，运维见 `docs/development.md`；本轮平台演进见 `workspaces/reviews/personal-platform-evolution/review.md`。旧目录仅为已有成果路径的兼容链接。现行内部模块、组件、默认数据库和表名均使用 LifeWeave；历史迁移和用户数据不批量改写。
 
 - 面向中文用户，交付可运行的工作管理、知识阅读与修订、AI 委托和成果审阅。
 - Vue Composition API + TypeScript；FastAPI Router → Service → Repository → PostgreSQL。

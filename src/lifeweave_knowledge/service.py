@@ -27,6 +27,7 @@ class LifeWeaveKnowledgeService:
         self.roots={key:value.resolve() if value else None for key,value in roots.items()}
         self.lifeweave_service=lifeweave_service
         self.run_reader: Callable[[str,str],dict[str,Any]] | None=None
+        self.evaluation_gate: Callable[[str,str,str],None] | None=None
 
     def root(self, workspace: str) -> Path:
         if workspace not in ('personal','team'): raise ValueError('未知工作区')
@@ -81,6 +82,10 @@ class LifeWeaveKnowledgeService:
         self.root(workspace)
         if body.get('sourceItemId'): self.lifeweave_service.get_item(workspace,body['sourceItemId'])
         if body.get('sourceEntityId') and not self.lifeweave_service.repository.get_entity(workspace,body['sourceEntityId']): raise KeyError(body['sourceEntityId'])
+        if body.get('predecessorCandidateId'):
+            predecessor = self.repository.get(workspace, body['predecessorCandidateId'])
+            if predecessor['target'] != body['target']:
+                raise ValueError('前任候选与新候选必须是同一能力类型')
         source_revision=None
         if body['target']=='knowledge':
             if not body.get('sourcePath') or not body.get('baseVersion'): raise ValueError('知识修订需要来源路径与读取版本')
@@ -96,7 +101,9 @@ class LifeWeaveKnowledgeService:
             if not isinstance(metadata,dict) or not isinstance(metadata.get('name'),str) or not re.fullmatch(r'[a-z0-9]+(?:-[a-z0-9]+)*',metadata['name']):
                 raise ValueError('Skill name 需要小写字母、数字及短横线')
             if not isinstance(metadata.get('description'),str) or not metadata['description'].strip(): raise ValueError('Skill 缺少 description')
-        row={'id':'cap-'+uuid4().hex[:16], 'sourceItemId':None,'sourceEntityId':None,'sourcePath':None,'baseVersion':None,**body,'sourceRevision':source_revision}
+        row={'id':'cap-'+uuid4().hex[:16], 'sourceItemId':None,'sourceEntityId':None,
+             'predecessorCandidateId':None,'sourcePath':None,'baseVersion':None,
+             **body,'sourceRevision':source_revision}
         row['version']=digest(row['content'])
         return self.repository.create(workspace,row,actor)
 
@@ -142,14 +149,19 @@ class LifeWeaveKnowledgeService:
             raise ValueError('需要该运行关联并已人工接受的实际证据')
 
     def publish(self, workspace: str, candidate_id: str, version: str, actor: str) -> dict[str,Any]:
-        candidate=self.repository.get(workspace,candidate_id)
-        if candidate['status']=='published' and candidate['version']==version: return candidate
-        if candidate['target']=='knowledge':
-            current=self.document(workspace,candidate['sourcePath'])
-            if current['version']!=candidate['baseVersion'] or current['sourceVersion']!=candidate['sourceRevision']:
-                raise ValueError('知识来源已变化，本次候选需重新比较与验证')
-        checks=candidate['verifications']
-        if not checks or checks[0]['result']!='accepted' or checks[0]['candidateVersion']!=version:
-            raise ValueError('当前版本尚无被接受的运行验证')
-        self._check_verification(workspace,candidate,checks[0])
-        return self.repository.publish(workspace,candidate_id,version,actor)
+        with self.repository.postgres.atomic() as conn:
+            conn.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,0))',
+                         (f'lifeweave:evaluation:{workspace}:{candidate_id}',))
+            candidate=self.repository.get(workspace,candidate_id)
+            if candidate['status']=='published' and candidate['version']==version: return candidate
+            if self.evaluation_gate:
+                self.evaluation_gate(workspace,candidate_id,version)
+            if candidate['target']=='knowledge':
+                current=self.document(workspace,candidate['sourcePath'])
+                if current['version']!=candidate['baseVersion'] or current['sourceVersion']!=candidate['sourceRevision']:
+                    raise ValueError('知识来源已变化，本次候选需重新比较与验证')
+            checks=candidate['verifications']
+            if not checks or checks[0]['result']!='accepted' or checks[0]['candidateVersion']!=version:
+                raise ValueError('当前版本尚无被接受的运行验证')
+            self._check_verification(workspace,candidate,checks[0])
+            return self.repository.publish(workspace,candidate_id,version,actor)

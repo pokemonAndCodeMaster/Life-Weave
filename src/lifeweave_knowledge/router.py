@@ -21,6 +21,7 @@ class CandidateCreate(BaseModel):
     baseVersion: str | None=None
     sourceItemId: str | None=None
     sourceEntityId: str | None=None
+    predecessorCandidateId: str | None=None
 
 
 class VerificationCreate(BaseModel):

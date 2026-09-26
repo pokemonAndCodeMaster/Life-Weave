@@ -297,7 +297,7 @@ class LifeWeaveService:
         if snapshot_id and frozen is None: raise KeyError(snapshot_id)
         source = frozen['snapshot'] if frozen else {'meetingConfig':meeting['config'], 'projection':self.meeting_projection(workspace,state), 'meetingNotes':state['meetingNotes']}
         config = source['meetingConfig']; projection=source['projection']
-        title=str(config.get('title','经纬会议纪要'))
+        title=str(config.get('title','LifeWeave 会议纪要'))
         lines=[f'# {title}','',f'> 导出时间：{datetime.now().astimezone().isoformat()}','']
         if frozen: lines += [f"> 冻结快照：{snapshot_id}", '']
         for section in projection['sections']:

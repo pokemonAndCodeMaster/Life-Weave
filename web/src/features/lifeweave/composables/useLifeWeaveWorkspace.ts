@@ -127,6 +127,7 @@ function normalizeWorkspace(raw: WorkspaceState, workspace: WorkspaceKind): Work
     improvements: improvementRows,
     meeting: (() => { const meeting = source.meeting ?? {}; const sections = meeting.config?.sections ?? []; return { ...emptyMeeting(), version: meeting.version, sections, order: sections.length ? sections.map((section: any) => section.key) : emptyMeeting().order, enabled: sections.length ? sections.filter((section: any) => section.enabled !== false).map((section: any) => section.key) : emptyMeeting().enabled, seen: meeting.config?.seen ?? [], notes: (source.meetingNotes ?? []).map((note: any) => ({ id: note.id, itemId: note.itemId, text: note.body, time: note.createdAt })), snapshot: meeting.snapshot ?? null } })(),
     preferences: (Array.isArray(source.preferences) ? source.preferences : []).find((entry: any) => entry.preferenceKey === 'items-view')?.payload ?? (source.preferences && !Array.isArray(source.preferences) ? source.preferences : {}),
+    homeLayout: (Array.isArray(source.preferences) ? source.preferences : []).find((entry: any) => entry.preferenceKey === 'home-view')?.payload ?? null,
     preferenceVersions: Object.fromEntries((Array.isArray(source.preferences) ? source.preferences : []).map((entry: any) => [entry.preferenceKey, entry.version])),
   }
 }
@@ -423,6 +424,10 @@ async function savePreferences(payload: Record<string, unknown>) {
   return mutate('/preferences/items-view', 'put', { version: state.value?.preferenceVersions?.['items-view'], payload }, '已保存本空间的事项呈现。')
 }
 
+async function saveHomeLayout(payload: Record<string, unknown>) {
+  return mutate('/preferences/home-view', 'put', { version: state.value?.preferenceVersions?.['home-view'], payload }, '已保存本空间的首页布局。')
+}
+
 async function createRun(payload: Parameters<typeof createRunRequest>[1]) {
   try {
     const result = await createRunRequest(activeWorkspace.value, payload)
@@ -515,6 +520,7 @@ export function useLifeWeaveWorkspace() {
     toggleMeetingSeen,
     addMeetingNote,
     savePreferences,
+    saveHomeLayout,
     createRun,
     refreshRun,
     actOnRun,

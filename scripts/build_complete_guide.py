@@ -11,8 +11,10 @@ OUTPUT = ROOT / 'docs/complete-guide.md'
 CURRENT = ['README.md', 'docs/README.md', 'docs/naming.md', 'docs/product.md',
            'docs/architecture.md', 'docs/status.md', 'docs/development.md',
            'LifeWeave_产品定义与首版迭代计划_v1.0_2026-09-19.md']
+SOURCE_DISCUSSIONS = ['个人管理平台优化.md']
 HISTORY = ['docs/brief.md', 'docs/rename-request.md', 'docs/delivery.md']
-PLANS = ['workspaces/reviews/lifeweave-next-stage/review.md']
+PLANS = ['workspaces/reviews/lifeweave-next-stage/review.md',
+         'workspaces/reviews/personal-platform-evolution/review.md']
 LINK = re.compile(r'(!?\[[^\]\n]*\]\()([^\s)]+)(\))')
 HEADING = re.compile(r'^(#{1,6}) (.+)$')
 
@@ -36,7 +38,7 @@ def headings(body):
 
 def build():
     available = {p.relative_to(ROOT).as_posix() for p in (ROOT / 'docs').rglob('*.md') if p != OUTPUT}
-    ordered = CURRENT + PLANS + HISTORY + sorted(available - set(CURRENT + HISTORY))
+    ordered = CURRENT + SOURCE_DISCUSSIONS + PLANS + HISTORY + sorted(available - set(CURRENT + HISTORY))
     sources = {path: (ROOT / path).read_text() for path in ordered}
     sections = {path: f'doc-{index + 1:02}' for index, path in enumerate(ordered)}
     anchors = {}
@@ -81,10 +83,10 @@ def build():
         return match[1] + dest + match[3]
 
     result = [
-        '<a id="complete-guide"></a>', '# LifeWeave · 经纬：完整项目说明', '',
+        '<a id="complete-guide"></a>', '# LifeWeave：完整项目说明', '',
         '这是一份可连续阅读的完整汇编：前半部分是当前产品、架构、状态和使用维护说明，后半部分是历史授权、交付与验证文字附录。', '',
-        f'范围为项目根 README、产品定义 v1.0 原文、docs/ 下全部 Markdown（不含本汇编自身），以及当前建设方案，共 {len(sources)} 份来源。'
-        '所有来源正文、表格、代码块、Mermaid 图及历史说明完整保留；重复内容也保留，不做摘要或删节。只调整标题层级、链接位置和文内导航。', '',
+        f'范围为项目根 README、产品定义与本轮原始讨论、docs/ 下全部 Markdown（不含本汇编自身），以及当前建设方案，共 {len(sources)} 份来源。'
+        '所有来源正文、表格、代码块、Mermaid 图及历史说明完整保留；重复内容也保留，不做摘要或删节。只调整标题层级、链接位置、Markdown 硬换行写法和文内导航。', '',
         '源码、截图、JSON 运行记录和 API 文档保留可访问的引用，不把它们误作本次需要合并的说明正文。'
         '历史附录中的旧名称、当时状态和旧测试数量按原文保留；当前能力请以“当前完成情况”为准。', '',
         '维护时先更新分篇，再执行 `python scripts/build_complete_guide.py`；'
@@ -93,7 +95,7 @@ def build():
     ]
     for path, body in sources.items():
         digest = hashlib.sha256(body.encode()).hexdigest()
-        kind = '当前说明' if path in CURRENT else ('建设方案（含未实现范围）' if path in PLANS else '历史与验证附录')
+        kind = '当前说明' if path in CURRENT else ('原始讨论' if path in SOURCE_DISCUSSIONS else ('建设方案（含未实现范围）' if path in PLANS else '历史与验证附录'))
         result.append(f'| {kind} | [{titles.get(path, Path(path).stem)}](#{sections[path]}) | `{path}` | `{digest}` |')
     for path, body in sources.items():
         result.extend(['', '---', '', f'<a id="{sections[path]}"></a>',
@@ -117,7 +119,11 @@ def build():
                 level, title = by_line[number]
                 result.extend([f'<a id="{sections[path]}-line-{number + 1}"></a>', ''])
                 line = '#' * min(len(level) + 1, 6) + ' ' + title
-            result.append(LINK.sub(lambda match: link_from(path, match), line))
+            rendered = LINK.sub(lambda match: link_from(path, match), line)
+            # Keep the source's Markdown hard line break without trailing whitespace in the generated file.
+            if rendered.endswith('  '):
+                rendered = rendered[:-2] + '<br>'
+            result.append(rendered)
         result.append(f'<!-- source-end: {path} -->')
     if historical_links:
         result.extend(['', '## 历史产物引用的验证边界', '',

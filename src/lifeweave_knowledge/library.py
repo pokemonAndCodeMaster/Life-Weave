@@ -41,11 +41,14 @@ class Library:
     def file(self, workspace: str, source_id: str, relative: str) -> Path:
         root = Path(self.source(workspace, source_id)['root']).resolve()
         rel = Path(relative)
-        if not relative or rel.is_absolute() or any(p in {'..', 'raw', '.git', '.runtime', 'node_modules'} or p.startswith('.') for p in rel.parts):
+        excluded = {'..', 'raw', '.git', '.runtime', 'node_modules'}
+        if not relative or rel.is_absolute() or any(p in excluded or p.startswith('.') for p in rel.parts):
             raise ValueError('请选择知识目录中的 Markdown 文件，不包含原始材料和隐藏目录')
         path = (root / rel).resolve()
         if not path.is_relative_to(root) or path.suffix.lower() != '.md':
             raise ValueError('文件必须位于所选知识目录内，扩展名为 .md')
+        if any(p in excluded or p.startswith('.') for p in path.relative_to(root).parts):
+            raise ValueError('链接指向隐藏目录或原始材料，不能作为知识正文读取')
         return path
 
     def document(self, workspace: str, source_id: str, relative: str):

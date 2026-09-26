@@ -1,6 +1,9 @@
 """Real migrations, HTTP and persistence, in a disposable database only."""
 from pathlib import Path
 from uuid import uuid4
+from concurrent.futures import ThreadPoolExecutor
+from threading import Barrier, Event
+from time import sleep
 import os
 import pytest
 import psycopg
@@ -50,6 +53,342 @@ def post(client, route, body, status=201):
     response = client.post('/api/lifeweave/personal'+route, json=body)
     assert response.status_code == status, response.text
     return response.json()
+
+
+def test_evaluation_tasks_use_frozen_candidate_and_accepted_run_evidence(dedicated_client):
+    client = dedicated_client
+    item = post(client, '/items', {'itemType': 'research', 'title': '评测攻略整理',
+                                   'payload': {'goal': '交付可核验的攻略'}})
+    candidate = post(client, '/capabilities', {
+        'title': '攻略研究候选', 'target': 'skill',
+        'content': '---\nname: game-research\ndescription: 研究游戏攻略\n---\n\n# 任务\n解释依据',
+        'desiredBehavior': '解释策略和证据', 'validationPlan': '以真实任务与人工证据评估',
+    })
+    evaluation = post(client, '/evaluations', {
+        'itemId': item['id'], 'targetKind': 'capability', 'candidateId': candidate['id'],
+        'title': '攻略研究验证', 'instruction': '整理本轮攻略',
+        'criteria': '说明阵容选择的依据、来源与不确定性',
+    })
+    assert evaluation['candidateVersion'] == candidate['version']
+    assert client.get('/api/lifeweave/team/evaluations/'+evaluation['id']).status_code == 404
+    assert client.post('/api/lifeweave/team/evaluations/'+evaluation['id']+'/start', json={}).status_code == 404
+    knowledge_root = client.app.state.library.roots['personal']
+    knowledge_root.mkdir(parents=True, exist_ok=True)
+    (knowledge_root/'攻略依据.md').write_text('# 攻略依据\n\n核对游戏版本。', encoding='utf-8')
+    method_id = client.app.state.task_sources.catalog('personal')['items'][0]['id']
+    started = client.post('/api/lifeweave/personal/evaluations/'+evaluation['id']+'/start',
+                          json={'engine': 'codex', 'directory': str(ROOT), 'methodId': method_id,
+                                'knowledgeRefs': ['local:攻略依据.md']})
+    assert started.status_code == 200, started.text
+    run_id = started.json()['runId']
+    run = client.get('/api/lifeweave/personal/runs/'+run_id).json()
+    assert run['state'] == 'queued'
+    assert run['capabilityCandidateId'] == candidate['id']
+    assert '说明阵容选择的依据' in run['instruction']
+    assert run['repositoryPath'] == str(ROOT)
+    assert run['environmentSnapshot']['selectedInputs'] == {
+        'methodId': method_id, 'knowledgeRefs': ['local:攻略依据.md']}
+    assert any(entry['id'] == method_id for entry in run['capabilities'])
+    assert started.json()['run']['selectedInputs']['knowledgeRefs'] == ['local:攻略依据.md']
+    ordinary_run = post(client, '/runs', {
+        'itemId': item['id'], 'instruction': '沿同一能力继续整理攻略', 'engine': 'codex',
+        'capabilityCandidateId': candidate['id'],
+    }, 202)
+    client.app.state.database_manager.postgres().execute(
+        "UPDATE workbench.t_lifeweave_run SET created_at='2026-09-26 00:00:00+00' WHERE id = ANY(%s)",
+        ([run_id, ordinary_run['id']],),
+    )
+    candidate_runs = client.get('/api/lifeweave/personal/runs', params={
+        'candidateId': candidate['id'], 'limit': 1,
+    }).json()
+    assert candidate_runs['total'] == 2
+    assert len(candidate_runs['items']) == 1
+    assert candidate_runs['items'][0]['id'] == max(run_id, ordinary_run['id'])
+    next_page = client.get('/api/lifeweave/personal/runs', params={
+        'candidateId': candidate['id'], 'limit': 1, 'offset': 1,
+    }).json()
+    assert {candidate_runs['items'][0]['id'], next_page['items'][0]['id']} == {run_id, ordinary_run['id']}
+    empty_page = client.get('/api/lifeweave/personal/runs', params={
+        'candidateId': candidate['id'], 'limit': 1, 'offset': 2,
+    }).json()
+    assert empty_page['items'] == [] and empty_page['total'] == 2
+    assert client.get('/api/lifeweave/team/runs', params={'candidateId': candidate['id']}).json()['total'] == 0
+    assert client.post('/api/lifeweave/personal/evaluations/'+evaluation['id']+'/start', json={}).status_code == 409
+    assessment = {'outcome': 'passed', 'assessment': '符合原定标准', 'evidenceId': 'missing'}
+    assert client.post('/api/lifeweave/personal/evaluations/'+evaluation['id']+'/assess', json=assessment).status_code == 409
+    db = client.app.state.database_manager.postgres()
+    db.execute("UPDATE workbench.t_lifeweave_run SET state='succeeded', finished_at=now() WHERE id=%s", (run_id,))
+    assert client.post('/api/lifeweave/personal/evaluations/'+evaluation['id']+'/assess', json=assessment).status_code == 409
+    evidence = post(client, '/items/'+item['id']+'/evidence', {
+        'artifactRef': '评测报告', 'artifactVersion': 'v1', 'environmentRef': '受控集成测试',
+        'summary': '已人工核对标准', 'runId': run_id,
+    })
+    post(client, '/evidence/'+evidence['id']+'/review', {'status': 'accepted', 'reason': '符合标准'}, 200)
+    manually_verified = client.post('/api/lifeweave/personal/capabilities/'+candidate['id']+'/verify', json={
+        'runId': run_id, 'evidenceId': evidence['id'], 'result': 'accepted',
+        'assessment': '人工确认本次运行',
+    })
+    assert manually_verified.status_code == 200, manually_verified.text
+    assert client.post('/api/lifeweave/personal/capabilities/'+candidate['id']+'/publish',
+                       json={'version': candidate['version']}).status_code == 409
+    assessment['evidenceId'] = evidence['id']
+    result = client.post('/api/lifeweave/personal/evaluations/'+evaluation['id']+'/assess', json=assessment)
+    assert result.status_code == 200, result.text
+    assert result.json()['outcome'] == 'passed'
+    assert client.get('/api/lifeweave/personal/capabilities/'+candidate['id']).json()['status'] == 'verified'
+    assert client.post('/api/lifeweave/personal/evaluations/'+evaluation['id']+'/assess', json=assessment).status_code == 409
+
+    system = post(client, '/evaluations', {
+        'itemId': item['id'], 'targetKind': 'system', 'title': '整件事评测',
+        'instruction': '交付攻略', 'criteria': '从入口到结果可接续',
+    })
+    system_run = client.post('/api/lifeweave/personal/evaluations/'+system['id']+'/start', json={}).json()['runId']
+    db.execute("UPDATE workbench.t_lifeweave_run SET state='failed', finished_at=now() WHERE id=%s", (system_run,))
+    failed = client.post('/api/lifeweave/personal/evaluations/'+system['id']+'/assess',
+                         json={'outcome': 'failed', 'assessment': '未形成可读成果'})
+    assert failed.status_code == 200 and failed.json()['outcome'] == 'failed'
+    improvement_url = '/api/lifeweave/personal/evaluations/'+system['id']+'/improvement'
+    improvement_body = {'targetKind': 'harness', 'problem': '未形成可读成果',
+                        'desiredBehavior': '保存可读成果和过程',
+                        'validationPlan': '沿同一事项与标准重新评测'}
+    assert client.post('/api/lifeweave/team/evaluations/'+system['id']+'/improvement',
+                       json=improvement_body).status_code == 404
+    improved = client.post(improvement_url, json=improvement_body)
+    assert improved.status_code == 200, improved.text
+    improvement_id = improved.json()['improvementId']
+    assert client.post(improvement_url, json=improvement_body).json()['improvementId'] == improvement_id
+    entity = client.get('/api/lifeweave/personal/entities/'+improvement_id).json()
+    assert entity['payload']['sourceEvaluationId'] == system['id']
+    assert entity['payload']['sourceRunId'] == system_run
+    assert entity['payload']['validationPlan'] == improvement_body['validationPlan']
+    assert any(relation['fromId'] == item['id'] and relation['toId'] == improvement_id
+               for relation in client.get('/api/lifeweave/personal/state').json()['relations'])
+    listing = client.get('/api/lifeweave/personal/evaluations').json()
+    assert listing['total'] == 2 and {row['outcome'] for row in listing['items']} == {'passed', 'failed'}
+    copied = {
+        'itemId': item['id'], 'targetKind': 'system', 'repeatOf': system['id'],
+        'title': '整件事评测 · 再评', 'instruction': '交付攻略', 'criteria': '从入口到结果可接续',
+    }
+    assert client.post('/api/lifeweave/personal/evaluations', json={**copied, 'criteria': '降低原标准'}).status_code == 409
+    repeated = post(client, '/evaluations', copied)
+    assert repeated['previous']['outcome'] == 'failed'
+    assert repeated['criteria'] == system['criteria'] and repeated['runId'] is None
+
+    candidate_case = {
+        'itemId': item['id'], 'targetKind': 'capability', 'candidateId': candidate['id'],
+        'title': '攻略研究再评', 'instruction': evaluation['instruction'],
+        'criteria': evaluation['criteria'], 'repeatOf': evaluation['id'],
+    }
+    second = post(client, '/evaluations', candidate_case)
+    second_run = client.post('/api/lifeweave/personal/evaluations/'+second['id']+'/start', json={}).json()['runId']
+    db.execute("UPDATE workbench.t_lifeweave_run SET state='failed', finished_at=now() WHERE id=%s", (second_run,))
+    failed_candidate = client.post('/api/lifeweave/personal/evaluations/'+second['id']+'/assess',
+                                   json={'outcome': 'failed', 'assessment': '未达到来源要求'})
+    assert failed_candidate.status_code == 200
+    publish_url = '/api/lifeweave/personal/capabilities/'+candidate['id']+'/publish'
+    assert client.post(publish_url, json={'version': candidate['version']}).status_code == 409
+
+    unrelated = post(client, '/evaluations', {
+        'itemId': item['id'], 'targetKind': 'capability', 'candidateId': candidate['id'],
+        'title': '更容易但不同的问题', 'instruction': '只给一个建议', 'criteria': '至少给出一个建议',
+    })
+    unrelated_run = client.post('/api/lifeweave/personal/evaluations/'+unrelated['id']+'/start', json={}).json()['runId']
+    db.execute("UPDATE workbench.t_lifeweave_run SET state='succeeded', finished_at=now() WHERE id=%s", (unrelated_run,))
+    unrelated_proof = post(client, '/items/'+item['id']+'/evidence', {
+        'artifactRef': '简单建议', 'artifactVersion': 'v1', 'environmentRef': '受控集成测试',
+        'summary': '更容易的任务通过', 'runId': unrelated_run,
+    })
+    post(client, '/evidence/'+unrelated_proof['id']+'/review', {'status': 'accepted', 'reason': '符合较低标准'}, 200)
+    unrelated_result = client.post('/api/lifeweave/personal/evaluations/'+unrelated['id']+'/assess',
+                                   json={'outcome': 'passed', 'assessment': '简单任务通过',
+                                         'evidenceId': unrelated_proof['id']})
+    assert unrelated_result.status_code == 200, unrelated_result.text
+    assert client.post(publish_url, json={'version': candidate['version']}).status_code == 409
+
+    third = post(client, '/evaluations', {**candidate_case, 'title': '攻略研究第三次评测', 'repeatOf': second['id']})
+    third_run = client.post('/api/lifeweave/personal/evaluations/'+third['id']+'/start', json={}).json()['runId']
+    db.execute("UPDATE workbench.t_lifeweave_run SET state='succeeded', finished_at=now() WHERE id=%s", (third_run,))
+    proof = post(client, '/items/'+item['id']+'/evidence', {
+        'artifactRef': '第三次评测报告', 'artifactVersion': 'v2', 'environmentRef': '受控集成测试',
+        'summary': '再次核对通过', 'runId': third_run,
+    })
+    post(client, '/evidence/'+proof['id']+'/review', {'status': 'accepted', 'reason': '标准均满足'}, 200)
+    passed_again = client.post('/api/lifeweave/personal/evaluations/'+third['id']+'/assess',
+                               json={'outcome': 'passed', 'assessment': '已补齐来源', 'evidenceId': proof['id']})
+    assert passed_again.status_code == 200
+    knowledge_service = client.app.state.lifeweave_knowledge_service
+    evaluation_service = client.app.state.lifeweave_evaluations
+    original_gate = knowledge_service.evaluation_gate
+    gate_entered, release_gate, create_entered = Event(), Event(), Event()
+
+    def held_gate(workspace, candidate_id, version):
+        gate_entered.set()
+        assert release_gate.wait(5)
+        original_gate(workspace, candidate_id, version)
+
+    def create_during_publish():
+        create_entered.set()
+        return evaluation_service.create('personal', {
+            **candidate_case, 'title': '发布并发新任务', 'repeatOf': third['id'],
+        })
+
+    knowledge_service.evaluation_gate = held_gate
+    try:
+        with ThreadPoolExecutor(max_workers=2) as workers:
+            publication = workers.submit(knowledge_service.publish, 'personal', candidate['id'],
+                                         candidate['version'], 'admin')
+            assert gate_entered.wait(5)
+            simultaneous_create = workers.submit(create_during_publish)
+            assert create_entered.wait(5)
+            sleep(0.2)
+            assert not simultaneous_create.done()  # candidate lock spans gate and publication
+            release_gate.set()
+            assert publication.result(timeout=5)['status'] == 'published'
+            with pytest.raises(ValueError, match='只能评测试验中的能力候选'):
+                simultaneous_create.result(timeout=5)
+    finally:
+        release_gate.set()
+        knowledge_service.evaluation_gate = original_gate
+    published = client.post(publish_url, json={'version': candidate['version']})
+    assert published.status_code == 200 and published.json()['status'] == 'published'
+    history_url = '/api/lifeweave/personal/capabilities/'+candidate['id']+'/evaluations'
+    history = client.get(history_url, params={'limit': 2}).json()
+    assert history['total'] == 4 and len(history['items']) == 2
+    assert history['items'][0]['id'] == third['id']
+    assert history['items'][0]['runId'] == third_run
+    assert history['items'][0]['evidence'][0]['status'] == 'accepted'
+    assert client.get(history_url, params={'limit': 2, 'offset': 2}).json()['total'] == 4
+    assert client.get(history_url.replace('/personal/', '/team/')).status_code == 404
+
+
+def test_successor_candidate_must_resolve_predecessor_failure_under_original_standard(dedicated_client):
+    client = dedicated_client
+    item = post(client, '/items', {'itemType': 'research', 'title': '能力改进链',
+                                   'payload': {'goal': '修复来源遗漏并复测'}})
+    predecessor = post(client, '/capabilities', {
+        'title': '来源说明', 'target': 'agent', 'content': '初版：总结结果',
+        'desiredBehavior': '说明依据', 'validationPlan': '保留来源后复测',
+    })
+    failed_task = post(client, '/evaluations', {
+        'itemId': item['id'], 'targetKind': 'capability', 'candidateId': predecessor['id'],
+        'title': '来源完整性', 'instruction': '给出有来源的答复', 'criteria': '逐项写出资料来源',
+    })
+    failed_run = client.post('/api/lifeweave/personal/evaluations/'+failed_task['id']+'/start', json={}).json()['runId']
+    db = client.app.state.database_manager.postgres()
+    db.execute("UPDATE workbench.t_lifeweave_run SET state='failed', finished_at=now() WHERE id=%s", (failed_run,))
+    failed = client.post('/api/lifeweave/personal/evaluations/'+failed_task['id']+'/assess',
+                         json={'outcome': 'failed', 'assessment': '遗漏来源'})
+    assert failed.status_code == 200
+    improvement = client.post('/api/lifeweave/personal/evaluations/'+failed_task['id']+'/improvement', json={
+        'targetKind': 'agent', 'problem': '遗漏来源', 'desiredBehavior': '逐项引用来源',
+        'validationPlan': '沿原标准复测',
+    }).json()
+    successor_body = {
+        'title': '来源说明', 'target': 'agent', 'content': '新版：逐项引用来源',
+        'desiredBehavior': '说明依据', 'validationPlan': '沿原标准复测',
+        'predecessorCandidateId': predecessor['id'], 'sourceEntityId': improvement['improvementId'],
+    }
+    assert client.post('/api/lifeweave/team/capabilities', json=successor_body).status_code == 404
+    assert client.post('/api/lifeweave/personal/capabilities',
+                       json={**successor_body, 'target': 'harness'}).status_code == 409
+    successor = post(client, '/capabilities', successor_body)
+    assert successor['predecessorCandidateId'] == predecessor['id']
+
+    def pass_task(task: dict, artifact: str) -> None:
+        run = client.post('/api/lifeweave/personal/evaluations/'+task['id']+'/start', json={}).json()['runId']
+        db.execute("UPDATE workbench.t_lifeweave_run SET state='succeeded', finished_at=now() WHERE id=%s", (run,))
+        proof = post(client, '/items/'+item['id']+'/evidence', {
+            'artifactRef': artifact, 'artifactVersion': 'v1', 'environmentRef': '受控集成测试',
+            'summary': '按当前标准审阅', 'runId': run,
+        })
+        post(client, '/evidence/'+proof['id']+'/review', {'status': 'accepted', 'reason': '符合本次标准'}, 200)
+        response = client.post('/api/lifeweave/personal/evaluations/'+task['id']+'/assess', json={
+            'outcome': 'passed', 'assessment': '符合本次标准', 'evidenceId': proof['id'],
+        })
+        assert response.status_code == 200, response.text
+
+    easier = post(client, '/evaluations', {
+        'itemId': item['id'], 'targetKind': 'capability', 'candidateId': successor['id'],
+        'title': '简单答复', 'instruction': '给一个结论', 'criteria': '有一个结论',
+    })
+    pass_task(easier, '简单答复')
+    publish_url = '/api/lifeweave/personal/capabilities/'+successor['id']+'/publish'
+    assert client.post(publish_url, json={'version': successor['version']}).status_code == 409
+    repaired = post(client, '/evaluations', {
+        'itemId': item['id'], 'targetKind': 'capability', 'candidateId': successor['id'],
+        'repeatOf': failed_task['id'], 'title': '来源完整性 · 新候选复测',
+        'instruction': failed_task['instruction'], 'criteria': failed_task['criteria'],
+    })
+    pass_task(repaired, '有来源的答复')
+    published = client.post(publish_url, json={'version': successor['version']})
+    assert published.status_code == 200 and published.json()['status'] == 'published'
+    history = client.get('/api/lifeweave/personal/capabilities/'+successor['id']+'/evaluations').json()
+    assert history['total'] == 3
+    assert [row['id'] for row in history['lineage']] == [successor['id'], predecessor['id']]
+    assert {row['id'] for row in history['items']} == {failed_task['id'], easier['id'], repaired['id']}
+
+
+def test_home_layout_is_durable_and_separate_for_personal_and_team(dedicated_client):
+    client = dedicated_client
+    layout = {'cards': [{'key': 'capture', 'column': 'main', 'visible': True},
+                        {'key': 'attention', 'column': 'aside', 'visible': False}]}
+    saved = client.put('/api/lifeweave/personal/preferences/home-view',
+                       json={'version': None, 'payload': layout})
+    assert saved.status_code == 200, saved.text
+    personal = client.get('/api/lifeweave/personal/state').json()
+    team = client.get('/api/lifeweave/team/state').json()
+    assert next(row for row in personal['preferences'] if row['preferenceKey'] == 'home-view')['payload'] == layout
+    assert not any(row['preferenceKey'] == 'home-view' for row in team['preferences'])
+    assert client.put('/api/lifeweave/personal/preferences/home-view',
+                      json={'version': None, 'payload': {}}).status_code == 409
+    barrier = Barrier(3)
+
+    def competing_save(marker: str):
+        barrier.wait(timeout=5)
+        return client.put('/api/lifeweave/personal/preferences/home-view',
+                          json={'version': saved.json()['version'], 'payload': {'marker': marker}})
+
+    with ThreadPoolExecutor(max_workers=2) as workers:
+        first = workers.submit(competing_save, 'first')
+        second = workers.submit(competing_save, 'second')
+        barrier.wait(timeout=5)
+        results = [first.result(timeout=5), second.result(timeout=5)]
+    assert sorted(response.status_code for response in results) == [200, 409]
+    winner = next(response.json()['payload'] for response in results if response.status_code == 200)
+    personal_after = client.get('/api/lifeweave/personal/state').json()
+    assert next(row for row in personal_after['preferences'] if row['preferenceKey'] == 'home-view')['payload'] == winner
+
+
+def test_library_links_are_derived_from_current_markdown_and_keep_scope(dedicated_client):
+    client = dedicated_client
+    root = client.app.state.library.roots['personal']
+    notes = root / 'notes'
+    notes.mkdir(parents=True)
+    source = notes / '甲.md'
+    target = notes / '乙.md'
+    source.write_text('# 甲\n\n[乙](%E4%B9%99.md#section) 和 [乙再读](乙.md?view=1)\n\n'
+                      '[失效](未建.md) [越界](../../secret.md) ![图](乙.md)\n\n'
+                      '```markdown\n[假链接](乙.md)\n```\n', encoding='utf-8')
+    target.write_text('# 乙\n\n[返回甲](甲.md)\n', encoding='utf-8')
+    url = '/api/lifeweave/personal/library/links'
+    current = client.get(url, params={'sourceId': 'local', 'path': 'notes/乙.md'})
+    assert current.status_code == 200, current.text
+    body = current.json()
+    assert body['scannedDocuments'] == 2
+    assert body['outgoing'][0]['path'] == 'notes/甲.md'
+    assert body['backlinks'] == [{'sourceId': 'local', 'path': 'notes/甲.md', 'title': '甲', 'label': '乙', 'count': 2}]
+    from_source = client.get(url, params={'sourceId': 'local', 'path': 'notes/甲.md'}).json()
+    assert {row['status'] for row in from_source['outgoing']} == {'valid', 'missing', 'blocked'}
+    assert len(from_source['outgoing']) == 3  # image and fenced code are not knowledge links
+    assert client.get('/api/lifeweave/team/library/links', params={'path': 'notes/乙.md'}).status_code == 404
+
+    hidden = root / '.hidden'
+    hidden.mkdir()
+    (hidden / 'secret.md').write_text('# 不可见', encoding='utf-8')
+    (notes / 'alias.md').symlink_to(hidden / 'secret.md')
+    assert client.get('/api/lifeweave/personal/library/document', params={'path': 'notes/alias.md'}).status_code == 409
+    source.write_text('# 甲\n\n不再引用乙。\n', encoding='utf-8')
+    assert client.get(url, params={'path': 'notes/乙.md'}).json()['backlinks'] == []
 
 
 def test_legacy_api_keeps_method_body_query_and_same_data(client):

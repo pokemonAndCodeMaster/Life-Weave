@@ -646,7 +646,7 @@ class LifeWeaveWorker:
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = argparse.ArgumentParser(description="经纬远程/本地执行节点")
+    parser = argparse.ArgumentParser(description="LifeWeave 远程/本地执行节点")
     parser.add_argument("--server", required=True)
     parser.add_argument("--workspace", choices=("personal", "team"))
     parser.add_argument("--machine-id")

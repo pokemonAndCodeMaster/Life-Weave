@@ -24,7 +24,7 @@ export function apiError(error: unknown): ApiErrorShape {
   const fallback = status === 409
     ? '内容已经被其他更新修改，请刷新后再试。'
     : status === 0
-      ? '无法连接经纬服务，请确认后端已经启动。'
+      ? '无法连接 LifeWeave 服务，请确认后端已经启动。'
       : '这次操作没有完成，请稍后重试。'
   return {
     status,
@@ -71,6 +71,79 @@ export async function createCapability(workspace: WorkspaceKind, payload: Record
 
 export async function listCapabilities(workspace: WorkspaceKind) {
   const { data } = await http.get(`${root(workspace)}/capabilities`)
+  return data
+}
+
+export async function listMethods(workspace: WorkspaceKind) {
+  const { data } = await http.get<{ items: Array<{ id: string; title: string; description: string; path: string }>; unavailable: Array<{ path: string; reason: string }> }>(`${root(workspace)}/methods`)
+  return data
+}
+
+export interface EvaluationTask {
+  id: string
+  workspace: WorkspaceKind
+  itemId: string
+  targetKind: 'system' | 'capability'
+  candidateId: string | null
+  candidateVersion: string | null
+  repeatOf: string | null
+  previous?: { id: string; outcome: 'passed' | 'failed' | 'inconclusive' | null; runId: string | null; candidateVersion: string | null; assessment: string | null }
+  title: string
+  instruction: string
+  criteria: string
+  state: 'planned' | 'running' | 'assessed'
+  runId: string | null
+  outcome: 'passed' | 'failed' | 'inconclusive' | null
+  assessment: string | null
+  evidenceId: string | null
+  improvementId?: string | null
+  createdAt: string
+  run?: { id: string; state: string; engine: string; itemId: string; finishedAt?: string | null;
+    repositoryPath?: string | null; repositoryRevision?: string | null;
+    selectedInputs?: { methodId?: string | null; knowledgeRefs?: string[] } }
+  evidence?: Array<{ id: string; status: string; summary?: string | null }>
+}
+
+export async function listEvaluations(workspace: WorkspaceKind, limit = 30, offset = 0) {
+  const { data } = await http.get<{ items: EvaluationTask[]; total: number }>(`${root(workspace)}/evaluations`, { params: { limit, offset } })
+  return data
+}
+
+export async function listCandidateEvaluations(workspace: WorkspaceKind, candidateId: string, limit = 10, offset = 0) {
+  const { data } = await http.get<{ items: EvaluationTask[]; total: number; lineage: Array<{ id: string; title: string; version: string }> }>(
+    `${root(workspace)}/capabilities/${encodeURIComponent(candidateId)}/evaluations`, { params: { limit, offset } },
+  )
+  return data
+}
+
+export async function createEvaluation(workspace: WorkspaceKind, payload: {
+  itemId: string; targetKind: 'system' | 'capability'; candidateId?: string | null; repeatOf?: string | null
+  title: string; instruction: string; criteria: string
+}) {
+  const { data } = await http.post<EvaluationTask>(`${root(workspace)}/evaluations`, payload)
+  return data
+}
+
+export async function startEvaluation(workspace: WorkspaceKind, id: string, payload: {
+  engine: 'codex' | 'opencode'; permission: 'read-only' | 'workspace-write'; model?: string | null
+  directory?: string | null; methodId?: string | null; knowledgeRefs?: string[]
+}) {
+  const { data } = await http.post<EvaluationTask>(`${root(workspace)}/evaluations/${encodeURIComponent(id)}/start`, payload)
+  return data
+}
+
+export async function assessEvaluation(workspace: WorkspaceKind, id: string, payload: {
+  outcome: 'passed' | 'failed' | 'inconclusive'; assessment: string; evidenceId?: string | null
+}) {
+  const { data } = await http.post<EvaluationTask>(`${root(workspace)}/evaluations/${encodeURIComponent(id)}/assess`, payload)
+  return data
+}
+
+export async function createEvaluationImprovement(workspace: WorkspaceKind, id: string, payload: {
+  targetKind: 'knowledge' | 'skill' | 'agent' | 'harness'
+  problem: string; desiredBehavior: string; validationPlan: string
+}) {
+  const { data } = await http.post<EvaluationTask>(`${root(workspace)}/evaluations/${encodeURIComponent(id)}/improvement`, payload)
   return data
 }
 
@@ -128,14 +201,26 @@ export async function listRuns(workspace: WorkspaceKind, params: {itemId?:string
   return Array.isArray(data) ? data : data.items
 }
 
+export async function listCandidateRuns(workspace: WorkspaceKind, candidateId: string, limit = 10, offset = 0) {
+  const { data } = await http.get<{ items: LifeWeaveRun[]; total: number }>(
+    `${root(workspace)}/runs`, { params: { candidateId, limit, offset } },
+  )
+  return data
+}
+
 export async function getRun(workspace: WorkspaceKind, runId: string) {
   const { data } = await http.get<LifeWeaveRun>(`${root(workspace)}/runs/${encodeURIComponent(runId)}`)
   return data
 }
 
 export async function getRunEvents(workspace: WorkspaceKind, runId: string) {
-  const { data } = await http.get<{ items?: LifeWeaveRun['events']; nextSequence: number }>(`${root(workspace)}/runs/${encodeURIComponent(runId)}/events`, { params: { afterSequence: 0, limit: 200 } })
+  const data = await getRunEventsPage(workspace, runId)
   return data.items ?? []
+}
+
+export async function getRunEventsPage(workspace: WorkspaceKind, runId: string, afterSequence = 0) {
+  const { data } = await http.get<{ items?: LifeWeaveRun['events']; nextSequence: number }>(`${root(workspace)}/runs/${encodeURIComponent(runId)}/events`, { params: { afterSequence, limit: 200 } })
+  return { items: data.items ?? [], nextSequence: data.nextSequence }
 }
 
 export async function getRunArtifactResult(workspace: WorkspaceKind, runId: string) {

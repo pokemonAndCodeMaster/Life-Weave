@@ -6,6 +6,7 @@ import { apiError } from '../api/lifeweave'
 import { useLifeWeaveWorkspace } from '../composables/useLifeWeaveWorkspace'
 import PageHeader from '../components/PageHeader.vue'
 import MarkdownBody from '../components/MarkdownBody.vue'
+import KnowledgeRelations from '../components/KnowledgeRelations.vue'
 import { resolveKnowledgePath } from '../utils/knowledgeLinks'
 import { downloadText } from '../utils/download'
 import { readingHtml } from '../utils/readingExport'
@@ -50,7 +51,7 @@ watch([activeWorkspace,()=>route.query.path,()=>route.query.source],()=> { selec
    <aside class="lw-panel lw-knowledge-nav"><button v-for="doc in entries" :key="doc.sourceId+doc.path" class="lw-knowledge-link" :class="{active:selected?.path===doc.path&&selected?.sourceId===doc.sourceId}" @click="read(doc)"><span>{{ doc.title }}<small>{{ doc.sourceTitle }} · {{ doc.path }}</small></span></button><div v-if="!entries.length" class="lw-empty">还没有知识。新建一篇，或在设置中接入已有目录。</div></aside>
    <article class="lw-panel lw-article">
     <form v-if="editing" class="lw-stack" @submit.prevent="save"><label class="lw-label">文件路径<input v-model="form.path" class="lw-field" placeholder="学习/阅读笔记.md" :readonly="!!selected" required/></label><label class="lw-label">Markdown 正文<textarea v-model="form.content" class="lw-field lw-large-textarea" rows="18" required></textarea></label><label class="lw-label">修改说明<input v-model="form.reason" class="lw-field" placeholder="这次补充或修正了什么" required/></label><div class="lw-inline"><button class="lw-btn primary" :disabled="busy">保存修订，查看差异</button><button type="button" class="lw-btn" @click="editing=false">取消</button></div></form>
-    <template v-else-if="selected"><div class="lw-between"><span class="lw-small lw-muted">{{ selected.sourceTitle }} · {{ selected.writable?'工作台管理':'外部只读来源' }}</span><div class="lw-inline"><button class="lw-btn sm" @click="downloadText(selected!.content,selected!.path.split('/').pop()||'知识.md')">下载原文</button><button class="lw-btn sm" @click="exportReading">下载阅读版</button><button class="lw-btn sm" @click="edit()">提出修订</button></div></div><div ref="readingBody" @click="follow"><MarkdownBody :content="selected.content" :references="selected.references"/></div><p class="lw-tiny lw-muted">{{ selected.path }} · 版本 {{ selected.version.slice(0,12) }}</p></template>
+    <template v-else-if="selected"><div class="lw-between"><span class="lw-small lw-muted">{{ selected.sourceTitle }} · {{ selected.writable?'工作台管理':'外部只读来源' }}</span><div class="lw-inline"><button class="lw-btn sm" @click="downloadText(selected!.content,selected!.path.split('/').pop()||'知识.md')">下载原文</button><button class="lw-btn sm" @click="exportReading">下载阅读版</button><button class="lw-btn sm" @click="edit()">提出修订</button></div></div><div ref="readingBody" @click="follow"><MarkdownBody :content="selected.content" :references="selected.references"/></div><p class="lw-tiny lw-muted">{{ selected.path }} · 版本 {{ selected.version.slice(0,12) }}</p><KnowledgeRelations :workspace="activeWorkspace" :source-id="selected.sourceId" :path="selected.path" :version="selected.version" /></template>
     <div v-else class="lw-empty"><h2>给下一次工作留一点积累</h2><p>选择左侧文章阅读全文，或新建一篇笔记。</p><button class="lw-btn primary" @click="edit(true)">写第一篇知识</button></div>
    </article>
   </div>

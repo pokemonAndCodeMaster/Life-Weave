@@ -1,4 +1,5 @@
 from pathlib import Path
+from contextlib import nullcontext
 from types import SimpleNamespace
 
 import pytest
@@ -17,7 +18,9 @@ def knowledge(tmp_path):
         result=next((r for r in rows[workspace] if r['id']==candidate_id),None)
         if result is None: raise KeyError(candidate_id)
         return result
-    repository=SimpleNamespace(list=lambda workspace:rows[workspace],get=get)
+    lock_connection=SimpleNamespace(execute=lambda *args: None)
+    postgres=SimpleNamespace(atomic=lambda: nullcontext(lock_connection))
+    repository=SimpleNamespace(list=lambda workspace:rows[workspace],get=get,postgres=postgres)
     service=LifeWeaveKnowledgeService(repository,{'personal':personal,'team':team},SimpleNamespace())
     return service,rows,personal,team
 

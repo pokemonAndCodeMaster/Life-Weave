@@ -246,6 +246,8 @@ export interface WorkspacePreferences {
   kind?: 'all' | 'mine'
 }
 
+export interface HomeCardLayout { key: 'attention' | 'active' | 'capture' | 'context' | 'environment'; column: 'main' | 'aside'; visible: boolean }
+
 export interface WorkspaceState {
   workspace: WorkspaceKind
   version?: number
@@ -261,6 +263,7 @@ export interface WorkspaceState {
   improvements: Improvement[]
   meeting: MeetingState
   preferences: WorkspacePreferences
+  homeLayout?: { cards: HomeCardLayout[] }
   preferenceVersions?: Record<string, number>
   actor?: { id: string; name: string; role?: string }
 }
@@ -272,6 +275,9 @@ export interface RunEvent {
   sequence?: number
   occurredAt?: string
   type?: string
+  eventType?: string
+  source?: string
+  channel?: string | null
   summary?: string
   payload?: Record<string, unknown>
 }

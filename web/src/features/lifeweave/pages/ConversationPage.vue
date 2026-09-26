@@ -20,6 +20,6 @@ function clearQuote() {
 </script>
 
 <template>
-  <PageHeader title="与经纬对话" subtitle="从眼前的问题开始，接着已有的工作往前走。" />
+  <PageHeader title="与 AI 对话" subtitle="从眼前的问题开始，接着已有的工作往前走。" />
   <ConversationWorkspace :workspace="workspace" :conversation-id="conversationId" :item-id="itemId" :initial-mode="route.query.mode==='discuss'?'discuss':undefined" :quote="quote" @clear-quote="clearQuote" />
 </template>

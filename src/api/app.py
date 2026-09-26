@@ -12,6 +12,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from src.lifeweave_knowledge.library import Library
+from src.lifeweave_knowledge.links import KnowledgeLinks
 from src.lifeweave_knowledge.library_router import router as library_router
 from src.integrations.task_sources import TaskSources
 from src.integrations.linear import LinearConnection, LinearService
@@ -29,6 +30,9 @@ from src.lifeweave.conversation_interpreter import ConversationInterpreter
 from src.lifeweave.conversation_router import router as conversation_router
 from src.lifeweave.research_outputs import ResearchOutputs, router as research_outputs_router
 from src.lifeweave.research_archive import ResearchArchive, router as research_archive_router
+from src.lifeweave.evaluation_repository import EvaluationRepository
+from src.lifeweave.evaluations import Evaluations
+from src.lifeweave.evaluation_router import router as evaluation_router
 from src.lifeweave_knowledge import LifeWeaveKnowledgeRepository, LifeWeaveKnowledgeService
 from src.lifeweave_knowledge.router import router as knowledge_router
 from src.lifeweave_runtime.repository import LifeWeaveRuntimeRepository
@@ -73,7 +77,7 @@ def create_app() -> FastAPI:
             await local_workers.close()
             manager.close()
 
-    app = FastAPI(title='LifeWeave · 经纬', version='0.1.0', lifespan=lifespan)
+    app = FastAPI(title='LifeWeave', version='0.1.0', lifespan=lifespan)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['127.0.0.1', 'localhost', 'testserver'])
     app.state.database_manager = manager
     app.state.lifeweave_service = work
@@ -84,11 +88,14 @@ def create_app() -> FastAPI:
     app.state.root = ROOT
     app.state.linear = LinearService(manager.postgres(), LinearConnection(ROOT), work)
     app.state.library = Library(manager.postgres(), roots)
+    app.state.knowledge_links = KnowledgeLinks(app.state.library)
     app.state.task_sources = TaskSources(ROOT, app.state.library)
     runtime.task_sources = app.state.task_sources
     app.state.work_continuation = WorkContinuation(work, runtime)
     app.state.research_outputs = ResearchOutputs(work, runtime, app.state.library, ROOT)
     app.state.research_archive = ResearchArchive(ROOT, app.state.research_outputs, app.state.linear.connection)
+    app.state.lifeweave_evaluations = Evaluations(EvaluationRepository(manager.postgres()), work, runtime, knowledge)
+    knowledge.evaluation_gate = app.state.lifeweave_evaluations.ensure_publishable
     app.state.library.reference_provider = app.state.research_outputs.document_references
     conversations = Conversations(manager.postgres(), work, runtime, app.state.work_continuation,
                                  app.state.task_sources, ConversationInterpreter(ROOT, local_workers))
@@ -120,12 +127,13 @@ def create_app() -> FastAPI:
     app.include_router(integrations_router)
     app.include_router(library_router)
     app.include_router(knowledge_router)
+    app.include_router(evaluation_router)
     app.include_router(runtime_router)
 
     @app.get('/api/health')
     def health():
         result = manager.postgres().health_check()
-        return {'status': 'ok', 'app': 'LifeWeave · 经纬', 'database': result.database, 'version': '0.1.0'}
+        return {'status': 'ok', 'app': 'LifeWeave', 'database': result.database, 'version': '0.1.0'}
 
     @app.get('/api/lifeweave/config')
     def configuration():

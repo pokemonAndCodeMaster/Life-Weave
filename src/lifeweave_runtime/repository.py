@@ -209,6 +209,7 @@ class LifeWeaveRuntimeRepository:
         limit: int,
         offset: int,
         item_id: str | None = None,
+        candidate_id: str | None = None,
         states: Iterable[str] = (),
     ) -> tuple[list[dict[str, Any]], int]:
         clauses = ["workspace = %(workspace)s"]
@@ -216,23 +217,30 @@ class LifeWeaveRuntimeRepository:
         if item_id:
             clauses.append("item_id = %(item_id)s")
             params["item_id"] = item_id
+        if candidate_id:
+            clauses.append("capability_candidate_id = %(candidate_id)s")
+            params["candidate_id"] = candidate_id
         state_values = list(states)
         if state_values:
             clauses.append("state = ANY(%(states)s)")
             params["states"] = state_values
+        where = ' AND '.join(clauses)
+        count = self._postgres.fetch_one(
+            f"SELECT COUNT(*)::integer AS total_count FROM {self._runs} WHERE {where}", params,
+        )
+        total = int(count['total_count']) if count else 0
+        if not total:
+            return [], 0
         rows = self._postgres.fetch_all(
             f"""
-                SELECT {RUN_COLUMNS}, COUNT(*) OVER()::integer AS total_count
+                SELECT {RUN_COLUMNS}
                 FROM {self._runs}
-                WHERE {' AND '.join(clauses)}
-                ORDER BY created_at DESC
+                WHERE {where}
+                ORDER BY created_at DESC, id DESC
                 LIMIT %(limit)s OFFSET %(offset)s
             """,
             params,
         )
-        total = int(rows[0]["total_count"]) if rows else 0
-        for row in rows:
-            row.pop("total_count", None)
         return rows, total
 
     def events(self, workspace: str, run_id: str, *, after_sequence: int, limit: int) -> list[dict[str, Any]]:

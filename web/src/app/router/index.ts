@@ -9,7 +9,7 @@ const router = createRouter({
     { path: '/gongzuo/:legacyPath(.*)*', redirect: (to) => ({ path: to.path.replace(/^\/gongzuo(?=\/|$)/, '/lifeweave'), query: to.query, hash: to.hash }) },
     { path: '/', redirect: '/lifeweave/personal/conversation' },
     { path: '/lifeweave', redirect: '/lifeweave/personal/conversation' },
-    { path: '/lifeweave/:workspace(personal|team)/conversation/:conversationId?', name: 'conversation', component: () => import('@/features/lifeweave/pages/ConversationPage.vue'), meta: { lifeweave: true, title: '与经纬对话' } },
+    { path: '/lifeweave/:workspace(personal|team)/conversation/:conversationId?', name: 'conversation', component: () => import('@/features/lifeweave/pages/ConversationPage.vue'), meta: { lifeweave: true, title: '与 AI 对话' } },
     { path: '/lifeweave/:workspace(personal|team)/home', name: 'home', component: () => import('@/features/lifeweave/pages/HomePage.vue'), meta: { lifeweave: true, title: '我的日常' } },
     { path: '/lifeweave/:workspace(personal|team)/items', name: 'items', component: () => import('@/features/lifeweave/pages/ItemsPage.vue'), meta: { lifeweave: true, title: '工作事项' } },
     { path: '/lifeweave/:workspace(personal|team)/ideas', name: 'ideas', component: () => import('@/features/lifeweave/pages/IdeasPage.vue'), meta: { lifeweave: true, title: '灵感与讨论' } },

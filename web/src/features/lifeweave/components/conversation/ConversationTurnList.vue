@@ -21,7 +21,7 @@ const rows = computed(() => props.turns.map(turn => ({ ...turn, runIds: [...new 
     <article v-for="turn in rows" :key="turn.id" class="turn">
       <div class="user-message"><span class="speaker">我</span><p>{{ turn.body }}</p></div>
       <div class="assistant-message">
-        <div class="lw-between"><span class="speaker">经纬</span><span class="lw-tiny lw-muted" role="status">{{ statusLabels[turn.status] }}</span></div>
+        <div class="lw-between"><span class="speaker">LifeWeave</span><span class="lw-tiny lw-muted" role="status">{{ statusLabels[turn.status] }}</span></div>
         <MarkdownBody v-if="turn.reply" :content="turn.reply" />
         <p v-else-if="turn.status === 'queued' || turn.status === 'processing'" class="lw-small lw-muted">请求已保存，可以离开后再回来查看。</p>
         <p v-if="turn.error" role="alert">{{ turn.error }}</p>

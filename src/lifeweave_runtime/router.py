@@ -64,6 +64,7 @@ def list_runs(
     limit: Annotated[int, Query(ge=1, le=100)] = 30,
     offset: Annotated[int, Query(ge=0)] = 0,
     item_id: Annotated[str | None, Query(alias="itemId")] = None,
+    candidate_id: Annotated[str | None, Query(alias="candidateId", max_length=64)] = None,
     states: Annotated[list[str] | None, Query(alias="state")] = None,
 ) -> dict:
     rows, total = service.list_runs(
@@ -71,6 +72,7 @@ def list_runs(
         limit=limit,
         offset=offset,
         item_id=item_id,
+        candidate_id=candidate_id,
         states=tuple(states or ()),
     )
     return {"items": rows, "total": total, "limit": limit, "offset": offset}

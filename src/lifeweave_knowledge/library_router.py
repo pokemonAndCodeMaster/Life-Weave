@@ -43,6 +43,15 @@ def catalog(request:Request,workspace:WorkspaceKey,q:str=''):
 def document(request:Request,workspace:WorkspaceKey,path:str,sourceId:str='local'):
     return call(request,'document',workspace,sourceId,path)
 
+@router.get('/links')
+def links(request:Request,workspace:WorkspaceKey,path:str,sourceId:str='local'):
+    try:
+        return request.app.state.knowledge_links.document_links(workspace,sourceId,path)
+    except KeyError as exc:
+        raise HTTPException(404,str(exc)) from exc
+    except (ValueError,OSError,UnicodeError) as exc:
+        raise HTTPException(409,str(exc)) from exc
+
 @router.get('/revisions')
 def revisions(request:Request,workspace:WorkspaceKey):
     return call(request,'revisions',workspace)

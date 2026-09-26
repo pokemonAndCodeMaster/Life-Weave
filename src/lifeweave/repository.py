@@ -191,13 +191,17 @@ class LifeWeaveRepository:
         return [self._camel(r) for r in self._postgres.fetch_all(f'SELECT * FROM {self.activities} WHERE workspace_key=%(workspace)s AND item_id=%(item)s ORDER BY created_at DESC',{'workspace':workspace,'item':item_id})]
 
     def save_preference(self,workspace:str,key:str,payload:dict[str,Any],expected:int|None,actor:str)->dict[str,Any]:
-        existing=self._one(f'SELECT workspace_key,preference_key,payload,version,updated_by,updated_at FROM {self.preferences} WHERE workspace_key=%(workspace)s AND preference_key=%(key)s',{'workspace':workspace,'key':key})
-        if existing is None:
-            if expected is not None: raise ConcurrentUpdateError('偏好尚不存在')
-            self._postgres.execute(f'INSERT INTO {self.preferences}(workspace_key,preference_key,payload,updated_by) VALUES (%s,%s,%s,%s)',(workspace,key,Jsonb(payload),actor))
+        if expected is None:
+            changed=self._postgres.execute(
+                f'INSERT INTO {self.preferences}(workspace_key,preference_key,payload,updated_by) '
+                'VALUES (%s,%s,%s,%s) ON CONFLICT (workspace_key,preference_key) DO NOTHING',
+                (workspace,key,Jsonb(payload),actor))
         else:
-            if expected != existing['version']: raise ConcurrentUpdateError('偏好已被其他人更新')
-            self._postgres.execute(f'UPDATE {self.preferences} SET payload=%s,version=version+1,updated_by=%s,updated_at=now() WHERE workspace_key=%s AND preference_key=%s',(Jsonb(payload),actor,workspace,key))
+            changed=self._postgres.execute(
+                f'UPDATE {self.preferences} SET payload=%s,version=version+1,updated_by=%s,updated_at=now() '
+                'WHERE workspace_key=%s AND preference_key=%s AND version=%s',
+                (Jsonb(payload),actor,workspace,key,expected))
+        if changed!=1: raise ConcurrentUpdateError('偏好已被其他人更新，请刷新后再保存')
         return self._one(f'SELECT workspace_key,preference_key,payload,version,updated_by,updated_at FROM {self.preferences} WHERE workspace_key=%(workspace)s AND preference_key=%(key)s',{'workspace':workspace,'key':key}) or (_ for _ in ()).throw(RuntimeError('pref readback failed'))
 
     def meeting(self,workspace:str)->dict[str,Any]|None:

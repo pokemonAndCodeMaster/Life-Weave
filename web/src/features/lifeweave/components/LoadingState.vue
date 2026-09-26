@@ -4,7 +4,7 @@ defineEmits<{ retry: [] }>()
 </script>
 
 <template>
-  <div v-if="loading" class="lw-panel lw-empty" role="status">正在读取经纬工作区…</div>
+  <div v-if="loading" class="lw-panel lw-empty" role="status">正在读取 LifeWeave 工作区…</div>
   <div v-else-if="error" class="lw-panel lw-empty" role="alert">
     <p>{{ error }}</p>
     <button class="lw-btn" type="button" @click="$emit('retry')">重新读取</button>

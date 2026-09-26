@@ -67,7 +67,7 @@ watch(() => itemRuns.value.map(run => `${run.id}:${run.state}`).join('|'), (valu
   <LoadingState v-if="!item" :loading="loading" :error="error?.message" empty="找不到这个事项。" @retry="loadDetail(itemId)" />
   <template v-else-if="rootItem">
     <PageHeader :title="item.title" :subtitle="item.goal" :eyebrow="`${item.id} / ${item.kind}`">
-      <RouterLink class="lw-btn primary" :to="{ path: `/lifeweave/${activeWorkspace}/conversation`, query: { itemId } }"><LifeWeaveIcon name="message" />与经纬继续这件事</RouterLink>
+      <RouterLink class="lw-btn primary" :to="{ path: `/lifeweave/${activeWorkspace}/conversation`, query: { itemId } }"><LifeWeaveIcon name="message" />继续讨论这件事</RouterLink>
       <button class="lw-btn primary" type="button" @click="delegateCurrentItem"><LifeWeaveIcon :name="rootItem.context.established ? 'spark' : 'layers'" />{{ rootItem.context.established ? '委托 AI' : '先建立上下文' }}</button>
       <RouterLink class="lw-btn" :to="{ path: `/lifeweave/${activeWorkspace}/conversation`, query: { itemId, mode: 'discuss' } }"><LifeWeaveIcon name="message" />就地讨论</RouterLink>
       <button class="lw-btn" type="button" @click="openModal('discussion', { item: rootItem })">记录讨论笔记</button>

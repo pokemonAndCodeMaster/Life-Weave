@@ -14,6 +14,7 @@ class LifeWeaveKnowledgeRepository:
     @staticmethod
     def wire(row: dict[str, Any]) -> dict[str, Any]:
         keys = {'workspace_key':'workspace', 'source_item_id':'sourceItemId', 'source_entity_id':'sourceEntityId',
+                'predecessor_candidate_id':'predecessorCandidateId',
                 'source_path':'sourcePath', 'base_version':'baseVersion', 'source_revision':'sourceRevision', 'desired_behavior':'desiredBehavior',
                 'validation_plan':'validationPlan', 'created_by':'createdBy', 'created_at':'createdAt',
                 'published_by':'publishedBy', 'published_at':'publishedAt', 'candidate_id':'candidateId',
@@ -36,9 +37,9 @@ class LifeWeaveKnowledgeRepository:
 
     def create(self, workspace: str, row: dict[str, Any], actor: str) -> dict[str, Any]:
         self.postgres.execute(f'''INSERT INTO {self.table}
-            (id,workspace_key,title,target,source_item_id,source_entity_id,source_path,base_version,source_revision,
+            (id,workspace_key,title,target,source_item_id,source_entity_id,predecessor_candidate_id,source_path,base_version,source_revision,
              content,desired_behavior,validation_plan,version,created_by)
-            VALUES (%(id)s,%(workspace)s,%(title)s,%(target)s,%(sourceItemId)s,%(sourceEntityId)s,%(sourcePath)s,
+            VALUES (%(id)s,%(workspace)s,%(title)s,%(target)s,%(sourceItemId)s,%(sourceEntityId)s,%(predecessorCandidateId)s,%(sourcePath)s,
                     %(baseVersion)s,%(sourceRevision)s,%(content)s,%(desiredBehavior)s,%(validationPlan)s,%(version)s,%(actor)s)''',
             {**row,'workspace':workspace,'actor':actor})
         return self.get(workspace,row['id'])

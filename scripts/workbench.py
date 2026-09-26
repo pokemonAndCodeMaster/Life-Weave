@@ -13,7 +13,7 @@ def owned_process(pid):
  except (FileNotFoundError,ProcessLookupError):return False
 
 def main():
- parser=argparse.ArgumentParser(description='经纬：安装、启动、停止与备份');parser.add_argument('action',choices=['setup','start','stop','status','backup']);args=parser.parse_args();RUNTIME.mkdir(exist_ok=True);RUNTIME.chmod(0o700);pidfile=RUNTIME/'server.pid'
+ parser=argparse.ArgumentParser(description='LifeWeave：安装、启动、停止与备份');parser.add_argument('action',choices=['setup','start','stop','status','backup']);args=parser.parse_args();RUNTIME.mkdir(exist_ok=True);RUNTIME.chmod(0o700);pidfile=RUNTIME/'server.pid'
  if args.action=='setup':
   if not PYTHON.exists():command([sys.executable,'-m','venv',ROOT/'.venv'])
   command([PYTHON,'-m','pip','install','-e','.[dev]']);command(['npm','ci','--no-audit','--no-fund'],ROOT/'web');command(['npm','run','build'],ROOT/'web');command(['bash','scripts/postgres.sh','init']);command([PYTHON,'-m','src.cli']);print('安装完成。启动：python scripts/workbench.py start')
