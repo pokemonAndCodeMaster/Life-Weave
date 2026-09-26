@@ -4,7 +4,9 @@ from uuid import uuid4
 from concurrent.futures import ThreadPoolExecutor
 from threading import Barrier, Event
 from time import sleep
+import json
 import os
+import subprocess
 import pytest
 import psycopg
 from psycopg import sql
@@ -53,6 +55,94 @@ def post(client, route, body, status=201):
     response = client.post('/api/lifeweave/personal'+route, json=body)
     assert response.status_code == status, response.text
     return response.json()
+
+
+def test_current_project_knowledge_uses_one_read_only_source_and_live_versions(dedicated_client, tmp_path):
+    client = dedicated_client
+    project = tmp_path / 'project'
+    (project / 'docs/history').mkdir(parents=True)
+    (project / 'docs/current-sources.json').write_text(json.dumps({
+        'id': 'lifeweave-project', 'title': 'LifeWeave 项目',
+        'paths': ['README.md', 'docs/status.md'],
+    }), encoding='utf-8')
+    (project / 'README.md').write_text('# LifeWeave\n[状态](docs/status.md)', encoding='utf-8')
+    status = project / 'docs/status.md'
+    status.write_text('# 当前状态\n开发事项可接续。', encoding='utf-8')
+    (project / 'docs/history/old.md').write_text('# 旧状态\n过期判断', encoding='utf-8')
+    client.app.state.library.project_root = project
+    base = '/api/lifeweave/personal/library'
+    sources = client.get(base + '/sources').json()
+    assert next(row for row in sources if row['id'] == 'lifeweave-project')['writable'] is False
+    catalog = client.get(base + '/documents', params={'sourceId': 'lifeweave-project'}).json()
+    assert {row['path'] for row in catalog['items']} == {'README.md', 'docs/status.md'}
+    assert client.get(base + '/documents', params={'sourceId': 'nonexistent'}).status_code == 404
+    assert client.get(base + '/document', params={'sourceId': 'lifeweave-project',
+                                                  'path': 'docs/history/old.md'}).status_code == 409
+    first = client.get(base + '/document', params={'sourceId': 'lifeweave-project',
+                                                   'path': 'docs/status.md'}).json()
+    first_snapshot = client.app.state.task_sources.snapshot('personal', None,
+                                                             ['lifeweave-project:docs/status.md'])[0]
+    assert first_snapshot['content'] == first['content']
+    assert first_snapshot['version'] == first['version']
+    status.write_text('# 当前状态\n开发事项和知识更新可接续。', encoding='utf-8')
+    updated = client.get(base + '/document', params={'sourceId': 'lifeweave-project',
+                                                     'path': 'docs/status.md'}).json()
+    assert updated['version'] != first['version']
+    assert '知识更新' in updated['content']
+    assert client.get('/api/lifeweave/team/library/document', params={
+        'sourceId': 'lifeweave-project', 'path': 'docs/status.md'}).status_code == 200
+
+
+def test_external_development_reports_real_git_state_without_creating_a_run(dedicated_client, tmp_path):
+    client = dedicated_client
+    project = tmp_path / 'code'
+    project.mkdir()
+    subprocess.run(['git', '-C', str(project), 'init', '-q'], check=True)
+    (project / 'feature.txt').write_text('before\n')
+    subprocess.run(['git', '-C', str(project), 'add', 'feature.txt'], check=True)
+    subprocess.run(['git', '-C', str(project), '-c', 'user.name=Test', '-c', 'user.email=test@example.invalid',
+                    'commit', '-qm', 'baseline'], check=True)
+    item = post(client, '/items', {'itemType': 'fix', 'title': '修复项目知识入口',
+                                   'payload': {'goal': '从知识页读取当前项目规范'}})
+    route = f"/items/{item['id']}/external-development/sessions"
+    body = {'requestId': 'external-start-one', 'repositoryPath': str(project),
+            'summary': '在当前会话准备项目知识入口', 'knowledgeRefs': ['lifeweave-project:docs/status.md']}
+    started = post(client, route, body)
+    assert started['event']['kind'] == 'external_development_start'
+    assert started['event']['payload']['observedGit']['repositoryPath'] == str(project)
+    assert started['event']['payload']['declaredInputs'][0]['version']
+    assert client.get('/api/lifeweave/team' + route).status_code == 404
+    assert post(client, route, body)['sessionId'] == started['sessionId']
+    assert client.post('/api/lifeweave/personal' + route, json={**body, 'summary': '不同内容'}).status_code == 409
+    (project / 'feature.txt').write_text('after\n')
+    events = route + '/' + started['sessionId'] + '/events'
+    report = {'requestId': 'external-check-one', 'phase': 'verification',
+              'summary': '实际运行一次检查', 'checks': ['pytest: passed']}
+    verified = post(client, events, report)
+    assert verified['payload']['observedGit']['changedPaths'] == ['feature.txt']
+    assert verified['payload']['reportedChecks'] == ['pytest: passed']
+    assert post(client, events, report)['id'] == verified['id']
+    assert client.post('/api/lifeweave/personal' + events, json={**report, 'summary': '另一个判断'}).status_code == 409
+    assert client.post('/api/lifeweave/team' + events, json={**report, 'requestId': 'team-request'}).status_code == 404
+    post(client, events, {'requestId': 'external-finish-one', 'phase': 'finished', 'summary': '记录真实结果'})
+    assert client.post('/api/lifeweave/personal' + events, json={**report, 'requestId': 'later'}).status_code == 409
+    listing = client.get('/api/lifeweave/personal' + route).json()['items']
+    assert len(listing) == 3
+    continuation = client.get(f"/api/lifeweave/personal/items/{item['id']}/continuation").json()
+    assert not continuation['runs']
+    assert [entry['payload']['phase'] for entry in continuation['externalDevelopment']] == [
+        'finished', 'verification', 'started']
+    assert continuation['externalDevelopment'][1]['payload']['observedGit']['changedPaths'] == ['feature.txt']
+    assert continuation['externalDevelopment'][1]['payload']['reportedChecks'] == ['pytest: passed']
+    assert client.get(f"/api/lifeweave/team/items/{item['id']}/continuation").status_code == 404
+    conversation = post(client, '/conversations', {
+        'requestId': 'external-conversation', 'title': '继续项目知识入口', 'itemId': item['id']})
+    prepared = client.app.state.conversations.prepare('personal', conversation['id'], {
+        'id': 'unused-turn', 'body': '继续项目知识入口', 'item_id': item['id'],
+        'request': {}, 'run_id': None, 'mode': 'discuss'})
+    assert [entry['phase'] for entry in prepared['externalDevelopment']] == [
+        'finished', 'verification', 'started']
+    assert prepared['externalDevelopment'][1]['observedGit']['changedPaths'] == ['feature.txt']
 
 
 def test_evaluation_tasks_use_frozen_candidate_and_accepted_run_evidence(dedicated_client):

@@ -43,6 +43,8 @@ class WorkContinuation:
                 raise ValueError('运行列表在读取时变化，请重新取得接续记录')
         discussion = repo.list_discussions(workspace, item_id=item_id)
         proposals = repo.list_proposals(workspace, item_id)
+        external_development = [row for row in repo.list_activities(workspace, item_id)
+                                if row['kind'] in {'external_development_start', 'external_development_event'}]
         parent_id = context.get('inheritedFromItemId')
         inherited = None
         if parent_id:
@@ -50,6 +52,7 @@ class WorkContinuation:
                          'contextProposals': repo.list_proposals(workspace, parent_id)}
         return {'readAt': datetime.now(timezone.utc).isoformat(), 'item': item, 'context': context,
                 'contextProposals': proposals, 'discussions': discussion, 'inherited': inherited,
+                'externalDevelopment': external_development,
                 'feedback': self.work.execution_feedback(workspace, item_id),
                 'evidence': repo.list_evidence(workspace, item_id),
                 'relations': repo.list_relations(workspace, item_id),
@@ -57,7 +60,8 @@ class WorkContinuation:
                          'retry_of', 'created_at', 'finished_at', 'context_version_id', 'capabilities')} for row in runs],
                 'nextStep': {'declared': item['payload'].get('nextStep'),
                              'openProposalCount': sum(p['status'] == 'open' for p in proposals),
-                             'note': '依据当前目标、待审候选、反馈与运行结果决定下一步；读取不授权执行。'},
+                             'note': '依据当前目标、待审候选、反馈、运行结果与已上报的外部开发记录决定下一步；读取不授权执行。'},
                 'boundaries': ['这是读取时的当前记录，提交修改仍须携带版本。',
                                '方法推荐、输入加载、实际步骤执行是不同证据。',
+                               '外部开发阶段与检查由会话主动上报，Git 状态由服务在上报时观测；它们不是平台 Run。',
                                '本机入口可用不表示 ChatGPT 或 Linear 已同步。']}

@@ -74,6 +74,7 @@ watch(() => itemRuns.value.map(run => `${run.id}:${run.state}`).join('|'), (valu
     </PageHeader>
     <div class="lw-detail-meta"><StatusBadge :value="item.state" /><span class="lw-owner"><span class="lw-avatar" :class="{ me: item.owner === '我' }">{{ item.owner.slice(-1) }}</span>{{ item.owner }}</span><span>责任人</span><span>·</span><span>目标 {{ item.due || '未安排' }}</span><StatusBadge v-for="domain in item.domains" :key="domain" :value="domain" /><StatusBadge :value="`上下文 v${rootItem.context.revision}`" tone="blue" /><StatusBadge v-if="item.parentId" :value="`继承 ${rootItem.id} 的共同背景`" tone="purple" /><span class="lw-spacer"></span><button class="lw-btn ghost sm" type="button" @click="openModal('relations', { item })">编辑关系</button></div>
     <div class="lw-tabs">
+      <button class="lw-tab" type="button" @click="loadDetail(itemId)">刷新记录</button>
       <button v-for="entry in tabs" :key="entry.key" class="lw-tab" :class="{ active: tab === entry.key }" type="button" @click="setTab(entry.key)">{{ entry.label }}<StatusBadge v-if="entry.key === 'context' && rootItem.context.proposals.length" :value="String(rootItem.context.proposals.length)" tone="amber" /></button>
     </div>
     <div class="lw-detail-layout">

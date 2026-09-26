@@ -11,7 +11,7 @@ export interface KnowledgeRelations {
   unavailableSources: string[]; unavailableDocuments: Array<{ path: string; reason: string }>
 }
 const root = (ws: WorkspaceKind) => `/lifeweave/${ws}/library`
-export async function documents(ws: WorkspaceKind,q='') { return (await http.get<{items:Document[];unavailableSources:string[]}>(`${root(ws)}/documents`,{params:{q}})).data }
+export async function documents(ws: WorkspaceKind,q='',sourceId?:string) { return (await http.get<{items:Document[];unavailableSources:string[]}>(`${root(ws)}/documents`,{params:{q,sourceId}})).data }
 export async function document(ws: WorkspaceKind,path:string,sourceId='local') { return (await http.get<Document>(`${root(ws)}/document`,{params:{path,sourceId}})).data }
 export async function links(ws: WorkspaceKind,path:string,sourceId='local') { return (await http.get<KnowledgeRelations>(`${root(ws)}/links`,{params:{path,sourceId}})).data }
 export async function sources(ws: WorkspaceKind) { return (await http.get<Source[]>(`${root(ws)}/sources`)).data }

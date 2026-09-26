@@ -80,6 +80,16 @@ class Conversations:
             result = str((run.get('result_payload') or {}).get('report') or run.get('result') or '')
             previous.append({'id':run['id'],'state':run['state'],'result':result[:2000],
                              'excerpt':len(result)>2000,'error':run.get('error')})
+        external = []
+        if current:
+            rows = self.work.repository.list_activities(workspace, current['id'])
+            external = [{'id':row['id'], 'createdAt':row['createdAt'], 'summary':row['body'],
+                         'phase':row['payload'].get('phase'), 'sessionId':row['payload'].get('sessionId'),
+                         'observedGit':row['payload'].get('observedGit'),
+                         'declaredInputs':row['payload'].get('declaredInputs', []),
+                         'reportedChecks':row['payload'].get('reportedChecks', []),
+                         'provenance':'阶段与检查由外部会话上报；Git 状态由服务观测'}
+                        for row in rows if row['kind'] in {'external_development_start', 'external_development_event'}][:10]
         research = []
         research_ids = list(dict.fromkeys(([current['id']] if current else []) + turn['request'].get('researchItemIds',[])))
         remaining_research = 120000
@@ -106,12 +116,13 @@ class Conversations:
                    'documentCandidateTotal':len(recommendations['documents']),
                    'researchOutputs':research,
                    'methods':recommendations['methods'][:10], 'runs':previous,
+                   'externalDevelopment':external,
                    'feedback':self.work.execution_feedback(workspace,current['id']) if current else [],
                    'history':[{'body':h['body'][:1500],'reply':(h['reply'] or '')[:1500],'status':h['status'],
                                'itemId':h['item_id'],'receipts':h['receipts']}
                               for h in history if h['id']!=turn['id']][-20:],
                    'historyTotal':len(history)-1,
-                   'limits':'相关事项最多20；知识最多10篇/40000字符；当前成果加5篇指定研究共120000字符，截断标记excerpt；最近20轮对话与5次运行摘要，不代表全部历史。'}
+                   'limits':'相关事项最多20；知识最多10篇/40000字符；当前成果加5篇指定研究共120000字符，截断标记excerpt；最近20轮对话、5次运行摘要和10条外部开发报告，不代表全部历史。'}
         return snapshot(context)
 
     async def process(self, workspace, cid, tid):

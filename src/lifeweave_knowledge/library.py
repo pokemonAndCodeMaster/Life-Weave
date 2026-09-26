@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import difflib
 import hashlib
+import json
 import os
 from pathlib import Path
 from uuid import uuid4
@@ -15,16 +16,23 @@ def fingerprint(body: str) -> str:
 
 
 class Library:
-    def __init__(self, postgres: PGConnector, roots: dict[str, Path]):
+    def __init__(self, postgres: PGConnector, roots: dict[str, Path], project_root: Path | None = None):
         self.db = postgres
         self.roots = roots
+        self.project_root = project_root or Path(__file__).resolve().parents[2]
         self.reference_provider = None
+
+    def project_source(self):
+        manifest = json.loads((self.project_root / 'docs/current-sources.json').read_text(encoding='utf-8'))
+        return {'id': manifest['id'], 'title': manifest['title'], 'root': str(self.project_root),
+                'writable': False, 'includedPaths': manifest['paths']}
 
     def sources(self, workspace: str):
         if workspace not in self.roots:
             raise ValueError('工作区不存在')
         rows = self.db.fetch_all('SELECT id,title,root FROM workbench.library_source WHERE workspace=%s ORDER BY created_at', (workspace,))
-        return [{'id': 'local', 'title': '工作台知识', 'root': str(self.roots[workspace]), 'writable': True}, *[{**row, 'writable': False} for row in rows]]
+        return [{'id': 'local', 'title': '工作台知识', 'root': str(self.roots[workspace]), 'writable': True},
+                self.project_source(), *[{**row, 'writable': False} for row in rows]]
 
     def add_source(self, workspace: str, title: str, root: str):
         path = Path(root).expanduser().resolve()
@@ -38,8 +46,17 @@ class Library:
             raise KeyError('来源不存在')
         return result
 
+    def files(self, source):
+        root = Path(source['root'])
+        if 'includedPaths' in source:
+            return [(path, root / path) for path in source['includedPaths']]
+        return [(path.relative_to(root).as_posix(), path) for path in sorted(root.rglob('*.md'))]
+
     def file(self, workspace: str, source_id: str, relative: str) -> Path:
-        root = Path(self.source(workspace, source_id)['root']).resolve()
+        source = self.source(workspace, source_id)
+        root = Path(source['root']).resolve()
+        if 'includedPaths' in source and relative not in source['includedPaths']:
+            raise ValueError('此文件不在项目当前规范清单中')
         rel = Path(relative)
         excluded = {'..', 'raw', '.git', '.runtime', 'node_modules'}
         if not relative or rel.is_absolute() or any(p in excluded or p.startswith('.') for p in rel.parts):
@@ -66,14 +83,14 @@ class Library:
     def title(content: str, fallback: str):
         return next((line[2:].strip() for line in content.splitlines() if line.startswith('# ')), Path(fallback).stem)
 
-    def catalog(self, workspace: str, query: str = ''):
+    def catalog(self, workspace: str, query: str = '', source_id: str | None = None):
         result = []; unavailable = []; unavailable_documents = []
-        for source in self.sources(workspace):
+        sources = [self.source(workspace, source_id)] if source_id else self.sources(workspace)
+        for source in sources:
             root = Path(source['root'])
             if not root.is_dir():
                 unavailable.append(source['title']); continue
-            for file in sorted(root.rglob('*.md')):
-                relative = file.relative_to(root).as_posix()
+            for relative, file in self.files(source):
                 try:
                     doc = self.document(workspace,source['id'],relative)
                 except (ValueError, KeyError, OSError, UnicodeError) as exc:

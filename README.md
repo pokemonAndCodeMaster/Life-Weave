@@ -8,14 +8,15 @@ LifeWeave 希望把工作、学习、爱好和生活中的想法、计划、行�
 
 ## 理解项目
 
-想连续阅读全文，可直接阅读 [完整项目说明（整合版）](docs/complete-guide.md)：包含下列说明全文及历史交付、验证文字附录。
+想连续阅读全文，可直接阅读 [当前项目说明（整合版）](docs/complete-guide.md)：只汇编当前规范说明；2026-09-26 以前的 46 份全文和验证记录保留在[历史完整汇编](docs/history/complete-guide-20260926.md)。
 
 第一次接触项目，按下面顺序阅读：
 
 1. [产品设计](docs/product.md)：为谁解决什么问题、日常怎样使用、为什么这样组织。
 2. [架构与关键实现](docs/architecture.md)：数据由谁维护，用户动作怎样穿过前后端，代码从哪里读起。
 3. [当前完成情况](docs/status.md)：已经能用、实现但未实测、尚未实现的能力及证据。
-4. [开发与运行维护](docs/development.md)：本地启动、配置、验证、改名兼容和排障。
+4. [建设路线](docs/roadmap.md)：下一阶段按用户结果交付什么。
+5. [开发与运行维护](docs/development.md)：本地启动、配置、验证、改名兼容和排障。
 
 [文档导航](docs/README.md) 区分当前说明与历史证据；[命名说明](docs/naming.md) 解释名称与适配边界。
 
@@ -40,6 +41,7 @@ python scripts/workbench.py start
 4. 在对话和事项页阅读完整成果，查看公式与本轮图片，选择历史版本、下载纯正文，或点“下载完整包（含图片）”取得可离线阅读的 ZIP。选中段落可保存定位反馈，再让对话继续修订。运行成功不会自动完成事项。
 5. 从成果提出知识候选，或在“知识与材料”写笔记。阅读差异后接受或拒绝；当前原文变化会阻止覆盖。已接受知识可供后续对话和研究读取。
    打开一篇知识后，可在正文下查看它引用的同源 Markdown 和反向引用；断链会提示，不能误当成已有材料。
+   “知识范围”选 **LifeWeave 项目**，可直接阅读当前产品、架构、状态与建设路线；这些原文只读引用本仓，不与历史汇编混排。
 6. 在“周回顾 / 组会”配置关注内容、冻结当次内容、记录讨论并导出 Markdown。
 7. 在“维护中心 → 能力与成长”可直接创建 Skill/Agent 候选，或从工作中的改进建议接续；创建不会自动安装或发布。在“评测任务”选择已有事项，写本次任务和通过标准；开始时可选 Git 仓库、方法与知识，所选输入固定到实际 Run。不选仓库时在空隔离目录运行。结束后查看过程、接受证据并记录判断，或把问题关联成改进建议。打开候选可看它及明确前任的工作样例、失败历史和关联委托。评测候选通过后进入已验证状态；当前候选及明确记录的前任候选若有失败，须沿原标准再评通过，才能显式发布。
 
@@ -105,6 +107,8 @@ python scripts/lifeweave.py discover '想继续的目标'
 python scripts/lifeweave.py continue item-实际编号
 python scripts/lifeweave.py recommend item-实际编号
 python scripts/lifeweave.py read-knowledge 'local:知识路径.md'
+python scripts/lifeweave.py knowledge --source lifeweave-project
+python scripts/lifeweave.py read-knowledge 'lifeweave-project:docs/status.md'
 python scripts/lifeweave.py read-method method-实际编号
 python scripts/lifeweave.py runs
 python scripts/lifeweave.py capture '先记一个生活想法，暂时不推进'
@@ -116,3 +120,5 @@ python scripts/lifeweave.py feedback item-实际编号 '重点理解错了，先
 事项概览的“接着推进”可查看当前记录、下载接续 JSON、保存针对事项或具体运行的纠偏。新的运行/重试会自动固定这些反馈，已有运行保持原输入；反馈不会自动改变已接受目标。重复发送相同反馈可使用同一 `--request-id`；其他创建动作遇到超时须先读取确认，不自动重发。
 
 命令读取本机服务，失败返回非零；`--workspace team` 切换空间。ChatGPT 远程连接、自然语言自动排程、自动发布方法改进尚未完成。完整研发方案见 [下一阶段产品方案](workspaces/reviews/lifeweave-next-stage/review.md)。
+
+在已经打开的 Codex 会话开发代码时，可按[开发与维护说明](docs/development.md#让当前-codex-会话接续开发事项)把实际阶段与 Git 状态写回同一事项。这是主动上报，不是对所有工具调用的自动追踪。

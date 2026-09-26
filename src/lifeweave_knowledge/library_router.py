@@ -36,8 +36,8 @@ def add_source(request:Request,workspace:WorkspaceKey,body:SourceCreate):
     return call(request,'add_source',workspace,body.title,body.root)
 
 @router.get('/documents')
-def catalog(request:Request,workspace:WorkspaceKey,q:str=''):
-    return call(request,'catalog',workspace,q)
+def catalog(request:Request,workspace:WorkspaceKey,q:str='',sourceId:str|None=None):
+    return call(request,'catalog',workspace,q,sourceId)
 
 @router.get('/document')
 def document(request:Request,workspace:WorkspaceKey,path:str,sourceId:str='local'):

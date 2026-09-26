@@ -31,6 +31,9 @@ def main(argv=None):
     p.add_argument('idea_id')
     p = commands.add_parser('read-knowledge', help='read the full current Markdown with source and version')
     p.add_argument('ref', help='sourceId:path as returned by recommend')
+    p = commands.add_parser('knowledge', help='search current Markdown knowledge without creating work')
+    p.add_argument('query', nargs='?', default='')
+    p.add_argument('--source', default=None, help='limit to a source ID, e.g. lifeweave-project')
     p = commands.add_parser('read-method', help='read the full method, support files and version; does not execute it')
     p.add_argument('method_id')
     p = commands.add_parser('runs', help='read all current runs in this workspace, optionally for one item')
@@ -47,6 +50,17 @@ def main(argv=None):
     p.add_argument('item_id'); p.add_argument('instruction')
     p.add_argument('--engine', choices=['codex', 'opencode'], default='codex')
     p.add_argument('--without-materials', action='store_true')
+    p = commands.add_parser('external-start', help='bind this already-running Codex session to an existing item and Git worktree')
+    p.add_argument('item_id'); p.add_argument('--repo', required=True); p.add_argument('--summary', required=True)
+    p.add_argument('--method'); p.add_argument('--knowledge', action='append', default=[])
+    p.add_argument('--request-id', default=None)
+    p = commands.add_parser('external-report', help='report an actual phase; this does not claim automatic tool capture')
+    p.add_argument('item_id'); p.add_argument('session_id')
+    p.add_argument('phase', choices=['context','design','implementation','verification','knowledge','finished','blocked'])
+    p.add_argument('summary'); p.add_argument('--check', action='append', default=[])
+    p.add_argument('--knowledge', action='append', default=[]); p.add_argument('--request-id', default=None)
+    p = commands.add_parser('external-list', help='read explicitly reported development activity for an item')
+    p.add_argument('item_id')
     args = parser.parse_args(argv)
     url = urlsplit(args.url)
     if url.scheme != 'http' or url.hostname not in {'127.0.0.1', 'localhost', '::1'} or url.username or url.password or url.path not in {'', '/'} or url.query or url.fragment:
@@ -77,6 +91,10 @@ def main(argv=None):
             source, separator, path = args.ref.partition(':')
             if not separator or not source or not path: parser.error('知识引用须为 sourceId:path')
             result = call('/library/document?' + urlencode({'sourceId': source, 'path': path}))
+        elif args.command == 'knowledge':
+            params = {'q': args.query}
+            if args.source: params['sourceId'] = args.source
+            result = call('/library/documents?' + urlencode(params))
         elif args.command == 'read-method':
             result = call('/methods/' + quote(args.method_id, safe=''))
         elif args.command == 'runs':
@@ -99,6 +117,21 @@ def main(argv=None):
             # Print retry identity before sending, including on a network timeout.
             print('feedback requestId: ' + request_id, file=sys.stderr)
             result = call(f'/items/{item}/feedback', {'body': args.body, 'runId': args.run_id, 'requestId': request_id})
+        elif args.command == 'external-start':
+            request_id = args.request_id or str(uuid4())
+            print('external-start requestId: ' + request_id, file=sys.stderr)
+            result = call(f'/items/{item}/external-development/sessions', {
+                'requestId': request_id, 'repositoryPath': args.repo, 'summary': args.summary,
+                'methodId': args.method, 'knowledgeRefs': args.knowledge})
+        elif args.command == 'external-report':
+            request_id = args.request_id or str(uuid4())
+            print('external-report requestId: ' + request_id, file=sys.stderr)
+            session = quote(args.session_id, safe='')
+            result = call(f'/items/{item}/external-development/sessions/{session}/events', {
+                'requestId': request_id, 'phase': args.phase, 'summary': args.summary,
+                'checks': args.check, 'knowledgeRefs': args.knowledge})
+        elif args.command == 'external-list':
+            result = call(f'/items/{item}/external-development/sessions')
         else:
             inputs = {} if args.without_materials else call(f'/items/{item}/input-recommendations?' + urlencode({'query': args.instruction}))['suggested']
             result = call('/runs', {'itemId': args.item_id, 'instruction': args.instruction, 'engine': args.engine, **inputs})

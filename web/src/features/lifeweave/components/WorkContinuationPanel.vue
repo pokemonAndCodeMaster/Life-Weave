@@ -56,8 +56,15 @@ onBeforeUnmount(() => { generation++ })
     <p v-if="error" role="alert">{{ error }}</p>
     <p v-if="loading" role="status">正在读取当前背景与材料……</p>
     <template v-if="data">
-      <p class="lw-small">已读取背景 v{{ data.context.revisionNo }} · {{ data.runs.length }} 次运行 · {{ data.feedback.length }} 条纠偏 · {{ data.nextStep.openProposalCount }} 项待审背景修改</p>
+      <p class="lw-small">已读取背景 v{{ data.context.revisionNo }} · {{ data.runs.length }} 次运行 · {{ data.externalDevelopment?.length ?? 0 }} 条外部开发记录 · {{ data.feedback.length }} 条纠偏 · {{ data.nextStep.openProposalCount }} 项待审背景修改</p>
       <p v-if="data.nextStep.declared">下一步：{{ data.nextStep.declared }}</p>
+      <details v-if="data.externalDevelopment?.length" class="lw-mb-10"><summary>已登记的外部开发进展</summary>
+        <p class="lw-small lw-muted">阶段和检查由外部会话上报；Git 状态由服务在上报时读取。完整记录可下载，也可在推进记录中查看。</p>
+        <div v-for="entry in data.externalDevelopment?.slice(0, 10) ?? []" :key="entry.id" class="lw-mb-10">
+          <strong>{{ entry.payload.phase }}</strong> · {{ entry.body }}<br />
+          <span v-if="entry.payload.observedGit" class="lw-small lw-muted">Git {{ entry.payload.observedGit.revision.slice(0, 12) }} · 修改 {{ entry.payload.observedGit.changedCount }} · 未跟踪 {{ entry.payload.observedGit.untrackedCount }}</span>
+        </div>
+      </details>
       <p class="lw-small lw-muted">读取当前记录不会启动执行。纠偏在新建或重试运行时自动加入输入；目标变更仍通过共享上下文审阅。</p>
       <RecommendedInputs v-if="materials" :workspace="workspace" :materials="materials" />
       <details v-if="data.feedback.length" class="lw-mb-10"><summary>已保存的纠偏反馈</summary><p v-for="entry in data.feedback" :key="entry.id" class="lw-preline">{{ entry.body }}<span v-if="entry.runId" class="lw-muted"> · {{ entry.runId }}</span></p></details>

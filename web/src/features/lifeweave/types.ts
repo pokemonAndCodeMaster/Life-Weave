@@ -67,6 +67,13 @@ export interface Activity {
   title: string
   text: string
   actor?: string
+  payload?: {
+    sessionId?: string
+    phase?: string
+    observedGit?: { repositoryPath: string; revision: string; changedPaths: string[]; untrackedPaths: string[]; changedCount: number; untrackedCount: number }
+    declaredInputs?: Array<{ id: string; title: string; version: string; sourcePath: string }>
+    reportedChecks?: string[]
+  }
 }
 
 export interface DiscussionMessage {

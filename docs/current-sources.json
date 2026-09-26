@@ -1,0 +1,15 @@
+{
+  "id": "lifeweave-project",
+  "title": "LifeWeave 项目",
+  "paths": [
+    "README.md",
+    "docs/README.md",
+    "docs/product.md",
+    "docs/architecture.md",
+    "docs/status.md",
+    "docs/roadmap.md",
+    "docs/development.md",
+    "docs/naming.md",
+    "docs/research-archive.md"
+  ]
+}

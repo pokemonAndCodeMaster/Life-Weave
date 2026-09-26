@@ -13,6 +13,10 @@ export interface Continuation {
   context: { revisionNo: number; content: Record<string, unknown> }
   feedback: Array<{ id: string; body: string; runId?: string | null }>
   runs: Array<{ id: string; state: string; result: string | null; error: string | null }>
+  externalDevelopment: Array<{ id: string; kind: string; body: string; createdAt: string; payload: {
+    sessionId: string; phase: string; observedGit?: { revision: string; changedCount: number; untrackedCount: number }
+    declaredInputs?: Array<{ title: string; version: string }>; reportedChecks?: string[]
+  } }>
   nextStep: { declared: string | null; openProposalCount: number; note: string }
 }
 

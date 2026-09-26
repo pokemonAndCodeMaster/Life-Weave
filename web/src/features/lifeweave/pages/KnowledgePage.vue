@@ -13,6 +13,7 @@ import { readingHtml } from '../utils/readingExport'
 const { activeWorkspace } = useLifeWeaveWorkspace()
 const route = useRoute(); const router = useRouter()
 const entries = shallowRef<library.Document[]>([]); const selected = shallowRef<library.Document|null>(null)
+const availableSources = shallowRef<library.Source[]>([]); const sourceFilter = shallowRef('all')
 const changes = shallowRef<library.Revision[]>([]); const selectedChange = shallowRef<library.Revision|null>(null)
 const query = shallowRef(''); const tab = shallowRef<'documents'|'revisions'>('documents')
 const editing = shallowRef(false); const busy = shallowRef(false); const error = shallowRef(''); const message = shallowRef('')
@@ -23,9 +24,9 @@ const pending = computed(() => changes.value.filter(r => r.status === 'draft').l
 async function action(fn:()=>Promise<void>) { busy.value=true;error.value='';message.value=''; try { await fn() } catch(e) { error.value=apiError(e).message } finally { busy.value=false } }
 async function refresh() {
  const scope=activeWorkspace.value
- const [catalog,revisions] = await Promise.all([library.documents(activeWorkspace.value,query.value),library.revisions(activeWorkspace.value)])
+ const [catalog,revisions,sources] = await Promise.all([library.documents(scope,query.value,sourceFilter.value==='all'?undefined:sourceFilter.value),library.revisions(scope),library.sources(scope)])
  if(scope!==activeWorkspace.value)return
- entries.value=catalog.items;changes.value=revisions
+ entries.value=catalog.items;changes.value=revisions;availableSources.value=sources
  if(catalog.unavailableSources.length) error.value=`来源暂不可用：${catalog.unavailableSources.join('、')}`
 }
 async function read(doc:Pick<library.Document,'path'|'sourceId'>) { await action(async()=> { const scope=activeWorkspace.value;const document=await library.document(scope,doc.path,doc.sourceId);if(scope!==activeWorkspace.value)return;selected.value=document;editing.value=false; await router.replace({query:{path:doc.path,source:doc.sourceId}}) }) }
@@ -39,6 +40,7 @@ function follow(event:MouseEvent) {
  if(/^[a-z]+:/i.test(href)){anchor.target='_blank';anchor.rel='noopener noreferrer';return}
  if(href.split('#')[0]?.endsWith('.md')) { event.preventDefault();const path=resolveKnowledgePath(selected.value.path,href);if(path)void read({path,sourceId:selected.value.sourceId});else error.value='此链接超出了所选知识目录。' }
 }
+watch(activeWorkspace,()=>{sourceFilter.value='all'})
 watch([activeWorkspace,()=>route.query.path,()=>route.query.source],()=> { selected.value=null;selectedChange.value=null;editing.value=false;void action(async()=> { await refresh();const path=String(route.query.path??'');if(path) selected.value=await library.document(activeWorkspace.value,path,String(route.query.source??'local')) }) },{immediate:true})
 </script>
 <template>
@@ -46,7 +48,7 @@ watch([activeWorkspace,()=>route.query.path,()=>route.query.source],()=> { selec
  <div class="lw-tabs"><button class="lw-tab" :class="{active:tab==='documents'}" @click="tab='documents'">知识库</button><button class="lw-tab" :class="{active:tab==='revisions'}" @click="tab='revisions'">修订与历史 <span v-if="pending">{{ pending }}</span></button></div>
  <p v-if="error" class="lw-notice warning" role="alert">{{ error }}</p><p v-if="message" class="lw-notice" role="status">{{ message }}</p>
  <template v-if="tab==='documents'">
-  <form class="lw-toolbar" @submit.prevent="action(refresh)"><input v-model="query" class="lw-grow" aria-label="搜索知识全文" placeholder="搜索标题、路径或正文"/><button class="lw-btn" :disabled="busy">搜索</button><RouterLink class="lw-text-btn" :to="`/lifeweave/${activeWorkspace}/settings`">管理知识来源</RouterLink></form>
+  <form class="lw-toolbar" @submit.prevent="action(refresh)"><label class="lw-label">知识范围<select v-model="sourceFilter" class="lw-field" @change="action(refresh)"><option value="all">全部来源</option><option v-for="source in availableSources" :key="source.id" :value="source.id">{{ source.title }}</option></select></label><input v-model="query" class="lw-grow" aria-label="搜索知识全文" placeholder="搜索标题、路径或正文"/><button class="lw-btn" :disabled="busy">搜索</button><RouterLink class="lw-text-btn" :to="`/lifeweave/${activeWorkspace}/settings`">管理知识来源</RouterLink></form>
   <div class="lw-knowledge-grid">
    <aside class="lw-panel lw-knowledge-nav"><button v-for="doc in entries" :key="doc.sourceId+doc.path" class="lw-knowledge-link" :class="{active:selected?.path===doc.path&&selected?.sourceId===doc.sourceId}" @click="read(doc)"><span>{{ doc.title }}<small>{{ doc.sourceTitle }} · {{ doc.path }}</small></span></button><div v-if="!entries.length" class="lw-empty">还没有知识。新建一篇，或在设置中接入已有目录。</div></aside>
    <article class="lw-panel lw-article">

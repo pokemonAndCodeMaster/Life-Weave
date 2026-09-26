@@ -42,12 +42,14 @@ flowchart TD
 | 跨页面工作状态和操作 | [useLifeWeaveWorkspace.ts](../web/src/features/lifeweave/composables/useLifeWeaveWorkspace.ts)、[API 客户端](../web/src/features/lifeweave/api/lifeweave.ts) |
 | 工作规则与数据库读写 | [工作服务](../src/lifeweave/service.py)、[工作 Repository](../src/lifeweave/repository.py)、[请求模型](../src/lifeweave/models.py) |
 | 知识全文与候选修改 | [library.py](../src/lifeweave_knowledge/library.py)、[KnowledgePage.vue](../web/src/features/lifeweave/pages/KnowledgePage.vue) |
+| LifeWeave 项目当前规范入口 | [当前来源清单](current-sources.json)、[library.py](../src/lifeweave_knowledge/library.py)、[KnowledgePage.vue](../web/src/features/lifeweave/pages/KnowledgePage.vue) |
 | Markdown 引用与反向发现 | [links.py](../src/lifeweave_knowledge/links.py)、[KnowledgeRelations.vue](../web/src/features/lifeweave/components/KnowledgeRelations.vue) |
 | 委托创建、重试和记录 | [运行服务](../src/lifeweave_runtime/service.py)、[运行 Repository](../src/lifeweave_runtime/repository.py) |
 | 本机节点与 CLI 执行 | [local_workers.py](../src/lifeweave_runtime/local_workers.py)、[worker.py](../src/lifeweave_runtime/worker.py)、[执行器接口](../src/agent_runtime/executor.py) |
 | 方法材料与 Linear | [task_sources.py](../src/integrations/task_sources.py)、[linear.py](../src/integrations/linear.py) |
 | 评测任务、能力历史与发布门槛 | [evaluations.py](../src/lifeweave/evaluations.py)、[evaluation_repository.py](../src/lifeweave/evaluation_repository.py)、[EvaluationBoard.vue](../web/src/features/lifeweave/components/evaluations/EvaluationBoard.vue)、[CapabilityHistory.vue](../web/src/features/lifeweave/components/evaluations/CapabilityHistory.vue) |
 | 首页预设与用户调整 | [homeLayout.ts](../web/src/features/lifeweave/utils/homeLayout.ts)、[HomePage.vue](../web/src/features/lifeweave/pages/HomePage.vue)、[HomeDashboardCard.vue](../web/src/features/lifeweave/components/HomeDashboardCard.vue) |
+| 外部 Codex 开发阶段与 Git 观测 | [external_development.py](../src/lifeweave/external_development.py)、[正式 CLI](../scripts/lifeweave.py)、[ItemActivityTab.vue](../web/src/features/lifeweave/components/ItemActivityTab.vue) |
 
 ## 数据分别保存在哪里
 
@@ -116,6 +118,8 @@ sequenceDiagram
 
 路径读取会核验所属空间、登记来源和根目录，拒绝越界及不允许的隐藏/raw 路径。页面用 Marked 渲染、DOMPurify 清理 HTML，并对中文相对 Markdown 链接做一次解码和根范围校验；源码行号链接先转换成受控读取地址，再清理 HTML。
 
+LifeWeave 项目本身作为只读内置来源出现在个人和团队知识页。它从[固定清单](current-sources.json)逐篇读取当前 Git 工作树的 Markdown 原文；目录扫描、直接读取与链接关系均遵守同一清单。历史汇编和验证原料不会因为同在仓库内就成为当前规范。知识目录可按来源筛选；正式 CLI 也能用 `knowledge --source lifeweave-project` 搜索，再以 `read-knowledge` 读取全文和指纹。被选入 Run 时复用 `TaskSources.snapshot` 固定正文版本；这不证明执行模型遵循了材料。
+
 引用关系由 `links.py` 使用 Mistune AST 从当前 Markdown 编译。它只识别同一来源内指向 `.md` 的相对链接，忽略代码块和图片；解码、规范化后再走 Library 路径边界。文件元数据相同的正文解析结果在本进程复用，出链是否存在及反向引用每次按当前可读目录重算。索引不是新的正式正文；外部文件变化通常由修改时间/大小触发重读，尚未完成海量目录容量验证。知识页读到的正文版本与关系响应一同返回，便于识别页面期间的变更。
 
 ## Linear 的读写怎样保持可解释
@@ -132,7 +136,9 @@ sequenceDiagram
 
 ## 新会话接续、材料推荐与纠偏
 
-`src/lifeweave/continuation.py` 从事项、已接受背景、待审提案、讨论、证据和所有分页运行记录生成当前接续输出；不把输出保存成另一份规范正文。`scripts/lifeweave.py` 是正式本机客户端，网页与它共用业务 API；宿主 Agent 理解自然表达，产品保存和读取事实。
+`src/lifeweave/continuation.py` 从事项、已接受背景、待审提案、讨论、证据、所有分页运行及外部开发活动生成当前接续输出；不把输出保存成另一份规范正文。网页对话准备阶段也取得当前事项最近十条外部开发报告并注明观测边界。`scripts/lifeweave.py` 是正式本机客户端，网页与它共用业务 API；宿主 Agent 理解自然表达，产品保存和读取事实。
+
+已有 Codex 会话直接开发时，`external-start` 与 `external-report` 经 [外部开发接口](../src/lifeweave/external_development.py)写入原事项的 activity。开始动作核对所选 Git 仓库，并把当前提交、已修改和未跟踪文件作为服务实际观测保存；方法和知识按当前原文固定版本引用。后续设计、实施、验证和知识变化由外部会话主动上报，服务在报告时再次观察 Git 状态。请求身份使超时重试不重复写入；空间、事项和会话身份不符则拒绝。详情的“推进记录”明确标示哪些是上报、哪些是 Git 观测。它不建立虚构的平台 Run，也不宣称自动捕获外部会话内部的命令或工具步骤。
 
 `TaskSources.recommend` 使用可解释文本匹配返回候选、命中理由和版本。网页预选最多一个方法、十篇知识并允许调整；CLI 提供推荐、全文阅读与显式委托。创建运行时再次计算当前推荐，记录在 `environment_snapshot.inputRecommendations`，实际选择保存在 `selectedInputs`，实际内容以 `capability_snapshot` 为准。重试固定原材料和原推荐，并标明来自旧运行；不把来源更新后的推荐版本冒充原材料版本。worker 的 `materializedCapabilities` 证明材料写入，实际步骤仍需执行事件支持。
 

@@ -22,6 +22,7 @@ from src.database import DatabaseManager
 from src.agent_runtime import CodexExecutor, OpenCodeExecutor
 from src.lifeweave import LifeWeaveRepository, LifeWeaveService
 from src.lifeweave.manual_results import router as results_router
+from src.lifeweave.external_development import router as external_development_router
 from src.lifeweave.router import router as work_router
 from src.lifeweave.continuation import WorkContinuation
 from src.lifeweave.continuation_router import router as continuation_router
@@ -87,7 +88,7 @@ def create_app() -> FastAPI:
     app.state.local_workers = local_workers
     app.state.root = ROOT
     app.state.linear = LinearService(manager.postgres(), LinearConnection(ROOT), work)
-    app.state.library = Library(manager.postgres(), roots)
+    app.state.library = Library(manager.postgres(), roots, ROOT)
     app.state.knowledge_links = KnowledgeLinks(app.state.library)
     app.state.task_sources = TaskSources(ROOT, app.state.library)
     runtime.task_sources = app.state.task_sources
@@ -124,6 +125,7 @@ def create_app() -> FastAPI:
     app.include_router(research_outputs_router)
     app.include_router(research_archive_router)
     app.include_router(results_router)
+    app.include_router(external_development_router)
     app.include_router(integrations_router)
     app.include_router(library_router)
     app.include_router(knowledge_router)

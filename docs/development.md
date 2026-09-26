@@ -99,6 +99,27 @@ python scripts/workbench.py start
 
 文档维护分工：行为与理由进入 `product.md` / `architecture.md`；新结果和未完成项进入 `status.md`；命令配置进入本页；真实日志和截图进入证据目录。历史证据保留版本，不在旧截图说明中伪造新的验证时间。
 
+## 让当前 Codex 会话接续开发事项
+
+项目规范在“知识与材料”选择 **LifeWeave 项目** 即可阅读，来源是[当前文档清单](current-sources.json)，外部原仓只读。正式 CLI 也能无须已有聊天记录查找和读取：
+
+```bash
+python scripts/lifeweave.py knowledge --source lifeweave-project
+python scripts/lifeweave.py read-knowledge lifeweave-project:docs/status.md
+python scripts/lifeweave.py discover '要继续的开发目标'
+python scripts/lifeweave.py continue item-实际编号
+```
+
+已经在 Codex 会话中直接开发时，可在同一事项中主动登记当前 Git 状态和阶段；先看[开发方法](../methods/lifeweave-development/SKILL.md)。服务会返回 `sessionId`。同一 `--request-id` 仅用于网络不确定时重试同一请求，不得拿它提交另一份内容：
+
+```bash
+python scripts/lifeweave.py external-start item-实际编号 --repo /path/to/git/repository --summary '本次要改什么' --knowledge lifeweave-project:docs/architecture.md
+python scripts/lifeweave.py external-report item-实际编号 external-返回编号 verification '检查了实际用户路径' --check '实际命令与观察结果'
+python scripts/lifeweave.py external-list item-实际编号
+```
+
+阶段只记录真正发生的动作。Git 提交和差异由服务读取；检查文字与选择的材料由当前会话主动上报。事项页“推进记录”和 `continue item-实际编号` 都可回读，网页“接着推进”也显示最近报告；刷新后可看到后来上报的阶段。该入口不能替代平台 Run 的自动事件，也不能证明未上报的命令；若服务不可用，先保留真实代码和测试结果，恢复后再标明观测缺口。项目文档在原仓修改后，知识页和新 CLI 读取会取得新指纹，不需要复制第二份正式正文。
+
 ## 从首版安装迁移内部名称
 
 本机已完成迁移。另一个仍使用默认旧数据库的安装，应先在旧代码版本停止应用、备份数据库与知识，再更新代码，运行：

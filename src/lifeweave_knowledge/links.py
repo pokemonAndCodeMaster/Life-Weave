@@ -73,13 +73,14 @@ class KnowledgeLinks:
             corpus: dict[tuple[str, str], dict[str, Any]] = {}
             unavailable_sources: list[str] = []
             unavailable_documents: list[dict[str, str]] = []
-            for source in self.library.sources(workspace):
+            # Relations are defined only within one source; scanning unrelated
+            # project or personal directories adds cost without possible links.
+            for source in [self.library.source(workspace, source_id)]:
                 root = Path(source['root'])
                 if not root.is_dir():
                     unavailable_sources.append(source['title'])
                     continue
-                for entry in sorted(root.rglob('*.md')):
-                    relative = entry.relative_to(root).as_posix()
+                for relative, entry in self.library.files(source):
                     if any(part.startswith('.') or part in {'raw', 'node_modules'} for part in Path(relative).parts):
                         continue
                     try:
