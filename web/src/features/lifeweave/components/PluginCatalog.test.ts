@@ -3,9 +3,11 @@ import { flushPromises, mount } from '@vue/test-utils'
 import { beforeEach, expect, it, vi } from 'vitest'
 import PluginCatalog from './PluginCatalog.vue'
 import * as plugins from '../api/plugins'
+import * as lifeweave from '../api/lifeweave'
 import type { PluginCall, PluginDescriptor } from '../api/plugins'
 
 vi.mock('../api/plugins', () => ({ pluginCatalog: vi.fn(), pluginDetail: vi.fn(), setPluginEnabled: vi.fn() }))
+vi.mock('../api/lifeweave', () => ({ apiError: (error: Error) => error, listPluginEvaluations: vi.fn() }))
 const descriptor: PluginDescriptor = {
   id: 'lifeweave.execution.codex', name: 'Codex 执行', description: '执行器', kind: 'executor',
   version: '1', operations: ['run'], requires: [], composed_of: [], implementationDigest: 'a'.repeat(64),
@@ -17,6 +19,7 @@ const oldCall = { id: 'call-old', item_id: 'old-personal-item', state: 'succeede
 beforeEach(() => {
   vi.resetAllMocks()
   vi.mocked(plugins.pluginCatalog).mockResolvedValue({ items: [descriptor], total: 1 })
+  vi.mocked(lifeweave.listPluginEvaluations).mockResolvedValue({ items: [], total: 0 })
 })
 
 it('clears prior-space calls and ignores a late detail response after switching space', async () => {

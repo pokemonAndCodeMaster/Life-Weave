@@ -10,7 +10,7 @@ import EvaluationEntry from './EvaluationEntry.vue'
 interface Candidate { id: string; title: string; status: string; version?: string }
 interface Item { id: string; title: string }
 interface Method { id: string; title: string; description: string }
-const props = defineProps<{ workspace: WorkspaceKind; candidates: Candidate[]; items: Item[]; methods: Method[] }>()
+const props = defineProps<{ workspace: WorkspaceKind; candidates: Candidate[]; items: Item[]; methods: Method[]; initialItemId?: string; initialPluginCallId?: string }>()
 const emit = defineEmits<{ changed: [] }>()
 const entries = shallowRef<EvaluationTask[]>([])
 const total = shallowRef(0)
@@ -31,6 +31,7 @@ async function load() {
   } catch (caught) { if (current === generation) error.value = apiError(caught).message }
 }
 watch(() => props.workspace, () => {
+  entries.value = []; total.value = 0; error.value = ''; busy.value = ''
   offset.value = 0; template.value = null; knowledge.value = []; knowledgeError.value = ''
   void load()
   const workspace = props.workspace
@@ -50,8 +51,8 @@ function reuse(entry: EvaluationTask) { template.value = entry; window.scrollTo(
 
 <template>
   <div class="evaluation-board">
-    <section class="lw-panel pad"><h2>建立评测任务</h2><p class="lw-small lw-sub">先写任务和通过标准。创建只保存计划；点击“开始真实评测”才会委托 AI。</p>
-      <EvaluationCreateForm :candidates="candidates" :items="items" :busy="Boolean(busy)" :template="template" @clear-template="template = null" @create="payload => action('create', () => createEvaluation(workspace, payload))" />
+    <section class="lw-panel pad"><h2>建立评测任务</h2><p class="lw-small lw-sub">整件事和能力候选先保存计划，再启动真实评测；插件评测直接绑定一条已完成的真实调用，由人按标准判断。</p>
+      <EvaluationCreateForm :candidates="candidates" :items="items" :busy="Boolean(busy)" :template="template" :initial-item-id="initialItemId" :initial-plugin-call-id="initialPluginCallId" @clear-template="template = null" @create="payload => action('create', () => createEvaluation(workspace, payload))" />
     </section>
     <section class="lw-panel pad"><div class="evaluation-top"><div><h2>评测记录</h2><p class="lw-small lw-sub">结果、过程与原目标分开核对；失败记录保留用于下一版比较。</p></div><button class="lw-btn sm" type="button" @click="load">刷新状态</button></div>
       <p v-if="error" class="lw-notice warning" role="alert">{{ error }}</p>

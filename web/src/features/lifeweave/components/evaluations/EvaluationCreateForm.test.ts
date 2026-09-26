@@ -32,3 +32,23 @@ describe('EvaluationCreateForm', () => {
       instruction: '解释阵容', criteria: '列出来源与限制' })
   })
 })
+
+it('prefills a real plugin call arriving from the item process link', async () => {
+  const view = mount(EvaluationCreateForm, { props: {
+    candidates: [], items: [], busy: false,
+    initialItemId: 'item-1234567890abcdef',
+    initialPluginCallId: 'pcall-1234567890abcdef12345678',
+  } })
+  expect((view.find('select').element as HTMLSelectElement).value).toBe('plugin')
+  expect((view.find('input[placeholder="从事项的插件过程复制 pcall-…"]').element as HTMLInputElement).value)
+    .toBe('pcall-1234567890abcdef12345678')
+  await view.find('input[placeholder^="例如"]').setValue('检查输入版本')
+  await view.findAll('textarea')[0]!.setValue('核对固定输入')
+  await view.findAll('textarea')[1]!.setValue('所有输入版本有明确来源')
+  await view.find('form').trigger('submit')
+  expect(view.emitted('create')?.[0]).toEqual([{
+    itemId: 'item-1234567890abcdef', targetKind: 'plugin',
+    pluginCallId: 'pcall-1234567890abcdef12345678',
+    title: '检查输入版本', instruction: '核对固定输入', criteria: '所有输入版本有明确来源',
+  }])
+})

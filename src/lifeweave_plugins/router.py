@@ -46,7 +46,8 @@ def process(request: Request, workspace: WorkspaceKey, item_id: str, assignmentI
 def calls(request: Request, workspace: WorkspaceKey, plugin_id: str, limit: int = 30):
     try:
         request.app.state.plugins.detail(workspace, plugin_id)
-        return {"items": request.app.state.plugin_host.calls(workspace, plugin_id=plugin_id, limit=limit)}
+        return {"items": request.app.state.plugins.public_calls(
+            request.app.state.plugin_host.calls(workspace, plugin_id=plugin_id, limit=limit))}
     except KeyError as exc:
         raise HTTPException(404, str(exc)) from exc
     except ValueError as exc:

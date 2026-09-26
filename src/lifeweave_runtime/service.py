@@ -735,14 +735,19 @@ class LifeWeaveRuntimeService:
                     "error": report.get("error"),
                 }
             )
-        row = self.repository.worker_report(
-            workspace=workspace,
-            machine_id=machine_id,
-            run_id=run_id,
-            lease_id=str(report["lease_id"]),
-            changes=changes,
-        )
-        effective_outcome = str(row["state"])
+        transaction = self.plugin_host.db.atomic() if getattr(self, "plugin_host", None) else nullcontext()
+        with transaction:
+            row = self.repository.worker_report(
+                workspace=workspace,
+                machine_id=machine_id,
+                run_id=run_id,
+                lease_id=str(report["lease_id"]),
+                changes=changes,
+            )
+            effective_outcome = str(row["state"])
+            if effective_outcome in TERMINAL_STATES and getattr(self, "plugin_host", None):
+                self.plugin_host.reconcile_terminal_run(
+                    workspace=workspace, run_id=run_id, outcome=effective_outcome)
         self.repository.append_event(
             workspace=workspace,
             run_id=run_id,

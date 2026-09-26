@@ -1,6 +1,7 @@
 """Catalog and task-process views over the same plugin identities used by calls."""
 from __future__ import annotations
 
+import re
 from typing import Any
 from psycopg.types.json import Jsonb
 
@@ -101,7 +102,67 @@ class PluginService:
             raise KeyError(identity)
         definition = self.registry.describe(identity)
         return {**definition, **self._status(workspace, identity, methods),
-                "recentCalls": self.host.calls(workspace, plugin_id=identity, limit=20)}
+                "recentCalls": self.public_calls(self.host.calls(workspace, plugin_id=identity, limit=20))}
+
+    @staticmethod
+    def public_call(call: dict[str, Any]) -> dict[str, Any]:
+        """Expose only structural facts; never transmit arbitrary plugin text."""
+        def reference(value: Any) -> dict[str, Any]:
+            if not isinstance(value, dict):
+                return {}
+            safe: dict[str, Any] = {}
+            patterns = {
+                'runId': r'^gzrun-\d{8}-\d{6}-[a-f0-9]{8}$',
+                'itemId': r'^item-[a-f0-9]{8,64}$',
+                'contextVersionId': r'^ctxv-[a-f0-9]{8,64}$',
+                'repositoryRevision': r'^[a-f0-9]{40}$',
+                'methodId': r'^method-[a-f0-9]{8,64}$',
+                'version': r'^(?:[a-f0-9]{64}|\d{1,6}(?:\.\d{1,6}){0,3})$',
+                'stage': r'^(?:plan|review|implementation)$',
+                'phase': r'^(?:planning|reviewing|implementing)$',
+                'state': r'^(?:queued|claimed|running|succeeded|failed|interrupted|cancelled)$',
+                'outcome': r'^(?:succeeded|failed|interrupted|cancelled)$',
+                'runOutcome': r'^(?:succeeded|failed|unavailable|cancelled|paused)$',
+                'stageOutcome': r'^(?:succeeded|failed|interrupted)$',
+                'result': r'^(?:clean|unchanged)$',
+            }
+            for key, pattern in patterns.items():
+                item = value.get(key)
+                if isinstance(item, str) and re.fullmatch(pattern, item):
+                    safe[key] = item
+            exit_code = value.get('exitCode')
+            if type(exit_code) is int and -255 <= exit_code <= 255:
+                safe['exitCode'] = exit_code
+            if value.get('endEventObserved') is False:
+                safe['endEventObserved'] = False
+            for key in ('knowledgeRefs', 'documentRefs'):
+                rows = value.get(key)
+                if isinstance(rows, list):
+                    safe[key + 'Count'] = min(len(rows), 1000)
+            methods = value.get('methodIds')
+            if isinstance(methods, list):
+                safe['methodIds'] = [item for item in methods[:20]
+                                     if isinstance(item, str) and re.fullmatch(r'method-[a-f0-9]{8,64}', item)]
+            sources = value.get('sources')
+            if isinstance(sources, list):
+                safe['sources'] = [
+                    {'version': item['version']} for item in sources[:20]
+                    if isinstance(item, dict) and isinstance(item.get('version'), str)
+                    and re.fullmatch(r'[a-f0-9]{64}', item['version'])]
+            return safe
+        fields = ('id', 'item_id', 'assignment_id', 'run_id', 'plan_id', 'step_id',
+                  'parent_call_id', 'plugin_id', 'plugin_version', 'implementation_digest',
+                  'operation', 'state', 'observed_by', 'started_at', 'finished_at')
+        return {**{key: call[key] for key in fields},
+                'input_ref': reference(call.get('input_ref')),
+                'output_ref': reference(call.get('output_ref')),
+                'has_error': bool(call.get('error')),
+                'error_code': call.get('error') if call.get('error') in {
+                    'authentication_failed', 'insufficient_balance', 'model_unavailable',
+                    'rate_limited', 'timeout', 'executor_error'} else None}
+
+    def public_calls(self, calls: list[dict[str, Any]]) -> list[dict[str, Any]]:
+        return [self.public_call(call) for call in calls]
 
     def require_runnable(self, workspace: str, identity: str, operation: str) -> dict[str, Any]:
         methods = self._methods(workspace)
@@ -201,6 +262,6 @@ class PluginService:
                 step["observation"] = ("binding-drift" if drift else "actual" if matched
                                        else "unknown-truncated" if len(calls) == 200
                                        else "conditional" if not step["required"] else "unobserved")
-        return {"itemId": item_id, "plans": plans, "calls": calls,
+        return {"itemId": item_id, "plans": plans, "calls": self.public_calls(calls),
                 "truncated": len(calls) == 200,
                 "boundary": "只显示 LifeWeave 受管插件边界的真实调用；未观测不等于没有发生，执行器内部按原生事件另查"}

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, shallowRef, watch } from 'vue'
+import { useRoute } from 'vue-router'
 import { apiError, listCapabilities, listMethods } from '../api/lifeweave'
 import EvaluationBoard from '../components/evaluations/EvaluationBoard.vue'
 import LifeWeaveIcon from '../components/LifeWeaveIcon.vue'
@@ -11,7 +12,11 @@ import { useLifeWeaveWorkspace } from '../composables/useLifeWeaveWorkspace'
 interface Capability { id: string; title: string; target: string; status: string; desiredBehavior?: string; validationPlan?: string; version?: string; sourceItemId?: string }
 interface Method { id: string; title: string; description: string; path: string }
 const tabs = { plugins: '插件目录', abilities: '能力与成长', evaluations: '评测任务', machines: '执行机', runs: '运行记录', connections: '连接与空间' } as const
-const tab = shallowRef<keyof typeof tabs>('plugins')
+const route = useRoute()
+const tab = shallowRef<keyof typeof tabs>(route.query.tab === 'evaluations' ? 'evaluations' : 'plugins')
+watch(() => route.query.tab, value => {
+  if (typeof value === 'string' && value in tabs) tab.value = value as keyof typeof tabs
+})
 const capabilities = shallowRef<Capability[]>([])
 const methods = shallowRef<Method[]>([])
 const unavailableMethods = shallowRef<Array<{ path: string; reason: string }>>([])
@@ -48,7 +53,7 @@ onBeforeUnmount(() => window.removeEventListener('lifeweave-capabilities-changed
     <div class="lw-section-title"><h2>从工作中形成的原始建议</h2><StatusBadge :value="`${improvements.length} 项`" /></div><article v-for="entry in improvements" :key="entry.id" class="lw-retro-row"><div class="lw-between"><StatusBadge :value="entry.kind" /><StatusBadge :value="entry.state" /></div><h3>{{ entry.title }}</h3><p>{{ entry.body }}</p><button class="lw-btn sm" type="button" @click="openModal('improvement-detail', { improvement: entry })">查看边界</button></article><div v-if="!improvements.length" class="lw-panel lw-empty">事项 → 复盘与成长 → 形成改进建议</div>
   </div><aside class="lw-panel pad"><h2>能力变化必须经过真实验证</h2><p class="lw-small lw-sub">改进建议先进入候选；只有绑定成功 Run 与人工接受证据，才能通过验证并发布。</p><hr class="lw-rule" /><h3>一种能力应说清楚</h3><p class="lw-small lw-sub">适用问题、输入、知识与工具、输出、停止条件与代表性案例。</p><h3>不同空间分别发布</h3><p class="lw-small lw-sub">个人与团队共享产品代码，不自动搬运公司数据或凭证。</p></aside></div>
 
-  <EvaluationBoard v-else-if="tab === 'evaluations'" :workspace="activeWorkspace" :items="state?.items ?? []" :candidates="capabilities" :methods="methods" @changed="onEvaluationChanged" />
+  <EvaluationBoard v-else-if="tab === 'evaluations'" :workspace="activeWorkspace" :items="state?.items ?? []" :candidates="capabilities" :methods="methods" :initial-item-id="typeof route.query.itemId === 'string' ? route.query.itemId : ''" :initial-plugin-call-id="typeof route.query.pluginCallId === 'string' ? route.query.pluginCallId : ''" @changed="onEvaluationChanged" />
 
   <template v-else-if="tab === 'machines'">
     <div class="lw-notice neutral lw-mb-20"><LifeWeaveIcon name="server" /><div>{{ isTeam ? '中心机统一派发，成员工作站承载运行。' : '个人 WSL 可以同时承载控制服务与本地执行端。' }} 状态来自真实执行端。</div></div>

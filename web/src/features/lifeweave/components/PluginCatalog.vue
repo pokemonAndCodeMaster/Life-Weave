@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from 'vue'
-import { apiError } from '../api/lifeweave'
+import { apiError, listPluginEvaluations } from '../api/lifeweave'
+import type { EvaluationTask } from '../api/lifeweave'
 import { pluginCatalog, pluginDetail, setPluginEnabled } from '../api/plugins'
 import type { PluginCall, PluginDescriptor } from '../api/plugins'
 import type { WorkspaceKind } from '../types'
@@ -12,6 +13,7 @@ const saving = shallowRef('')
 const error = shallowRef('')
 const selected = shallowRef('')
 const recent = shallowRef<PluginCall[]>([])
+const evaluations = shallowRef<EvaluationTask[]>([])
 const groups = computed(() => {
   const labels: Record<string, string> = { foundation: '基础能力', composite: '组合工作', skill: '工作方法', executor: '执行器', script: '检查脚本' }
   return Object.entries(labels).map(([kind, title]) => ({ kind, title, items: items.value.filter(item => item.kind === kind) }))
@@ -27,23 +29,28 @@ async function refresh() {
   } catch (caught) { if (ticket === generation) error.value = apiError(caught).message }
   finally { if (ticket === generation) loading.value = false }
 }
-watch(() => props.workspace, () => { items.value = []; selected.value = ''; recent.value = []; void refresh() }, { immediate: true })
+watch(() => props.workspace, () => { items.value = []; selected.value = ''; recent.value = []; evaluations.value = []; void refresh() }, { immediate: true })
 async function inspect(plugin: PluginDescriptor) {
-  if (selected.value === plugin.id) { selected.value = ''; recent.value = []; return }
+  if (selected.value === plugin.id) { selected.value = ''; recent.value = []; evaluations.value = []; return }
   const workspace = props.workspace
   const ticket = generation
   try {
-    const detail = await pluginDetail(workspace, plugin.id)
-    if (ticket === generation && workspace === props.workspace) { selected.value = plugin.id; recent.value = detail.recentCalls }
+    const [detail, history] = await Promise.all([pluginDetail(workspace, plugin.id), listPluginEvaluations(workspace, plugin.id)])
+    if (ticket === generation && workspace === props.workspace) { selected.value = plugin.id; recent.value = detail.recentCalls; evaluations.value = history.items }
   }
   catch (caught) { if (ticket === generation && workspace === props.workspace) error.value = apiError(caught).message }
 }
 async function toggle(plugin: PluginDescriptor) {
   if (saving.value) return
+  const workspace = props.workspace
+  const ticket = generation
   saving.value = plugin.id
-  try { await setPluginEnabled(props.workspace, plugin.id, !plugin.enabled, plugin.configVersion); await refresh() }
-  catch (caught) { error.value = apiError(caught).message }
-  finally { saving.value = '' }
+  try {
+    await setPluginEnabled(workspace, plugin.id, !plugin.enabled, plugin.configVersion)
+    if (ticket === generation && workspace === props.workspace) await refresh()
+  }
+  catch (caught) { if (workspace === props.workspace) error.value = apiError(caught).message }
+  finally { if (saving.value === plugin.id) saving.value = '' }
 }
 </script>
 
@@ -53,7 +60,7 @@ async function toggle(plugin: PluginDescriptor) {
     <p v-if="error" class="lw-notice warning" role="alert">{{ error }}</p>
     <p v-if="loading && !items.length" class="lw-small" role="status">正在读取插件…</p>
     <section v-for="group in groups" :key="group.kind" class="plugin-group" :aria-label="group.title">
-      <h3>{{ group.title }}</h3>
+      <h3>{{ group.title }} <span class="lw-tiny lw-muted">{{ group.items.length }}</span></h3>
       <article v-for="plugin in group.items" :key="plugin.id" class="lw-note-card plugin-card">
         <div class="lw-between"><strong>{{ plugin.name }}</strong><span class="lw-tag">{{ plugin.runnable ? '可运行' : '不可运行' }}</span></div>
         <p class="lw-small">{{ plugin.description }}</p>
@@ -68,6 +75,9 @@ async function toggle(plugin: PluginDescriptor) {
         <div v-if="selected === plugin.id" class="plugin-history">
           <p v-if="!recent.length" class="lw-tiny lw-muted">此空间尚无受管调用记录。</p>
           <RouterLink v-for="call in recent" :key="call.id" class="lw-small" :to="`/lifeweave/${workspace}/items/${encodeURIComponent(call.item_id)}/development`">{{ call.started_at.slice(0, 16).replace('T', ' ') }} · {{ call.operation }} · {{ call.state }} · {{ call.item_id }}</RouterLink>
+          <strong class="lw-small">评测与改进</strong>
+          <p v-if="!evaluations.length" class="lw-tiny lw-muted">此插件尚无显式评测；调用成功不等于通过业务判断。</p>
+          <RouterLink v-for="entry in evaluations" :key="entry.id" class="lw-small" :to="{ path: `/lifeweave/${workspace}/maintenance`, query: { tab: 'evaluations' } }">{{ entry.title }} · {{ entry.pluginVersion }} · {{ entry.outcome || entry.state }}{{ entry.improvementId ? ` · 改进 ${entry.improvementId}` : '' }}</RouterLink>
         </div>
       </article>
     </section>
@@ -76,10 +86,13 @@ async function toggle(plugin: PluginDescriptor) {
 </template>
 
 <style scoped>
-.plugin-catalog,.plugin-group { display: grid; gap: 12px; }
-.plugin-group { border-top: 1px solid var(--lw-line, #dededb); padding-top: 14px; }
-.plugin-card { display: grid; gap: 5px; overflow-wrap: anywhere; }
+.plugin-catalog { display: grid; gap: 18px; }
+.plugin-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; border-top: 1px solid var(--lw-line, #dededb); padding-top: 14px; }
+.plugin-group h3 { grid-column: 1 / -1; margin: 0; }
+.plugin-card { display: grid; align-content: start; gap: 7px; overflow-wrap: anywhere; }
 .plugin-card p { margin: 0; }
+.plugin-card > p { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; }
 .plugin-card summary { cursor: pointer; }
 .plugin-history { display: grid; gap: 6px; padding: 8px 0; }
+@media (max-width: 760px) { .plugin-group { grid-template-columns: 1fr; } }
 </style>

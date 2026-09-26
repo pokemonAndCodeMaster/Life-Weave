@@ -1,6 +1,7 @@
 """Notion mirror preserves originals and does not overwrite a changed remote page."""
 import hashlib
 import json
+import subprocess
 from pathlib import Path
 
 import pytest
@@ -71,6 +72,7 @@ def test_token_file_permissions_and_current_doc_inventory(tmp_path, monkeypatch)
         enabled=True, tokenFile=str(token), rootPage='3e7af682864481769d2decf36863c820').model_dump())
     seen = []
     monkeypatch.setattr(mirror, 'sync', lambda *args: seen.append(args))
+    monkeypatch.setattr(mirror, 'confirmed_source_url', lambda path, content, config: 'https://example.test/' + path)
     assert mirror.sync_current_docs('personal')['count'] == 1
     assert seen[0][1] == 'project:README.md'
     assert seen[0][4] == hashlib.sha256(b'# Source original').hexdigest()
@@ -122,6 +124,7 @@ def test_project_doc_failure_does_not_block_next_source(tmp_path, monkeypatch):
         return {'status': 'confirmed'}
 
     monkeypatch.setattr(mirror, 'sync', fake_sync)
+    monkeypatch.setattr(mirror, 'confirmed_source_url', lambda path, content, config: 'https://example.test/' + path)
     result = mirror.sync_current_docs('personal')
     assert attempted == ['project:README.md', 'project:docs/status.md']
     assert result['status'] == 'partial' and result['count'] == 1 and result['failedCount'] == 1
@@ -138,9 +141,64 @@ def test_missing_project_doc_records_failure_and_continues(tmp_path, monkeypatch
         enabled=True, tokenFile='/tmp/not-used', rootPage='3e7af682864481769d2decf36863c820').model_dump())
     seen = []
     monkeypatch.setattr(mirror, 'sync', lambda _workspace, source, *_args: seen.append(source))
+    monkeypatch.setattr(mirror, 'confirmed_source_url', lambda path, content, config: 'https://example.test/' + path)
 
     result = mirror.sync_current_docs('personal')
 
     assert result['status'] == 'partial' and result['count'] == 1 and result['failedCount'] == 1
     assert seen == ['project:README.md']
     assert mirror.state('personal')['project:docs/missing.md']['lastAttempt']['version'] == 'unavailable'
+
+
+def test_selected_current_document_uses_fixed_source_version_and_records_publish_failure(tmp_path, monkeypatch):
+    mirror = NotionMirror(tmp_path)
+    (tmp_path / 'docs').mkdir()
+    source = tmp_path / 'docs/plugin-system.md'
+    source.write_text('# Plugin facts')
+    (tmp_path / 'docs/current-sources.json').write_text(json.dumps({
+        'archiveBaseUrl': 'https://github.com/example/repo/blob/main',
+        'paths': ['docs/plugin-system.md']}))
+    version = hashlib.sha256(source.read_bytes()).hexdigest()
+    assert mirror.sync_current_document('personal', 'lifeweave-project', 'docs/plugin-system.md', version) == {
+        'status': 'unconfigured', 'version': version}
+    with pytest.raises(ValueError, match='原文版本已变化'):
+        mirror.sync_current_document('personal', 'lifeweave-project', 'docs/plugin-system.md', '0' * 64)
+    with pytest.raises(ValueError, match='不在当前项目'):
+        mirror.sync_current_document('personal', 'lifeweave-project', 'docs/other.md', version)
+    mirror.save(mirror.folder / 'personal/settings.json', MirrorSettings(
+        enabled=True, tokenFile='/tmp/not-used', rootPage='3e7af682864481769d2decf36863c820').model_dump())
+    seen = []
+    monkeypatch.setattr(mirror, 'sync', lambda *args: seen.append(args) or {'status': 'confirmed'})
+    monkeypatch.setattr(mirror, 'confirmed_source_url', lambda path, content, config: 'https://example.test/' + path)
+    assert mirror.sync_current_document('personal', 'lifeweave-project', 'docs/plugin-system.md', version)['status'] == 'confirmed'
+    assert seen[0][1] == 'project:docs/plugin-system.md'
+    assert seen[0][5].endswith('/docs/plugin-system.md')
+    monkeypatch.setattr(mirror, 'sync', lambda *_args: (_ for _ in ()).throw(ValueError('remote changed')))
+    with pytest.raises(ValueError, match='remote changed'):
+        mirror.sync_current_document('personal', 'lifeweave-project', 'docs/plugin-system.md', version)
+    assert mirror.state('personal')['project:docs/plugin-system.md']['lastAttempt']['status'] == 'failed'
+
+
+def test_current_source_requires_exact_committed_and_remote_version(tmp_path, monkeypatch):
+    mirror = NotionMirror(tmp_path)
+    source = tmp_path / 'README.md'
+    source.write_text('# Original\n')
+    for args in [('init', '-q'), ('config', 'user.name', 'Test'),
+                 ('config', 'user.email', 'test@example.local'), ('add', 'README.md'),
+                 ('commit', '-qm', 'original')]:
+        subprocess.run(['git', *args], cwd=tmp_path, check=True)
+    head = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=tmp_path, text=True).strip()
+    original_run = subprocess.run
+
+    def run(args, **kwargs):
+        if args[:2] == ['git', 'ls-remote']:
+            return subprocess.CompletedProcess(args, 0, stdout=head + '\trefs/heads/main\n', stderr='')
+        return original_run(args, **kwargs)
+
+    monkeypatch.setattr('src.integrations.github_source.subprocess.run', run)
+    config = {'archiveBaseUrl': 'https://github.com/example/repo/blob/main'}
+    url = mirror.confirmed_source_url('README.md', source.read_text(), config)
+    assert url == f'https://github.com/example/repo/blob/{head}/README.md'
+    source.write_text('# Changed locally\n')
+    with pytest.raises(ValueError, match='尚未作为当前 main'):
+        mirror.confirmed_source_url('README.md', source.read_text(), config)

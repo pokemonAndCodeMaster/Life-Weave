@@ -57,4 +57,23 @@ describe('EvaluationEntry', () => {
       validationPlan: '沿评测 eval-one 的同一任务和通过标准再评，比较运行过程与结果。',
     }])
   })
+
+  it('lets a completed script call be judged without inventing a model run', async () => {
+    const pluginEntry: EvaluationTask = {
+      ...entry, targetKind: 'plugin', candidateId: null, candidateVersion: null,
+      pluginId: 'lifeweave.checks.repository', pluginVersion: '1.0.0', pluginCallId: 'pcall-one',
+      pluginCall: { id: 'pcall-one', plugin_id: 'lifeweave.checks.repository', plugin_version: '1.0.0',
+        implementation_digest: 'abc123', operation: 'verify_inputs', state: 'succeeded', run_id: null },
+      runId: null, run: undefined, evidence: [],
+    }
+    const wrapper = mount(EvaluationEntry, { props: { entry: pluginEntry, workspace: 'personal', busy: false },
+      global: { stubs: { RouterLink: true } } })
+    expect(wrapper.text()).toContain('固定调用')
+    await wrapper.find('select').setValue('passed')
+    await wrapper.find('textarea').setValue('检查结果与实际输入一致')
+    await wrapper.find('form').trigger('submit')
+    expect(wrapper.emitted('assess')?.[0]).toEqual(['eval-one', {
+      outcome: 'passed', assessment: '检查结果与实际输入一致',
+    }])
+  })
 })

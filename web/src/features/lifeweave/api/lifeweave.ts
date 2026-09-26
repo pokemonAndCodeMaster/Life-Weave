@@ -83,9 +83,13 @@ export interface EvaluationTask {
   id: string
   workspace: WorkspaceKind
   itemId: string
-  targetKind: 'system' | 'capability'
+  targetKind: 'system' | 'capability' | 'plugin'
   candidateId: string | null
   candidateVersion: string | null
+  pluginId?: string | null
+  pluginVersion?: string | null
+  pluginCallId?: string | null
+  pluginCall?: { id: string; plugin_id: string; plugin_version: string; implementation_digest: string; operation: string; state: string; run_id: string | null }
   repeatOf: string | null
   previous?: { id: string; outcome: 'passed' | 'failed' | 'inconclusive' | null; runId: string | null; candidateVersion: string | null; assessment: string | null }
   title: string
@@ -116,8 +120,16 @@ export async function listCandidateEvaluations(workspace: WorkspaceKind, candida
   return data
 }
 
+export async function listPluginEvaluations(workspace: WorkspaceKind, pluginId: string, limit = 10, offset = 0) {
+  const { data } = await http.get<{ items: EvaluationTask[]; total: number }>(
+    `${root(workspace)}/plugins/${encodeURIComponent(pluginId)}/evaluations`, { params: { limit, offset } },
+  )
+  return data
+}
+
 export async function createEvaluation(workspace: WorkspaceKind, payload: {
-  itemId: string; targetKind: 'system' | 'capability'; candidateId?: string | null; repeatOf?: string | null
+  itemId: string; targetKind: 'system' | 'capability' | 'plugin'; candidateId?: string | null;
+  pluginCallId?: string | null; repeatOf?: string | null
   title: string; instruction: string; criteria: string
 }) {
   const { data } = await http.post<EvaluationTask>(`${root(workspace)}/evaluations`, payload)

@@ -19,7 +19,9 @@ const startForm = reactive({ engine: 'codex' as 'codex' | 'opencode', permission
 const assessment = reactive({ outcome: 'inconclusive' as 'passed' | 'failed' | 'inconclusive', body: '', evidenceId: '' })
 const showingImprovement = shallowRef(false)
 const improvement = reactive({ targetKind: 'harness' as 'knowledge' | 'skill' | 'agent' | 'harness', problem: '', desiredBehavior: '', validationPlan: '' })
-const terminal = computed(() => ['succeeded', 'failed', 'unavailable', 'cancelled'].includes(props.entry.run?.state ?? ''))
+const terminal = computed(() => props.entry.targetKind === 'plugin'
+  ? (!props.entry.run || ['succeeded', 'failed', 'unavailable', 'cancelled'].includes(props.entry.run.state))
+  : ['succeeded', 'failed', 'unavailable', 'cancelled'].includes(props.entry.run?.state ?? ''))
 const acceptedEvidence = computed(() => (props.entry.evidence ?? []).filter(entry => entry.status === 'accepted'))
 const validInputs = computed(() => startForm.knowledgeRefs.length <= 10)
 const evaluationStatus = computed(() => ({ planned: '待启动', running: '待判断', passed: '评测通过',
@@ -27,9 +29,9 @@ const evaluationStatus = computed(() => ({ planned: '待启动', running: '待�
 const evaluationTone = computed(() => props.entry.outcome === 'passed' ? 'green' :
   props.entry.outcome === 'failed' ? 'red' : props.entry.state === 'planned' ? 'amber' : 'blue')
 function submitAssessment() {
-  if (!assessment.body.trim() || (assessment.outcome === 'passed' && !assessment.evidenceId)) return
+  if (!assessment.body.trim() || (assessment.outcome === 'passed' && props.entry.runId && !assessment.evidenceId)) return
   emit('assess', props.entry.id, { outcome: assessment.outcome, assessment: assessment.body.trim(),
-    ...(assessment.outcome === 'passed' ? { evidenceId: assessment.evidenceId } : {}) })
+    ...(assessment.outcome === 'passed' && assessment.evidenceId ? { evidenceId: assessment.evidenceId } : {}) })
 }
 function beginImprovement() {
   improvement.targetKind = props.entry.targetKind === 'system' ? 'harness' : 'skill'
@@ -49,10 +51,10 @@ function submitImprovement() {
 
 <template>
   <article class="evaluation-entry">
-    <div class="evaluation-heading"><div><h3>{{ entry.title }}</h3><p class="lw-small lw-sub">{{ entry.targetKind === 'system' ? '整件事 / 平台' : `能力候选 ${entry.candidateId} · ${entry.candidateVersion?.slice(0, 10)}` }}</p></div><StatusBadge :value="entry.outcome || entry.state" :tone="evaluationTone">{{ evaluationStatus }}</StatusBadge></div>
+    <div class="evaluation-heading"><div><h3>{{ entry.title }}</h3><p class="lw-small lw-sub">{{ entry.targetKind === 'system' ? '整件事 / 平台' : entry.targetKind === 'plugin' ? `插件 ${entry.pluginId} · ${entry.pluginVersion} · 调用 ${entry.pluginCallId}` : `能力候选 ${entry.candidateId} · ${entry.candidateVersion?.slice(0, 10)}` }}</p></div><StatusBadge :value="entry.outcome || entry.state" :tone="evaluationTone">{{ evaluationStatus }}</StatusBadge></div>
     <p class="evaluation-label">本次任务</p><p class="evaluation-copy">{{ entry.instruction }}</p>
     <p class="evaluation-label">通过标准</p><p class="evaluation-copy">{{ entry.criteria }}</p>
-    <p v-if="entry.previous" class="lw-small lw-sub">对照前次 {{ entry.previous.id }}：{{ entry.previous.outcome === 'passed' ? '通过' : entry.previous.outcome === 'failed' ? '未通过' : '无法判断' }} · {{ entry.previous.candidateVersion?.slice(0, 10) || '平台整体' }}。{{ entry.previous.assessment }}</p>
+    <p v-if="entry.previous" class="lw-small lw-sub">对照前次 {{ entry.previous.id }}：{{ entry.previous.outcome === 'passed' ? '通过' : entry.previous.outcome === 'failed' ? '未通过' : '无法判断' }} · {{ entry.previous.candidateVersion?.slice(0, 10) || (entry.targetKind === 'plugin' ? '同一插件' : '平台整体') }}。{{ entry.previous.assessment }}</p>
     <div class="evaluation-links"><RouterLink :to="`/lifeweave/${workspace}/items/${encodeURIComponent(entry.itemId)}/outputs`">打开事项与证据</RouterLink><RouterLink v-if="entry.runId" :to="{ path: `/lifeweave/${workspace}/runs`, query: { runId: entry.runId } }">查看运行过程 · {{ entry.runId }}</RouterLink></div>
     <form v-if="entry.state === 'planned'" class="evaluation-action" @submit.prevent="validInputs && emit('start', entry.id, { engine: startForm.engine, permission: startForm.permission, model: startForm.model || undefined, directory: startForm.directory.trim() || undefined, methodId: startForm.methodId || undefined, knowledgeRefs: startForm.knowledgeRefs })">
       <div class="evaluation-grid"><label class="lw-label">执行器<select v-model="startForm.engine" class="lw-field"><option value="codex">Codex</option><option value="opencode">OpenCode</option></select></label><label class="lw-label">工作目录权限<select v-model="startForm.permission" class="lw-field"><option value="read-only">只读</option><option value="workspace-write">允许写入隔离目录</option></select></label></div>
@@ -65,14 +67,15 @@ function submitImprovement() {
       <button type="submit" class="lw-btn primary" :disabled="busy || !validInputs">开始真实评测</button>
     </form>
     <div v-else-if="entry.state === 'running'">
-      <p class="lw-small lw-sub">运行状态：{{ entry.run?.state ?? '读取中' }}。请到事项中阅读成果和过程，接受对应证据后再判断是否通过。</p>
-      <p class="lw-small lw-sub">本轮输入：{{ entry.run?.repositoryPath ? `仓库 ${entry.run.repositoryPath} @ ${entry.run.repositoryRevision?.slice(0, 10) || '未固定提交'}` : '空隔离目录' }}；方法 {{ entry.run?.selectedInputs?.methodId || '无' }}；知识 {{ entry.run?.selectedInputs?.knowledgeRefs?.length || 0 }} 篇。</p>
+      <p v-if="entry.targetKind === 'plugin'" class="lw-small lw-sub">固定调用：{{ entry.pluginCall?.operation }} · {{ entry.pluginCall?.state }} · 实现 {{ entry.pluginCall?.implementation_digest?.slice(0, 12) }}。请对照本次调用和原始事项判断，调用成功不自动等于评测通过。</p>
+      <template v-else><p class="lw-small lw-sub">运行状态：{{ entry.run?.state ?? '读取中' }}。请到事项中阅读成果和过程，接受对应证据后再判断是否通过。</p>
+      <p class="lw-small lw-sub">本轮输入：{{ entry.run?.repositoryPath ? `仓库 ${entry.run.repositoryPath} @ ${entry.run.repositoryRevision?.slice(0, 10) || '未固定提交'}` : '空隔离目录' }}；方法 {{ entry.run?.selectedInputs?.methodId || '无' }}；知识 {{ entry.run?.selectedInputs?.knowledgeRefs?.length || 0 }} 篇。</p></template>
       <form v-if="terminal" class="evaluation-action" @submit.prevent="submitAssessment">
         <label class="lw-label">判断<select v-model="assessment.outcome" class="lw-field"><option value="inconclusive">暂无法判断</option><option value="failed">未通过</option><option value="passed">通过</option></select></label>
-        <label v-if="assessment.outcome === 'passed'" class="lw-label">已接受的运行证据<select v-model="assessment.evidenceId" class="lw-field" required><option value="">请选择</option><option v-for="evidence in acceptedEvidence" :key="evidence.id" :value="evidence.id">{{ evidence.summary || evidence.id }}</option></select></label>
-        <p v-if="assessment.outcome === 'passed' && !acceptedEvidence.length" class="lw-small lw-sub">此运行还没有已接受证据。先到事项中审阅，再刷新评测列表。</p>
+        <label v-if="assessment.outcome === 'passed' && entry.runId" class="lw-label">已接受的运行证据<select v-model="assessment.evidenceId" class="lw-field" required><option value="">请选择</option><option v-for="evidence in acceptedEvidence" :key="evidence.id" :value="evidence.id">{{ evidence.summary || evidence.id }}</option></select></label>
+        <p v-if="assessment.outcome === 'passed' && entry.runId && !acceptedEvidence.length" class="lw-small lw-sub">此运行还没有已接受证据。先到事项中审阅，再刷新评测列表。</p>
         <label class="lw-label">对照标准的理由<textarea v-model="assessment.body" class="lw-field" rows="3" required /></label>
-        <button class="lw-btn primary" type="submit" :disabled="busy || !assessment.body.trim() || (assessment.outcome === 'passed' && !assessment.evidenceId)">保存判断</button>
+        <button class="lw-btn primary" type="submit" :disabled="busy || !assessment.body.trim() || (assessment.outcome === 'passed' && !!entry.runId && !assessment.evidenceId)">保存判断</button>
       </form>
     </div>
     <div v-else><p class="evaluation-copy"><strong>{{ entry.outcome === 'passed' ? '通过' : entry.outcome === 'failed' ? '未通过' : '无法判断' }}：</strong>{{ entry.assessment }}</p>

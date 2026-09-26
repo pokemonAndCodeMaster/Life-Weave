@@ -17,6 +17,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from src.lifeweave.models import WorkspaceKey
 from src.lifeweave.research_archive import document_content
 from src.lifeweave.research_bundle import rewrite_markdown
+from src.integrations.github_source import confirmed_github_blob
 
 
 NOTION_VERSION = '2026-03-11'
@@ -211,14 +212,45 @@ class NotionMirror:
                     raise ValueError('项目当前文档路径不可读取')
                 content = path.read_text()
                 version = digest(content)
+                url = self.confirmed_source_url(relative, content, config)
                 self.sync(workspace, source, relative, content, version,
-                          config['archiveBaseUrl'].rstrip('/') + '/' + quote(relative))
+                          url)
                 count += 1
             except (ValueError, OSError) as exc:
                 self.record_failure(workspace, source, version, str(exc))
                 failed[source] = str(exc)
         return {'status': 'partial' if failed else 'confirmed', 'count': count,
                 'failedCount': len(failed), 'errors': failed}
+
+    def sync_current_document(self, workspace: str, source_id: str,
+                              path: str, expected_version: str) -> dict:
+        if source_id != 'lifeweave-project':
+            raise ValueError('目前仅支持当前项目清单中的原文单篇发布')
+        config = json.loads((self.root / 'docs/current-sources.json').read_text())
+        if path not in config['paths']:
+            raise ValueError('此文档不在当前项目原文清单中')
+        source = (self.root / path).resolve()
+        if not source.is_relative_to(self.root.resolve()) or not source.is_file():
+            raise ValueError('项目原文不可读取')
+        content = source.read_text(encoding='utf-8')
+        version = digest(content)
+        if version != expected_version:
+            raise ValueError('原文版本已变化，请重新打开后再发布')
+        if not self.settings(workspace)['enabled']:
+            return {'status': 'unconfigured', 'version': version}
+        source_key = f'project:{path}'
+        try:
+            url = self.confirmed_source_url(path, content, config)
+            return self.sync(workspace, source_key, path, content, version,
+                             url)
+        except (ValueError, OSError) as exc:
+            self.record_failure(workspace, source_key, version, str(exc))
+            raise
+
+    def confirmed_source_url(self, path: str, content: str, config: dict) -> str:
+        """Link an immutable GitHub blob only if this exact body is on main."""
+        return confirmed_github_blob(self.root, path, content.encode('utf-8'),
+                                     str(config.get('archiveBaseUrl') or ''))
 
     def sync_report(self, workspace: str, manifest: dict, report: str, github_url: str) -> dict:
         if not self.settings(workspace)['enabled']:
@@ -239,6 +271,13 @@ class NotionMirror:
 
 
 router = APIRouter(prefix='/api/lifeweave/{workspace}', tags=['notion-mirror'])
+
+
+class DocumentSync(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    sourceId: str = Field(min_length=1, max_length=64)
+    path: str = Field(min_length=1, max_length=1000)
+    expectedVersion: str = Field(min_length=64, max_length=64)
 
 
 @router.get('/notion-mirror/settings')
@@ -264,4 +303,13 @@ def sync(request: Request, workspace: WorkspaceKey):
     try:
         return request.app.state.notion_mirror.sync_current_docs(workspace)
     except (ValueError, OSError) as exc:
+        raise HTTPException(409, str(exc)) from exc
+
+
+@router.post('/notion-mirror/document')
+def sync_document(request: Request, workspace: WorkspaceKey, body: DocumentSync):
+    try:
+        return request.app.state.notion_mirror.sync_current_document(
+            workspace, body.sourceId, body.path, body.expectedVersion)
+    except (ValueError, OSError, UnicodeError) as exc:
         raise HTTPException(409, str(exc)) from exc

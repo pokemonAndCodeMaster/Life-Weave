@@ -2,6 +2,8 @@
 from __future__ import annotations
 
 import posixpath
+import hashlib
+import json
 from pathlib import Path
 from threading import RLock
 from typing import Any
@@ -9,6 +11,7 @@ from urllib.parse import unquote, urlsplit
 from urllib.parse import quote
 
 import mistune
+from src.integrations.github_source import confirmed_github_blob
 
 from .library import Library, fingerprint
 
@@ -125,3 +128,45 @@ class KnowledgeLinks:
                     'outgoing': outgoing, 'backlinks': backlinks,
                     'scannedDocuments': len(corpus), 'unavailableSources': unavailable_sources,
                     'unavailableDocuments': unavailable_documents}
+
+    def semantic_relations(self, workspace: str, source_id: str, path: str) -> dict[str, Any]:
+        """Read authored, version-pinned assertions; never infer a predicate from a hyperlink."""
+        selected = self.library.document(workspace, source_id, path)
+        project = self.library.project_root.resolve()
+        registry = json.loads((project / 'docs/knowledge-relations.json').read_text(encoding='utf-8'))
+        if registry.get('version') != 1 or not isinstance(registry.get('relations'), list):
+            raise ValueError('知识语义关系清单版本不可读取')
+        base_url = self.library.source(workspace, source_id).get('archiveBaseUrl')
+        rows = []
+        for entry in registry['relations']:
+            if entry.get('sourceId') != source_id or entry.get('sourcePath') != path:
+                continue
+            relation = entry.get('relation')
+            target = entry.get('targetPath')
+            if relation not in {'implemented_by', 'verified_by'} or not isinstance(target, str):
+                raise ValueError('知识语义关系存在未知类型或目标')
+            relative = Path(target)
+            if relative.is_absolute() or '..' in relative.parts or not target.startswith(('src/', 'tests/')):
+                raise ValueError('知识语义关系目标越界')
+            file = (project / relative).resolve()
+            exists = file.is_relative_to(project) and file.is_file()
+            target_version = hashlib.sha256(file.read_bytes()).hexdigest() if exists else None
+            quote_text = entry.get('evidenceQuote')
+            source_current = (entry.get('sourceVersion') == selected['version']
+                              and isinstance(quote_text, str) and quote_text in selected['content'])
+            status = ('missing' if not exists else 'current' if source_current
+                      and entry.get('targetVersion') == target_version else 'stale')
+            target_url = None
+            if status == 'current' and base_url:
+                try:
+                    target_url = confirmed_github_blob(project, target, file.read_bytes(), base_url, timeout=3)
+                except ValueError:
+                    pass  # The local assertion remains visible without a misleading remote link.
+            rows.append({'relation': relation, 'targetPath': target,
+                         'sourceVersion': entry.get('sourceVersion'),
+                         'targetVersion': entry.get('targetVersion'),
+                         'currentSourceVersion': selected['version'],
+                         'currentTargetVersion': target_version,
+                         'evidenceQuote': entry.get('evidenceQuote'), 'status': status,
+                         'targetUrl': target_url})
+        return {'sourceId': source_id, 'path': path, 'version': selected['version'], 'items': rows}

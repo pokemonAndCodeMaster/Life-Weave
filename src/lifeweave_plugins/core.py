@@ -153,8 +153,8 @@ class PluginHost:
         self.db.execute(
             "INSERT INTO workbench.lifeweave_plugin_call "
             "(id,workspace,item_id,assignment_id,run_id,plan_id,step_id,parent_call_id,plugin_id,plugin_version,"
-            "implementation_digest,operation,state,input_ref,observed_by) "
-            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'started',%s,'platform')",
+            "implementation_digest,operation,state,input_ref,observed_by,started_at) "
+            "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'started',%s,'platform',clock_timestamp())",
             (call_id, workspace, item_id, assignment_id, run_id, plan_id, step_id,
              _parent_call.get(), identity, definition.version, self.registry.digest(definition),
              operation, Jsonb(input_ref or {})))
@@ -162,11 +162,11 @@ class PluginHost:
         try:
             result = handler()
         except Exception as exc:
-            self.db.execute("UPDATE workbench.lifeweave_plugin_call SET state='failed',error=%s,finished_at=now() WHERE id=%s",
+            self.db.execute("UPDATE workbench.lifeweave_plugin_call SET state='failed',error=%s,finished_at=clock_timestamp() WHERE id=%s",
                             (str(exc)[:2000], call_id))
             raise
         else:
-            self.db.execute("UPDATE workbench.lifeweave_plugin_call SET state=%s,output_ref=%s,finished_at=now() WHERE id=%s",
+            self.db.execute("UPDATE workbench.lifeweave_plugin_call SET state=%s,output_ref=%s,finished_at=clock_timestamp() WHERE id=%s",
                             ("accepted" if accepted else "succeeded", Jsonb(output_ref(result) if output_ref else {}), call_id))
             return result
         finally:
@@ -212,8 +212,8 @@ class PluginHost:
             self.db.execute(
                 "INSERT INTO workbench.lifeweave_plugin_call "
                 "(id,workspace,item_id,assignment_id,run_id,plan_id,step_id,parent_call_id,plugin_id,plugin_version,"
-                "implementation_digest,operation,state,input_ref,observed_by) "
-                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'run','started',%s,'worker-report') "
+                "implementation_digest,operation,state,input_ref,observed_by,started_at) "
+                "VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,'run','started',%s,'worker-report',clock_timestamp()) "
                 "ON CONFLICT (workspace,run_id,plugin_id,operation) WHERE run_id IS NOT NULL AND observed_by = 'worker-report' DO NOTHING",
                 ("pcall-" + uuid4().hex[:24], workspace, item_id, assignment_id, run_id,
                  plan_id, f"{label}.codex", parent["id"] if parent else None,
@@ -222,9 +222,32 @@ class PluginHost:
         elif outcome in {"succeeded", "failed", "interrupted"}:
             state = outcome
             changed = self.db.execute(
-                "UPDATE workbench.lifeweave_plugin_call SET state=%s,output_ref=%s,error=%s,finished_at=now() "
+                "UPDATE workbench.lifeweave_plugin_call SET state=%s,output_ref=%s,error=%s,finished_at=clock_timestamp() "
                 "WHERE workspace=%s AND run_id=%s AND plugin_id=%s AND operation='run' AND state='started'",
                 (state, Jsonb({"runId": run_id, "outcome": outcome, "exitCode": exit_code}),
                  (error or "")[:2000] or None, workspace, run_id, identity))
             if changed != 1:
                 raise ValueError("执行插件尚未记录启动，不能接受结束事件")
+
+    def reconcile_terminal_run(self, *, workspace: str, run_id: str, outcome: str) -> int:
+        """Leave a truthful gap when the worker's adapter-end event was lost."""
+        return self.db.execute(
+            "UPDATE workbench.lifeweave_plugin_call SET state='interrupted', "
+            "error='执行器结束事件未观测；Run 已报告终态，不能推断插件成功', "
+            "output_ref=%s,finished_at=clock_timestamp() "
+            "WHERE workspace=%s AND run_id=%s AND operation='run' "
+            "AND observed_by='worker-report' AND state='started'",
+            (Jsonb({"runId": run_id, "runOutcome": outcome, "endEventObserved": False}), workspace, run_id))
+
+    def complete_development_stage(self, *, workspace: str, assignment_id: str,
+                                   run_id: str, outcome: str) -> int:
+        """Close the accepted composite call only after its stage is checked."""
+        if outcome not in {"succeeded", "failed", "interrupted"}:
+            raise ValueError("未知开发阶段结果")
+        return self.db.execute(
+            "UPDATE workbench.lifeweave_plugin_call SET run_id=%s,state=%s,"
+            "output_ref=output_ref || %s,finished_at=clock_timestamp() "
+            "WHERE workspace=%s AND assignment_id=%s AND plugin_id='lifeweave.development' "
+            "AND state='accepted' AND output_ref->>'runId'=%s",
+            (run_id, outcome, Jsonb({"stageOutcome": outcome}),
+             workspace, assignment_id, run_id))

@@ -15,6 +15,8 @@ class EvaluationRepository:
         names = {'workspace_key': 'workspace', 'item_id': 'itemId', 'target_kind': 'targetKind',
                  'candidate_id': 'candidateId', 'candidate_version': 'candidateVersion',
                  'repeat_of': 'repeatOf',
+                 'plugin_id': 'pluginId', 'plugin_version': 'pluginVersion',
+                 'plugin_call_id': 'pluginCallId',
                  'run_id': 'runId', 'evidence_id': 'evidenceId', 'improvement_id': 'improvementId',
                  'created_at': 'createdAt',
                  'assessed_at': 'assessedAt'}
@@ -51,12 +53,27 @@ class EvaluationRepository:
         )
         return [self.wire(row) for row in rows], int(count['total']) if count else 0
 
+    def list_for_plugin(self, workspace: str, plugin_id: str, limit: int,
+                        offset: int) -> tuple[list[dict[str, Any]], int]:
+        rows = self.postgres.fetch_all(
+            f'''SELECT * FROM {self.table} WHERE workspace_key=%s AND plugin_id=%s
+            ORDER BY created_at DESC,id DESC LIMIT %s OFFSET %s''',
+            (workspace, plugin_id, limit, offset),
+        )
+        count = self.postgres.fetch_one(
+            f'SELECT count(*) AS total FROM {self.table} WHERE workspace_key=%s AND plugin_id=%s',
+            (workspace, plugin_id),
+        )
+        return [self.wire(row) for row in rows], int(count['total']) if count else 0
+
     def create(self, workspace: str, row: dict[str, Any]) -> dict[str, Any]:
         self.postgres.execute(
             f'''INSERT INTO {self.table}
-            (id,workspace_key,item_id,target_kind,candidate_id,candidate_version,repeat_of,title,instruction,criteria)
+            (id,workspace_key,item_id,target_kind,candidate_id,candidate_version,plugin_id,plugin_version,
+             plugin_call_id,repeat_of,title,instruction,criteria,state,run_id)
             VALUES (%(id)s,%(workspace)s,%(itemId)s,%(targetKind)s,%(candidateId)s,%(candidateVersion)s,
-                    %(repeatOf)s,%(title)s,%(instruction)s,%(criteria)s)''',
+                    %(pluginId)s,%(pluginVersion)s,%(pluginCallId)s,%(repeatOf)s,%(title)s,
+                    %(instruction)s,%(criteria)s,%(state)s,%(runId)s)''',
             {**row, 'workspace': workspace},
         )
         return self.get(workspace, row['id'])

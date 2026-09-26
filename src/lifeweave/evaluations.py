@@ -12,6 +12,15 @@ class Evaluations:
         self.work = work
         self.runtime = runtime
         self.knowledge = knowledge
+        self.plugins: Any = None
+
+    def _plugin_call(self, workspace: str, call_id: str) -> dict[str, Any]:
+        call = self.repository.postgres.fetch_one(
+            'SELECT * FROM workbench.lifeweave_plugin_call WHERE workspace=%s AND id=%s',
+            (workspace, call_id))
+        if call is None:
+            raise KeyError(call_id)
+        return call
 
     def create(self, workspace: str, body: dict[str, Any]) -> dict[str, Any]:
         self.work.get_item(workspace, body['itemId'])
@@ -23,21 +32,47 @@ class Evaluations:
             if any(previous[key] != body[key] for key in ('itemId', 'targetKind', 'instruction', 'criteria')):
                 raise ValueError('对照评测必须保持同一事项、任务和通过标准')
         candidate_id = body.get('candidateId')
+        plugin_call_id = body.get('pluginCallId')
         with self.repository.postgres.atomic() as conn:
             if body['targetKind'] == 'capability':
                 if not candidate_id:
                     raise ValueError('能力评测必须选择候选')
+                if plugin_call_id:
+                    raise ValueError('能力候选评测不绑定插件调用')
                 conn.execute('SELECT pg_advisory_xact_lock(hashtextextended(%s,0))',
                              (f'lifeweave:evaluation:{workspace}:{candidate_id}',))
                 candidate = self.knowledge.repository.get(workspace, candidate_id)
                 if candidate['status'] not in ('candidate', 'verified'):
                     raise ValueError('只能评测试验中的能力候选')
                 version = candidate['version']
+                plugin_id = plugin_version = None
+                call_run_id = None
+            elif body['targetKind'] == 'plugin':
+                if candidate_id or not plugin_call_id:
+                    raise ValueError('插件评测必须选择一次真实调用，不能绑定能力候选')
+                call = self._plugin_call(workspace, plugin_call_id)
+                if call['item_id'] != body['itemId']:
+                    raise ValueError('插件调用与评测事项不一致')
+                if call['state'] not in ('succeeded', 'failed', 'interrupted'):
+                    raise ValueError('插件调用尚未结束，暂不能评测')
+                plugin_id, plugin_version = call['plugin_id'], call['plugin_version']
+                call_run_id = call['run_id']
+                version = None
+                if repeat_of and previous['pluginId'] != plugin_id:
+                    raise ValueError('对照评测必须使用同一插件身份')
             else:
                 if candidate_id:
                     raise ValueError('平台整体评测不绑定能力候选')
+                if plugin_call_id:
+                    raise ValueError('平台整体评测不绑定插件调用')
                 version = None
-            row = {'id': 'eval-' + uuid4().hex[:16], 'repeatOf': None, **body, 'candidateVersion': version}
+                plugin_id = plugin_version = None
+                call_run_id = None
+            row = {'id': 'eval-' + uuid4().hex[:16], 'repeatOf': None, **body,
+                   'candidateId': candidate_id, 'candidateVersion': version,
+                   'pluginId': plugin_id, 'pluginVersion': plugin_version,
+                   'pluginCallId': plugin_call_id if body['targetKind'] == 'plugin' else None,
+                   'runId': call_run_id, 'state': 'running' if body['targetKind'] == 'plugin' else 'planned'}
             self.repository.create(workspace, row)
         return self.get(workspace, row['id'])
 
@@ -60,6 +95,12 @@ class Evaluations:
                 for entry in self.work.repository.list_evidence(workspace, row['itemId'])
                 if entry.get('runId') == row['runId']
             ]
+        if row.get('pluginCallId'):
+            call = self._plugin_call(workspace, row['pluginCallId'])
+            row['pluginCall'] = {key: call[key] for key in
+                                 ('id', 'plugin_id', 'plugin_version', 'implementation_digest', 'operation', 'state',
+                                  'run_id', 'item_id',
+                                  'started_at', 'finished_at')}
         return row
 
     def list(self, workspace: str, limit: int = 30, offset: int = 0) -> dict[str, Any]:
@@ -84,12 +125,31 @@ class Evaluations:
         return {'items': [self.get(workspace, row['id']) for row in rows],
                 'lineage': lineage, 'total': total, 'limit': limit, 'offset': offset}
 
+    def plugin_history(self, workspace: str, plugin_id: str,
+                       limit: int = 20, offset: int = 0) -> dict[str, Any]:
+        if self.plugins is None:
+            raise KeyError(plugin_id)
+        try:
+            self.plugins.detail(workspace, plugin_id)
+        except KeyError:
+            # Removed methods retain read-only evidence, scoped to this workspace.
+            existing = self.repository.postgres.fetch_one(
+                'SELECT 1 FROM workbench.t_lifeweave_evaluation '
+                'WHERE workspace_key=%s AND plugin_id=%s LIMIT 1', (workspace, plugin_id))
+            if not existing:
+                raise
+        rows, total = self.repository.list_for_plugin(workspace, plugin_id, limit, offset)
+        return {'items': [self.get(workspace, row['id']) for row in rows],
+                'total': total, 'limit': limit, 'offset': offset}
+
     def start(self, workspace: str, evaluation_id: str, *, engine: str, permission: str, model: str | None,
               directory: str | None, method_id: str | None, knowledge_refs: list[str]) -> dict[str, Any]:
         with self.repository.postgres.atomic():
             row = self.repository.get(workspace, evaluation_id, lock=True)
             if row['state'] != 'planned':
                 raise ValueError('评测已开始，不能重复创建运行')
+            if row['targetKind'] == 'plugin':
+                raise ValueError('插件评测已绑定真实调用，不能重复启动')
             candidate_id = row['candidateId']
             if candidate_id:
                 candidate = self.knowledge.repository.get(workspace, candidate_id)
@@ -108,20 +168,28 @@ class Evaluations:
                evidence_id: str | None) -> dict[str, Any]:
         with self.repository.postgres.atomic():
             row = self.repository.get(workspace, evaluation_id, lock=True)
-            if row['state'] != 'running' or not row['runId']:
+            if row['state'] != 'running' or (not row['runId'] and not row.get('pluginCallId')):
                 raise ValueError('评测尚未运行或已经评估')
-            run = self.runtime.get_run(workspace, row['runId'])
-            if run['item_id'] != row['itemId']:
-                raise ValueError('运行与评测事项不一致')
-            if run['state'] not in ('succeeded', 'failed', 'unavailable', 'cancelled'):
-                raise ValueError('运行尚未结束，暂不能判断')
+            run = self.runtime.get_run(workspace, row['runId']) if row['runId'] else None
+            if run:
+                if run['item_id'] != row['itemId']:
+                    raise ValueError('运行与评测事项不一致')
+                if run['state'] not in ('succeeded', 'failed', 'unavailable', 'cancelled'):
+                    raise ValueError('运行尚未结束，暂不能判断')
+            call = self._plugin_call(workspace, row['pluginCallId']) if row.get('pluginCallId') else None
+            if call and (call['plugin_id'] != row['pluginId'] or call['plugin_version'] != row['pluginVersion']
+                         or call['item_id'] != row['itemId'] or call['run_id'] != row['runId']):
+                raise ValueError('插件评测的固定调用身份已变化')
             if outcome == 'passed':
-                if run['state'] != 'succeeded':
+                if call and call['state'] != 'succeeded':
+                    raise ValueError('通过评测需要真实成功结束的插件调用')
+                if run and run['state'] != 'succeeded':
                     raise ValueError('通过评测需要真实成功结束的运行')
-                evidence = next((entry for entry in self.work.repository.list_evidence(workspace, row['itemId'])
-                                 if entry['id'] == evidence_id), None)
-                if not evidence or evidence.get('runId') != row['runId'] or evidence['status'] != 'accepted':
-                    raise ValueError('通过评测需要本次运行中已人工接受的证据')
+                if run:
+                    evidence = next((entry for entry in self.work.repository.list_evidence(workspace, row['itemId'])
+                                     if entry['id'] == evidence_id), None)
+                    if not evidence or evidence.get('runId') != row['runId'] or evidence['status'] != 'accepted':
+                        raise ValueError('通过评测需要本次运行中已人工接受的证据')
                 if row['candidateId']:
                     candidate = self.knowledge.repository.get(workspace, row['candidateId'])
                     if candidate['version'] != row['candidateVersion']:
@@ -185,7 +253,8 @@ class Evaluations:
                 workspace, entity_type='improvement', title='改进：' + row['title'],
                 payload={'sourceItemId': row['itemId'], 'sourceEvaluationId': row['id'],
                          'sourceRunId': row['runId'], 'sourceOutcome': row['outcome'],
-                         'targetKind': target_kind, 'targetRef': row['candidateId'] or '',
+                         'targetKind': target_kind,
+                         'targetRef': row.get('pluginId') or row['candidateId'] or '',
                          'problem': problem.strip(), 'body': problem.strip(),
                          'desiredBehavior': desired_behavior.strip(),
                          'validationPlan': validation_plan.strip(), 'state': '草案'},

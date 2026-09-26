@@ -281,11 +281,16 @@ class DevelopmentService:
             run = self.runtime.get_run_snapshot(row["workspace"], run_id)
             if run["state"] not in TERMINAL_RUNS:
                 return
+            def complete(outcome: str) -> None:
+                self.plugin_host.complete_development_stage(
+                    workspace=row["workspace"], assignment_id=identity,
+                    run_id=run_id, outcome=outcome)
             if run["state"] != "succeeded":
                 target = "cancelled" if run["state"] == "cancelled" else "failed"
                 conn.execute("UPDATE workbench.lifeweave_development_assignment "
                              "SET status=%s,error=%s,updated_at=now() WHERE id=%s",
                              (target, f"{status} 阶段 {run['state']}：{str(run.get('error') or '')[:1500]}", identity))
+                complete("interrupted" if target == "cancelled" else "failed")
                 return
             if status in {"planning", "reviewing"}:
                 try:
@@ -302,16 +307,19 @@ class DevelopmentService:
                     conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                  "SET status='blocked',error=%s,updated_at=now() WHERE id=%s",
                                  (str(exc), identity))
+                    complete("failed")
                     return
             if status == "implementing":
                 conn.execute("UPDATE workbench.lifeweave_development_assignment "
                              "SET status='awaiting_acceptance',updated_at=now() WHERE id=%s", (identity,))
+                complete("succeeded")
                 return
             result = str(run.get("result") or "").strip()
             if status == "planning" and len(result) < 80:
                 conn.execute("UPDATE workbench.lifeweave_development_assignment "
                              "SET status='blocked',error='方案正文过短，未进入实施',updated_at=now() WHERE id=%s",
                              (identity,))
+                complete("failed")
                 return
             if status == "planning":
                 digest = hashlib.sha256(result.encode()).hexdigest()
@@ -331,12 +339,14 @@ class DevelopmentService:
                 conn.execute("UPDATE workbench.lifeweave_development_assignment "
                              "SET status='blocked',error=%s,updated_at=now() WHERE id=%s",
                              (str(exc), identity))
+                complete("failed")
                 return
             if status == "planning" and row["review_mode"] == "independent":
                 review = self._stage_run(row, "review", row["instruction"])
                 conn.execute("UPDATE workbench.lifeweave_development_assignment "
                              "SET status='reviewing',review_run_id=%s,updated_at=now() WHERE id=%s",
                              (review["id"], identity))
+                complete("succeeded")
                 return
             if status == "reviewing":
                 decision = "pass" if re.search(r"^REVIEW_DECISION:\s*PASS\s*$", result, re.I | re.M) else "needs_revision"
@@ -347,12 +357,14 @@ class DevelopmentService:
                     conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                  "SET status='blocked',error='独立审阅未通过或没有明确 PASS',updated_at=now() WHERE id=%s",
                                  (identity,))
+                    complete("failed")
                     return
             else:
                 if "自检" not in result:
                     conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                  "SET status='blocked',error='轻量方案缺少自检',updated_at=now() WHERE id=%s",
                                  (identity,))
+                    complete("failed")
                     return
                 row = conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                    "SET review='方案阶段自检（非独立审阅）',review_decision='self_checked',"
@@ -361,6 +373,7 @@ class DevelopmentService:
             conn.execute("UPDATE workbench.lifeweave_development_assignment "
                          "SET status='implementing',implementation_run_id=%s,updated_at=now() WHERE id=%s",
                          (implementation["id"], identity))
+            complete("succeeded")
 
     def scan(self) -> None:
         rows = self.db.fetch_all("SELECT id FROM workbench.lifeweave_development_assignment "

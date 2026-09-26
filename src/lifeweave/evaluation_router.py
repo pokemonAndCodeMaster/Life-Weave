@@ -17,8 +17,9 @@ class Input(BaseModel):
 
 class EvaluationCreate(Input):
     item_id: str = Field(min_length=1, max_length=64)
-    target_kind: Literal['system', 'capability']
+    target_kind: Literal['system', 'capability', 'plugin']
     candidate_id: str | None = Field(default=None, max_length=64)
+    plugin_call_id: str | None = Field(default=None, max_length=64)
     repeat_of: str | None = Field(default=None, max_length=64)
     title: str = Field(min_length=1, max_length=256)
     instruction: str = Field(min_length=1, max_length=100_000)
@@ -66,6 +67,12 @@ def evaluations(request: Request, workspace: WorkspaceKey,
 def candidate_history(request: Request, workspace: WorkspaceKey, candidate_id: str,
                       limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0)):
     return call(request, 'candidate_history', workspace, candidate_id, limit, offset)
+
+
+@router.get('/plugins/{plugin_id}/evaluations')
+def plugin_history(request: Request, workspace: WorkspaceKey, plugin_id: str,
+                   limit: int = Query(20, ge=1, le=100), offset: int = Query(0, ge=0)):
+    return call(request, 'plugin_history', workspace, plugin_id, limit, offset)
 
 
 @router.post('/evaluations', status_code=201)

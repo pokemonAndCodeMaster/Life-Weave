@@ -15,8 +15,8 @@
 | 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `1ae7266824d6fd7466b593c5a3d7dbb65faa66cf1b59229ff7efbd26112ee472` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-03) | `docs/product.md` | `afacca1738d92bd7e94efe5075b1d76f615ca35ecf4d379022bd60038381f789` |
 | 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `ba008a360c31c8a7e914e3fe20d77cc26a230ef74e27859532b67ed673ea4e38` |
-| 当前说明 | [插件目录与开发过程：首个可运行切片](#doc-05) | `docs/plugin-system.md` | `c5f79df8ed80e3e9d8eaa747fe0f507520f901c13b205a0442232f5453ebba13` |
-| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `9e460750f2728231ddc6ae266d8657434180f4a272fa6aba6e3b1a72731fd90f` |
+| 当前说明 | [插件目录与开发过程：首个可运行切片](#doc-05) | `docs/plugin-system.md` | `80e15a511db4fbaf6cce8daead7aaa67129a8a676e6adbd58c2d29a5d9b47f2a` |
+| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `8bef3ca2fe00735e4344d2639b16208ebd4b244c41c244513142450eda4347b8` |
 | 当前说明 | [当前建设路线](#doc-07) | `docs/roadmap.md` | `563c1874c1a6e154c9a16063ea91feec947c489f180ce519ce4bb473f40ddadb` |
 | 当前说明 | [开发与运行维护](#doc-08) | `docs/development.md` | `711ddbeac9fe0e883528e0376affad195746dc79869911ec6d294d3c56b49d08` |
 | 当前说明 | [LifeWeave：名称与适配](#doc-09) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
@@ -552,28 +552,32 @@ GitHub 以分支提交回读确认；Notion 以 Markdown 全文回读、来源�
 
 打开“能力与评测 → 插件目录”，可见每项能力的身份、版本、依赖、可运行原因和本空间启停状态。点“查看近期使用”能从插件回到实际事项。停用阻止该空间的新调用，不删除历史；已在执行中的外部进程不会被强行中止。Codex 可用性首先取决于本机 CLI，真正账号和模型仍以运行结果为证。OpenCode 在开发委托中继续暂停。
 
+事项的每次实际调用可展开固定插件版本、实现摘要、开始结束时间和受限的输入输出引用。能定位到 Run 的调用可继续看同一事项的阶段与原生事件；插件调用 API 只返回受限结构字段、知识数量和来源版本，不传提示词、命令、路径、未知引用字段和自由文本错误，页面再做一次白名单显示，不把原始事件摘要直接显示出来。嵌套调用的后续记录使用实际时钟，早期同事务记录的时间粒度不足，不能据其计算耗时。Worker 已报告 Run 终态但缺少执行器结束事件时，调用标为“中断／结束未观测”，不从 Run 成功反推插件成功。
+
+已结束的调用可从事项打开“评价这次调用”，填写本次任务与通过标准，再由人判断。开发主调用在阶段 Run 结束且通过该阶段检查后才从“已受理”变为成功；未通过检查则记录失败。评测固定插件 ID、版本、实现摘要、调用和可选 Run；一个 Run 可分别评价组合插件和执行器插件，失败和改进建议保留。带 Run 的“通过”仍须同一次 Run 的人工接受证据；无 Run 的脚本调用须真实成功结束并由人说明通过理由。目录详情可反查该插件的显式评测和改进；调用成功本身不构成评测通过。
+
 在需求或修复事项的“开发 Agent”页发起委托后，展开“插件计划与实际调用”。计划与绑定在委托创建时固定，实际调用只由服务端真正进入对应操作或受信任执行机进入 `executor.run` 边界时记下。一个条目有计划但没有调用，页面显示“尚无实际调用”，不推断执行器内部发生了什么。旧委托没有插件计划，会明确显示历史边界。开发页继续使用原 Run 和原生事件；插件过程接口故障时不遮断原有记录。
 
 目前可见的组合是 `lifeweave.development` → `lifeweave.context` → `lifeweave.knowledge` 的推荐和选定正文读取、`lifeweave.method.<原方法ID>` 的版本固定，以及 `lifeweave.execution.codex` 和 `lifeweave.checks.repository`。方法的“已绑定”仅证明材料被选入快照，不证明模型遵循全部步骤。Run 环境中的 `contextPack` 含编译器版本、背景版本、来源版本和最终提示词 SHA-256；提示词正文仍由原 Run 快照保存。推荐会扫描受管来源并记录候选引用；选中的正文另存于原能力快照。
 
-<a id="doc-05-line-13"></a>
+<a id="doc-05-line-17"></a>
 
 ### 实现与数据归属
 
 - [core.py](../src/lifeweave_plugins/core.py) 管内置描述、依赖校验、实现摘要与调用边界；[service.py](../src/lifeweave_plugins/service.py) 管空间状态、固定计划、绑定核验和计划／实际投影。
-- [013_plugin_foundation.sql](../migrations/013_plugin_foundation.sql) 新增固定计划、调用与空间启停三张表；既有事项、开发委托、Run、事件和知识正文仍由原模块负责。项目知识原文继续在 Git，本地知识原文继续在 Markdown，Notion 仍是镜像。
+- [013_plugin_foundation.sql](../migrations/013_plugin_foundation.sql) 新增固定计划、调用与空间启停三张表；[014_plugin_evaluations.sql](../migrations/014_plugin_evaluations.sql) 让原评测表按真实插件调用记录判断，并允许同一 Run 有多个评测目标；[015_development_call_completion.sql](../migrations/015_development_call_completion.sql) 用旧委托的终态与实际阶段进展保守补齐组合调用结果。既有事项、开发委托、Run、事件和知识正文仍由原模块负责。项目知识原文继续在 Git，本地知识原文继续在 Markdown，Notion 仍是镜像。
 - [development.py](../src/lifeweave/development.py) 仍决定方案、审阅、自检、实施与只读检查何时推进；插件绑定不接管业务状态机。[Runtime](../src/lifeweave_runtime/service.py) 在创建 Run 时固定上下文和真实所选材料；[Worker](../src/lifeweave_runtime/worker.py) 紧贴执行器调用上报开始／结束事件。受信任租约、Run 事件和插件调用记录共同构成受管边界证据。
-- `GET /api/lifeweave/{space}/plugins`、`GET /plugins/{id}`、`PUT /plugins/{id}/enabled`、`GET /plugins/{id}/calls` 与 `GET /items/{itemId}/plugin-process` 是读取和控制入口。启停请求带期望配置版本；版本冲突返回 409。没有任意插件代码安装或通用执行 POST。
+- `GET /api/lifeweave/{space}/plugins`、`GET /plugins/{id}`、`PUT /plugins/{id}/enabled`、`GET /plugins/{id}/calls` 与 `GET /items/{itemId}/plugin-process` 是读取和控制入口。插件评测沿用 `POST /evaluations`、`POST /evaluations/{id}/assess`，并由 `GET /plugins/{id}/evaluations` 反查。启停请求带期望配置版本；版本冲突返回 409。没有任意插件代码安装或通用执行 POST。
 
-<a id="doc-05-line-20"></a>
+<a id="doc-05-line-24"></a>
 
 ### 当前边界与后续验收
 
-首个切片只把开发主链中的插件身份和真实调用接通。现有知识修订、Markdown 链接和 Notion 发布、评测任务继续在原入口运行；它们尚未全部成为统一插件操作。`lifeweave.evaluation` 在目录中标“不可运行”，不把原评测功能冒称为新插件接入。语义关系、单篇 Notion 发布、插件级评测和调用反馈尚待下一阶段。后台 Notion 镜像令牌仍未配置；本机 Codex 的交互式 Notion 授权不能替代它。
+开发主链、调用阅读与插件级显式评测已接通。项目知识页可展示人工登记且固定源文、代码版本的“由什么实现／验证”关系；版本变化会标为待复核，普通 Markdown 链接不会被当成语义断言。关系只在本地版本匹配时标已核对；只有 GitHub main 确认同一提交才给不可变远端链接。受管项目文档可逐篇请求 Notion 发布，要求当前原文版本匹配、正文已提交并推到 GitHub main，再以不可变提交链接标明来源，发布后完整回读；未配置后台授权时明确显示未发布。知识修订、Markdown 链接和 Notion 发布仍在原入口运行，尚未全部成为统一插件操作。`lifeweave.evaluation` 在目录中仍标“不可运行”，因为评测自身尚未被统一 Host 包装成可调用插件。后台 Notion 镜像令牌仍未配置；本机 Codex 的交互式 Notion 授权不能替代它。
 
 受管 Worker 的开始／结束事件证明它跨过执行适配器调用边界，不证明模型内部每条工具命令都被完整观察。外部本机 Codex 会话、未绑定 Hook 和第三方内部行为维持原有限定。执行结果和检查通过不等于用户已经接受工作。计划绑定的版本或实现摘要漂移会拒绝新调用；原计划和已发生的调用保留，需重新委托。单次页面调用最多返回 200 条，达到上限时未匹配步骤标为“无法判定”。
 
-回归使用一次性 PostgreSQL 测试库检查旧入口、空间隔离、停用和固定绑定；Vue 类型检查、组件测试和构建检查目录与开发页面。正式能力还须用真实 Codex 委托、页面查看和第二个任务复用继续验证，不能由测试库代替。
+回归使用一次性 PostgreSQL 测试库检查旧入口、空间隔离、停用、固定绑定和插件评测；Vue 类型检查、组件测试和构建检查目录、开发与评价页面。真实委托 `dev-ac40c6a24079a273e873eede1d84e5a6` 已沿同一事项完成方案、独立审阅、隔离实施及页面核对，固定了方法与两篇项目知识，并产生真实 Codex 调用；主仓集成另以 Git 提交为准。第二个不同任务的复用与真实用户判断仍需继续验证，不能由测试库代替。
 <!-- source-end: docs/plugin-system.md -->
 
 ---
@@ -598,7 +602,8 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |
 | 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](#doc-01-line-101) | 原始命令和输出不上传；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件 |
 | 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[Codex 小仓执行](evidence/development-agent/README.md)、[OpenCode 小仓成功及后续反例](evidence/development-agent/opencode-chain.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量；OpenCode 后续只读阶段被发现写入隔离树，现已从开发页暂停，待修复回归；复杂工程质量、外部会话自动逐工具采集仍未验证，结果不会自动合入原仓 |
-| 查看开发插件目录、按空间停用新调用，并在事项对照固定计划与真实受管调用 | [插件实现说明](#doc-05)；一次性数据库回归覆盖绑定、停用、跨空间与执行边界，正式库已备份并迁移 | 插件级评价、知识语义关系和 Notion 自动镜像尚未接通；此切片尚待正式 Codex 自用和页面核查，不等于整份阶段 1 方案已完成 |
+| 查看开发插件目录、按空间停用新调用，在事项展开实际调用和同事项 Run，并对真实插件调用作显式评测 | [插件实现说明](#doc-05)；正式 Codex 自用委托经过方案、独立审阅、隔离实施与页面核查；数据库和 Vue 回归覆盖空间隔离、版本、异常事件和评价 | 第二任务复用与用户业务验收尚未完成；人工评价不能由技术执行成功自动代替 |
+| 在项目知识页查看带来源版本的实现／验证关系，逐篇请求 Notion 镜像并查看上次回读状态 | `docs/knowledge-relations.json` 的显式关系及版本核对；单篇发布沿用原镜像器的版本冲突、远端冲突与全文回读检查 | 当前仅登记了插件说明的两条关系，其他文档无断言；产品后端 Notion 凭据未配置，不能报告线上自动发布成功 |
 
 Codex 已有正式仓的真实成功记录。OpenCode 曾用 `--model opencode/mimo-v2.5-free` 和本机账号副本完成小仓三阶段及 7 项 unittest，但下一次只读方案的子代理写入了隔离树，故该开发选项当前暂停；成功一次不代表权限边界可靠。执行快照记录的是传给 CLI 的模型参数，尚无来自上游提供方的模型身份回执。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。
 

@@ -79,6 +79,22 @@ def test_development_plan_review_implementation_and_idempotence(dedicated_client
     done = service.get('personal', first['id'])
     assert done['status'] == 'awaiting_acceptance'
     assert len({done['planRunId'], done['reviewRunId'], done['implementationRunId']}) == 3
+    stage_calls = client.app.state.database_manager.postgres().fetch_all(
+        "SELECT operation,state,run_id,output_ref FROM workbench.lifeweave_plugin_call "
+        "WHERE assignment_id=%s AND plugin_id='lifeweave.development'", (first['id'],))
+    assert {(call['operation'], call['run_id'], call['state']) for call in stage_calls} == {
+        ('plan', done['planRunId'], 'succeeded'),
+        ('review', done['reviewRunId'], 'succeeded'),
+        ('implement', done['implementationRunId'], 'succeeded')}
+    assert all(call['output_ref']['stageOutcome'] == 'succeeded' for call in stage_calls)
+    for call in stage_calls[:2]:
+        response = client.post(f'{path}/evaluations', json={
+            'itemId': item['id'], 'targetKind': 'plugin', 'pluginCallId': next(
+                entry['id'] for entry in client.get(f'{path}/items/{item["id"]}/plugin-process').json()['calls']
+                if entry['plugin_id'] == 'lifeweave.development' and entry['operation'] == call['operation']),
+            'title': 'Check the stage', 'instruction': 'Inspect stage result',
+            'criteria': 'The stage is recorded with the source Run'})
+        assert response.status_code == 201, response.text
     assert client.get(f'{path}/items/{item["id"]}/development').json()['items'][0]['id'] == first['id']
     sandbox = tmp_path / '.runtime/executions/personal/fake-run/repo'
     sandbox.mkdir(parents=True)

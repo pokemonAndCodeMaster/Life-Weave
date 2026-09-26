@@ -143,6 +143,7 @@ def create_app() -> FastAPI:
     app.state.research_outputs = ResearchOutputs(work, runtime, app.state.library, ROOT)
     app.state.research_archive = ResearchArchive(ROOT, app.state.research_outputs, app.state.linear.connection, app.state.notion_mirror)
     app.state.lifeweave_evaluations = Evaluations(EvaluationRepository(manager.postgres()), work, runtime, knowledge)
+    app.state.lifeweave_evaluations.plugins = app.state.plugins
     knowledge.evaluation_gate = app.state.lifeweave_evaluations.ensure_publishable
     app.state.library.reference_provider = app.state.research_outputs.document_references
     conversations = Conversations(manager.postgres(), work, runtime, app.state.work_continuation,
