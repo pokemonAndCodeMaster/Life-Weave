@@ -14,6 +14,7 @@
 - [开发 Agent 双入口与 Notion 知识联动](research/personal/item-92989f3f9ca34660/gzrun-20260926-143708-dda99456/report.md) · `gzrun-20260926-143708-dda99456`
 - [开发 Agent 双入口与 Notion 知识联动](research/personal/item-92989f3f9ca34660/gzrun-20260926-144846-7e285659/report.md) · `gzrun-20260926-144846-7e285659`
 - [开发 Agent 双入口与 Notion 知识联动](research/personal/item-92989f3f9ca34660/gzrun-20260926-163150-9b181d3e/report.md) · `gzrun-20260926-163150-9b181d3e`
+- [开发 Agent 双入口与 Notion 知识联动](research/personal/item-92989f3f9ca34660/gzrun-20260926-163408-4b56d934/report.md) · `gzrun-20260926-163408-4b56d934`
 - [验证 OpenCode 开发链：空白字符串词数](research/personal/item-c52809b4b3294166/gzrun-20260926-145410-af1a6a3a/report.md) · `gzrun-20260926-145410-af1a6a3a`
 - [验证 OpenCode 开发链：空白字符串词数](research/personal/item-c52809b4b3294166/gzrun-20260926-145615-c2750f14/report.md) · `gzrun-20260926-145615-c2750f14`
 - [验证 OpenCode 开发链：空白字符串词数](research/personal/item-c52809b4b3294166/gzrun-20260926-145718-a0deeaab/report.md) · `gzrun-20260926-145718-a0deeaab`
