@@ -12,10 +12,10 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | 管理本地 Markdown、提交修订、比较和接受；查看同源 Markdown 引用 | [知识关系证据](evidence/personal-platform-evolution/README.md) | 外部来源的修订不能直接在产品里覆盖原仓正文 |
 | 创建 Skill/Agent/Harness 候选，围绕事项运行评测、看轨迹和工作样例，并按同标准再评 | 两次内部窄任务真实 Codex 运行；临时数据库和页面验证见[评测证据](evidence/personal-platform-evolution/README.md) | 不能自动创建、优化、合并能力；实施者判定通过不等于用户验收或跨领域有效 |
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |
-| 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](../README.md#在新的本机-agent-会话接续) | 原始命令和输出不上传；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件 |
+| 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，在事项开发页直接阅读；明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [本机真实会话的网页回读](evidence/plugin-stage3/README.md)、[真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](../README.md#在新的本机-agent-会话接续) | 原始命令和输出不上传；本轮新会话未观测到 Hook；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件或平台插件调用 |
 | 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[Codex 小仓执行](evidence/development-agent/README.md)、[OpenCode 小仓成功及后续反例](evidence/development-agent/opencode-chain.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量；OpenCode 后续只读阶段被发现写入隔离树，现已从开发页暂停，待修复回归；复杂工程质量、外部会话自动逐工具采集仍未验证，结果不会自动合入原仓 |
 | 查看开发插件目录、按空间停用新调用，在事项展开实际调用和同事项 Run，并对真实插件调用作显式评测 | [插件实现说明](plugin-system.md)与[两项真实任务证据](evidence/plugin-stage1/README.md)；首项改插件页面，次项补知识操作说明，均经过方案、独立审阅、隔离实施与主仓集成 | 用户业务验收尚未完成；人工评价不能由技术执行成功自动代替 |
-| 在网页明确选择仅方案或允许实施；可写运行后下载固定代码 ZIP，核对目标提交，并针对这份交付接受或提出修改 | [阶段 2 首条真实纵切](evidence/plugin-stage2/README.md)：同一事项先停 `plan_ready`，再以新委托完成方案、独立审阅、隔离实施、固定包、主仓集成、正式浏览器与知识再读 | 首条有界前端任务已技术核验，用户尚未业务接受；旧委托不自动补造 ZIP，包留在本机运行目录；跨模块开发与远程部署未验证 |
+| 在网页明确选择仅方案或允许实施；可写运行后下载固定代码 ZIP，核对目标提交，并针对这份交付接受或提出修改 | [阶段 2 首条真实纵切](evidence/plugin-stage2/README.md)：同一事项先停 `plan_ready`，再以新委托完成方案、独立审阅、隔离实施、固定包、主仓集成、正式浏览器与知识再读；[并发打包反例](evidence/plugin-stage3/README.md) | 首条有界前端任务已技术核验，用户尚未业务接受；旧委托不自动补造 ZIP，包留在本机运行目录；跨模块开发与远程部署未验证 |
 | 在项目知识页查看带来源版本的实现／验证关系，逐篇请求 Notion 镜像并查看上次回读状态 | `docs/knowledge-relations.json` 的显式关系及版本核对；单篇发布沿用原镜像器的版本冲突、远端冲突与全文回读检查 | 当前仅登记了插件说明的两条关系，其他文档无断言；产品后端 Notion 凭据未配置，不能报告线上自动发布成功 |
 
 Codex 已有正式仓的真实成功记录。OpenCode 曾用 `--model opencode/mimo-v2.5-free` 和本机账号副本完成小仓三阶段及 7 项 unittest，但下一次只读方案的子代理写入了隔离树，故该开发选项当前暂停；成功一次不代表权限边界可靠。执行快照记录的是传给 CLI 的模型参数，尚无来自上游提供方的模型身份回执。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。

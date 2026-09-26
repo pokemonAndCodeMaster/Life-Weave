@@ -10,6 +10,7 @@ import hashlib
 import io
 import json
 import os
+import stat
 import subprocess
 import tempfile
 import zipfile
@@ -65,6 +66,42 @@ def _zip_bytes(manifest: dict[str, Any], patch: bytes, result: str) -> bytes:
     return output.getvalue()
 
 
+def _file_snapshot(directory: Path, paths: list[str]) -> dict[str, tuple[str, int, str]]:
+    """Capture file identity without following a worktree symlink outside the repo."""
+    result = {}
+    for path in paths:
+        relative = Path(path)
+        if relative.is_absolute() or '..' in relative.parts or not relative.parts:
+            raise ValueError("交付路径不在工作树内")
+        file = directory / relative
+        if not file.parent.resolve().is_relative_to(directory):
+            raise ValueError("交付路径不在工作树内")
+        try:
+            details = file.lstat()
+        except FileNotFoundError:
+            result[path] = ('absent', 0, '')
+            continue
+        mode = stat.S_IMODE(details.st_mode)
+        if stat.S_ISLNK(details.st_mode):
+            result[path] = ('symlink', mode, os.readlink(file))
+        elif stat.S_ISREG(details.st_mode):
+            descriptor = os.open(file, os.O_RDONLY | os.O_NOFOLLOW)
+            try:
+                opened = os.fstat(descriptor)
+                if not stat.S_ISREG(opened.st_mode):
+                    raise ValueError("交付文件类型发生变化")
+                digest = hashlib.sha256()
+                with os.fdopen(descriptor, 'rb', closefd=False) as stream:
+                    for block in iter(lambda: stream.read(1024 * 1024), b''):
+                        digest.update(block)
+                result[path] = ('file', stat.S_IMODE(opened.st_mode), digest.hexdigest())
+            finally:
+                os.close(descriptor)
+        else:
+            raise ValueError("交付文件包含不支持的类型")
+    return result
+
+
 def freeze_delivery(project_root: Path, assignment: dict[str, Any], run: dict[str, Any]) -> tuple[dict[str, Any], str]:
     environment = run.get("environment_snapshot") or {}
     actual = environment.get("actualDirectory")
@@ -91,6 +128,7 @@ def freeze_delivery(project_root: Path, assignment: dict[str, Any], run: dict[st
     paths = sorted(path for path in set(tracked + untracked) if path not in excluded)
     if not paths:
         raise ValueError("实施运行没有可交付的文件变化")
+    file_snapshot = _file_snapshot(directory, paths)
     with tempfile.TemporaryDirectory(prefix="lifeweave-delivery-index-") as temporary:
         env = {**os.environ, "GIT_INDEX_FILE": str(Path(temporary) / "index"), "GIT_LITERAL_PATHSPECS": "1"}
         _git(directory, "read-tree", base, env=env)
@@ -117,7 +155,8 @@ def freeze_delivery(project_root: Path, assignment: dict[str, Any], run: dict[st
         _git(replay, "add", "-A")
         if _git(replay, "write-tree").decode().strip() != staged_tree:
             raise ValueError("交付补丁回放与文件清单不一致")
-    if before != _git(directory, "status", "--porcelain=v1", "-z", "--untracked-files=all"):
+    if (before != _git(directory, "status", "--porcelain=v1", "-z", "--untracked-files=all")
+            or file_snapshot != _file_snapshot(directory, paths)):
         raise ValueError("打包过程中工作树发生变化，请重新生成")
     result = str(run.get("result") or "")
     manifest = {"schemaVersion": 1, "assignmentId": assignment["id"], "itemId": assignment["item_id"],
@@ -127,7 +166,7 @@ def freeze_delivery(project_root: Path, assignment: dict[str, Any], run: dict[st
                 "files": files, "excludedGenerated": excluded,
                 "patchSha256": hashlib.sha256(patch).hexdigest(),
                 "implementationResultSha256": hashlib.sha256(result.encode()).hexdigest(),
-                "serviceChecks": ["git-diff-check", "base-patch-replay-tree-match", "stable-worktree-snapshot"],
+                "serviceChecks": ["git-diff-check", "base-patch-replay-tree-match", "stable-worktree-status-and-content"],
                 "verificationBoundary": "实施结果是 Agent 报告；补丁与文件清单由服务从 Git 工作树固定。"}
     content = _zip_bytes(manifest, patch, result)
     digest = hashlib.sha256(content).hexdigest()

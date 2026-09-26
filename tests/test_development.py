@@ -12,6 +12,7 @@ from test_live_database import dedicated_client, post
 
 from src.agent_runtime.opencode_executor import OpenCodeExecutor
 from src.agent_runtime.tree_snapshot import tree_sha256
+from src.lifeweave import development_delivery
 
 
 def test_opencode_readonly_denies_shell_edit_and_subagents():
@@ -53,6 +54,37 @@ def implementation_checkout(client, tmp_path, source, run_id):
     (target / 'README.md').write_text('# Delivered\n')
     (target / 'new.bin').write_bytes(b'\x00\x01\xff')
     return target
+
+
+def test_delivery_rejects_content_change_with_same_git_status(tmp_path, monkeypatch):
+    source = repository(tmp_path)
+    target = tmp_path / '.runtime/executions/personal/live-run/repo'
+    target.parent.mkdir(parents=True)
+    subprocess.run(['git', 'clone', '-q', str(source), str(target)], check=True)
+    (target / 'README.md').write_text('# First version\n')
+    base = subprocess.check_output(['git', 'rev-parse', 'HEAD'], cwd=source, text=True).strip()
+    original_git = development_delivery._git
+    changed = False
+
+    def change_after_staging(directory, *args, **kwargs):
+        nonlocal changed
+        result = original_git(directory, *args, **kwargs)
+        if args == ('write-tree',) and not changed:
+            changed = True
+            (target / 'README.md').write_text('# Second version\n')
+        return result
+
+    monkeypatch.setattr(development_delivery, '_git', change_after_staging)
+    with pytest.raises(ValueError, match='打包过程中工作树发生变化'):
+        development_delivery.freeze_delivery(tmp_path, {
+            'id': 'dev-race', 'item_id': 'item-race', 'repository_revision': base,
+            'plan_sha256': 'a' * 64, 'review_run_id': 'review-run',
+            'review_decision': 'PASS', 'input_versions': [],
+        }, {'id': 'live-run', 'environment_snapshot': {'actualDirectory': str(target)}, 'result': 'done'})
+    assert changed
+    assert subprocess.check_output(
+        ['git', 'status', '--porcelain=v1'], cwd=target, text=True).strip() == 'M README.md'
+    assert not (tmp_path / '.runtime/development-deliveries/dev-race.zip').exists()
 
 
 def test_development_plan_review_implementation_and_idempotence(dedicated_client, tmp_path):

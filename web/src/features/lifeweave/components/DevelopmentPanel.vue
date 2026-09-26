@@ -10,6 +10,7 @@ import MarkdownBody from './MarkdownBody.vue'
 import RunTrace from './RunTrace.vue'
 import PluginProcess from './PluginProcess.vue'
 import DevelopmentDelivery from './DevelopmentDelivery.vue'
+import ExternalDevelopmentPanel from './ExternalDevelopmentPanel.vue'
 
 const props = defineProps<{ workspace: WorkspaceKind; itemId: string; initialInstruction?: string }>()
 const choices = shallowRef<DevelopmentChoices | null>(null)
@@ -141,7 +142,8 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
         </details>
       </article>
     </div>
-    <p v-else class="lw-small lw-muted">此事项尚无开发委托。本机 Codex 直接工作时仍需关联此事项并主动上报阶段；平台不会假装捕获它的内部命令。</p>
+    <p v-else class="lw-small lw-muted">此事项尚无网页发起的开发委托。</p>
+    <ExternalDevelopmentPanel :workspace="workspace" :item-id="itemId" />
   </section>
 </template>
 
