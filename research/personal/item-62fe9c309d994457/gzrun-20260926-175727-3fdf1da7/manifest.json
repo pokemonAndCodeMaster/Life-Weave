@@ -1,0 +1,15 @@
+{
+  "workspace": "personal",
+  "itemId": "item-62fe9c309d994457",
+  "runId": "gzrun-20260926-175727-3fdf1da7",
+  "title": "阶段 2 自用：交付页提供完整版本复制入口",
+  "version": "073ba626880caea714bb94c4beccf0c77c9e426cee3f8bbc874ab5c6ba25513e",
+  "files": [],
+  "warnings": [
+    "未打包本机绝对或网页路径：/home/yyh/project/lifeweave/.runtime/executions/personal/gzrun-20260926-175727-3fdf1da7/repo/web/src/features/lifeweave/components/DevelopmentDelivery.vue",
+    "未打包本机绝对或网页路径：/home/yyh/project/lifeweave/.runtime/executions/personal/gzrun-20260926-175727-3fdf1da7/repo/web/src/features/lifeweave/api/development.ts",
+    "未打包本机绝对或网页路径：/home/yyh/project/lifeweave/.runtime/executions/personal/gzrun-20260926-175727-3fdf1da7/repo/docs/development.md",
+    "未打包本机绝对或网页路径：/home/yyh/project/lifeweave/.runtime/executions/personal/gzrun-20260926-175727-3fdf1da7/repo/tests/test_development.py"
+  ],
+  "boundary": "研究成果归档，不代表已接受的正式知识。外部网址仍需联网。"
+}
