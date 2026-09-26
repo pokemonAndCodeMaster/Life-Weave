@@ -2,6 +2,9 @@ from __future__ import annotations
 
 import os
 import secrets
+import asyncio
+import logging
+from contextlib import suppress
 from contextlib import asynccontextmanager
 from src.config.environment import get_env
 from pathlib import Path
@@ -16,6 +19,7 @@ from src.lifeweave_knowledge.links import KnowledgeLinks
 from src.lifeweave_knowledge.library_router import router as library_router
 from src.integrations.task_sources import TaskSources
 from src.integrations.linear import LinearConnection, LinearService
+from src.integrations.notion_mirror import NotionMirror, router as notion_mirror_router
 from src.integrations.router import router as integrations_router
 from src.config import ConfigManager
 from src.database import DatabaseManager
@@ -23,6 +27,8 @@ from src.agent_runtime import CodexExecutor, OpenCodeExecutor
 from src.lifeweave import LifeWeaveRepository, LifeWeaveService
 from src.lifeweave.manual_results import router as results_router
 from src.lifeweave.external_development import router as external_development_router
+from src.lifeweave.development import DevelopmentService
+from src.lifeweave.development_router import router as development_router
 from src.lifeweave.router import router as work_router
 from src.lifeweave.continuation import WorkContinuation
 from src.lifeweave.continuation_router import router as continuation_router
@@ -67,12 +73,40 @@ def create_app() -> FastAPI:
         manager.postgres().open()
         runtime.recover_expired_leases()
         conversations.recover()
+        async def advance_development():
+            while True:
+                try:
+                    app.state.development.scan()
+                except Exception:
+                    logging.exception('开发委托恢复或推进失败')
+                await asyncio.sleep(3)
+        async def mirror_project_docs():
+            while True:
+                for workspace in ('personal', 'team'):
+                    try:
+                        if app.state.notion_mirror.settings(workspace)['enabled']:
+                            await asyncio.to_thread(app.state.notion_mirror.sync_current_docs, workspace)
+                    except Exception:
+                        logging.exception('Notion 项目文档镜像失败')
+                await asyncio.sleep(60)
+        development_task = None
+        notion_task = None
         try:
             await local_workers.initialize()
+            development_task = asyncio.create_task(advance_development())
+            notion_task = asyncio.create_task(mirror_project_docs())
             if os.environ.get('LIFEWEAVE_ARCHIVE_WORKER','1') == '1' and get_env('LIFEWEAVE_LOCAL_WORKER','1') != '0':
                 await app.state.research_archive.start()
             yield
         finally:
+            if development_task:
+                development_task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await development_task
+            if notion_task:
+                notion_task.cancel()
+                with suppress(asyncio.CancelledError):
+                    await notion_task
             await app.state.research_archive.close()
             await conversations.close()
             await local_workers.close()
@@ -88,18 +122,20 @@ def create_app() -> FastAPI:
     app.state.local_workers = local_workers
     app.state.root = ROOT
     app.state.linear = LinearService(manager.postgres(), LinearConnection(ROOT), work)
+    app.state.notion_mirror = NotionMirror(ROOT)
     app.state.library = Library(manager.postgres(), roots, ROOT)
     app.state.knowledge_links = KnowledgeLinks(app.state.library)
     app.state.task_sources = TaskSources(ROOT, app.state.library)
     runtime.task_sources = app.state.task_sources
+    app.state.development = DevelopmentService(manager.postgres(), work, runtime, app.state.task_sources, ROOT)
     app.state.work_continuation = WorkContinuation(work, runtime)
     app.state.research_outputs = ResearchOutputs(work, runtime, app.state.library, ROOT)
-    app.state.research_archive = ResearchArchive(ROOT, app.state.research_outputs, app.state.linear.connection)
+    app.state.research_archive = ResearchArchive(ROOT, app.state.research_outputs, app.state.linear.connection, app.state.notion_mirror)
     app.state.lifeweave_evaluations = Evaluations(EvaluationRepository(manager.postgres()), work, runtime, knowledge)
     knowledge.evaluation_gate = app.state.lifeweave_evaluations.ensure_publishable
     app.state.library.reference_provider = app.state.research_outputs.document_references
     conversations = Conversations(manager.postgres(), work, runtime, app.state.work_continuation,
-                                 app.state.task_sources, ConversationInterpreter(ROOT, local_workers))
+                                 app.state.task_sources, ConversationInterpreter(ROOT, local_workers), app.state.development)
     conversations.outputs = app.state.research_outputs
     app.state.conversations = conversations
     runtime.support_provider = lambda workspace, item_id: research_support(conversations,workspace,item_id)
@@ -126,7 +162,9 @@ def create_app() -> FastAPI:
     app.include_router(research_archive_router)
     app.include_router(results_router)
     app.include_router(external_development_router)
+    app.include_router(development_router)
     app.include_router(integrations_router)
+    app.include_router(notion_mirror_router)
     app.include_router(library_router)
     app.include_router(knowledge_router)
     app.include_router(evaluation_router)

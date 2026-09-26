@@ -9,6 +9,10 @@ import shutil
 import socket
 import subprocess
 import sys
+try:
+    import tomllib
+except ImportError:
+    import tomli as tomllib
 import urllib.error
 import urllib.request
 from src.config.environment import get_env
@@ -316,8 +320,9 @@ class LifeWeaveWorker:
         ).strip(".-")
         return cleaned or "capability"
 
-    def _materialize_capabilities(self, run: dict[str, Any], worktree: Path) -> list[str]:
+    def _materialize_capabilities(self, run: dict[str, Any], worktree: Path) -> tuple[list[str], list[str]]:
         written: list[str] = []
+        all_written: list[str] = []
         manifest: list[dict[str, Any]] = []
         for entry in run.get("capability_snapshot") or []:
             capability_id = self._safe_capability_id(entry.get("id"))
@@ -348,9 +353,11 @@ class LifeWeaveWorker:
                         raise ValueError("Skill 支持文件越出了方法目录")
                     support.parent.mkdir(parents=True, exist_ok=True)
                     support.write_text(str(body), encoding="utf-8")
+                    all_written.append(str(support.relative_to(worktree)))
                     if support.suffix == ".sh":
                         support.chmod(0o700)
             written.append(str(destination.relative_to(worktree)))
+            all_written.append(str(destination.relative_to(worktree)))
             manifest.append(
                 {
                     "id": entry.get("id"),
@@ -368,7 +375,8 @@ class LifeWeaveWorker:
                 json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
                 encoding="utf-8",
             )
-        return written
+            all_written.append(str(manifest_path.relative_to(worktree)))
+        return written, all_written
 
     def _docker_prefix(self, run: dict[str, Any], worktree: Path, artifacts: Path, home: Path) -> tuple[str, ...]:
         docker = shutil.which("docker")
@@ -464,12 +472,23 @@ class LifeWeaveWorker:
             if not health.available:
                 raise FileNotFoundError(health.reason or f"执行器不可用：{run['engine']}")
             worktree, artifacts, home = self._prepare_worktree(run)
-            materialized = self._materialize_capabilities(run, worktree)
+            materialized, materialized_files = self._materialize_capabilities(run, worktree)
             environment, inherit_environment = self._isolated_environment(
                 home,
                 workspace=str(run["workspace"]),
                 engine=str(run["engine"]),
             )
+            effective_model = run.get('model')
+            model_source = 'run selection' if effective_model else 'not reported'
+            if run['engine'] == 'codex' and not effective_model:
+                config_file = Path(environment['CODEX_HOME']) / 'config.toml'
+                if config_file.is_file():
+                    try:
+                        effective_model = tomllib.loads(config_file.read_text()).get('model')
+                        if effective_model:
+                            model_source = 'Codex CLI config'
+                    except (OSError, ValueError):
+                        pass
             prefix: tuple[str, ...] = ()
             worktree_argument: Path | None = None
             artifact_argument_root: Path | None = None
@@ -485,10 +504,14 @@ class LifeWeaveWorker:
                 "executor": run["engine"],
                 "executorCommand": health.command,
                 "executorVersion": health.version,
+                "effectiveModel": effective_model,
+                "modelSource": model_source,
+                "credentialSource": f"{run['workspace']} local CLI account copy",
                 "repositoryRevision": run.get("repository_revision"),
                 "actualDirectory": str(worktree),
                 "sessionHome": str(home),
                 "materializedCapabilities": materialized,
+                "materializedInputFiles": materialized_files,
             }
             environment_snapshot["identity"] = self._environment_identity(environment_snapshot)
             initial_heartbeat = await self.client.heartbeat(

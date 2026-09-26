@@ -1,5 +1,5 @@
 export type WorkspaceKind = 'team' | 'personal'
-export type ItemTab = 'overview' | 'context' | 'outputs' | 'activity' | 'retro'
+export type ItemTab = 'overview' | 'context' | 'outputs' | 'activity' | 'retro' | 'development'
 export type AgendaKey = 'decisions' | 'topics' | 'deliveries'
 
 export interface ContextDecision {
@@ -63,6 +63,7 @@ export interface Artifact {
 
 export interface Activity {
   id?: string
+  itemId?: string
   time: string
   title: string
   text: string
@@ -73,6 +74,13 @@ export interface Activity {
     observedGit?: { repositoryPath: string; revision: string; changedPaths: string[]; untrackedPaths: string[]; changedCount: number; untrackedCount: number }
     declaredInputs?: Array<{ id: string; title: string; version: string; sourcePath: string }>
     reportedChecks?: string[]
+    source?: string
+    nativeSessionId?: string
+    turnId?: string
+    toolName?: string
+    model?: string
+    inputHash?: string
+    exitCode?: number | null
   }
 }
 
@@ -99,6 +107,7 @@ export interface Improvement {
 
 export interface WorkItem {
   id: string
+  itemType?: string
   version: number
   payload: Record<string, unknown>
   title: string
@@ -296,6 +305,8 @@ export interface LifeWeaveRun {
   attempt: number
   machine: string | null
   engine: 'codex' | 'opencode' | string
+  model?: string | null
+  environmentSnapshot?: { effectiveModel?: string | null; modelSource?: string; credentialSource?: string; executorVersion?: string; [key: string]: unknown }
   session: string | null
   rev: number
   image: string | null

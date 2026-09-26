@@ -120,6 +120,10 @@ def test_external_development_reports_real_git_state_without_creating_a_run(dedi
     assert post(client, route, body)['sessionId'] == started['sessionId']
     assert client.post('/api/lifeweave/personal' + route, json={**body, 'summary': '不同内容'}).status_code == 409
     (project / 'feature.txt').write_text('after\n')
+    current_diff = client.get('/api/lifeweave/personal' + route + '/' + started['sessionId'] + '/diff')
+    assert current_diff.status_code == 200, current_diff.text
+    assert current_diff.json()['files'] == ['feature.txt']
+    assert '+after' in current_diff.json()['patch']
     events = route + '/' + started['sessionId'] + '/events'
     report = {'requestId': 'external-check-one', 'phase': 'verification',
               'summary': '实际运行一次检查', 'checks': ['pytest: passed']}

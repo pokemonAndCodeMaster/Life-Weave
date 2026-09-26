@@ -20,7 +20,7 @@ def settings(request:Request,workspace:WorkspaceKey):
  return {'executors':health,'linearConfigured':request.app.state.linear.connection.configured(),'existingCredentialAvailable':(Path.home()/'.config/omni-brain/linear-api-key').is_file(),'localWorker':request.app.state.local_workers.status(workspace),'identityMode':'本机单用户','workspace':workspace}
 @router.post('/connections/linear')
 def connect(request:Request,workspace:WorkspaceKey,body:ConnectionInput):
- return call(request.app.state.linear.connection.save,body.token,body.credentialFile)
+ raise HTTPException(410,'Linear 已转为历史只读，不再更新连接配置')
 @router.get('/connections/linear')
 def connection(request:Request,workspace:WorkspaceKey):return call(request.app.state.linear.connection.viewer)
 @router.get('/linear/issues')
@@ -30,9 +30,9 @@ def bindings(request:Request,workspace:WorkspaceKey):return call(request.app.sta
 @router.post('/linear/import')
 def import_issue(request:Request,workspace:WorkspaceKey,body:ImportInput):return call(request.app.state.linear.import_issue,workspace,body.issueId)
 @router.post('/linear/publications')
-def prepare(request:Request,workspace:WorkspaceKey,body:PublicationInput):return call(request.app.state.linear.prepare,workspace,body.itemId,body.body)
+def prepare(request:Request,workspace:WorkspaceKey,body:PublicationInput):raise HTTPException(410,'Linear 已转为历史只读，不再创建发布稿')
 @router.post('/linear/publications/{publication_id}/publish')
-def publish(request:Request,workspace:WorkspaceKey,publication_id:str):return call(request.app.state.linear.publish,workspace,publication_id)
+def publish(request:Request,workspace:WorkspaceKey,publication_id:str):raise HTTPException(410,'Linear 已转为历史只读，不再向 Linear 写入')
 
 class MethodsInput(BaseModel):
  root:str=Field(min_length=1,max_length=4096)

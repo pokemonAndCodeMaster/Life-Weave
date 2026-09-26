@@ -20,10 +20,11 @@ def research_support(conversations, workspace, item_id):
 
 
 class Conversations:
-    def __init__(self, db, work, runtime, continuation, sources, interpreter):
+    def __init__(self, db, work, runtime, continuation, sources, interpreter, development=None):
         self.db, self.work, self.runtime = db, work, runtime
         self.continuation, self.sources, self.interpreter = continuation, sources, interpreter
         self.repository = ConversationRepository(db)
+        self.development = development
         self.tasks = {}
         self.outputs = None
 
@@ -214,19 +215,36 @@ class Conversations:
                         title=decision.title,proposed_content=content,provenance=[{'conversationId':cid,'turnId':tid}],actor_id=actor)
                     receipts.append({'kind':'context','id':proposed['id'],'itemId':item_id,'title':'目标修改待审，当前目标尚未改变'})
                 if decision.intent=='execute':
-                    _, active = self.runtime.list_runs(workspace,item_id=item_id,limit=1,offset=0,
+                    if item['itemType'] in {'requirement','fix'}:
+                        repository_path = turn['request'].get('repositoryPath')
+                        if repository_path and self.development:
+                            assignment = self.development.create(
+                                workspace, item_id=item_id, request_id=tid,
+                                instruction=decision.instruction or turn['body'],
+                                repository_path=repository_path,
+                                acknowledge_excluded_changes=bool(turn['request'].get('acknowledgeExcludedChanges')))
+                            run_id = assignment['planRunId']
+                            receipts.append({'kind':'development','id':assignment['id'],'itemId':item_id,
+                                             'runId':run_id,'title':'开发委托已启动：先形成只读方案'})
+                            decision.reply += '\n\n开发委托已启动；第一步是只读方案，之后按审阅结果进入实施。'
+                        else:
+                            receipts.append({'kind':'development','id':item_id,'itemId':item_id,
+                                             'title':'开发任务已关联事项；请选择项目目录后启动，尚未执行代码'})
+                            decision.reply += '\n\n开发任务已关联此事项。请打开事项的“开发 Agent”页选择项目仓库并启动；目前尚未执行代码。'
+                    else:
+                        _, active = self.runtime.list_runs(workspace,item_id=item_id,limit=1,offset=0,
                             states=('queued','claimed','running','pause_requested','cancelling'))
-                    if active:
-                        raise ValueError('该事项仍有委托进行中，请等待完成或先停止；没有重复发起')
-                    current = self.work.current_context_snapshot(workspace,item_id)
-                    suggested = self.sources.recommend(workspace,item,current,decision.instruction or turn['body'])['suggested']
-                    run = self.runtime.create_run(workspace,item_id=item_id,
-                        instruction=decision.instruction or turn['body'],engine='codex',
-                        permission='workspace-write',method_id=suggested['methodId'],
-                        related_research=context.get('researchOutputs',[]),
-                        knowledge_refs=suggested['knowledgeRefs'],actor_id=actor)
-                    run_id = run['id']
-                    receipts.append({'kind':'run','id':run_id,'runId':run_id,'itemId':item_id,'title':'委托已排队，结果以运行状态为准'})
+                        if active:
+                            raise ValueError('该事项仍有委托进行中，请等待完成或先停止；没有重复发起')
+                        current = self.work.current_context_snapshot(workspace,item_id)
+                        suggested = self.sources.recommend(workspace,item,current,decision.instruction or turn['body'])['suggested']
+                        run = self.runtime.create_run(workspace,item_id=item_id,
+                            instruction=decision.instruction or turn['body'],engine='codex',
+                            permission='workspace-write',method_id=suggested['methodId'],
+                            related_research=context.get('researchOutputs',[]),
+                            knowledge_refs=suggested['knowledgeRefs'],actor_id=actor)
+                        run_id = run['id']
+                        receipts.append({'kind':'run','id':run_id,'runId':run_id,'itemId':item_id,'title':'委托已排队，结果以运行状态为准'})
                 if decision.intent=='knowledge':
                     if not self.outputs or not decision.knowledge:
                         raise ValueError('尚未形成可审阅的知识候选')

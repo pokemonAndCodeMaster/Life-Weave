@@ -68,8 +68,9 @@ class ArchiveSettings(BaseModel):
 
 
 class ResearchArchive:
-    def __init__(self, root, outputs, linear):
+    def __init__(self, root, outputs, linear, notion=None):
         self.root, self.outputs, self.linear = Path(root), outputs, linear
+        self.notion = notion
         self.folder = self.root/'.runtime/research-archives'
         self.task = None
         self.stopping = False
@@ -116,7 +117,8 @@ class ResearchArchive:
     def status(self, workspace, run_id):
         self.outputs.runtime.get_run_snapshot(workspace,run_id)
         return self.load(self.folder/workspace/run_id/'state.json', {
-            'runId':run_id, 'local':{'status':'pending'}, 'github':{'status':'pending'}, 'linear':{'status':'pending'}})
+            'runId':run_id, 'local':{'status':'pending'}, 'github':{'status':'pending'},
+            'notion':{'status':'unconfigured'}, 'linear':{'status':'historical_read_only'}})
 
     def archive(self, workspace, run_id):
         # One process/worker owns transitions and git checkout at a time, including retries.
@@ -147,7 +149,10 @@ class ResearchArchive:
             state['local'] = {'status':'confirmed','path':str(bundle_dir.relative_to(self.root)),
                               'zipSha256':digest(zipped),'warnings':manifest['warnings']}
             self.save(state_file,state)
-            for target, configured in [('github',settings['githubRepository']),('linear',settings['linearProjectId'])]:
+            if state.get('linear', {}).get('status') != 'confirmed':
+                state['linear'] = {'status': 'historical_read_only', 'error': 'Linear 已转为历史只读；新版本不再归档到 Linear'}
+                self.save(state_file, state)
+            for target, configured in [('github',settings['githubRepository'])]:
                 previous = state.get(target,{})
                 if previous.get('status') == 'confirmed' and previous.get('target') == configured:
                     continue
@@ -160,10 +165,7 @@ class ResearchArchive:
                 state[target] = {**previous,'status':'sending','target':configured}
                 self.save(state_file,state)
                 try:
-                    if target == 'github':
-                        result = self.github(folder,bundle_dir,manifest,configured)
-                    else:
-                        result = self.publish_linear(files,zipped,manifest,configured,state,state_file)
+                    result = self.github(folder,bundle_dir,manifest,configured)
                     state[target] = {**state[target],**result,'status':'confirmed',
                                      'confirmedAt':datetime.now(timezone.utc).isoformat()}
                     state[target].pop('error',None)
@@ -172,6 +174,23 @@ class ResearchArchive:
                     state[target]['status'] = 'failed'
                     state[target]['error'] = str(exc)[:500] if isinstance(exc,ValueError) else '归档传输失败；本地成果保留，可重试'
                 self.save(state_file,state)
+            if self.notion and self.notion.settings(workspace)['enabled']:
+                previous = state.get('notion', {})
+                try:
+                    if state.get('github', {}).get('status') != 'confirmed':
+                        raise ValueError('GitHub 正文尚未归档，Notion 镜像等待可访问的原文地址')
+                    # sync_report re-reads even an unchanged source version, so a
+                    # human edit or deleted page cannot remain silently confirmed.
+                    state['notion'] = self.notion.sync_report(
+                        workspace, manifest, files['report.md'].decode(), state['github']['url'])
+                except Exception as exc:
+                    message = str(exc)[:500] if isinstance(exc, ValueError) else 'Notion 镜像失败；本地与 GitHub 成果保留'
+                    state['notion'] = {**previous, 'status': 'failed', 'error': message}
+                    self.notion.record_failure(workspace, f'research:{run_id}', manifest['version'], message)
+                self.save(state_file, state)
+            elif self.notion:
+                state['notion'] = {'status': 'unconfigured'}
+                self.save(state_file, state)
             state['retryAfter'] = time.time()+300
             self.save(state_file,state)
             return state
@@ -301,8 +320,11 @@ class ResearchArchive:
                     finished=str(run.get('finished_at') or run['created_at'])
                     if settings.get('since') and datetime.fromisoformat(finished)<datetime.fromisoformat(settings['since']) and not status.get('retryAfter'):
                         continue
-                    if all(status.get(k,{}).get('status')=='confirmed' and status[k].get('target')==settings[key]
-                           for k,key in [('github','githubRepository'),('linear','linearProjectId')]):
+                    github_done = (status.get('github',{}).get('status')=='confirmed' and
+                                   status['github'].get('target')==settings['githubRepository'])
+                    notion_enabled = bool(self.notion and self.notion.settings(workspace)['enabled'])
+                    notion_done = not notion_enabled or status.get('notion',{}).get('status')=='confirmed'
+                    if github_done and notion_done and not notion_enabled:
                         continue
                     if status.get('retryAfter',0)>time.time():
                         continue

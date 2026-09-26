@@ -64,19 +64,18 @@ def test_bundle_limit_and_missing_reference_are_not_silent(output_client):
     assert build_bundle(c.app.state.research_outputs,'personal',run['id'])[1]['warnings']
 
 
-def test_archive_targets_retry_independently_and_preserve_remote_changes(output_client,tmp_path,monkeypatch):
+def test_archive_uses_github_and_keeps_linear_historical_read_only(output_client,tmp_path,monkeypatch):
     c=output_client;_,run,root,_=specimen(c)
     service=ResearchArchive(tmp_path,c.app.state.research_outputs,None)
     service.configure('personal',ArchiveSettings(enabled=True,githubRepository='https://github.com/test/repo',linearProjectId='project'))
     calls=[]
     def github(*args):calls.append('github');return {'url':'https://github.com/test/repo/snapshot','commit':'abc'}
-    def failed(*args):calls.append('linear');raise ValueError('远端暂时失败')
-    monkeypatch.setattr(service,'github',github);monkeypatch.setattr(service,'publish_linear',failed)
+    def forbidden(*args):raise AssertionError('Linear must remain read-only')
+    monkeypatch.setattr(service,'github',github);monkeypatch.setattr(service,'publish_linear',forbidden)
     first=service.archive('personal',run['id'])
-    assert first['github']['status']=='confirmed' and first['linear']['status']=='failed'
-    monkeypatch.setattr(service,'publish_linear',lambda *args: {'url':'https://linear.app/document/version'})
+    assert first['github']['status']=='confirmed' and first['linear']['status']=='historical_read_only'
     second=service.archive('personal',run['id'])
-    assert second['linear']['status']=='confirmed' and calls.count('github')==1
+    assert second['linear']['status']=='historical_read_only' and calls.count('github')==1
     service.archive('personal',run['id']);assert calls.count('github')==1
     (root/'research/nested.txt').write_text('引用已变化')
     with pytest.raises(ValueError,match='旧版'):service.archive('personal',run['id'])
@@ -92,6 +91,40 @@ def test_worker_automatically_archives_success_and_skips_failed_runs(output_clie
     service.tick()
     assert run['id'] in seen
     assert all(c.app.state.lifeweave_runtime_service.get_run_snapshot('personal',r)['state']=='succeeded' for r in seen)
+
+
+def test_confirmed_notion_report_is_rechecked_and_remote_drift_becomes_failure(output_client,tmp_path,monkeypatch):
+    c=output_client;_,run,_,_=specimen(c)
+    class Notion:
+        calls=0
+        failures=[]
+        def settings(self, workspace): return {'enabled': workspace=='personal'}
+        def sync_report(self, workspace, manifest, report, github_url):
+            self.calls+=1
+            if self.calls==3: raise ValueError('Notion 镜像页已变化')
+            return {'status':'confirmed','version':manifest['version'],'sourceUrl':github_url,
+                    'url':'https://www.notion.so/test','pageId':'notion-page'}
+        def record_failure(self, workspace, source, version, error):
+            self.failures.append((workspace, source, version, error))
+    notion=Notion()
+    service=ResearchArchive(tmp_path,c.app.state.research_outputs,None,notion)
+    settings=service.configure('personal',ArchiveSettings(enabled=True,githubRepository='https://github.com/test/repo'))
+    settings['since']='2000-01-01T00:00:00+00:00';service.save(service.folder/'personal/settings.json',settings)
+    monkeypatch.setattr(service,'github',lambda *_:{'url':'https://github.com/test/repo/report.md','commit':'abc'})
+    first=service.archive('personal',run['id'])
+    assert first['notion']['status']=='confirmed' and notion.calls==1
+    second=service.archive('personal',run['id'])
+    assert second['notion']['status']=='confirmed' and notion.calls==2
+    second['retryAfter']=0
+    service.save(service.folder/'personal'/run['id']/'state.json',second)
+    runtime=service.outputs.runtime
+    monkeypatch.setattr(runtime,'list_runs',lambda workspace,limit,offset:
+                        ([runtime.get_run_snapshot(workspace,run['id'])],1) if workspace=='personal' and offset==0 else ([],0))
+    service.tick()
+    result=service.status('personal',run['id'])
+    assert notion.calls==3 and result['notion']['status']=='failed'
+    assert result['notion']['url']=='https://www.notion.so/test'
+    assert notion.failures[0][1]==f'research:{run["id"]}'
 
 
 def test_markdown_rewriting_only_changes_actual_links():

@@ -94,6 +94,29 @@ def test_discussion_constraint_and_action_failure_are_atomic(web,monkeypatch):
     assert row['status']=='failed'
 
 
+def test_explicit_development_conversation_starts_read_only_plan(web, tmp_path):
+    from test_development import repository
+    c, model = web
+    root = repository(tmp_path)
+    cid = post(c, '/conversations', {'requestId': 'development-conversation'})['id']
+    model.decision = decision('execute')
+    model.decision['itemType'] = 'fix'
+    model.decision['instruction'] = 'Fix the issue in the selected repository'
+    row = turn(c, cid, '请修复这个项目的问题', 'execute', repositoryPath=str(root))
+    assert row['status'] == 'completed' and row['runId']
+    assert [receipt['kind'] for receipt in row['receipts']] == ['item', 'discussion', 'development']
+    assignment = c.get(f'/api/lifeweave/personal/items/{row["itemId"]}/development').json()['items'][0]
+    assert assignment['planRunId'] == row['runId'] and assignment['status'] == 'planning'
+    run = c.app.state.lifeweave_runtime_service.get_run_snapshot('personal', row['runId'])
+    assert run['sandbox'] == 'read-only' and run['state'] == 'queued'
+    assert row['inputContext']['repositoryPath'] == str(root)
+    model.decision = decision('execute')
+    model.decision['itemType'] = 'requirement'
+    without_repo = turn(c, cid, '请新增另一个项目的功能', 'execute')
+    assert without_repo['status'] == 'completed' and without_repo['runId'] is None
+    assert without_repo['receipts'][-1]['kind'] == 'development'
+
+
 def test_feedback_profile_and_previous_output_reach_next_run(web):
     c,m=web
     item=post(c,'/items',{'itemType':'research','title':'反馈和偏好','initialContext':{'goal':'理解采光'}})
@@ -114,7 +137,8 @@ def test_feedback_profile_and_previous_output_reach_next_run(web):
     assert '先给一个具体例子' in run['prompt_snapshot']
     assert '需要解释训练数据' in run['prompt_snapshot']
     assert run['environment_snapshot']['feedbackSnapshot'][-1]['anchor']=='训练数据'
-    assert row['inputContext']=={'itemId':item['id'],'runId':prior['id'],'anchor':'训练数据'}
+    assert row['inputContext']=={'itemId':item['id'],'runId':prior['id'],'anchor':'训练数据',
+                                 'repositoryPath':None,'acknowledgeExcludedChanges':False}
     assert c.get('/api/lifeweave/personal/personal-model').json()['preferences']=='解释时先给一个具体例子'
     assert m.contexts[-1]['profile']['goals']=='了解植物'
     assert c.app.state.lifeweave_runtime_service.get_run_snapshot('personal',prior['id'])['result']=='# 旧成果\n需要解释训练数据。'

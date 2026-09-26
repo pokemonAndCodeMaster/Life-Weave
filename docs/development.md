@@ -118,7 +118,9 @@ python scripts/lifeweave.py external-report item-实际编号 external-返回编
 python scripts/lifeweave.py external-list item-实际编号
 ```
 
-阶段只记录真正发生的动作。Git 提交和差异由服务读取；检查文字与选择的材料由当前会话主动上报。事项页“推进记录”和 `continue item-实际编号` 都可回读，网页“接着推进”也显示最近报告；刷新后可看到后来上报的阶段。该入口不能替代平台 Run 的自动事件，也不能证明未上报的命令；若服务不可用，先保留真实代码和测试结果，恢复后再标明观测缺口。项目文档在原仓修改后，知识页和新 CLI 读取会取得新指纹，不需要复制第二份正式正文。
+阶段只记录真正发生的动作。Git 提交和差异由服务读取；检查文字与选择的材料由当前会话主动上报。若本机 Codex 对 `/home/yyh/.codex/hooks.json` 完成信任审查，`external-start` 会利用 `CODEX_SESSION_ID` 将当前原生会话与事项绑定，之后支持的 `PostToolUse`、`Stop`、`Interrupt` 元数据自动进入同一推进记录。已有外部记录可在**同一个** Codex 会话内运行 `external-bind item-编号 external-编号 --repo /path/to/repository` 后开始采集。Hook 不保存原始命令、工具参数/输出；未绑定或未受信任、沙箱阻断本机 HTTP、Hook 被跳过时都不能宣称捕获完整过程。[真实烟测](evidence/development-agent/hook-smoke.md)记录成功与失败边界。
+
+事项页“推进记录”和 `continue item-实际编号` 都可回读阶段；页面将原生 Hook 与主动上报分别标明。原始 Git 差异可从外部会话的“查看当前 Git 差异”读取，它反映当前仓库相对起始提交的所有变化，可能包含其他会话的改动，不能自动归功于该 Agent。服务不可用时，先保留真实代码和测试结果，恢复后再标明观测缺口。项目文档在原仓修改后，知识页和新 CLI 读取会取得新指纹，不需要复制第二份正式正文。
 
 ## 从首版安装迁移内部名称
 
@@ -145,6 +147,12 @@ python scripts/workbench.py start
 
 ## 自动归档维护
 
-在设置页配置 GitHub HTTPS 仓地址、Linear 项目 UUID 并启用；实际 Git 传输使用本机已有 SSH 认证，须事先能非交互访问对应仓。Linear 复用现有连接。状态、上传断点与归档 checkout 在 `.runtime/research-archives/{space}`，均应随私有运行配置备份，不提交凭证。`LIFEWEAVE_ARCHIVE_WORKER=0` 可关闭后台扫描；默认跟随本机 worker 启用。停止服务会等待当前归档请求结束，先看归档状态再维护。
+在设置页配置 GitHub HTTPS 仓地址并启用；实际 Git 传输使用本机已有 SSH 认证，须事先能非交互访问对应仓。若要自动镜像至 Notion，还需在“Notion 知识镜像”填写已授权的根页面和仅本机可读、权限为 `600` 的集成令牌文件。Codex 中的 Notion OAuth 与该后台令牌是两条连接。状态、上传断点与归档 checkout 在 `.runtime/research-archives/{space}`；Notion 配置与回读状态在 `.runtime/notion-mirror/{space}`，均应随私有运行配置备份，不提交凭证。`LIFEWEAVE_ARCHIVE_WORKER=0` 可关闭报告后台扫描；默认跟随本机 worker 启用。停止服务会等待当前归档请求结束，先看归档状态再维护。
 
 失败在成果页按目标显示，5分钟后自动重试或点立即归档。更换 GitHub 目标后，已有 checkout 不会自动改 remote，页面明确报错；停止服务并将该空间的 `git/` 目录移到备份位置，再启服务重试，服务会为新目标建立 checkout。不要删除逐运行的 `bundle/` 与 `state.json`。首次启用前的旧成果不批量回填，用户逐项触发；曾失败的记录启动后恢复扫描。详见 [归档与跨文章讨论](research-archive.md)。
+
+## 开发 Agent 的受管委托
+
+在需求或修复事项中打开“开发 Agent”，写明交付目标并选择 Git 目录。先检查当前仓库提交；未提交内容不会进入隔离工作树，必须显式勾选确认才能在脏工作树上委托。平台固定事项背景、所选方法与知识版本，依次执行只读方案、独立只读审阅（或小改动自检）和可写实施。只有审阅明确通过且原提交、背景及知识版本未改变时才进入实施。各阶段有独立 Run、真实事件和错误；结果页可读隔离工作树的 Git 差异，但不会自动合入原仓。
+
+网页对话中的明确开发委托若提供项目目录，会自动建立同样的方案 Run；没提供目录时只登记事项并提示到“开发 Agent”补齐目录。单纯讨论、记录和研究保持原路径。本机 Codex 直接开发时，使用上述 `external-start` / `external-report` 关联同一事项；当前只能主动上报阶段和服务观测 Git，尚不能自动捕获该会话每条工具命令。OpenCode 仍显示为不可用，不能把已安装当作真实可调用。

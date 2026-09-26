@@ -47,7 +47,7 @@ python scripts/workbench.py start
 
 “就地讨论”会打开关联当前事项的 AI 对话；展开“附带其他研究成果”，可明确选入其他论文。已有知识另按问题匹配读取，实际来源及版本显示在回复下方。
 
-在“设置与连接 → 研究成果自动归档”启用后，新成功报告会自动写入 GitHub 的 `research-archive` 分支及 Linear 项目文档。失败保留本地并重试；以前的成果可点“立即归档 / 重试”。[当前两篇远端归档](https://github.com/pokemonAndCodeMaster/Life-Weave/tree/research-archive)在本机关机后仍能访问。代码在同仓 `main`；归档范围是成果与引用材料，不是整套运行数据库或自动采纳正式知识。详见 [归档与跨文章讨论](docs/research-archive.md)。
+在“设置与连接 → 研究成果自动归档”启用后，新成功报告会自动写入 GitHub 的 `research-archive` 分支；配置 Notion 后，正文也会进入单向镜像。两个目标分别显示回读状态，失败保留本地并重试；以前的成果可点“立即归档 / 重试”。[当前两篇 GitHub 归档](https://github.com/pokemonAndCodeMaster/Life-Weave/tree/research-archive)在本机关机后仍能访问。原有 Linear 文档仅作历史只读，不再接收新报告。代码在同仓 `main`；归档范围是成果与引用材料，不是整套运行数据库或自动采纳正式知识。详见 [归档与跨文章讨论](docs/research-archive.md)。
 
 本机首次交付已实际跑通 Codex。OpenCode 可建立会话，但当前配置下的真实调用连续返回执行器内部错误，暂建议选 Codex；具体记录见交付说明。重试是关联到原委托的新尝试，不是恢复原生 CLI 会话。
 
@@ -55,13 +55,12 @@ python scripts/workbench.py start
 
 ## 连接已有积累
 
-“设置与连接”可以添加已有 Markdown 知识目录、包含各个 `SKILL.md` 子目录的 Skills 根目录，以及 Linear 连接。
+“设置与连接”可以添加已有 Markdown 知识目录、包含各个 `SKILL.md` 子目录的 Skills 根目录，以及 Notion 镜像连接。Linear 仅保留既有历史读取。
 
 - 外部知识只读；修订可下载，交回原仓库处理。工作台管理的知识默认写入 `.runtime/knowledge/{personal,team}`。
 - 委托时按需选择一套 Skill 和最多 10 篇知识，固定正文与方法支持文件。重试保留已选择资料的快照；要使用更新后的资料，创建新委托。Skills 需要适用于目标工程；引用原仓库专有脚本的方法仍可能需要调整。
-- Linear 使用个人 API Key 或本机权限为 `600` 的凭证文件。凭证保存在 `.runtime/linear.json`，不进入 Git，也不回传到页面。
-- Linear 页面分页读取分配给当前账号的事项。导入创建本地工作；再次导入更新远端快照，保留本地标题、目标、安排和进展。
-- 向 Linear 事项发送评论时，先准备固定正文预览，再点发送。系统回读评论核对；网络结果不确定时优先核对已有评论，不自动重复发送。本地事项与 Linear 状态独立维护。
+- Notion 后台镜像使用单独的集成令牌文件和根页面授权。本机 Codex 的 Notion OAuth 只供交互式读取，不能替代后台令牌；未配置时页面如实显示“未启用”。原文留在 Git 仓或本机知识库。
+- 旧 Linear 连接可读取历史事项和已归档文档；新评论、发布及研究自动归档已停止。
 
 ## 数据与运行
 
@@ -121,4 +120,4 @@ python scripts/lifeweave.py feedback item-实际编号 '重点理解错了，先
 
 命令读取本机服务，失败返回非零；`--workspace team` 切换空间。ChatGPT 远程连接、自然语言自动排程、自动发布方法改进尚未完成。完整研发方案见 [下一阶段产品方案](workspaces/reviews/lifeweave-next-stage/review.md)。
 
-在已经打开的 Codex 会话开发代码时，可按[开发与维护说明](docs/development.md#让当前-codex-会话接续开发事项)把实际阶段与 Git 状态写回同一事项。这是主动上报，不是对所有工具调用的自动追踪。
+在已经打开的 Codex 会话开发代码时，可按[开发与维护说明](docs/development.md#让当前-codex-会话接续开发事项)把实际阶段与 Git 状态写回同一事项。明确绑定且 Codex 信任本机 Hook 后，受支持的工具和生命周期元数据也会自动出现在推进记录；它不上传原始命令/输出，且不能保证捕获所有步骤。受管网页委托另有完整 Run 记录。

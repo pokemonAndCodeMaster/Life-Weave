@@ -14,7 +14,8 @@ flowchart TD
     API --> Work[工作服务：背景、计划、证据、回顾]
     API --> Library[知识服务：原文与修订]
     API --> Runtime[运行服务：固定输入、排队、结果]
-    API --> Links[连接服务：Linear 与 Skills]
+    API --> Links[连接服务：Notion 镜像、Skills 与 Linear 历史]
+    API --> Development[开发委托：方案、审阅、实施]
     API --> Evaluation[评测服务：任务、标准与人工判断]
     Work --> DB[(PostgreSQL)]
     Library --> DB
@@ -26,7 +27,8 @@ flowchart TD
     Runtime --> Worker[执行节点：领取任务与报告过程]
     Worker --> CLI[Codex / OpenCode]
     CLI --> Isolated[每轮隔离目录和结果文件]
-    Links --> Linear[Linear API]
+    Links --> Notion[Notion API]
+    Links --> Linear[Linear 历史只读]
     Links --> Sources[已有知识与 Skills 目录]
 ```
 
@@ -50,6 +52,8 @@ flowchart TD
 | 评测任务、能力历史与发布门槛 | [evaluations.py](../src/lifeweave/evaluations.py)、[evaluation_repository.py](../src/lifeweave/evaluation_repository.py)、[EvaluationBoard.vue](../web/src/features/lifeweave/components/evaluations/EvaluationBoard.vue)、[CapabilityHistory.vue](../web/src/features/lifeweave/components/evaluations/CapabilityHistory.vue) |
 | 首页预设与用户调整 | [homeLayout.ts](../web/src/features/lifeweave/utils/homeLayout.ts)、[HomePage.vue](../web/src/features/lifeweave/pages/HomePage.vue)、[HomeDashboardCard.vue](../web/src/features/lifeweave/components/HomeDashboardCard.vue) |
 | 外部 Codex 开发阶段与 Git 观测 | [external_development.py](../src/lifeweave/external_development.py)、[正式 CLI](../scripts/lifeweave.py)、[ItemActivityTab.vue](../web/src/features/lifeweave/components/ItemActivityTab.vue) |
+| 网页开发委托与隔离差异 | [development.py](../src/lifeweave/development.py)、[development_router.py](../src/lifeweave/development_router.py)、[DevelopmentPanel.vue](../web/src/features/lifeweave/components/DevelopmentPanel.vue) |
+| Notion 单向镜像 | [notion_mirror.py](../src/integrations/notion_mirror.py)、[NotionMirrorSettings.vue](../web/src/features/lifeweave/components/NotionMirrorSettings.vue) |
 
 ## 数据分别保存在哪里
 
@@ -66,10 +70,11 @@ PostgreSQL 的 `workbench` schema 保存以下对象。完整字段以 [migratio
 | machine / run / run_event | 执行节点、输入快照、尝试、事件、结果 | 运行状态是技术事实，不自动替代业务接受 |
 | document_revision / library_source | Markdown 候选、源指纹、外部目录登记 | 正式知识原文仍在文件中 |
 | linear_binding / linear_publication | 来源关联、远端快照、发送预览和核对状态 | 本地事项和 Linear 状态不做自动覆盖 |
+| lifeweave_development_assignment | 同一事项的开发目标、固定提交/背景/材料版本与各阶段 Run | 审阅明确通过且版本未变才启动可写实施；终态仍待用户接受 |
 | capability / capability_verification | 已复用的能力候选与验证记录；候选可显式记录前任 ID | 不凭名称推断能力血缘；旧候选失败在前任链内参与新候选发布判断 |
 | evaluation | 目标事项、评测对象与候选版本、指令、通过标准、实际 Run、人工结论和证据；同标准再评引用前一条，改进建议反链 | 评测不复制事项正文或运行事件；发布要求显式通过评测，未完成者阻断，当前及前任未通过者须在同一标准的再评链中得到通过 |
 
-`.runtime/knowledge/{personal,team}` 保存本机知识原文；外部资料仍留在登记目录。`.runtime/executions/{space}/{run}/` 保存该轮工作目录、账号运行副本和产物。方法连接配置、本机节点设置、Linear 连接配置也在 `.runtime/`，不会提交到 Git。
+`.runtime/knowledge/{personal,team}` 保存本机知识原文；外部资料仍留在登记目录。`.runtime/executions/{space}/{run}/` 保存该轮工作目录、账号运行副本和产物。方法连接配置、本机节点设置、旧 Linear 连接及 Notion 镜像状态也在 `.runtime/`，不会提交到 Git。
 
 结构化业务对象常用 JSONB 保存有差异的内容，避免为每种学习或生活事项提前设计独立表。代价是字段语义主要由 Service 和页面适配器约束；扩展公共字段时需要同时检查输入校验、持久化与多个页面，不能只改显示名称。
 
@@ -122,11 +127,11 @@ LifeWeave 项目本身作为只读内置来源出现在个人和团队知识页�
 
 引用关系由 `links.py` 使用 Mistune AST 从当前 Markdown 编译。它只识别同一来源内指向 `.md` 的相对链接，忽略代码块和图片；解码、规范化后再走 Library 路径边界。文件元数据相同的正文解析结果在本进程复用，出链是否存在及反向引用每次按当前可读目录重算。索引不是新的正式正文；外部文件变化通常由修改时间/大小触发重读，尚未完成海量目录容量验证。知识页读到的正文版本与关系响应一同返回，便于识别页面期间的变更。
 
-## Linear 的读写怎样保持可解释
+## Linear 的历史读取边界
 
 首次引入用空间与远端 ID 计算稳定本地 ID，在事务内创建事项、初始背景和来源关联。重复引入只更新远端快照，保留本地编辑与安排。
 
-发送结果先保存固定正文预览，真正发送时使用固定评论 ID。成功后回读正文比对；若网络返回不确定，下一次先核对同一评论，不盲目再发一条。不能确认时保留不确定状态并让用户核查。此发送路径有模拟远端测试，尚没有真实发送证据。
+原有评论预览和发布记录为历史数据。新写入端点返回只读提示；新研究成果不再排队到 Linear。原关联与已确认归档链接保持可读，但不能据此推定 Notion 已完成迁移。
 
 ## 当前架构的适用范围
 
@@ -138,7 +143,9 @@ LifeWeave 项目本身作为只读内置来源出现在个人和团队知识页�
 
 `src/lifeweave/continuation.py` 从事项、已接受背景、待审提案、讨论、证据、所有分页运行及外部开发活动生成当前接续输出；不把输出保存成另一份规范正文。网页对话准备阶段也取得当前事项最近十条外部开发报告并注明观测边界。`scripts/lifeweave.py` 是正式本机客户端，网页与它共用业务 API；宿主 Agent 理解自然表达，产品保存和读取事实。
 
-已有 Codex 会话直接开发时，`external-start` 与 `external-report` 经 [外部开发接口](../src/lifeweave/external_development.py)写入原事项的 activity。开始动作核对所选 Git 仓库，并把当前提交、已修改和未跟踪文件作为服务实际观测保存；方法和知识按当前原文固定版本引用。后续设计、实施、验证和知识变化由外部会话主动上报，服务在报告时再次观察 Git 状态。请求身份使超时重试不重复写入；空间、事项和会话身份不符则拒绝。详情的“推进记录”明确标示哪些是上报、哪些是 Git 观测。它不建立虚构的平台 Run，也不宣称自动捕获外部会话内部的命令或工具步骤。
+已有 Codex 会话直接开发时，`external-start` 与 `external-report` 经 [外部开发接口](../src/lifeweave/external_development.py)写入原事项的 activity。开始动作核对所选 Git 仓库，并把当前提交、已修改和未跟踪文件作为服务实际观测保存；方法和知识按当前原文固定版本引用。后续设计、实施、验证和知识变化由外部会话主动上报，服务在报告时再次观察 Git 状态。请求身份使超时重试不重复写入；空间、事项和会话身份不符则拒绝。详情的“推进记录”明确标示哪些是上报、哪些是 Git 观测。外部会话不建立虚构的平台 Run；受支持的自动元数据由下述 Hook 另行标注来源。
+
+本机 [Codex Hook 桥接](../scripts/lifeweave_hook.py)只处理 CLI 已显式绑定到事项且 Git 根目录一致的原生会话。`PostToolUse`、`Stop`、`Interrupt` 记录原生 ID、模型、工具名和输入哈希；服务另读当前 Git 状态。原始工具输入与输出不进入工作台，Hook 事件按 ID 去重，页面与人工阶段报告分开标示。用户级 Hook 配置位于 `/home/yyh/.codex/hooks.json`，需要 Codex 自身信任；沙箱、本机服务或 Hook 覆盖范围会影响实际采集。外部会话的 Git 补丁只证明当前仓库相对起始提交的变化，不归因于某条工具事件。[真实烟测](evidence/development-agent/hook-smoke.md)记录了成功绑定与网络被沙箱阻断的反例。
 
 `TaskSources.recommend` 使用可解释文本匹配返回候选、命中理由和版本。网页预选最多一个方法、十篇知识并允许调整；CLI 提供推荐、全文阅读与显式委托。创建运行时再次计算当前推荐，记录在 `environment_snapshot.inputRecommendations`，实际选择保存在 `selectedInputs`，实际内容以 `capability_snapshot` 为准。重试固定原材料和原推荐，并标明来自旧运行；不把来源更新后的推荐版本冒充原材料版本。worker 的 `materializedCapabilities` 证明材料写入，实际步骤仍需执行事件支持。
 
@@ -174,6 +181,6 @@ SQL 006 增加对话、消息与明确方向/偏好；SQL 007 增加成果来源
 
 ## 成果的异地归档
 
-`research_archive.py` 复用同一个便携包。每空间设置及逐运行归档状态保存在 `.runtime/research-archives`，进程间文件锁串行保护归档 checkout；后台每20秒扫描已启用空间，新成功正文进入归档，失败5分钟后重试。GitHub 用独立 checkout 写 `research-archive`，Linear 上传图片、引用材料和 ZIP，再创建关联项目的完整版本文档。每目标独立确认与重试，固定运行和正文身份避免重复创建，远端冲突不覆盖。
+`research_archive.py` 复用同一个便携包。每空间设置及逐运行归档状态保存在 `.runtime/research-archives`，进程间文件锁串行保护归档 checkout；后台每20秒扫描已启用空间，新成功正文进入归档，失败5分钟后重试。GitHub 用独立 checkout 写 `research-archive`；配置 Notion 后，报告正文作为带源版本的子页镜像。每目标独立确认与重试，固定运行和正文身份避免重复创建，远端冲突不覆盖。
 
-GitHub 以分支提交回读确认；Linear 附件校验字节 SHA-256，正文按完整解析结构核对（允许排版规范化，保留文字、代码、链接、图片、表格顺序）。Linear 不按工作台的 KaTeX 方式解释数学：发布投影将公式转为 LaTeX 代码，防止矩阵中的等号/减号被误认标题；原 Markdown 不变。确认是当次快照证明，并非持续监测人对远端的后续修改。细节、设置和恢复边界见 [归档与跨文章讨论](research-archive.md)。
+GitHub 以分支提交回读确认；Notion 以 Markdown 全文回读、来源版本及截断/未知块检查确认，图片目前引用 GitHub Raw 文件，未逐张完成页面显示验收。项目当前文档从固定清单扫描，每60秒尝试单向镜像；研究报告启用后约每5分钟复核已确认镜像。单篇失败单独记录并继续，既有人工 Notion 页面不覆盖。相同源版本再次扫描时也回读远端，发现被改动即显示失败；两次扫描之间不持续监测远端。细节、设置和恢复边界见 [归档与跨文章讨论](research-archive.md)。

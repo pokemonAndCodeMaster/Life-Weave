@@ -10,7 +10,7 @@ const statusLabels = { queued: '已保存 · 等待处理', processing: '正在�
 function receiptPath(receipt: ConversationTurn['receipts'][number], turn: ConversationTurn) {
   const itemId = receipt.itemId || turn.itemId || (receipt.kind === 'item' ? receipt.id : '')
   if (!itemId) return ''
-  const tab = receipt.kind === 'context' ? 'context' : receipt.kind === 'knowledge' ? 'outputs' : 'overview'
+  const tab = receipt.kind === 'context' ? 'context' : receipt.kind === 'knowledge' ? 'outputs' : receipt.kind === 'development' ? 'development' : 'overview'
   return `/lifeweave/${props.workspace}/items/${encodeURIComponent(itemId)}/${tab}`
 }
 const rows = computed(() => props.turns.map(turn => ({ ...turn, runIds: [...new Set([turn.runId, ...turn.receipts.map(receipt => receipt.runId || (receipt.kind === 'run' ? receipt.id : null))].filter((id): id is string => !!id))] })))

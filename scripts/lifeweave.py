@@ -7,11 +7,15 @@ work with recommended inputs. An unavailable connection is an error, not a sync.
 """
 import argparse
 import json
+import os
 import sys
+from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, urlencode, urlsplit
 from urllib.request import Request, urlopen
 from uuid import uuid4
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from lifeweave_hook import bind_session
 
 
 def main(argv=None):
@@ -59,6 +63,9 @@ def main(argv=None):
     p.add_argument('phase', choices=['context','design','implementation','verification','knowledge','finished','blocked'])
     p.add_argument('summary'); p.add_argument('--check', action='append', default=[])
     p.add_argument('--knowledge', action='append', default=[]); p.add_argument('--request-id', default=None)
+    p = commands.add_parser('external-bind', help='bind an existing external record to this Codex native session for supported hooks')
+    p.add_argument('item_id'); p.add_argument('session_id'); p.add_argument('--repo', required=True)
+    p.add_argument('--request-id', default=None)
     p = commands.add_parser('external-list', help='read explicitly reported development activity for an item')
     p.add_argument('item_id')
     args = parser.parse_args(argv)
@@ -120,9 +127,19 @@ def main(argv=None):
         elif args.command == 'external-start':
             request_id = args.request_id or str(uuid4())
             print('external-start requestId: ' + request_id, file=sys.stderr)
+            native_id = os.environ.get('CODEX_SESSION_ID') or os.environ.get('CODEX_THREAD_ID')
             result = call(f'/items/{item}/external-development/sessions', {
                 'requestId': request_id, 'repositoryPath': args.repo, 'summary': args.summary,
-                'methodId': args.method, 'knowledgeRefs': args.knowledge})
+                'methodId': args.method, 'knowledgeRefs': args.knowledge,
+                'nativeSessionId': native_id})
+            if native_id:
+                if result['event'].get('payload', {}).get('nativeSessionId') != native_id:
+                    session = quote(result['sessionId'], safe='')
+                    call(f'/items/{item}/external-development/sessions/{session}/binding', {
+                        'requestId': 'native-bind-' + native_id,
+                        'nativeSessionId': native_id, 'repositoryPath': args.repo})
+                bind_session(native_id, base_url=args.url, workspace=args.workspace,
+                             item_id=args.item_id, external_id=result['sessionId'], repository=args.repo)
         elif args.command == 'external-report':
             request_id = args.request_id or str(uuid4())
             print('external-report requestId: ' + request_id, file=sys.stderr)
@@ -132,6 +149,17 @@ def main(argv=None):
                 'checks': args.check, 'knowledgeRefs': args.knowledge})
         elif args.command == 'external-list':
             result = call(f'/items/{item}/external-development/sessions')
+        elif args.command == 'external-bind':
+            native_id = os.environ.get('CODEX_SESSION_ID') or os.environ.get('CODEX_THREAD_ID')
+            if not native_id: parser.error('只在运行中的 Codex 会话内绑定原生 Hook')
+            request_id = args.request_id or str(uuid4())
+            print('external-bind requestId: ' + request_id, file=sys.stderr)
+            session = quote(args.session_id, safe='')
+            result = call(f'/items/{item}/external-development/sessions/{session}/binding', {
+                'requestId': request_id, 'nativeSessionId': native_id,
+                'repositoryPath': args.repo})
+            bind_session(native_id, base_url=args.url, workspace=args.workspace,
+                         item_id=args.item_id, external_id=args.session_id, repository=args.repo)
         else:
             inputs = {} if args.without_materials else call(f'/items/{item}/input-recommendations?' + urlencode({'query': args.instruction}))['suggested']
             result = call('/runs', {'itemId': args.item_id, 'instruction': args.instruction, 'engine': args.engine, **inputs})

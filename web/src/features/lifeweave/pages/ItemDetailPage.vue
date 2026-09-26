@@ -14,6 +14,7 @@ import WorkContinuationPanel from '../components/WorkContinuationPanel.vue'
 import ResearchOutputPanel from '../components/ResearchOutputPanel.vue'
 import ResearchKnowledgeReview from '../components/ResearchKnowledgeReview.vue'
 import NextReviewEditor from '../components/conversation/NextReviewEditor.vue'
+import DevelopmentPanel from '../components/DevelopmentPanel.vue'
 import { useLifeWeaveWorkspace } from '../composables/useLifeWeaveWorkspace'
 import {listRuns} from '../api/lifeweave'
 import type {LifeWeaveRun} from '../types'
@@ -25,7 +26,7 @@ const { activeWorkspace, loading, error, itemDetails, rootOf, loadItem, openModa
 const itemId = computed(() => String(route.params.itemId ?? ''))
 const item = computed(() => itemDetails.value[itemId.value])
 const rootItem = computed(() => item.value ? rootOf(item.value) : undefined)
-const tab = computed(() => (['overview', 'context', 'outputs', 'activity', 'retro'].includes(String(route.params.tab)) ? route.params.tab : 'overview') as ItemTab)
+const tab = computed(() => (['overview', 'context', 'outputs', 'activity', 'retro', 'development'].includes(String(route.params.tab)) ? route.params.tab : 'overview') as ItemTab)
 const tabs: Array<{ key: ItemTab; label: string }> = [
   { key: 'overview', label: '概览' }, { key: 'context', label: '共享上下文' }, { key: 'outputs', label: '成果与验证' }, { key: 'activity', label: '推进记录' }, { key: 'retro', label: '复盘与成长' },
 ]
@@ -69,6 +70,7 @@ watch(() => itemRuns.value.map(run => `${run.id}:${run.state}`).join('|'), (valu
     <PageHeader :title="item.title" :subtitle="item.goal" :eyebrow="`${item.id} / ${item.kind}`">
       <RouterLink class="lw-btn primary" :to="{ path: `/lifeweave/${activeWorkspace}/conversation`, query: { itemId } }"><LifeWeaveIcon name="message" />继续讨论这件事</RouterLink>
       <button class="lw-btn primary" type="button" @click="delegateCurrentItem"><LifeWeaveIcon :name="rootItem.context.established ? 'spark' : 'layers'" />{{ rootItem.context.established ? '委托 AI' : '先建立上下文' }}</button>
+      <button v-if="item.itemType === 'requirement' || item.itemType === 'fix'" class="lw-btn" type="button" @click="setTab('development')">开发 Agent</button>
       <RouterLink class="lw-btn" :to="{ path: `/lifeweave/${activeWorkspace}/conversation`, query: { itemId, mode: 'discuss' } }"><LifeWeaveIcon name="message" />就地讨论</RouterLink>
       <button class="lw-btn" type="button" @click="openModal('discussion', { item: rootItem })">记录讨论笔记</button>
     </PageHeader>
@@ -76,6 +78,7 @@ watch(() => itemRuns.value.map(run => `${run.id}:${run.state}`).join('|'), (valu
     <div class="lw-tabs">
       <button class="lw-tab" type="button" @click="loadDetail(itemId)">刷新记录</button>
       <button v-for="entry in tabs" :key="entry.key" class="lw-tab" :class="{ active: tab === entry.key }" type="button" @click="setTab(entry.key)">{{ entry.label }}<StatusBadge v-if="entry.key === 'context' && rootItem.context.proposals.length" :value="String(rootItem.context.proposals.length)" tone="amber" /></button>
+      <button v-if="item.itemType === 'requirement' || item.itemType === 'fix'" class="lw-tab" :class="{ active: tab === 'development' }" type="button" @click="setTab('development')">开发 Agent</button>
     </div>
     <div class="lw-detail-layout">
       <section class="lw-detail-main" aria-label="事项内容">
@@ -83,7 +86,8 @@ watch(() => itemRuns.value.map(run => `${run.id}:${run.state}`).join('|'), (valu
         <ItemContextTab v-else-if="tab === 'context'" :item="item" :root-item="rootItem" />
         <ItemOutputsTab v-else-if="tab === 'outputs'" :item="item" :runs="itemRuns" />
         <ItemActivityTab v-else-if="tab === 'activity'" :item="item" :root-item="rootItem" />
-        <ItemRetroTab v-else :item="item" :root-item="rootItem" />
+        <ItemRetroTab v-else-if="tab === 'retro'" :item="item" :root-item="rootItem" />
+        <DevelopmentPanel v-else :key="`${activeWorkspace}:${itemId}:development`" :workspace="activeWorkspace" :item-id="itemId" :initial-instruction="item.goal" />
         <ResearchOutputPanel v-if="tab === 'overview' || tab === 'outputs'" :key="`${activeWorkspace}:${itemId}:output`" :workspace="activeWorkspace" :item-id="itemId" :refresh-key="researchRefresh" @quote="quoteForConversation" @feedback-saved="researchRefresh++" @candidate-created="researchRefresh++" />
         <ResearchKnowledgeReview v-if="tab === 'outputs'" :key="`${activeWorkspace}:${itemId}:knowledge`" :workspace="activeWorkspace" :item-id="itemId" :refresh-key="researchRefresh" @changed="researchRefresh++" />
         <WorkContinuationPanel v-if="tab === 'overview'" :workspace="activeWorkspace" :item-id="itemId" @saved="loadDetail(itemId)" />

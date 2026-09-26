@@ -20,6 +20,8 @@ class TurnCreate(Input):
     runId: str | None = Field(default=None, max_length=64)
     anchor: str | None = Field(default=None, max_length=2000)
     researchItemIds: list[str] = Field(default_factory=list, max_length=5)
+    repositoryPath: str | None = Field(default=None, max_length=4096)
+    acknowledgeExcludedChanges: bool = False
 
     @field_validator('researchItemIds')
     @classmethod
@@ -54,7 +56,7 @@ class Decision(Input):
     reply: str = Field(min_length=1, max_length=30000)
     title: str = Field(min_length=1, max_length=256)
     itemId: str | None
-    itemType: Literal['research','learning','personal','hobby','other']
+    itemType: Literal['research','learning','personal','hobby','requirement','fix','other']
     instruction: str
     feedback: str | None
     proposedGoal: str | None
