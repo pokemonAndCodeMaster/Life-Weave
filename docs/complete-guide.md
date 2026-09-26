@@ -15,7 +15,7 @@
 | 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `a3be812cde0d817c4372184d2b6d476a348674976fdbf0da7a6a1648b853ed9c` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-03) | `docs/product.md` | `4d58806aae1a75847c52c96a41b3537d0a6b484669f6e8670db7909e40ea713f` |
 | 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `659515ea3a46ec97e235599b05ba8169e8b66e12968913a13b37a529db80c5f3` |
-| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `31bdee347abc27568dde2c3fab586d4fab3c56165eabbc14248ec877d0c7280e` |
+| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `e403247a8fa068d75a01e08703091d774f81f92692ec94473aa3d154cdfd1ed1` |
 | 当前说明 | [当前建设路线](#doc-06) | `docs/roadmap.md` | `af82f9d3c4269be77228e1fd68e2cfb4e36ddbc1e07595296448997e12c84e6e` |
 | 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `5b3cdaa389c34140b8f0cce5553ff749994b021cfe6b841a7c349cc71edc8dd7` |
 | 当前说明 | [LifeWeave：名称与适配](#doc-08) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
@@ -548,7 +548,7 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 
 启用后的研究报告自动归档到 GitHub 与 Linear；本机停机时不能生成或上传新报告。Notion 全文副本、飞书入口、远程 ChatGPT、多成员身份、各自模型连接、时间容量与日历、周期评测及正式自动知识回写均未实现。[归档维护说明](#doc-09)区分远端已确认版本与本地待传状态。
 
-当前服务已让项目知识可找、可读，原文变更后的新版本能被下一次读取；外部开发报告也能通过同一事项接续。[正式服务的桌面与手机核查](evidence/project-development/README.md)覆盖这两条阅读路径。外部记录从本次集成阶段开始；此前代码改动有 Git 差异与候选测试，缺失实时内部 trace。下一步仍须让正式事项收拢最终知识更新、源码提交与剩余边界，并使远端版本可核。阶段和验收条件见[建设路线](#doc-06)。
+当前服务已让项目知识可找、可读，原文变更后的新版本能被下一次读取；外部开发报告也能通过同一事项接续。[正式服务的桌面与手机核查](evidence/project-development/README.md)覆盖这两条阅读路径。正式事项 `item-58363ef3851142d8` 已记录 GitHub 提交、测试、页面证据和后续档案导航修复，目前待用户使用验收。外部会话在本次集成阶段才登记；此前代码改动有 Git 差异与候选测试，但没有实时内部 trace。后续重点是从需求起点即登记、自动捕获可观察步骤，并验证反馈怎样改善下一轮。阶段和验收条件见[建设路线](#doc-06)。
 <!-- source-end: docs/status.md -->
 
 ---
