@@ -8,6 +8,7 @@ import secrets
 import subprocess
 from collections.abc import Callable, Mapping
 from datetime import datetime, timezone
+from contextlib import nullcontext
 from pathlib import Path
 from typing import Any
 from uuid import uuid4
@@ -226,6 +227,7 @@ class LifeWeaveRuntimeService:
         method_id: str | None = None,
         knowledge_refs: list[str] | None = None,
         related_research: list[dict[str, Any]] | None = None,
+        plugin_scope: dict[str, str] | None = None,
         actor_id: str = "admin",
     ) -> dict[str, Any]:
         workspace = self._workspace(workspace)
@@ -244,30 +246,88 @@ class LifeWeaveRuntimeService:
                 raise ValueError(f"指定执行机不支持运行环境：{runtime}")
             if runtime == "docker" and image not in (capabilities.get("images") or []):
                 raise ValueError(f"指定执行机没有声明镜像：{image}")
-        item = self.lifeweave_service.get_item(workspace, item_id)
-        context = self.lifeweave_service.current_context_snapshot(workspace, item_id)
-        capabilities = (
-            self.capability_provider(workspace, capability_candidate_id)
-            if self.capability_provider
-            else []
-        )
-        recommendations = self.task_sources.recommend(workspace, item, context, instruction) if self.task_sources else None
-        if self.task_sources:
-            capabilities += self.task_sources.snapshot(workspace, method_id, knowledge_refs)
-        item = self._json_snapshot(item)
-        context = self._json_snapshot(context)
-        capabilities = self._json_snapshot(capabilities)
-        feedback = self._json_snapshot(self.lifeweave_service.execution_feedback(workspace, item_id))
-        support = self._json_snapshot(self.support_provider(workspace,item_id)) if self.support_provider else {}
-        if related_research:
-            support['relatedResearch'] = self._json_snapshot(related_research)
+        run_id = f"gzrun-{datetime.now(timezone.utc):%Y%m%d-%H%M%S}-{uuid4().hex[:8]}"
+        scope = plugin_scope or {}
+        stage = scope.get("stage")
+        label = {"plan": "plan", "review": "review", "implementation": "implement"}.get(stage, stage)
+
+        def prepare() -> dict[str, Any]:
+            item = self.lifeweave_service.get_item(workspace, item_id)
+            context = self.lifeweave_service.current_context_snapshot(workspace, item_id)
+            if self.task_sources and getattr(self, "plugin_host", None):
+                recommendations = self.plugin_host.invoke(
+                    "lifeweave.knowledge", "recommend", workspace=workspace, item_id=item_id,
+                    assignment_id=scope.get("assignmentId"), plan_id=scope.get("planId"), run_id=run_id,
+                    step_id=f"{label}.recommend" if label else None,
+                    input_ref={"itemId": item_id, "contextVersionId": context["versionId"]},
+                    handler=lambda: self.task_sources.recommend(workspace, item, context, instruction),
+                    output_ref=lambda value: {"methodIds": [row["id"] for row in value.get("methods", [])],
+                                              "documentRefs": [row["ref"] for row in value.get("documents", [])]})
+            else:
+                recommendations = self.task_sources.recommend(workspace, item, context, instruction) if self.task_sources else None
+            capabilities: list[dict[str, Any]] = []
+            if self.capability_provider or (self.task_sources and knowledge_refs):
+                def read_knowledge() -> list[dict[str, Any]]:
+                    published = self.capability_provider(workspace, capability_candidate_id) if self.capability_provider else []
+                    selected = self.task_sources.snapshot(workspace, None, knowledge_refs) if self.task_sources else []
+                    return [*published, *selected]
+                if getattr(self, "plugin_host", None):
+                    capabilities.extend(self.plugin_host.invoke(
+                        "lifeweave.knowledge", "read", workspace=workspace, item_id=item_id,
+                        assignment_id=scope.get("assignmentId"), plan_id=scope.get("planId"), run_id=run_id,
+                        step_id=f"{label}.knowledge" if label else None,
+                        input_ref={"knowledgeRefs": knowledge_refs or [], "candidateId": capability_candidate_id},
+                        handler=read_knowledge,
+                        output_ref=lambda rows: {"sources": [{"id": row.get("id"), "version": row.get("version"),
+                                                               "sourcePath": row.get("sourcePath")} for row in rows]}))
+                else:
+                    capabilities.extend(read_knowledge())
+            if self.task_sources and method_id:
+                if getattr(self, "plugins", None):
+                    method_plugin = self.plugins.method_binding(workspace, method_id)
+                    capabilities[0:0] = self.plugin_host.invoke(
+                        method_plugin, "bind", workspace=workspace, item_id=item_id,
+                        assignment_id=scope.get("assignmentId"), plan_id=scope.get("planId"), run_id=run_id,
+                        step_id=f"{label}.method" if label else None,
+                        input_ref={"methodId": method_id},
+                        handler=lambda: self.task_sources.snapshot(workspace, method_id, []),
+                        output_ref=lambda rows: {"methodId": method_id, "version": rows[0]["version"]})
+                else:
+                    capabilities[0:0] = self.task_sources.snapshot(workspace, method_id, [])
+            feedback = self._json_snapshot(self.lifeweave_service.execution_feedback(workspace, item_id))
+            support = self._json_snapshot(self.support_provider(workspace,item_id)) if self.support_provider else {}
+            if related_research:
+                support['relatedResearch'] = self._json_snapshot(related_research)
+            return {"item": self._json_snapshot(item), "context": self._json_snapshot(context),
+                    "capabilities": self._json_snapshot(capabilities), "recommendations": recommendations,
+                    "feedback": feedback, "support": support}
+
+        if getattr(self, "plugin_host", None):
+            prepared = self.plugin_host.invoke(
+                "lifeweave.context", "compile", workspace=workspace, item_id=item_id,
+                assignment_id=scope.get("assignmentId"), plan_id=scope.get("planId"), run_id=run_id,
+                step_id=f"{label}.context" if label else None,
+                input_ref={"contextVersion": "read-at-call", "phase": stage,
+                           "knowledgeRefs": knowledge_refs or [], "methodId": method_id},
+                handler=prepare,
+                output_ref=lambda value: {"contextVersionId": value["context"]["versionId"],
+                                          "sources": [{"id": row.get("id"), "version": row.get("version"),
+                                                       "sourcePath": row.get("sourcePath")}
+                                                      for row in value["capabilities"]]})
+        else:
+            prepared = prepare()
+        item, context = prepared["item"], prepared["context"]
+        capabilities, recommendations = prepared["capabilities"], prepared["recommendations"]
+        feedback, support = prepared["feedback"], prepared["support"]
+        prompt_snapshot = self._prompt(
+            item=item, context=context, capabilities=capabilities, instruction=instruction,
+            feedback=feedback, support=support)
         attempt = self.repository.next_attempt(workspace, item_id)
         source = Path(directory).expanduser() if directory else self.repository_root
         repository_path: str | None = None
         repository_revision: str | None = None
         if source:
             repository_path, repository_revision = self._git_identity(source.resolve())
-        run_id = f"gzrun-{datetime.now(timezone.utc):%Y%m%d-%H%M%S}-{uuid4().hex[:8]}"
         execution_directory = self.runtime_root / workspace / run_id / "repo"
         run = self.repository.create_run(
             {
@@ -278,9 +338,7 @@ class LifeWeaveRuntimeService:
                 "retry_of": None,
                 "actor_id": actor_id,
                 "instruction": instruction,
-                "prompt_snapshot": self._prompt(
-                    item=item, context=context, capabilities=capabilities, instruction=instruction, feedback=feedback, support=support
-                ),
+                "prompt_snapshot": prompt_snapshot,
                 "item_snapshot": item,
                 "context_snapshot": context,
                 "capability_snapshot": capabilities,
@@ -308,6 +366,15 @@ class LifeWeaveRuntimeService:
                     "selectedInputs": {"methodId": method_id, "knowledgeRefs": knowledge_refs or []},
                     "requestedRuntime": runtime,
                     "requestedImage": image,
+                    "pluginScope": scope,
+                    "contextPack": {
+                        "compiler": "lifeweave.context",
+                        "compilerVersion": self.plugin_host.registry.require("lifeweave.context").version if getattr(self, "plugin_host", None) else None,
+                        "promptSha256": hashlib.sha256(prompt_snapshot.encode("utf-8")).hexdigest(),
+                        "contextVersionId": context["versionId"],
+                        "sourceVersions": [{"id": entry.get("id"), "version": entry.get("version"),
+                                            "sourcePath": entry.get("sourcePath")} for entry in capabilities],
+                    },
                 },
                 "artifact_candidates": [],
                 "evidence_candidates": [],
@@ -573,17 +640,43 @@ class LifeWeaveRuntimeService:
         payload: dict[str, Any],
     ) -> dict[str, Any]:
         self.authenticate_worker(workspace, machine_id, token)
-        return self.repository.append_event(
-            workspace=workspace,
-            run_id=run_id,
-            event_type=event_type,
-            source=source,
-            channel=channel,
-            summary=summary,
-            payload=payload,
-            machine_id=machine_id,
-            lease_id=lease_id,
-        )
+        plugin_outcome: str | None = None
+        if event_type == "plugin.execution.started":
+            if source != "worker":
+                raise ValueError("执行插件边界必须由执行机上报")
+            plugin_outcome = "running"
+        elif event_type == "plugin.execution.finished":
+            if source != "worker" or payload.get("outcome") not in {"succeeded", "failed", "interrupted"}:
+                raise ValueError("执行插件结束事件缺少有效结果")
+            plugin_outcome = str(payload["outcome"])
+        run = self._required_run(workspace, run_id) if plugin_outcome else None
+        if plugin_outcome == "running" and run and run["state"] != "running":
+            raise ValueError("Run 尚未进入 running，不能记录执行器启动")
+        if plugin_outcome == "running" and run and getattr(self, "plugins", None):
+            scope = (run.get("environment_snapshot") or {}).get("pluginScope") or {}
+            if scope.get("planId"):
+                self.plugins.require_bound(workspace, scope["planId"],
+                                           f"lifeweave.execution.{run['engine']}", "run")
+        transaction = self.plugin_host.db.atomic() if plugin_outcome and getattr(self, "plugin_host", None) else nullcontext()
+        with transaction:
+            event = self.repository.append_event(
+                workspace=workspace,
+                run_id=run_id,
+                event_type=event_type,
+                source=source,
+                channel=channel,
+                summary=summary,
+                payload=payload,
+                machine_id=machine_id,
+                lease_id=lease_id,
+            )
+            if plugin_outcome and run and getattr(self, "plugin_host", None):
+                self.plugin_host.worker_transition(
+                    workspace=workspace, item_id=str(run["item_id"]), run_id=run_id,
+                    scope=(run.get("environment_snapshot") or {}).get("pluginScope") or {},
+                    engine=str(run["engine"]), outcome=plugin_outcome,
+                    exit_code=payload.get("exitCode"), error=payload.get("error"))
+        return event
 
     def worker_report(
         self,
@@ -609,11 +702,16 @@ class LifeWeaveRuntimeService:
                 raise ValueError(f"Run 未处于 {expected}，不能回报 {outcome}")
         if outcome == "succeeded" and report.get("exit_code") not in {None, 0}:
             raise ValueError("非零退出码不能回报 succeeded")
+        scope = (existing.get("environment_snapshot") or {}).get("pluginScope") or {}
+        if outcome == "running" and scope.get("planId") and getattr(self, "plugins", None):
+            self.plugins.require_bound(workspace, scope["planId"],
+                                       f"lifeweave.execution.{existing['engine']}", "run")
         now = datetime.now(timezone.utc)
         # Workers report observed execution facts; they cannot replace input
         # provenance fixed by the control service when the attempt was created.
         fixed_input_keys = {'feedbackSnapshot', 'inputRecommendations', 'selectedInputs',
                             'requestedRuntime', 'requestedImage', 'retriedFrom', 'contextSynced', 'researchSupport'}
+        fixed_input_keys.update({'pluginScope', 'contextPack'})
         environment = dict(existing.get('environment_snapshot') or {})
         environment.update({key: value for key, value in (report.get('environment') or {}).items()
                             if key not in fixed_input_keys})
@@ -702,4 +800,13 @@ class LifeWeaveRuntimeService:
         return self.format_run(row)
 
     def recover_expired_leases(self) -> int:
-        return self.repository.recover_expired_leases()
+        recovered = self.repository.recover_expired_leases()
+        if recovered and getattr(self, "plugin_host", None):
+            self.plugin_host.db.execute(
+                "UPDATE workbench.lifeweave_plugin_call AS call "
+                "SET state='interrupted',error='执行机租约失效',finished_at=now() "
+                "FROM workbench.t_lifeweave_run AS run "
+                "WHERE call.workspace=run.workspace AND call.run_id=run.id "
+                "AND call.observed_by='worker-report' AND call.state='started' "
+                "AND run.state='failed' AND run.failure_code='lease_expired'")
+        return recovered

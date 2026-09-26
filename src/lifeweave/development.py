@@ -173,6 +173,7 @@ class DevelopmentService:
                                 next((entry["version"] for entry in versions if entry["id"] == method_id), "unknown"),
                                 engine, model, root, revision, dirty, context["versionId"], method_id,
                                 Jsonb(refs), Jsonb(versions), review_mode)).fetchone()
+            self.plugins.create_development_plan(conn, row)
             run = self._stage_run(row, "plan", instruction)
             row = conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                "SET plan_run_id=%s,updated_at=now() WHERE id=%s RETURNING *",
@@ -188,24 +189,38 @@ class DevelopmentService:
             prompt = ("开发委托的只读方案阶段。只能阅读仓库与已选知识，不能修改文件。"
                       "请写用户将看到的行为、受影响模块和接口、实现顺序、风险、验证、知识变化。"
                       "结尾必须有“自检”及尚未解决的问题。\n\n用户任务：" + instruction)
-            return self.runtime.create_run(assignment["workspace"], instruction=prompt,
-                                           permission="read-only", **common)
-        if stage == "review":
+            permission = "read-only"
+        elif stage == "review":
             prompt = ("你是独立方案审阅者，本次为全新只读 Run。请核对用户原目标、项目提交、方案的遗漏和可验证性，"
                       "不得实施或修改文件。结束时单独一行写 REVIEW_DECISION: PASS 或 "
                       "REVIEW_DECISION: NEEDS_REVISION，并解释具体问题。\n\n"
                       f"用户任务：{assignment['instruction']}\n"
                       f"审查方案 SHA-256：{assignment['plan_sha256']}\n\n"
                       f"方案正文：\n{assignment['plan']}")
+            permission = "read-only"
+        else:
+            prompt = ("按已审方案在本轮隔离工作树实施，运行与改动相称的真实验证。"
+                      "交付时给出实际文件差异、测试结果、未完成项和知识更新；不要声称代码已合回原仓。\n\n"
+                      f"用户任务：{assignment['instruction']}\n"
+                      f"已审方案 SHA-256：{assignment['plan_sha256']}\n{assignment['plan']}\n\n"
+                      f"审阅记录：{assignment['review']}")
+            permission = "workspace-write"
+        plan = self.plugins.plan_for_assignment(assignment["workspace"], assignment["id"])
+        if plan is None:
+            # Assignments created before the plugin migration retain their old
+            # workflow. Do not backfill a plan after execution has begun.
             return self.runtime.create_run(assignment["workspace"], instruction=prompt,
-                                           permission="read-only", **common)
-        prompt = ("按已审方案在本轮隔离工作树实施，运行与改动相称的真实验证。"
-                  "交付时给出实际文件差异、测试结果、未完成项和知识更新；不要声称代码已合回原仓。\n\n"
-                  f"用户任务：{assignment['instruction']}\n"
-                  f"已审方案 SHA-256：{assignment['plan_sha256']}\n{assignment['plan']}\n\n"
-                  f"审阅记录：{assignment['review']}")
-        return self.runtime.create_run(assignment["workspace"], instruction=prompt,
-                                       permission="workspace-write", **common)
+                                           permission=permission, **common)
+        step = {"plan": "plan.development", "review": "review.development", "implementation": "implement.development"}[stage]
+        operation = {"plan": "plan", "review": "review", "implementation": "implement"}[stage]
+        scope = {"assignmentId": assignment["id"], "planId": plan["id"], "stage": stage}
+        return self.plugin_host.invoke(
+            "lifeweave.development", operation, workspace=assignment["workspace"], item_id=assignment["item_id"],
+            assignment_id=assignment["id"], plan_id=plan["id"], step_id=step,
+            input_ref={"repositoryRevision": assignment["repository_revision"], "stage": stage},
+            handler=lambda: self.runtime.create_run(assignment["workspace"], instruction=prompt,
+                                                    permission=permission, plugin_scope=scope, **common),
+            output_ref=lambda run: {"runId": run["id"], "state": "queued"}, accepted=True)
 
     def _assert_unchanged(self, row: dict[str, Any]) -> None:
         root, revision, _ = self._project(row["repository_path"])
@@ -274,7 +289,15 @@ class DevelopmentService:
                 return
             if status in {"planning", "reviewing"}:
                 try:
-                    self._assert_readonly_clean(run, row["repository_revision"])
+                    plan = self.plugins.plan_for_assignment(row["workspace"], row["id"])
+                    label = "plan" if status == "planning" else "review"
+                    self.plugin_host.invoke(
+                        "lifeweave.checks.repository", "verify_readonly", workspace=row["workspace"],
+                        item_id=row["item_id"], assignment_id=row["id"], plan_id=plan["id"] if plan else None,
+                        run_id=run_id, step_id=f"{label}.check" if plan else None,
+                        input_ref={"runId": run_id, "repositoryRevision": row["repository_revision"]},
+                        handler=lambda: self._assert_readonly_clean(run, row["repository_revision"]),
+                        output_ref=lambda _: {"runId": run_id, "result": "clean"})
                 except (ValueError, OSError, subprocess.SubprocessError) as exc:
                     conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                  "SET status='blocked',error=%s,updated_at=now() WHERE id=%s",
@@ -296,7 +319,14 @@ class DevelopmentService:
                                    "SET plan=%s,plan_sha256=%s,updated_at=now() WHERE id=%s RETURNING *",
                                    (result, digest, identity)).fetchone()
             try:
-                self._assert_unchanged(row)
+                self.plugin_host.invoke(
+                    "lifeweave.checks.repository", "verify_inputs", workspace=row["workspace"],
+                    item_id=row["item_id"], assignment_id=row["id"], plan_id=plan["id"] if plan else None,
+                    run_id=run_id, step_id=f"{label}.inputs" if plan else None,
+                    input_ref={"repositoryRevision": row["repository_revision"],
+                               "contextVersionId": row["context_version_id"]},
+                    handler=lambda: self._assert_unchanged(row),
+                    output_ref=lambda _: {"result": "unchanged"})
             except (ValueError, OSError) as exc:
                 conn.execute("UPDATE workbench.lifeweave_development_assignment "
                              "SET status='blocked',error=%s,updated_at=now() WHERE id=%s",

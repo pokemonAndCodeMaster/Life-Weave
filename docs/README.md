@@ -13,6 +13,7 @@ LifeWeave 希望帮助个人与协作中的人，把工作、学习、爱好和�
 | 个人管理平台新讨论如何进入产品 | [原始讨论与演进方案](../workspaces/reviews/personal-platform-evolution/review.md) |
 | 本轮评测、知识关联与首页实际验证 | [平台演进证据](evidence/personal-platform-evolution/README.md) |
 | 用户动作如何实现、数据放在哪里 | [架构与关键实现](architecture.md) |
+| 插件目录、固定计划与受管调用怎样使用 | [插件目录与开发过程](plugin-system.md) |
 | 现在能做什么、哪些还不能依赖 | [当前完成情况](status.md) |
 | 怎样启动、修改、验证和维护 | [开发与运行维护](development.md) |
 | 为什么叫 LifeWeave、哪些名称已适配 | [命名与兼容](naming.md) |

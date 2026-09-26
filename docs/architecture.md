@@ -53,6 +53,7 @@ flowchart TD
 | 首页预设与用户调整 | [homeLayout.ts](../web/src/features/lifeweave/utils/homeLayout.ts)、[HomePage.vue](../web/src/features/lifeweave/pages/HomePage.vue)、[HomeDashboardCard.vue](../web/src/features/lifeweave/components/HomeDashboardCard.vue) |
 | 外部 Codex 开发阶段与 Git 观测 | [external_development.py](../src/lifeweave/external_development.py)、[正式 CLI](../scripts/lifeweave.py)、[ItemActivityTab.vue](../web/src/features/lifeweave/components/ItemActivityTab.vue) |
 | 网页开发委托与隔离差异 | [development.py](../src/lifeweave/development.py)、[development_router.py](../src/lifeweave/development_router.py)、[DevelopmentPanel.vue](../web/src/features/lifeweave/components/DevelopmentPanel.vue) |
+| 插件目录、固定计划与调用对照 | [插件内核](../src/lifeweave_plugins/core.py)、[插件服务](../src/lifeweave_plugins/service.py)、[PluginCatalog.vue](../web/src/features/lifeweave/components/PluginCatalog.vue)、[PluginProcess.vue](../web/src/features/lifeweave/components/PluginProcess.vue)；范围与边界见[插件说明](plugin-system.md) |
 | Notion 单向镜像 | [notion_mirror.py](../src/integrations/notion_mirror.py)、[NotionMirrorSettings.vue](../web/src/features/lifeweave/components/NotionMirrorSettings.vue) |
 
 ## 数据分别保存在哪里

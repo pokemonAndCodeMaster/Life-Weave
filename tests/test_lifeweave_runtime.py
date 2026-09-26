@@ -608,6 +608,10 @@ def test_worker_runs_real_subprocess_retains_artifact_and_isolates_sessions(tmp_
         ".agents/skills/candidate-check/SKILL.md"
     ]
     assert core.evidence[0]["status"] == "submitted"
+    trace = runtime.events("personal", first["id"], after_sequence=0, limit=100)
+    boundaries = [event["event_type"] for event in trace
+                  if event["event_type"].startswith("plugin.execution.")]
+    assert boundaries == ["plugin.execution.started", "plugin.execution.finished"]
 
     second = runtime.create_run("personal", item_id="P-2", instruction="return home", engine="codex")
     assert asyncio.run(worker.execute_once()) is True

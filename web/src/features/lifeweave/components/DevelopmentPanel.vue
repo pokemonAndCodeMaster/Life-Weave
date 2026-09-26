@@ -3,9 +3,12 @@ import { onBeforeUnmount, reactive, shallowRef, watch } from 'vue'
 import { apiError, getRun, getRunEvents } from '../api/lifeweave'
 import { cancelDevelopment, createDevelopment, developmentChoices, getDevelopmentDiff, listDevelopment } from '../api/development'
 import type { DevelopmentAssignment, DevelopmentChoices, DevelopmentDiff } from '../api/development'
+import { pluginProcess } from '../api/plugins'
+import type { PluginProcess as PluginProcessValue } from '../api/plugins'
 import type { LifeWeaveRun, RunEvent, WorkspaceKind } from '../types'
 import MarkdownBody from './MarkdownBody.vue'
 import RunTrace from './RunTrace.vue'
+import PluginProcess from './PluginProcess.vue'
 
 const props = defineProps<{ workspace: WorkspaceKind; itemId: string; initialInstruction?: string }>()
 const choices = shallowRef<DevelopmentChoices | null>(null)
@@ -13,6 +16,8 @@ const assignments = shallowRef<DevelopmentAssignment[]>([])
 const runs = shallowRef<Record<string, LifeWeaveRun>>({})
 const events = shallowRef<Record<string, RunEvent[]>>({})
 const diffs = shallowRef<Record<string, DevelopmentDiff>>({})
+const process = shallowRef<PluginProcessValue | null>(null)
+const processError = shallowRef('')
 const error = shallowRef('')
 const busy = shallowRef(false)
 const requestId = shallowRef(crypto.randomUUID())
@@ -22,9 +27,15 @@ let generation = 0
 let timer: ReturnType<typeof setTimeout> | undefined
 async function refresh(ticket = generation) {
   try {
-    const rows = await listDevelopment(props.workspace, props.itemId)
+    const [rowsResult, pluginResult] = await Promise.allSettled([
+      listDevelopment(props.workspace, props.itemId), pluginProcess(props.workspace, props.itemId),
+    ])
     if (ticket !== generation) return
+    if (rowsResult.status === 'rejected') throw rowsResult.reason
+    const rows = rowsResult.value
     assignments.value = rows
+    process.value = pluginResult.status === 'fulfilled' ? pluginResult.value : null
+    processError.value = pluginResult.status === 'rejected' ? apiError(pluginResult.reason).message : ''
     const runIds = rows.flatMap(row => [row.planRunId, row.reviewRunId, row.implementationRunId]).filter((id): id is string => !!id)
     const snapshots = await Promise.all(runIds.map(async id => ({ id, run: await getRun(props.workspace, id), trace: await getRunEvents(props.workspace, id) })))
     if (ticket !== generation) return
@@ -36,7 +47,7 @@ async function refresh(ticket = generation) {
 }
 watch(() => [props.workspace, props.itemId], async () => {
   const ticket = ++generation
-  clearTimeout(timer); assignments.value = []; runs.value = {}; events.value = {}; diffs.value = {}; choices.value = null; error.value = ''
+  clearTimeout(timer); assignments.value = []; runs.value = {}; events.value = {}; diffs.value = {}; process.value = null; processError.value = ''; choices.value = null; error.value = ''
   form.instruction = props.initialInstruction || ''; form.repositoryPath = ''; form.engine = 'codex'; form.model = ''
   try {
     const value = await developmentChoices(props.workspace, props.itemId)
@@ -106,6 +117,7 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
         <p v-if="assignment.status === 'awaiting_acceptance'" class="lw-small">实施运行已结束。请核对结果、运行事件和隔离工作树；代码是否已合入目标仓以目标仓当前 Git 状态为准，业务接受仍待确认。</p>
         <div v-if="assignment.implementationRunId"><button class="lw-btn ghost sm" type="button" @click="showDiff(assignment.id)">查看实际 Git 差异</button><details v-if="diffs[assignment.id]" open><summary>实际改动 {{ diffs[assignment.id]!.fileCount }} 个文件{{ diffs[assignment.id]!.truncated ? ' · 页面已截断' : '' }}</summary><p class="lw-tiny lw-muted">基于提交 {{ diffs[assignment.id]!.baseRevision.slice(0, 12) }}。执行输入文件已从差异中排除；受管运行本身不会自动合入目标仓。</p><p v-if="diffs[assignment.id]!.generatedArtifactsExcluded.length" class="lw-tiny lw-muted">已排除 {{ diffs[assignment.id]!.generatedArtifactsExcluded.length }} 个未跟踪的测试缓存文件；它们未计入改动数。</p><pre class="development-diff">{{ diffs[assignment.id]!.patch || '没有代码差异' }}</pre></details></div>
         <details v-if="assignment.inputVersions.length"><summary>固定输入与版本</summary><ul><li v-for="entry in assignment.inputVersions" :key="entry.id">{{ entry.id }} · {{ entry.version.slice(0, 12) }} · {{ entry.sourcePath }}</li></ul></details>
+        <PluginProcess :process="process" :assignment-id="assignment.id" :error="processError" />
         <details v-for="stage in stages" :key="stage.key" :open="stage.key === 'implementationRunId' && assignment.status === 'awaiting_acceptance'">
           <summary>{{ stage.title }} · {{ assignment[stage.key] ? (runs[assignment[stage.key]!]?.state || '读取中') : '尚未开始' }}</summary>
           <template v-if="assignment[stage.key]"><p class="lw-tiny lw-mono">Run {{ assignment[stage.key] }} · {{ runs[assignment[stage.key]!]?.directory || '等待执行机' }}</p><p v-if="runs[assignment[stage.key]!]?.environmentSnapshot" class="lw-tiny lw-muted">实际模型：{{ runs[assignment[stage.key]!]!.environmentSnapshot?.effectiveModel || '执行器未报告' }} · 来源：{{ runs[assignment[stage.key]!]!.environmentSnapshot?.modelSource || '未知' }} · 凭据：{{ runs[assignment[stage.key]!]!.environmentSnapshot?.credentialSource || '未报告' }}</p>

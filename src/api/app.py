@@ -47,6 +47,9 @@ from src.lifeweave_runtime.service import LifeWeaveRuntimeService
 from src.lifeweave_runtime.router import router as runtime_router
 from src.lifeweave_runtime.models import RunOut
 from src.lifeweave_runtime.local_workers import LocalWorkers
+from src.lifeweave_plugins import PluginHost, builtin_registry
+from src.lifeweave_plugins.service import PluginService
+from src.lifeweave_plugins.router import router as plugin_router
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -127,7 +130,15 @@ def create_app() -> FastAPI:
     app.state.knowledge_links = KnowledgeLinks(app.state.library)
     app.state.task_sources = TaskSources(ROOT, app.state.library)
     runtime.task_sources = app.state.task_sources
+    app.state.plugin_host = PluginHost(manager.postgres(), builtin_registry(ROOT))
+    app.state.plugins = PluginService(manager.postgres(), app.state.plugin_host.registry,
+                                      app.state.plugin_host, app.state.task_sources, runtime, work)
+    app.state.plugin_host.service = app.state.plugins
+    runtime.plugin_host = app.state.plugin_host
+    runtime.plugins = app.state.plugins
     app.state.development = DevelopmentService(manager.postgres(), work, runtime, app.state.task_sources, ROOT)
+    app.state.development.plugin_host = app.state.plugin_host
+    app.state.development.plugins = app.state.plugins
     app.state.work_continuation = WorkContinuation(work, runtime)
     app.state.research_outputs = ResearchOutputs(work, runtime, app.state.library, ROOT)
     app.state.research_archive = ResearchArchive(ROOT, app.state.research_outputs, app.state.linear.connection, app.state.notion_mirror)
@@ -163,6 +174,7 @@ def create_app() -> FastAPI:
     app.include_router(results_router)
     app.include_router(external_development_router)
     app.include_router(development_router)
+    app.include_router(plugin_router)
     app.include_router(integrations_router)
     app.include_router(notion_mirror_router)
     app.include_router(library_router)

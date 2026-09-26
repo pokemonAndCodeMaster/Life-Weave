@@ -5,12 +5,13 @@ import EvaluationBoard from '../components/evaluations/EvaluationBoard.vue'
 import LifeWeaveIcon from '../components/LifeWeaveIcon.vue'
 import PageHeader from '../components/PageHeader.vue'
 import StatusBadge from '../components/StatusBadge.vue'
+import PluginCatalog from '../components/PluginCatalog.vue'
 import { useLifeWeaveWorkspace } from '../composables/useLifeWeaveWorkspace'
 
 interface Capability { id: string; title: string; target: string; status: string; desiredBehavior?: string; validationPlan?: string; version?: string; sourceItemId?: string }
 interface Method { id: string; title: string; description: string; path: string }
-const tabs = { abilities: '能力与成长', evaluations: '评测任务', machines: '执行机', runs: '运行记录', connections: '连接与空间' } as const
-const tab = shallowRef<keyof typeof tabs>('abilities')
+const tabs = { plugins: '插件目录', abilities: '能力与成长', evaluations: '评测任务', machines: '执行机', runs: '运行记录', connections: '连接与空间' } as const
+const tab = shallowRef<keyof typeof tabs>('plugins')
 const capabilities = shallowRef<Capability[]>([])
 const methods = shallowRef<Method[]>([])
 const unavailableMethods = shallowRef<Array<{ path: string; reason: string }>>([])
@@ -39,7 +40,9 @@ onBeforeUnmount(() => window.removeEventListener('lifeweave-capabilities-changed
   <PageHeader title="能力与评测" subtitle="查看当前能用的方法，定义评测任务，并对照真实运行决定是否改进能力。" />
   <div class="lw-tabs"><button v-for="(label, key) in tabs" :key="key" class="lw-tab" :class="{ active: tab === key }" type="button" @click="tab = key">{{ label }}</button></div>
 
-  <div v-if="tab === 'abilities'" class="lw-two-cols"><div>
+  <PluginCatalog v-if="tab === 'plugins'" :workspace="activeWorkspace" />
+
+  <div v-else-if="tab === 'abilities'" class="lw-two-cols"><div>
     <section class="lw-panel"><header class="lw-panel-head"><h2>已登记的工作方法</h2><StatusBadge :value="`${methods.length} 项`" /></header><p class="lw-small lw-sub">这些方法可在事项委托中选择；登记不表示本次已加载，更不表示执行器遵循了全部步骤。</p><div v-for="method in methods" :key="method.id" class="lw-list-row"><LifeWeaveIcon name="book" /><div class="lw-grow"><div class="lw-list-title">{{ method.title }}</div><div class="lw-list-sub">{{ method.description }}</div></div><StatusBadge value="已登记" /></div><div v-if="!methods.length" class="lw-empty">当前空间尚无可读取的方法。</div><p v-for="entry in unavailableMethods" :key="entry.path" class="lw-small lw-sub">来源不可用：{{ entry.path }} · {{ entry.reason }}</p></section>
     <section class="lw-panel"><header class="lw-panel-head"><h2>能力候选</h2><div class="lw-inline"><StatusBadge value="验证与发布必须有真实证据" tone="amber" /><button class="lw-btn sm" type="button" @click="openModal('capability-create')">创建候选</button></div></header><div v-for="candidate in capabilities" :key="candidate.id" class="lw-list-row"><LifeWeaveIcon name="spark" /><div class="lw-grow"><div class="lw-list-title">{{ candidate.title }}</div><div class="lw-list-sub">{{ candidate.desiredBehavior || candidate.validationPlan }}</div><div class="lw-tiny lw-muted lw-mt-5">{{ candidate.target }} · v{{ candidate.version ?? 1 }}</div></div><StatusBadge :value="candidate.status" /><button class="lw-btn sm" type="button" @click="openModal('capability-detail', { capabilityId: candidate.id })">查看</button></div><div v-if="capabilityError" class="lw-empty">{{ capabilityError }}</div><div v-else-if="!capabilities.length" class="lw-empty">尚无可验证的能力候选。</div></section>
     <div class="lw-section-title"><h2>从工作中形成的原始建议</h2><StatusBadge :value="`${improvements.length} 项`" /></div><article v-for="entry in improvements" :key="entry.id" class="lw-retro-row"><div class="lw-between"><StatusBadge :value="entry.kind" /><StatusBadge :value="entry.state" /></div><h3>{{ entry.title }}</h3><p>{{ entry.body }}</p><button class="lw-btn sm" type="button" @click="openModal('improvement-detail', { improvement: entry })">查看边界</button></article><div v-if="!improvements.length" class="lw-panel lw-empty">事项 → 复盘与成长 → 形成改进建议</div>

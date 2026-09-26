@@ -563,23 +563,45 @@ class LifeWeaveWorker:
                 nonlocal process
                 process = value
 
-            result = await executor.run(
-                ExecutorRequest(
-                    worktree=worktree,
-                    prompt=str(run["prompt_snapshot"]),
-                    run_id=run_id,
-                    model=run.get("model"),
-                    sandbox=str(run.get("sandbox") or "read-only"),
-                    artifact_path=artifacts,
-                    environment=environment,
-                    command_prefix=prefix,
-                    worktree_argument=worktree_argument,
-                    artifact_argument_root=artifact_argument_root,
-                    inherit_environment=inherit_environment,
-                ),
-                on_event,
-                on_process,
-            )
+            async def execution_event(event_type: str, outcome: str | None = None,
+                                      exit_code: int | None = None, error: str | None = None) -> None:
+                await self.client.event(run_id, {
+                    "lease_id": lease_id, "event_type": event_type, "source": "worker",
+                    "channel": "plugin", "summary": "执行器调用开始" if outcome is None else "执行器调用结束",
+                    "payload": {"outcome": outcome, "exitCode": exit_code, "error": error,
+                                "promptSha256": (run.get("environment_snapshot") or {}).get("contextPack", {}).get("promptSha256")},
+                })
+
+            # This event is adjacent to the actual adapter call. If it cannot
+            # be persisted, do not start an unobservable external process.
+            await execution_event("plugin.execution.started")
+            try:
+                result = await executor.run(
+                    ExecutorRequest(
+                        worktree=worktree,
+                        prompt=str(run["prompt_snapshot"]),
+                        run_id=run_id,
+                        model=run.get("model"),
+                        sandbox=str(run.get("sandbox") or "read-only"),
+                        artifact_path=artifacts,
+                        environment=environment,
+                        command_prefix=prefix,
+                        worktree_argument=worktree_argument,
+                        artifact_argument_root=artifact_argument_root,
+                        inherit_environment=inherit_environment,
+                    ),
+                    on_event,
+                    on_process,
+                )
+            except BaseException as exc:
+                try:
+                    await execution_event("plugin.execution.finished", "interrupted" if isinstance(exc, asyncio.CancelledError) else "failed", error=str(exc))
+                except Exception:
+                    pass
+                raise
+            await execution_event("plugin.execution.finished",
+                                  "interrupted" if stop_outcome else "succeeded" if result.exit_code == 0 and not result.failure_reason else "failed",
+                                  exit_code=result.exit_code, error=result.failure_reason)
             heartbeat_stop.set()
             await heartbeat_task
             if stop_outcome:

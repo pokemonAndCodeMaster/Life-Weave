@@ -3,7 +3,7 @@
 
 这是当前产品、状态、架构、路线和使用维护说明的连续阅读版；每篇仍在原位置维护，本文件从固定规范清单重建。
 
-本次收录 9 份当前来源，正文完整保留。原始讨论、旧规格、验证和失败记录见[历史完整汇编](history/complete-guide-20260926.md)及各当前文档中的证据链接，不与当前结论混排。
+本次收录 10 份当前来源，正文完整保留。原始讨论、旧规格、验证和失败记录见[历史完整汇编](history/complete-guide-20260926.md)及各当前文档中的证据链接，不与当前结论混排。
 
 维护时先更新分篇，再执行 `python scripts/build_complete_guide.py`；`python scripts/build_complete_guide.py --check` 会逐篇检查整合版是否与当前来源一致。
 
@@ -11,15 +11,16 @@
 
 | 部分 | 章节 | 来源 | 原文 SHA-256 |
 | --- | --- | --- | --- |
-| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `8408e2860030fd8990869418b9bb3bbeb77e3d4969bdd0a367876c00cd185322` |
-| 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `a3be812cde0d817c4372184d2b6d476a348674976fdbf0da7a6a1648b853ed9c` |
+| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `6509d5c9b670e70de3af1cdfa78364e8e94c4da126d4b56f9cf45f9b7a02adbe` |
+| 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `1ae7266824d6fd7466b593c5a3d7dbb65faa66cf1b59229ff7efbd26112ee472` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-03) | `docs/product.md` | `afacca1738d92bd7e94efe5075b1d76f615ca35ecf4d379022bd60038381f789` |
-| 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `34888c839427db5d552717a6e6e4c2581f113b6c1f15cc59d1b35d2397c5f4b6` |
-| 当前说明 | [当前完成情况](#doc-05) | `docs/status.md` | `9311a4a2c2e4942a3909cd1c22fbfb77ab648d2ed7b3a9ea1328120a0e4a47a3` |
-| 当前说明 | [当前建设路线](#doc-06) | `docs/roadmap.md` | `563c1874c1a6e154c9a16063ea91feec947c489f180ce519ce4bb473f40ddadb` |
-| 当前说明 | [开发与运行维护](#doc-07) | `docs/development.md` | `711ddbeac9fe0e883528e0376affad195746dc79869911ec6d294d3c56b49d08` |
-| 当前说明 | [LifeWeave：名称与适配](#doc-08) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
-| 当前说明 | [研究成果归档、离线阅读与跨文章讨论](#doc-09) | `docs/research-archive.md` | `e3d4980ab611ac1c975ce3122f27f6ceb53c57756716fc7003396e52aa77d3f7` |
+| 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `ba008a360c31c8a7e914e3fe20d77cc26a230ef74e27859532b67ed673ea4e38` |
+| 当前说明 | [插件目录与开发过程：首个可运行切片](#doc-05) | `docs/plugin-system.md` | `c5f79df8ed80e3e9d8eaa747fe0f507520f901c13b205a0442232f5453ebba13` |
+| 当前说明 | [当前完成情况](#doc-06) | `docs/status.md` | `9e460750f2728231ddc6ae266d8657434180f4a272fa6aba6e3b1a72731fd90f` |
+| 当前说明 | [当前建设路线](#doc-07) | `docs/roadmap.md` | `563c1874c1a6e154c9a16063ea91feec947c489f180ce519ce4bb473f40ddadb` |
+| 当前说明 | [开发与运行维护](#doc-08) | `docs/development.md` | `711ddbeac9fe0e883528e0376affad195746dc79869911ec6d294d3c56b49d08` |
+| 当前说明 | [LifeWeave：名称与适配](#doc-09) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
+| 当前说明 | [研究成果归档、离线阅读与跨文章讨论](#doc-10) | `docs/research-archive.md` | `e3d4980ab611ac1c975ce3122f27f6ceb53c57756716fc7003396e52aa77d3f7` |
 
 ---
 
@@ -45,11 +46,11 @@ LifeWeave 希望把工作、学习、爱好和生活中的想法、计划、行�
 
 1. [产品设计](#doc-03)：为谁解决什么问题、日常怎样使用、为什么这样组织。
 2. [架构与关键实现](#doc-04)：数据由谁维护，用户动作怎样穿过前后端，代码从哪里读起。
-3. [当前完成情况](#doc-05)：已经能用、实现但未实测、尚未实现的能力及证据。
-4. [建设路线](#doc-06)：下一阶段按用户结果交付什么。
-5. [开发与运行维护](#doc-07)：本地启动、配置、验证、改名兼容和排障。
+3. [当前完成情况](#doc-06)：已经能用、实现但未实测、尚未实现的能力及证据。
+4. [建设路线](#doc-07)：下一阶段按用户结果交付什么。
+5. [开发与运行维护](#doc-08)：本地启动、配置、验证、改名兼容和排障。
 
-[文档导航](#doc-02) 区分当前说明与历史证据；[命名说明](#doc-08) 解释名称与适配边界。
+[文档导航](#doc-02) 区分当前说明与历史证据；[命名说明](#doc-09) 解释名称与适配边界。
 
 [个人管理平台优化讨论与演进方案](../workspaces/reviews/personal-platform-evolution/review.md) 完整追踪本轮原始讨论、设计取舍和已实现范围。
 
@@ -78,15 +79,17 @@ python scripts/workbench.py start
 6. 在“周回顾 / 组会”配置关注内容、冻结当次内容、记录讨论并导出 Markdown。
 7. 在“维护中心 → 能力与成长”可直接创建 Skill/Agent 候选，或从工作中的改进建议接续；创建不会自动安装或发布。在“评测任务”选择已有事项，写本次任务和通过标准；开始时可选 Git 仓库、方法与知识，所选输入固定到实际 Run。不选仓库时在空隔离目录运行。结束后查看过程、接受证据并记录判断，或把问题关联成改进建议。打开候选可看它及明确前任的工作样例、失败历史和关联委托。评测候选通过后进入已验证状态；当前候选及明确记录的前任候选若有失败，须沿原标准再评通过，才能显式发布。
 
+“能力与评测 → 插件目录”展示当前受管开发能力、方法、执行器和脚本的身份、依赖与空间启停。需求/修复事项的“开发 Agent”可对照固定插件计划与实际调用；原方案、Run 事件和代码差异继续保留。具体观测范围及未接入能力见[插件目录与开发过程](#doc-05)。
+
 “就地讨论”会打开关联当前事项的 AI 对话；展开“附带其他研究成果”，可明确选入其他论文。已有知识另按问题匹配读取，实际来源及版本显示在回复下方。
 
-在“设置与连接 → 研究成果自动归档”启用后，新成功报告会自动写入 GitHub 的 `research-archive` 分支；配置 Notion 后，正文也会进入单向镜像。两个目标分别显示回读状态，失败保留本地并重试；以前的成果可点“立即归档 / 重试”。[当前两篇 GitHub 归档](https://github.com/pokemonAndCodeMaster/Life-Weave/tree/research-archive)在本机关机后仍能访问。原有 Linear 文档仅作历史只读，不再接收新报告。代码在同仓 `main`；归档范围是成果与引用材料，不是整套运行数据库或自动采纳正式知识。详见 [归档与跨文章讨论](#doc-09)。
+在“设置与连接 → 研究成果自动归档”启用后，新成功报告会自动写入 GitHub 的 `research-archive` 分支；配置 Notion 后，正文也会进入单向镜像。两个目标分别显示回读状态，失败保留本地并重试；以前的成果可点“立即归档 / 重试”。[当前两篇 GitHub 归档](https://github.com/pokemonAndCodeMaster/Life-Weave/tree/research-archive)在本机关机后仍能访问。原有 Linear 文档仅作历史只读，不再接收新报告。代码在同仓 `main`；归档范围是成果与引用材料，不是整套运行数据库或自动采纳正式知识。详见 [归档与跨文章讨论](#doc-10)。
 
 本机 Codex 已在正式 LifeWeave 仓的网页开发委托中跑通。OpenCode 指定模型曾完成一次三阶段小仓任务，但后续浏览器委托发现其只读方案可通过子代理写入隔离树；该委托已取消，网页 OpenCode 开发选项暂时关闭，直到权限与阶段检查通过真实回归。见[第二执行器实测与反例](evidence/development-agent/opencode-chain.md)。重试是关联到原委托的新尝试，不是恢复原生 CLI 会话。
 
-本轮已通过工作台完成 [Qwen-Drive 第一轮研究](http://127.0.0.1:8010/lifeweave/personal/items/item-810217743bbb4be2/outputs)。该入口属于当前本机安装；新安装不会预置这份个人事项。研究可用版的证据、明确边界和后续日常 Alpha 计划见 [当前完成情况](#doc-05)。
+本轮已通过工作台完成 [Qwen-Drive 第一轮研究](http://127.0.0.1:8010/lifeweave/personal/items/item-810217743bbb4be2/outputs)。该入口属于当前本机安装；新安装不会预置这份个人事项。研究可用版的证据、明确边界和后续日常 Alpha 计划见 [当前完成情况](#doc-06)。
 
-<a id="doc-01-line-56"></a>
+<a id="doc-01-line-58"></a>
 
 ### 连接已有积累
 
@@ -97,7 +100,7 @@ python scripts/workbench.py start
 - Notion 后台镜像使用单独的集成令牌文件和根页面授权。本机 Codex 的 Notion OAuth 只供交互式读取，不能替代后台令牌；未配置时页面如实显示“未启用”。原文留在 Git 仓或本机知识库。
 - 旧 Linear 连接可读取历史事项和已归档文档；新评论、发布及研究自动归档已停止。
 
-<a id="doc-01-line-65"></a>
+<a id="doc-01-line-67"></a>
 
 ### 数据与运行
 
@@ -116,7 +119,7 @@ python scripts/workbench.py start
 
 本机服务只监听 `127.0.0.1:8010`。当前身份是本机单用户，个人/团队是内容空间，**没有多人登录与成员权限系统**。不应直接暴露到公网。团队执行机和 Docker 协议保留，但默认启动个人空间的本机 worker；团队空间可以在设置中明确选择使用本机账号启用执行。远程执行需要另行部署与验证。
 
-<a id="doc-01-line-82"></a>
+<a id="doc-01-line-84"></a>
 
 ### 开发与验证
 
@@ -133,9 +136,9 @@ npm run build
 
 数据库集成测试在本项目 PostgreSQL 中创建随机命名的临时数据库，完成后删除；不会清空使用中的工作台数据库。实际浏览器与 AI 验证记录见 [交付记录](delivery.md)。
 
-API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`，页面前缀 `/lifeweave/`。旧页面仍会跳转；旧 API 客户端须跟随 308，或改用新前缀。配置读取范围见 [运行维护](#doc-07-line-29)。数据库变更新增到 `migrations/`，启动时按摘要校验并只应用新版本。
+API 文档：<http://127.0.0.1:8010/docs>，当前接口前缀 `/api/lifeweave/`，页面前缀 `/lifeweave/`。旧页面仍会跳转；旧 API 客户端须跟随 308，或改用新前缀。配置读取范围见 [运行维护](#doc-08-line-29)。数据库变更新增到 `migrations/`，启动时按摘要校验并只应用新版本。
 
-<a id="doc-01-line-99"></a>
+<a id="doc-01-line-101"></a>
 
 ### 在新的本机 Agent 会话接续
 
@@ -164,7 +167,7 @@ python scripts/lifeweave.py feedback item-实际编号 '重点理解错了，先
 
 命令读取本机服务，失败返回非零；`--workspace team` 切换空间。ChatGPT 远程连接、自然语言自动排程、自动发布方法改进尚未完成。完整研发方案见 [下一阶段产品方案](../workspaces/reviews/lifeweave-next-stage/review.md)。
 
-在已经打开的 Codex 会话开发代码时，可按[开发与维护说明](#doc-07-line-102)把实际阶段与 Git 状态写回同一事项。明确绑定且 Codex 信任本机 Hook 后，受支持的工具和生命周期元数据也会自动出现在推进记录；它不上传原始命令/输出，且不能保证捕获所有步骤。受管网页委托另有完整 Run 记录。
+在已经打开的 Codex 会话开发代码时，可按[开发与维护说明](#doc-08-line-102)把实际阶段与 Git 状态写回同一事项。明确绑定且 Codex 信任本机 Hook 后，受支持的工具和生命周期元数据也会自动出现在推进记录；它不上传原始命令/输出，且不能保证捕获所有步骤。受管网页委托另有完整 Run 记录。
 <!-- source-end: README.md -->
 
 ---
@@ -182,22 +185,23 @@ LifeWeave 希望帮助个人与协作中的人，把工作、学习、爱好和�
 | 读者想知道什么 | 阅读入口 |
 | --- | --- |
 | 为什么做、准备怎样解决问题 | [产品设计](#doc-03) |
-| 下一阶段怎样交付 | [建设路线](#doc-06) |
+| 下一阶段怎样交付 | [建设路线](#doc-07) |
 | 本轮批准的行为与首版验收 | [产品定义与首版迭代计划 v1.0](../LifeWeave_产品定义与首版迭代计划_v1.0_2026-09-19.md) |
 | 完整产品能力如何分批建设 | [下一阶段产品方案](../workspaces/reviews/lifeweave-next-stage/review.md) |
 | 个人管理平台新讨论如何进入产品 | [原始讨论与演进方案](../workspaces/reviews/personal-platform-evolution/review.md) |
 | 本轮评测、知识关联与首页实际验证 | [平台演进证据](evidence/personal-platform-evolution/README.md) |
 | 用户动作如何实现、数据放在哪里 | [架构与关键实现](#doc-04) |
-| 现在能做什么、哪些还不能依赖 | [当前完成情况](#doc-05) |
-| 怎样启动、修改、验证和维护 | [开发与运行维护](#doc-07) |
-| 为什么叫 LifeWeave、哪些名称已适配 | [命名与兼容](#doc-08) |
+| 插件目录、固定计划与受管调用怎样使用 | [插件目录与开发过程](#doc-05) |
+| 现在能做什么、哪些还不能依赖 | [当前完成情况](#doc-06) |
+| 怎样启动、修改、验证和维护 | [开发与运行维护](#doc-08) |
+| 为什么叫 LifeWeave、哪些名称已适配 | [命名与兼容](#doc-09) |
 | 亲自打开应用并完成第一项工作 | [项目首页与使用步骤](#doc-01) |
 
 当前说明以本仓源码、迁移和运行结果为依据。修改功能时，应同步受影响的产品说明、实现说明或状态；精确字段仍以源码和运行中的 [API 文档](http://127.0.0.1:8010/docs) 为准，不在文档里维护逐函数副本。
 
 历史材料单独保留：[初始授权](brief.md)、[首次交付](delivery.md)、[首轮证据](evidence/README.md)、[此次改名要求](rename-request.md)。其中旧名称、旧路径、截图、运行 ID 和原始输入应按当时事实理解，不能因为改名而重写成新的验证证据。
 
-[研究归档与跨文章讨论](#doc-09)：云端入口、ZIP 使用、自动触发及恢复范围。
+[研究归档与跨文章讨论](#doc-10)：云端入口、ZIP 使用、自动触发及恢复范围。
 <!-- source-end: docs/README.md -->
 
 ---
@@ -224,7 +228,7 @@ LifeWeave 的愿景，是让这些事情有清楚的入口、持续的背景、�
 
 例如准备一次旅行，可以先记下“秋天想去徒步”的想法；确定要推进时创建个人事项，写清时间、预算和限制，关联资料。之后自己整理清单，或选择材料让 AI 给出候选路线。读完结果、补充实际核验，再保存成果。下次打开事项，不必从聊天历史重建目的与约束。
 
-这个例子说明现有通用对象如何承载生活事务，并非已经完成旅行业务验证。首轮实际验证用的是工作台交付检查、知识笔记和团队会议议程，详见 [状态与证据](#doc-05)。
+这个例子说明现有通用对象如何承载生活事务，并非已经完成旅行业务验证。首轮实际验证用的是工作台交付检查、知识笔记和团队会议议程，详见 [状态与证据](#doc-06)。
 
 当前页面按用户动作组织：
 
@@ -266,7 +270,7 @@ LifeWeave 的愿景，是让这些事情有清楚的入口、持续的背景、�
 
 有价值的成果可整理为知识候选，比较差异后再接受。后续对话和研究读取已接受的知识，并标明来源；候选与模型自述不能替代接受动作。请求失败保留原话，结果不确定时按原请求身份核查；业务运行的重试是有历史关联的新尝试。
 
-上述路径已有真实模型、数据库和网页验证，具体成功、失败与修复记录见 [当前状态](#doc-05)；它不保证模型对每篇论文的解释正确，也不代表用户已经学会论文。论文质量、用户理解和产品可接续性分别判断。
+上述路径已有真实模型、数据库和网页验证，具体成功、失败与修复记录见 [当前状态](#doc-06)；它不保证模型对每篇论文的解释正确，也不代表用户已经学会论文。论文质量、用户理解和产品可接续性分别判断。
 
 <a id="doc-03-line-55"></a>
 
@@ -314,7 +318,7 @@ Notion 当前承担在线阅读镜像，原文仍由 Git 仓或本机知识目�
 
 “能力与评测”把一次工作作为可检查的案例：用户先写要做什么、怎样算通过；开始时可以选择只读 Git 仓库、工作方法和知识，系统固定本轮实际输入并创建真实委托。不选仓库时执行器处于空隔离目录，无法核验项目源码。普通事项委托也可从当前空间的可试验候选中直接选择。结果出来后可以打开运行过程、在事项中接受证据，再记录通过、失败或无法判断。候选详情直接列出关联事项、标准、判断和运行；通过的评测可作为有来源的工作样例，失败也保留在历史中。候选能力通过后进入已验证状态，但是否发布仍需用户决定；发布要求本版本至少一次显式评测通过，且不能有未完成的评测。当前候选及明确记录的前任候选若有失败或无法判断，须沿原任务与标准建立再评并通过；另外新建一个更容易的任务，即使通过，也不能覆盖原问题。没有明确前任关系的同名候选不会被系统擅自合并。评测后可把发现的问题、目标行为和下次验证方法关联成改进建议，之后仍需另行建立、验证并发布候选。这个入口管理人工判断与版本证据，不自动证明 AI 答案正确。
 
-研究可用版已用两篇真实论文验证过局部路径。当前优先让 LifeWeave 的项目知识进入工作台，并让一次真实开发的事项、材料、执行、验证和知识变化可以接续；随后扩展日常时间安排、多入口和团队能力。未实现范围与每阶段验收见[当前状态](#doc-05)和[建设路线](#doc-06)。原有方案与讨论仍在[历史说明](../workspaces/reviews/lifeweave-next-stage/review.md)中保留。
+研究可用版已用两篇真实论文验证过局部路径。当前优先让 LifeWeave 的项目知识进入工作台，并让一次真实开发的事项、材料、执行、验证和知识变化可以接续；随后扩展日常时间安排、多入口和团队能力。未实现范围与每阶段验收见[当前状态](#doc-06)和[建设路线](#doc-07)。原有方案与讨论仍在[历史说明](../workspaces/reviews/lifeweave-next-stage/review.md)中保留。
 <!-- source-end: docs/product.md -->
 
 ---
@@ -361,7 +365,7 @@ flowchart TD
 
 程序集成入口在 [src/api/app.py](../src/api/app.py)。它创建数据库连接、工作服务、知识服务、执行器和外部连接；启动时恢复过期租约并启动已启用的本机节点，退出时关闭节点和连接池。生产构建的 Vue 静态文件也由这个进程提供。
 
-当前 Python、Vue、数据库与执行材料统一使用 LifeWeave 命名；历史入口兼容见 [命名说明](#doc-08)。
+当前 Python、Vue、数据库与执行材料统一使用 LifeWeave 命名；历史入口兼容见 [命名说明](#doc-09)。
 
 | 职责 | 主要代码入口 |
 | --- | --- |
@@ -380,9 +384,10 @@ flowchart TD
 | 首页预设与用户调整 | [homeLayout.ts](../web/src/features/lifeweave/utils/homeLayout.ts)、[HomePage.vue](../web/src/features/lifeweave/pages/HomePage.vue)、[HomeDashboardCard.vue](../web/src/features/lifeweave/components/HomeDashboardCard.vue) |
 | 外部 Codex 开发阶段与 Git 观测 | [external_development.py](../src/lifeweave/external_development.py)、[正式 CLI](../scripts/lifeweave.py)、[ItemActivityTab.vue](../web/src/features/lifeweave/components/ItemActivityTab.vue) |
 | 网页开发委托与隔离差异 | [development.py](../src/lifeweave/development.py)、[development_router.py](../src/lifeweave/development_router.py)、[DevelopmentPanel.vue](../web/src/features/lifeweave/components/DevelopmentPanel.vue) |
+| 插件目录、固定计划与调用对照 | [插件内核](../src/lifeweave_plugins/core.py)、[插件服务](../src/lifeweave_plugins/service.py)、[PluginCatalog.vue](../web/src/features/lifeweave/components/PluginCatalog.vue)、[PluginProcess.vue](../web/src/features/lifeweave/components/PluginProcess.vue)；范围与边界见[插件说明](#doc-05) |
 | Notion 单向镜像 | [notion_mirror.py](../src/integrations/notion_mirror.py)、[NotionMirrorSettings.vue](../web/src/features/lifeweave/components/NotionMirrorSettings.vue) |
 
-<a id="doc-04-line-58"></a>
+<a id="doc-04-line-59"></a>
 
 ### 数据分别保存在哪里
 
@@ -407,7 +412,7 @@ PostgreSQL 的 `workbench` schema 保存以下对象。完整字段以 [migratio
 
 结构化业务对象常用 JSONB 保存有差异的内容，避免为每种学习或生活事项提前设计独立表。代价是字段语义主要由 Service 和页面适配器约束；扩展公共字段时需要同时检查输入校验、持久化与多个页面，不能只改显示名称。
 
-<a id="doc-04-line-81"></a>
+<a id="doc-04-line-82"></a>
 
 ### 一次事项修改怎样生效
 
@@ -417,7 +422,7 @@ PostgreSQL 的 `workbench` schema 保存以下对象。完整字段以 [migratio
 
 子事项的委托背景从 [current_context_snapshot](../src/lifeweave/service.py) 组装，包含共享背景与本次局部目标。修改这个方法时，必须检查根事项和子事项，防止 AI 只得到父目标或只得到孤立的子标题。
 
-<a id="doc-04-line-89"></a>
+<a id="doc-04-line-90"></a>
 
 ### 一次 AI 委托怎样完成
 
@@ -448,7 +453,7 @@ sequenceDiagram
 
 失败、取消和不可用状态保存到同一运行记录。界面的“按当前背景再试”建立关联的新尝试，并取当前背景；它不是恢复原生 CLI 会话。运行的原生会话 ID 用于追溯。源码链接只读取该轮受控目录内允许类型的文本文件，不把任意路径开放给浏览器。
 
-<a id="doc-04-line-118"></a>
+<a id="doc-04-line-119"></a>
 
 ### 知识修改为什么不会静默替换正文
 
@@ -462,7 +467,7 @@ LifeWeave 项目本身作为只读内置来源出现在个人和团队知识页�
 
 引用关系由 `links.py` 使用 Mistune AST 从当前 Markdown 编译。它只识别同一来源内指向 `.md` 的相对链接，忽略代码块和图片；解码、规范化后再走 Library 路径边界。文件元数据相同的正文解析结果在本进程复用，出链是否存在及反向引用每次按当前可读目录重算。索引不是新的正式正文；外部文件变化通常由修改时间/大小触发重读，尚未完成海量目录容量验证。知识页读到的正文版本与关系响应一同返回，便于识别页面期间的变更。
 
-<a id="doc-04-line-130"></a>
+<a id="doc-04-line-131"></a>
 
 ### Linear 的历史读取边界
 
@@ -470,7 +475,7 @@ LifeWeave 项目本身作为只读内置来源出现在个人和团队知识页�
 
 原有评论预览和发布记录为历史数据。新写入端点返回只读提示；新研究成果不再排队到 Linear。原关联与已确认归档链接保持可读，但不能据此推定 Notion 已完成迁移。
 
-<a id="doc-04-line-136"></a>
+<a id="doc-04-line-137"></a>
 
 ### 当前架构的适用范围
 
@@ -478,7 +483,7 @@ LifeWeave 项目本身作为只读内置来源出现在个人和团队知识页�
 
 这种结构优先让单机使用和调试简单，并保留未来拆出执行节点的接口。真正引入多用户、远程访问或高并发前，需要增加相应身份、权限、调度、存储和故障验证，不能仅把监听地址改成公网。
 
-<a id="doc-04-line-142"></a>
+<a id="doc-04-line-143"></a>
 
 ### 新会话接续、材料推荐与纠偏
 
@@ -494,7 +499,7 @@ LifeWeave 项目本身作为只读内置来源出现在个人和团队知识页�
 
 源码与默认数据库都已使用 LifeWeave 命名。SQL 005 只原位改标识，外键和数据身份保持；迁移总账在应用迁移前由 `src.cli` 改名。安装级数据库/角色通过私有集群专用脚本原位迁移，命令与回退边界见开发说明。
 
-<a id="doc-04-line-156"></a>
+<a id="doc-04-line-157"></a>
 
 ### 网页自然对话与研究成果
 
@@ -522,24 +527,64 @@ SQL 006 增加对话、消息与明确方向/偏好；SQL 007 增加成果来源
 
 论文还可能用普通 Markdown 文字链接引用本轮图片。`/source` 对 PNG/JPEG/GIF/WebP 委托既有 `ResearchOutputs.asset` 校验并返回正确媒体类型，因此报告、知识映射与 HTML 阅读版共享同一读取行为；不为修链接改写原成果，也不扩大到任意二进制文件。
 
-<a id="doc-04-line-182"></a>
+<a id="doc-04-line-183"></a>
 
 ### 成果的异地归档
 
 `research_archive.py` 复用同一个便携包。每空间设置及逐运行归档状态保存在 `.runtime/research-archives`，进程间文件锁串行保护归档 checkout；后台每20秒扫描已启用空间，新成功正文进入归档，失败5分钟后重试。GitHub 用独立 checkout 写 `research-archive`；配置 Notion 后，报告正文作为带源版本的子页镜像。每目标独立确认与重试，固定运行和正文身份避免重复创建，远端冲突不覆盖。
 
-GitHub 以分支提交回读确认；Notion 以 Markdown 全文回读、来源版本及截断/未知块检查确认，图片目前引用 GitHub Raw 文件，未逐张完成页面显示验收。项目当前文档从固定清单扫描，每60秒尝试单向镜像；研究报告启用后约每5分钟复核已确认镜像。单篇失败单独记录并继续，既有人工 Notion 页面不覆盖。相同源版本再次扫描时也回读远端，发现被改动即显示失败；两次扫描之间不持续监测远端。细节、设置和恢复边界见 [归档与跨文章讨论](#doc-09)。
+GitHub 以分支提交回读确认；Notion 以 Markdown 全文回读、来源版本及截断/未知块检查确认，图片目前引用 GitHub Raw 文件，未逐张完成页面显示验收。项目当前文档从固定清单扫描，每60秒尝试单向镜像；研究报告启用后约每5分钟复核已确认镜像。单篇失败单独记录并继续，既有人工 Notion 页面不覆盖。相同源版本再次扫描时也回读远端，发现被改动即显示失败；两次扫描之间不持续监测远端。细节、设置和恢复边界见 [归档与跨文章讨论](#doc-10)。
 <!-- source-end: docs/architecture.md -->
 
 ---
 
 <a id="doc-05"></a>
-<!-- source-begin: docs/status.md -->
+<!-- source-begin: docs/plugin-system.md -->
 <a id="doc-05-line-1"></a>
+
+## 插件目录与开发过程：首个可运行切片
+
+日期：2026-09-27。设计依据是 [Notion 阶段计划](https://app.notion.com/p/3e7af682864481d6a5f3c7f7b8542bc0)与[阶段 1 施工方案](../workspaces/reviews/plugin-foundation-stage1/review.md)。本文只描述当前代码已经接入的边界；后续阶段仍按该方案推进。
+
+<a id="doc-05-line-5"></a>
+
+### 使用者怎样看
+
+打开“能力与评测 → 插件目录”，可见每项能力的身份、版本、依赖、可运行原因和本空间启停状态。点“查看近期使用”能从插件回到实际事项。停用阻止该空间的新调用，不删除历史；已在执行中的外部进程不会被强行中止。Codex 可用性首先取决于本机 CLI，真正账号和模型仍以运行结果为证。OpenCode 在开发委托中继续暂停。
+
+在需求或修复事项的“开发 Agent”页发起委托后，展开“插件计划与实际调用”。计划与绑定在委托创建时固定，实际调用只由服务端真正进入对应操作或受信任执行机进入 `executor.run` 边界时记下。一个条目有计划但没有调用，页面显示“尚无实际调用”，不推断执行器内部发生了什么。旧委托没有插件计划，会明确显示历史边界。开发页继续使用原 Run 和原生事件；插件过程接口故障时不遮断原有记录。
+
+目前可见的组合是 `lifeweave.development` → `lifeweave.context` → `lifeweave.knowledge` 的推荐和选定正文读取、`lifeweave.method.<原方法ID>` 的版本固定，以及 `lifeweave.execution.codex` 和 `lifeweave.checks.repository`。方法的“已绑定”仅证明材料被选入快照，不证明模型遵循全部步骤。Run 环境中的 `contextPack` 含编译器版本、背景版本、来源版本和最终提示词 SHA-256；提示词正文仍由原 Run 快照保存。推荐会扫描受管来源并记录候选引用；选中的正文另存于原能力快照。
+
+<a id="doc-05-line-13"></a>
+
+### 实现与数据归属
+
+- [core.py](../src/lifeweave_plugins/core.py) 管内置描述、依赖校验、实现摘要与调用边界；[service.py](../src/lifeweave_plugins/service.py) 管空间状态、固定计划、绑定核验和计划／实际投影。
+- [013_plugin_foundation.sql](../migrations/013_plugin_foundation.sql) 新增固定计划、调用与空间启停三张表；既有事项、开发委托、Run、事件和知识正文仍由原模块负责。项目知识原文继续在 Git，本地知识原文继续在 Markdown，Notion 仍是镜像。
+- [development.py](../src/lifeweave/development.py) 仍决定方案、审阅、自检、实施与只读检查何时推进；插件绑定不接管业务状态机。[Runtime](../src/lifeweave_runtime/service.py) 在创建 Run 时固定上下文和真实所选材料；[Worker](../src/lifeweave_runtime/worker.py) 紧贴执行器调用上报开始／结束事件。受信任租约、Run 事件和插件调用记录共同构成受管边界证据。
+- `GET /api/lifeweave/{space}/plugins`、`GET /plugins/{id}`、`PUT /plugins/{id}/enabled`、`GET /plugins/{id}/calls` 与 `GET /items/{itemId}/plugin-process` 是读取和控制入口。启停请求带期望配置版本；版本冲突返回 409。没有任意插件代码安装或通用执行 POST。
+
+<a id="doc-05-line-20"></a>
+
+### 当前边界与后续验收
+
+首个切片只把开发主链中的插件身份和真实调用接通。现有知识修订、Markdown 链接和 Notion 发布、评测任务继续在原入口运行；它们尚未全部成为统一插件操作。`lifeweave.evaluation` 在目录中标“不可运行”，不把原评测功能冒称为新插件接入。语义关系、单篇 Notion 发布、插件级评测和调用反馈尚待下一阶段。后台 Notion 镜像令牌仍未配置；本机 Codex 的交互式 Notion 授权不能替代它。
+
+受管 Worker 的开始／结束事件证明它跨过执行适配器调用边界，不证明模型内部每条工具命令都被完整观察。外部本机 Codex 会话、未绑定 Hook 和第三方内部行为维持原有限定。执行结果和检查通过不等于用户已经接受工作。计划绑定的版本或实现摘要漂移会拒绝新调用；原计划和已发生的调用保留，需重新委托。单次页面调用最多返回 200 条，达到上限时未匹配步骤标为“无法判定”。
+
+回归使用一次性 PostgreSQL 测试库检查旧入口、空间隔离、停用和固定绑定；Vue 类型检查、组件测试和构建检查目录与开发页面。正式能力还须用真实 Codex 委托、页面查看和第二个任务复用继续验证，不能由测试库代替。
+<!-- source-end: docs/plugin-system.md -->
+
+---
+
+<a id="doc-06"></a>
+<!-- source-begin: docs/status.md -->
+<a id="doc-06-line-1"></a>
 
 ## 当前完成情况
 
-核对日期：2026-09-26。本页描述当前可用范围。历史阶段的测试数量、失败与修复记录保留在[历史状态](history/status-through-20260926.md)和[证据目录](evidence/README.md)，不作为当前能力的累计完成率。
+核对日期：2026-09-27。本页描述当前可用范围。历史阶段的测试数量、失败与修复记录保留在[历史状态](history/status-through-20260926.md)和[证据目录](evidence/README.md)，不作为当前能力的累计完成率。
 
 LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容空间，不是多人账号。已有真实研究、持续事项、人工主导的能力试验；开发自用、自动进化和远程团队使用尚未形成完整体验。
 
@@ -551,27 +596,28 @@ LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容�
 | 管理本地 Markdown、提交修订、比较和接受；查看同源 Markdown 引用 | [知识关系证据](evidence/personal-platform-evolution/README.md) | 外部来源的修订不能直接在产品里覆盖原仓正文 |
 | 创建 Skill/Agent/Harness 候选，围绕事项运行评测、看轨迹和工作样例，并按同标准再评 | 两次内部窄任务真实 Codex 运行；临时数据库和页面验证见[评测证据](evidence/personal-platform-evolution/README.md) | 不能自动创建、优化、合并能力；实施者判定通过不等于用户验收或跨领域有效 |
 | 在个人、团队空间调整首页五张卡片 | [桌面与手机页面证据](evidence/personal-platform-evolution/README.md) | 任意组件、拖拽或自然语言改布局 |
-| 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](#doc-01-line-99) | 原始命令和输出不上传；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件 |
+| 使用正式 CLI 查找、接续、反馈事项；已有本机 Codex 会话可主动关联并上报阶段，明确绑定且 Hook 受信任后可记录部分原生工具/生命周期元数据 | [真实 Hook 烟测](evidence/development-agent/hook-smoke.md)、[使用步骤](#doc-01-line-101) | 原始命令和输出不上传；只读沙箱可能阻断本机 HTTP，Hook 可能被跳过，未绑定会话不追踪；人工上报不能冒充原生事件 |
 | 在需求/修复事项中提交开发委托，分开查看只读方案、独立审阅或自检、可写实施的 Run 和隔离工作树差异 | [正式 LifeWeave 仓网页委托](evidence/development-agent/live-project-run.md)、[Codex 小仓执行](evidence/development-agent/README.md)、[OpenCode 小仓成功及后续反例](evidence/development-agent/opencode-chain.md)及数据库/HTTP 回归；前端类型检查和构建通过 | 正式仓只核验有界 CLI 增量；OpenCode 后续只读阶段被发现写入隔离树，现已从开发页暂停，待修复回归；复杂工程质量、外部会话自动逐工具采集仍未验证，结果不会自动合入原仓 |
+| 查看开发插件目录、按空间停用新调用，并在事项对照固定计划与真实受管调用 | [插件实现说明](#doc-05)；一次性数据库回归覆盖绑定、停用、跨空间与执行边界，正式库已备份并迁移 | 插件级评价、知识语义关系和 Notion 自动镜像尚未接通；此切片尚待正式 Codex 自用和页面核查，不等于整份阶段 1 方案已完成 |
 
 Codex 已有正式仓的真实成功记录。OpenCode 曾用 `--model opencode/mimo-v2.5-free` 和本机账号副本完成小仓三阶段及 7 项 unittest，但下一次只读方案的子代理写入了隔离树，故该开发选项当前暂停；成功一次不代表权限边界可靠。执行快照记录的是传给 CLI 的模型参数，尚无来自上游提供方的模型身份回执。运行事件可查看，但不等于 Agent 内部每步工具调用均可观察。选 Git 仓库时固定提交并在独立目录运行，未提交改动不会自动带入，代码产物也不会自动合回原仓。
 
-启用后的新研究报告继续自动归档到 GitHub；Linear 仅保留历史只读。Notion 单向镜像已实现配置、项目文档逐篇扫描、报告投递与 Markdown 回读；同版本复查也读取远端并检查冲突。但后台令牌及根页面尚未配置，故没有真实 Notion 自动镜像完成证据。用户完成浏览器授权后，本机 Codex 新会话通过直接的 `mcp__notion__notion_fetch` 读出项目入口标题；[读取记录](evidence/development-agent/notion-mcp-smoke.md)证明交互式 Notion MCP 可用，与后台镜像授权不同。本机停机时不能生成或上传新报告。飞书入口、远程 ChatGPT、多成员身份、各自模型连接、时间容量与日历、周期评测及正式自动知识回写均未实现。[归档维护说明](#doc-09)区分远端已确认版本与本地待传状态。
+启用后的新研究报告继续自动归档到 GitHub；Linear 仅保留历史只读。Notion 单向镜像已实现配置、项目文档逐篇扫描、报告投递与 Markdown 回读；同版本复查也读取远端并检查冲突。但后台令牌及根页面尚未配置，故没有真实 Notion 自动镜像完成证据。用户完成浏览器授权后，本机 Codex 新会话通过直接的 `mcp__notion__notion_fetch` 读出项目入口标题；[读取记录](evidence/development-agent/notion-mcp-smoke.md)证明交互式 Notion MCP 可用，与后台镜像授权不同。本机停机时不能生成或上传新报告。飞书入口、远程 ChatGPT、多成员身份、各自模型连接、时间容量与日历、周期评测及正式自动知识回写均未实现。[归档维护说明](#doc-10)区分远端已确认版本与本地待传状态。
 
-当前服务已让项目知识可找、可读，原文变更后的新版本能被下一次读取；外部开发报告也能通过同一事项接续。[正式服务的桌面与手机核查](evidence/project-development/README.md)覆盖这两条阅读路径。正式事项 `item-58363ef3851142d8` 已记录 GitHub 提交、测试、页面证据和后续档案导航修复，目前待用户使用验收。本轮以后绑定的 Codex 会话可以用受信任 Hook 记录支持的事件；更早的代码改动只有 Git 差异与主动上报，无法补造实时 trace。后续重点是在真实复杂开发中从任务起点绑定、核对工具覆盖和验证反馈怎样改善下一轮。阶段和验收条件见[建设路线](#doc-06)。
+当前服务已让项目知识可找、可读，原文变更后的新版本能被下一次读取；外部开发报告也能通过同一事项接续。[正式服务的桌面与手机核查](evidence/project-development/README.md)覆盖这两条阅读路径。正式事项 `item-58363ef3851142d8` 已记录 GitHub 提交、测试、页面证据和后续档案导航修复，目前待用户使用验收。本轮以后绑定的 Codex 会话可以用受信任 Hook 记录支持的事件；更早的代码改动只有 Git 差异与主动上报，无法补造实时 trace。后续重点是在真实复杂开发中从任务起点绑定、核对工具覆盖和验证反馈怎样改善下一轮。阶段和验收条件见[建设路线](#doc-07)。
 <!-- source-end: docs/status.md -->
 
 ---
 
-<a id="doc-06"></a>
+<a id="doc-07"></a>
 <!-- source-begin: docs/roadmap.md -->
-<a id="doc-06-line-1"></a>
+<a id="doc-07-line-1"></a>
 
 ## 当前建设路线
 
-核对日期：2026-09-26。LifeWeave 面向工作、学习、生活和爱好，开发工作是近期验证共用底座的一类真实事项，并非产品唯一用途。目标和当前范围分别见[产品设计](#doc-03)与[当前状态](#doc-05)。各阶段按用户能完成的事验收，不按页面数或测试数计算百分比。
+核对日期：2026-09-26。LifeWeave 面向工作、学习、生活和爱好，开发工作是近期验证共用底座的一类真实事项，并非产品唯一用途。目标和当前范围分别见[产品设计](#doc-03)与[当前状态](#doc-06)。各阶段按用户能完成的事验收，不按页面数或测试数计算百分比。
 
-<a id="doc-06-line-5"></a>
+<a id="doc-07-line-5"></a>
 
 ### 先让项目知识与开发工作接得上
 
@@ -581,21 +627,21 @@ Codex 已有正式仓的真实成功记录。OpenCode 曾用 `--model opencode/m
 
 已用 Codex 在[临时小仓](evidence/development-agent/README.md)和[正式 LifeWeave 仓的有界任务](evidence/development-agent/live-project-run.md)跑通三阶段开发；OpenCode 指定模型曾完成小仓任务，但后续[只读越权反例](evidence/development-agent/opencode-chain.md)要求先修复并真实复测，再开放网页开发入口。然后用真实 LifeWeave 复杂事项核对方案质量、背景冲突、过程事件、测试证据和反馈接续，并继续验证本机 Codex Hook 在受信任会话中的覆盖率。Notion 后台凭据和根页面授权就绪后，先对一篇当前文档及一篇带图报告做上传、回读和实际页面显示验收，再批量镜像。
 
-验收包括：从全新页面和新会话查找并打开正确规范；所选方法和最多十篇知识的版本随运行固定；修改后再次读取看到新正文；同一事项能定位可复查的代码与测试结果；无仓库时明确无法核验源码。日常服务保持稳定，候选在隔离环境验证。[开发与运维](#doc-07)说明正式命令和环境。
+验收包括：从全新页面和新会话查找并打开正确规范；所选方法和最多十篇知识的版本随运行固定；修改后再次读取看到新正文；同一事项能定位可复查的代码与测试结果；无仓库时明确无法核验源码。日常服务保持稳定，候选在隔离环境验证。[开发与运维](#doc-08)说明正式命令和环境。
 
-<a id="doc-06-line-15"></a>
+<a id="doc-07-line-15"></a>
 
 ### 然后让反馈确实改善下一次
 
 在真实任务的可观察步骤上定位反馈，区分输入问题、知识问题、方法问题和代码问题。以同一标准重跑旧失败，同时检查原有成功、新任务及相邻反例；有可靠证据才发布新能力。当前只有人工评测、运行事件和显式前任的发布门槛，自动判定、定期回归、自动优化及回退仍待实现。[能力审查](../workspaces/reviews/personal-platform-evolution/review.md)记录当前边界。
 
-<a id="doc-06-line-19"></a>
+<a id="doc-07-line-19"></a>
 
 ### 扩展到不同入口和领域
 
 让手机消息与网页接续同一事项，让 Notion 读取同源全文；扩大知识关系、模型连接和运行组件。以论文、攻略、日常安排及开发等不同工作检验同一底座，不把研发流程套给所有事情。同步要能显示冲突和失败；远端回读全文与资产后才算成功。
 
-<a id="doc-06-line-23"></a>
+<a id="doc-07-line-23"></a>
 
 ### 支持个人和团队长期使用
 
@@ -606,13 +652,13 @@ Codex 已有正式仓的真实成功记录。OpenCode 曾用 `--model opencode/m
 
 ---
 
-<a id="doc-07"></a>
+<a id="doc-08"></a>
 <!-- source-begin: docs/development.md -->
-<a id="doc-07-line-1"></a>
+<a id="doc-08-line-1"></a>
 
 ## 开发与运行维护
 
-<a id="doc-07-line-3"></a>
+<a id="doc-08-line-3"></a>
 
 ### 先把项目跑起来
 
@@ -629,7 +675,7 @@ python scripts/workbench.py status
 
 不要在正式日常数据库运行清空或示例重建脚本。应用与 PostgreSQL 都由本目录负责，旧工程兼容链接不表示另一个安装。
 
-<a id="doc-07-line-18"></a>
+<a id="doc-08-line-18"></a>
 
 ### 读代码的顺序
 
@@ -642,7 +688,7 @@ python scripts/workbench.py status
 
 Vue 使用 TypeScript 和 Composition API；前后端输入字段主要通过模型别名转换，不能在新页面自行猜测 snake_case/camelCase。后端业务字段变化要检查多个页面和冻结快照语义；数据库迁移只能新增，不能改已应用文件。
 
-<a id="doc-07-line-29"></a>
+<a id="doc-08-line-29"></a>
 
 ### 配置和凭证
 
@@ -667,7 +713,7 @@ Vue 使用 TypeScript 和 Composition API；前后端输入字段主要通过模
 
 `.runtime/` 为私有运行目录：Linear 配置、本机节点身份和 CLI 账号副本不得入 Git。原有 Skills 目录和外部知识登记是来源引用，不能假定换一台电脑仍存在这些绝对路径。
 
-<a id="doc-07-line-52"></a>
+<a id="doc-08-line-52"></a>
 
 ### 运行验证
 
@@ -682,7 +728,7 @@ npm --prefix web run build
 
 涉及页面时，用真实浏览器从新页面进入，检查请求、错误和业务结果。比如背景修订要看列表、详情、回顾与导出；改路由要同时看直接进入、刷新、旧链接和团队空间。测试 AI 调度可用合成执行器，真实账号调用应明确记录，不能混称为同一证据。
 
-<a id="doc-07-line-65"></a>
+<a id="doc-08-line-65"></a>
 
 ### 备份与恢复
 
@@ -700,7 +746,7 @@ python scripts/workbench.py start
 
 该脚本只打包默认 `.runtime/knowledge`；自定义知识根、外部知识、连接配置、CLI 账号和运行产物目录需要另行备份。仅有数据库 dump 不能恢复所有原文和 AI worktree。
 
-<a id="doc-07-line-81"></a>
+<a id="doc-08-line-81"></a>
 
 ### 常见问题从哪里查
 
@@ -715,7 +761,7 @@ python scripts/workbench.py start
 
 当前命令只停止本项目 PID，不使用按名称批量杀进程。`stop` 保留数据库进程，数据库本身的管理脚本是 `scripts/postgres.sh`。
 
-<a id="doc-07-line-94"></a>
+<a id="doc-08-line-94"></a>
 
 ### 改名后的维护原则
 
@@ -725,7 +771,7 @@ python scripts/workbench.py start
 
 文档维护分工：行为与理由进入 `product.md` / `architecture.md`；新结果和未完成项进入 `status.md`；命令配置进入本页；真实日志和截图进入证据目录。历史证据保留版本，不在旧截图说明中伪造新的验证时间。
 
-<a id="doc-07-line-102"></a>
+<a id="doc-08-line-102"></a>
 
 ### 让当前 Codex 会话接续开发事项
 
@@ -750,7 +796,7 @@ python scripts/lifeweave.py external-list item-实际编号
 
 事项页“推进记录”和 `continue item-实际编号` 都可回读阶段；页面将原生 Hook 与主动上报分别标明。原始 Git 差异可从外部会话的“查看当前 Git 差异”读取，它反映当前仓库相对起始提交的所有变化，可能包含其他会话的改动，不能自动归功于该 Agent。服务不可用时，先保留真实代码和测试结果，恢复后再标明观测缺口。项目文档在原仓修改后，知识页和新 CLI 读取会取得新指纹，不需要复制第二份正式正文。
 
-<a id="doc-07-line-125"></a>
+<a id="doc-08-line-125"></a>
 
 ### 从首版安装迁移内部名称
 
@@ -764,7 +810,7 @@ python scripts/workbench.py start
 
 脚本只处理本工程私有 socket 上默认旧数据库/角色，检查没有业务连接后原位重命名；重复运行无变化。自定义数据库继续由环境配置指定，SQL 005 仍迁移其内部表名。旧 `.env` 中若显式指定默认旧数据库或角色，需更新为 `LIFEWEAVE_DB_NAME=lifeweave`、`LIFEWEAVE_DB_USER=lifeweave`。回退时先停服务，将备份恢复到独立数据库，用迁移前代码验证后再切换；不能仅回退代码连接已改名的表。
 
-<a id="doc-07-line-137"></a>
+<a id="doc-08-line-137"></a>
 
 ### 网页研究入口的维护
 
@@ -777,15 +823,15 @@ python scripts/workbench.py start
 
 若 PDF 工具输出触发 `\u0000 cannot be converted to text`，旧失败尝试会保留。升级到带 `storage_text.py` 的版本后，从运行页“按当前背景再试”建立新尝试。事件或运行环境中的 `_lifeweaveTextStorage.originalJsonBase64` 可按 base64 → JSON 还原受影响原数据；页面中的 `␀` 是存储投影。不要用批量删除源文控制字符或手改运行状态掩盖失败。
 
-<a id="doc-07-line-148"></a>
+<a id="doc-08-line-148"></a>
 
 ### 自动归档维护
 
 在设置页配置 GitHub HTTPS 仓地址并启用；实际 Git 传输使用本机已有 SSH 认证，须事先能非交互访问对应仓。若要自动镜像至 Notion，还需在“Notion 知识镜像”填写已授权的根页面和仅本机可读、权限为 `600` 的集成令牌文件。Codex 中的 Notion OAuth 与该后台令牌是两条连接。状态、上传断点与归档 checkout 在 `.runtime/research-archives/{space}`；Notion 配置与回读状态在 `.runtime/notion-mirror/{space}`，均应随私有运行配置备份，不提交凭证。`LIFEWEAVE_ARCHIVE_WORKER=0` 可关闭报告后台扫描；默认跟随本机 worker 启用。停止服务会等待当前归档请求结束，先看归档状态再维护。
 
-失败在成果页按目标显示，5分钟后自动重试或点立即归档。更换 GitHub 目标后，已有 checkout 不会自动改 remote，页面明确报错；停止服务并将该空间的 `git/` 目录移到备份位置，再启服务重试，服务会为新目标建立 checkout。不要删除逐运行的 `bundle/` 与 `state.json`。首次启用前的旧成果不批量回填，用户逐项触发；曾失败的记录启动后恢复扫描。详见 [归档与跨文章讨论](#doc-09)。
+失败在成果页按目标显示，5分钟后自动重试或点立即归档。更换 GitHub 目标后，已有 checkout 不会自动改 remote，页面明确报错；停止服务并将该空间的 `git/` 目录移到备份位置，再启服务重试，服务会为新目标建立 checkout。不要删除逐运行的 `bundle/` 与 `state.json`。首次启用前的旧成果不批量回填，用户逐项触发；曾失败的记录启动后恢复扫描。详见 [归档与跨文章讨论](#doc-10)。
 
-<a id="doc-07-line-154"></a>
+<a id="doc-08-line-154"></a>
 
 ### 开发 Agent 的受管委托
 
@@ -798,13 +844,13 @@ python scripts/workbench.py start
 
 ---
 
-<a id="doc-08"></a>
+<a id="doc-09"></a>
 <!-- source-begin: docs/naming.md -->
-<a id="doc-08-line-1"></a>
+<a id="doc-09-line-1"></a>
 
 ## LifeWeave：名称与适配
 
-<a id="doc-08-line-3"></a>
+<a id="doc-09-line-3"></a>
 
 ### 名称表达什么
 
@@ -814,7 +860,7 @@ python scripts/workbench.py start
 
 命名取舍：只用 Order 容易把产品理解为排程工具；只用 Work 会缩窄生活与爱好；使用 LifeWeave 保留了关联和长期积累的含义。英文新名尚未定稿；没有进行商标、域名或应用商店名称排他性认定。
 
-<a id="doc-08-line-11"></a>
+<a id="doc-09-line-11"></a>
 
 ### 统一约定
 
@@ -830,7 +876,7 @@ python scripts/workbench.py start
 
 图标沿用两组相互穿插的线，源文件为 [favicon.svg](../web/public/favicon.svg)。页面标题、导航、API 标题、错误提示和新生成文案使用 LifeWeave；历史成果不改写。
 
-<a id="doc-08-line-25"></a>
+<a id="doc-09-line-25"></a>
 
 ### 为什么仍能看到旧名称
 
@@ -838,7 +884,7 @@ python scripts/workbench.py start
 
 旧页面自动跳到新页面并保留查询参数与片段；旧 API 使用 HTTP 308 跳转，保留方法、请求体和查询参数。**客户端必须支持并跟随 308，或者直接改用 `/api/lifeweave/`**；例如本机 Python 3.10 的 urllib 默认会将 308 当作异常，旧 SDK 不能一概视为透明兼容。新页面和执行节点只生成新接口地址。
 
-`GONGZUO_*` 环境变量作为安装兼容别名仍可读取；同一来源同时提供新旧变量时，新变量优先。数据库与日志的 ConfigManager 支持 `.env`，且进程环境优先；知识根、执行器与生命周期脚本只读取进程环境，详见 [配置说明](#doc-07-line-29)。
+`GONGZUO_*` 环境变量作为安装兼容别名仍可读取；同一来源同时提供新旧变量时，新变量优先。数据库与日志的 ConfigManager 支持 `.env`，且进程环境优先；知识根、执行器与生命周期脚本只读取进程环境，详见 [配置说明](#doc-08-line-29)。
 
 现行 Python 模块为 `src/lifeweave`、`src/lifeweave_runtime`、`src/lifeweave_knowledge`；Vue 位于 `features/lifeweave`，组件和类型使用 `LifeWeave`，CSS 使用 `lw-`。数据库和角色均为 `lifeweave`，业务表为 `t_lifeweave_*`，迁移总账为 `lifeweave_migrations`；新运行材料写入 `.lifeweave`，执行节点使用 `X-LifeWeave-*` 请求头。旧请求头仍作为兼容输入接受。
 
@@ -849,15 +895,15 @@ python scripts/workbench.py start
 
 ---
 
-<a id="doc-09"></a>
+<a id="doc-10"></a>
 <!-- source-begin: docs/research-archive.md -->
-<a id="doc-09-line-1"></a>
+<a id="doc-10-line-1"></a>
 
 ## 研究成果归档、离线阅读与跨文章讨论
 
 本轮解决的是：报告只留在家中电脑时无法随时找回，单独下载 Markdown 会丢本机图片，以及讨论另一篇文章时需要明确带入已有成果。用户已明确选择“每次成功生成报告后自动归档”，目标仓为 `pokemonAndCodeMaster/Life-Weave`。
 
-<a id="doc-09-line-5"></a>
+<a id="doc-10-line-5"></a>
 
 ### 现在从哪里找两篇论文
 
@@ -872,7 +918,7 @@ python scripts/workbench.py start
 
 远端已上传的版本在本机关机后仍可访问；新的研究、讨论和自动上传需要工作台服务运行。仓库或历史 Linear 工作区若限制访问，另一台设备仍须登录有权访问的账号。此前验证过 GitHub 重新 clone 后的完整文件，以及历史 Linear 正文和附件回读；未完成已登录 Linear 页面实际显示验收。旧 Linear 公式显示为 LaTeX 代码原文；ZIP 内原 Markdown 与工作台的公式版本保持一致。Notion 镜像尚需单独配置后台集成令牌及页面授权，不能因本机 Codex 的 OAuth 已授权就视为报告已镜像。
 
-<a id="doc-09-line-18"></a>
+<a id="doc-10-line-18"></a>
 
 ### 自动和手动怎样配合
 
@@ -884,7 +930,7 @@ python scripts/workbench.py start
 
 Git 使用本机 SSH 认证，归档在私有独立 checkout 中提交 `research-archive` 分支。自动归档不提交开发者当前工作区里的代码、账号文件或数据库。Notion 镜像从已确认的 GitHub 报告正文创建子页，将图片链接改为 GitHub Raw 地址并回读 Markdown、来源版本和完整性标记；当前还没有对 Notion 图片实际显示逐张验收，离线图片以 ZIP 为准。旧 Linear 已停止新增发布和报告重试，既有归档保留。
 
-<a id="doc-09-line-28"></a>
+<a id="doc-10-line-28"></a>
 
 ### 下载后怎样保留图片
 
@@ -900,7 +946,7 @@ Git 使用本机 SSH 认证，归档在私有独立 checkout 中提交 `research
 
 实际两篇包没有缺失警告。Qwen 收录11个引用文件，GSSM 收录28个；断网打开解压正文时，Qwen 的两张内嵌图与 GSSM 的一张内嵌图均实际解码显示。被文字链接引用的其他图片也在包内。
 
-<a id="doc-09-line-42"></a>
+<a id="doc-10-line-42"></a>
 
 ### 怎样讨论当前文章并引用另一篇
 
@@ -912,11 +958,11 @@ Git 使用本机 SSH 认证，归档在私有独立 checkout 中提交 `research
 
 [本轮真实跨文章讨论](http://127.0.0.1:8010/lifeweave/personal/conversation/conversation-6214d5172fb425f7ce4e34642a954be9?itemId=item-de7785d0790445d8)比较两篇的学习目标、训练信号与风险含义，并区分报告事实和组合建议。该轮只保存讨论，没有新执行、知识接受或目标采纳。
 
-<a id="doc-09-line-52"></a>
+<a id="doc-10-line-52"></a>
 
 ### 后续维护责任
 
-源码入口是 `research_bundle.py`、`research_archive.py`、`Conversations.prepare` 与对应 Vue 组件；运行配置见[维护文档](#doc-07)。本次新事实的长期维护位置是本仓 [架构](#doc-04)、本页与[当前状态](#doc-05)。Omni-Brain 的知识体系和本产品并非同一个来源身份，本轮没有把这里的实现直接写成其正式知识；未来如需登记，建议新增 `knowledge/lifeweave/research-archive.md` 来源页并经原库治理接受。
+源码入口是 `research_bundle.py`、`research_archive.py`、`Conversations.prepare` 与对应 Vue 组件；运行配置见[维护文档](#doc-08)。本次新事实的长期维护位置是本仓 [架构](#doc-04)、本页与[当前状态](#doc-06)。Omni-Brain 的知识体系和本产品并非同一个来源身份，本轮没有把这里的实现直接写成其正式知识；未来如需登记，建议新增 `knowledge/lifeweave/research-archive.md` 来源页并经原库治理接受。
 
 自动成果归档没有完成已接受知识的单独自动发布、全库备份或完整个人日常 Alpha。Notion 后台令牌未配置前，新增报告只会继续归档至 GitHub；既有两篇的 Notion 镜像仍待真实上传和回读。[验证记录](evidence/research-archive/README.md)区分了历史远端、本机网页和受控回归的覆盖范围。
 <!-- source-end: docs/research-archive.md -->
