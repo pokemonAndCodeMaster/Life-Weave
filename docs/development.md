@@ -120,6 +120,8 @@ python scripts/lifeweave.py external-list item-实际编号
 
 阶段只记录真正发生的动作。Git 提交和差异由服务读取；检查文字与选择的材料由当前会话主动上报。若本机 Codex 对 `/home/yyh/.codex/hooks.json` 完成信任审查，`external-start` 会利用 `CODEX_SESSION_ID` 将当前原生会话与事项绑定，之后支持的 `PostToolUse`、`Stop`、`Interrupt` 元数据自动进入同一推进记录。已有外部记录可在**同一个** Codex 会话内运行 `external-bind item-编号 external-编号 --repo /path/to/repository` 后开始采集。Hook 不保存原始命令、工具参数/输出；未绑定或未受信任、沙箱阻断本机 HTTP、Hook 被跳过时都不能宣称捕获完整过程。[真实烟测](evidence/development-agent/hook-smoke.md)记录成功与失败边界。
 
+要让本机 Hook 覆盖目标仓，最好从该 Git 仓目录启动 Codex 会话。转发器要求 Hook 事件的会话工作目录属于绑定仓；在另一个仓打开 Codex、仅给单条工具命令指定目标仓 `workdir`，仍可能因为会话根不匹配而不被上报。先用 Codex 的 `/hooks` 检查是否信任当前定义，再以实际事件核对；没有事件时仍可用 `external-report` 主动记录，不把它称为自动追踪。
+
 事项页“开发 Agent”有独立的“本机 Codex 会话”区域，可按原生会话阅读固定输入、主动上报阶段、实际收到的 Hook 元事件与观测缺口；“推进记录”和 `continue item-实际编号` 仍可回读阶段。原始 Git 差异可从外部会话的“查看当前 Git 差异”读取，它反映当前仓库相对起始提交的所有变化，可能包含其他会话的改动，不能自动归功于该 Agent。服务不可用时，先保留真实代码和测试结果，恢复后再标明观测缺口。项目文档在原仓修改后，知识页和新 CLI 读取会取得新指纹，不需要复制第二份正式正文。
 
 ## 从首版安装迁移内部名称
