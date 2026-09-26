@@ -20,3 +20,4 @@
 - [验证 OpenCode 开发链：空白字符串词数](research/personal/item-c52809b4b3294166/gzrun-20260926-145615-c2750f14/report.md) · `gzrun-20260926-145615-c2750f14`
 - [验证 OpenCode 开发链：空白字符串词数](research/personal/item-c52809b4b3294166/gzrun-20260926-145718-a0deeaab/report.md) · `gzrun-20260926-145718-a0deeaab`
 - [GSSM v5 原文与代码核验及持续论文研究](research/personal/item-de7785d0790445d8/gzrun-20260919-130600-2cabbf3e/report.md) · `gzrun-20260919-130600-2cabbf3e`
+- [补齐开发任务使用当前项目知识的操作说明](research/personal/item-e044cf4e1af64b0c/gzrun-20260926-172328-9706ccec/report.md) · `gzrun-20260926-172328-9706ccec`
