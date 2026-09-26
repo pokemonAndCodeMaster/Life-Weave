@@ -39,3 +39,15 @@ it('clears prior-space calls and ignores a late detail response after switching 
   expect(view.text()).toContain('查看近期使用')
   view.unmount()
 })
+
+it('opens the exact registered plugin when linked from an external session', async () => {
+  vi.mocked(plugins.pluginDetail).mockResolvedValue({ ...descriptor, recentCalls: [] })
+  const view = mount(PluginCatalog, {
+    props: { workspace: 'personal', focusPluginId: descriptor.id },
+    global: { stubs: { RouterLink: { props: ['to'], template: '<a><slot /></a>' } } },
+  })
+  await flushPromises()
+  expect(plugins.pluginDetail).toHaveBeenCalledWith('personal', descriptor.id)
+  expect(view.text()).toContain('此空间尚无受管调用记录')
+  view.unmount()
+})

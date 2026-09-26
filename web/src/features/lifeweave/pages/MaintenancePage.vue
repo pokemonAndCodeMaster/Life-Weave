@@ -45,7 +45,7 @@ onBeforeUnmount(() => window.removeEventListener('lifeweave-capabilities-changed
   <PageHeader title="能力与评测" subtitle="查看当前能用的方法，定义评测任务，并对照真实运行决定是否改进能力。" />
   <div class="lw-tabs"><button v-for="(label, key) in tabs" :key="key" class="lw-tab" :class="{ active: tab === key }" type="button" @click="tab = key">{{ label }}</button></div>
 
-  <PluginCatalog v-if="tab === 'plugins'" :workspace="activeWorkspace" />
+  <PluginCatalog v-if="tab === 'plugins'" :workspace="activeWorkspace" :focus-plugin-id="typeof route.query.pluginId === 'string' ? route.query.pluginId : undefined" />
 
   <div v-else-if="tab === 'abilities'" class="lw-two-cols"><div>
     <section class="lw-panel"><header class="lw-panel-head"><h2>已登记的工作方法</h2><StatusBadge :value="`${methods.length} 项`" /></header><p class="lw-small lw-sub">这些方法可在事项委托中选择；登记不表示本次已加载，更不表示执行器遵循了全部步骤。</p><div v-for="method in methods" :key="method.id" class="lw-list-row"><LifeWeaveIcon name="book" /><div class="lw-grow"><div class="lw-list-title">{{ method.title }}</div><div class="lw-list-sub">{{ method.description }}</div></div><StatusBadge value="已登记" /></div><div v-if="!methods.length" class="lw-empty">当前空间尚无可读取的方法。</div><p v-for="entry in unavailableMethods" :key="entry.path" class="lw-small lw-sub">来源不可用：{{ entry.path }} · {{ entry.reason }}</p></section>

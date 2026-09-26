@@ -90,6 +90,7 @@ async function showDiff(sessionId: string) {
       <p class="lw-tiny lw-mono">本机记录 {{ session.start.payload.sessionId }}<br />原生 Codex 会话 {{ session.start.payload.nativeSessionId || '未登记' }}</p>
       <p v-if="session.start.payload.observedGit" class="lw-tiny lw-mono">仓库 {{ session.start.payload.observedGit.repositoryPath }}<br />开始提交 {{ session.start.payload.observedGit.revision }}</p>
       <p class="lw-tiny lw-muted">固定方法 {{ session.start.payload.methodId || '未报告' }} · 开始时登记知识 {{ session.start.payload.declaredInputs?.length || 0 }} 篇</p>
+      <p v-if="session.start.payload.agentId === 'development'" class="lw-tiny lw-muted">关联能力 <RouterLink :to="{ path: `/lifeweave/${workspace}/maintenance`, query: { tab: 'plugins', pluginId: 'lifeweave.development' } }">开发工作插件</RouterLink>；本机报告不计作受管插件调用。</p>
       <details v-if="session.start.payload.declaredInputs?.length">
         <summary>固定输入与版本</summary>
         <ul><li v-for="entry in session.start.payload.declaredInputs" :key="entry.id">{{ entry.title }} · {{ entry.sourcePath }} · {{ entry.version }}</li></ul>

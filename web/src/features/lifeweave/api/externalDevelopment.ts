@@ -11,6 +11,7 @@ export interface ExternalActivity {
     phase: string
     source?: string
     nativeSessionId?: string | null
+    agentId?: string | null
     methodId?: string | null
     observedGit?: {
       repositoryPath: string; revision: string; changedCount: number; untrackedCount: number

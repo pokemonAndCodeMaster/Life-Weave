@@ -6,7 +6,7 @@ import { pluginCatalog, pluginDetail, setPluginEnabled } from '../api/plugins'
 import type { PluginCall, PluginDescriptor } from '../api/plugins'
 import type { WorkspaceKind } from '../types'
 
-const props = defineProps<{ workspace: WorkspaceKind }>()
+const props = defineProps<{ workspace: WorkspaceKind; focusPluginId?: string }>()
 const items = shallowRef<PluginDescriptor[]>([])
 const loading = shallowRef(false)
 const saving = shallowRef('')
@@ -30,6 +30,11 @@ async function refresh() {
   finally { if (ticket === generation) loading.value = false }
 }
 watch(() => props.workspace, () => { items.value = []; selected.value = ''; recent.value = []; evaluations.value = []; void refresh() }, { immediate: true })
+watch(() => [props.focusPluginId, items.value], () => {
+  const id = props.focusPluginId
+  const target = items.value.find(item => item.id === id)
+  if (target && selected.value !== target.id) void inspect(target)
+})
 async function inspect(plugin: PluginDescriptor) {
   if (selected.value === plugin.id) { selected.value = ''; recent.value = []; evaluations.value = []; return }
   const workspace = props.workspace
