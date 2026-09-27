@@ -66,13 +66,14 @@ describe('失败消息接续与成果阅读', () => {
   it('成功回执默认展示可读成果，原始运行正文不重复，提示可查看历史版本', async () => {
     api.getRun.mockResolvedValue({ id: 'historical-run', itemId: 'item-1', state: 'succeeded', result: '# 原始长报告\n不应重复显示', error: null })
     const wrapper = mount(ConversationRunReceipt, { props: { workspace: 'personal', runId: 'historical-run' }, global: { stubs: {
-      RouterLink: true, ResearchOutputPanel: { template: '<article><h2>当前成果</h2><p>可直接阅读的正文</p><select aria-label="成果版本"><option>当前成果</option><option>历史成果</option></select></article>' },
+      RouterLink: true, ResearchOutputPanel: { name: 'ResearchOutputPanel', props: ['selectedRunId'], template: '<article><h2>当前成果</h2><p>可直接阅读的正文</p><select aria-label="成果版本"><option>当前成果</option><option>历史成果</option></select></article>' },
     } } })
     wrappers.push(wrapper); await flushPromises()
     expect(wrapper.text()).toContain('可直接阅读的正文')
     expect(wrapper.find('details').exists()).toBe(false)
     expect(wrapper.text()).not.toContain('# 原始长报告')
-    expect(wrapper.text()).toContain('可能包含后续运行的修订')
+    expect(wrapper.text()).toContain('这次运行的成果')
+    expect(wrapper.findComponent({ name: 'ResearchOutputPanel' }).props('selectedRunId')).toBe('historical-run')
     expect(wrapper.find('select').exists()).toBe(true)
   })
 })

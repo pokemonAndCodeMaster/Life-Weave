@@ -1,10 +1,11 @@
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/vue'
+import { flushPromises } from '@vue/test-utils'
 import { defineComponent } from 'vue'
 import { createMemoryHistory, createRouter } from 'vue-router'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-const { get, post } = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }))
-vi.mock('@/shared/api/http', () => ({ http: { get, post, request: vi.fn() } }))
+const { get, post, put } = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn() }))
+vi.mock('@/shared/api/http', () => ({ http: { get, post, put, request: vi.fn() } }))
 
 import LifeWeaveModalHost from '../components/LifeWeaveModalHost.vue'
 import { useLifeWeaveWorkspace } from '../composables/useLifeWeaveWorkspace'
@@ -33,6 +34,17 @@ async function openPage(id = 'child-1', parentEstablished = true) {
   const items = [parent, child]
   get.mockImplementation(async (url: string) => {
     if (url.endsWith('/research-output')) return { data: { current: null, versions: [] } }
+    if (url.endsWith('/work-view')) {
+      const workItemId = url.split('/').at(-2)
+      return { data: {
+        itemId: workItemId, itemVersion: 1,
+        current: { state: 'in_progress', label: '进行中', summary: '等待整理照片', updatedAt: '2026-09-27T00:00:00Z' },
+        plan: { id: 'plan-1', title: '整理周末照片', provider: 'manual', source: 'declared', version: 1, editable: true, nodes: [
+          { id: 'select', title: '挑选照片', description: '选出要留下的照片', summary: '选出十张', state: 'succeeded', dependsOn: [], outputIds: [] },
+          { id: 'group', title: '给照片分组', description: '按地点分组', summary: '已分好三组', state: 'planned', dependsOn: ['select'], outputIds: [] },
+        ] }, outputs: [], warnings: [],
+      } }
+    }
     if (url.endsWith('/state')) return { data: { items, ideas: [], topics: [], domains: [], resources: [], relations: [] } }
     if (url.endsWith('/runs') || url.endsWith('/machines')) return { data: { items: [] } }
     return { data: items.find((entry) => url.endsWith('/items/' + entry.id)) }
@@ -50,7 +62,7 @@ async function openPage(id = 'child-1', parentEstablished = true) {
 }
 
 beforeEach(() => {
-  get.mockReset(); post.mockReset()
+  get.mockReset(); post.mockReset(); put.mockReset()
   const workspace = useLifeWeaveWorkspace()
   workspace.closeModal()
   workspace.itemDetails.value = {}
@@ -60,6 +72,32 @@ beforeEach(() => {
 afterEach(cleanup)
 
 describe('事项页委托', () => {
+  it('默认只呈现当前局面和通用工作图，节点详情需要点击才展开', async () => {
+    await openPage()
+    await waitFor(() => expect(screen.getByRole('group', { name: '工作步骤依赖图' })).toBeTruthy())
+    expect(screen.queryByRole('region', { name: '所选步骤' })).toBeNull()
+    expect(screen.getByText('等待整理照片')).toBeTruthy()
+    expect(screen.getByText('已声明计划 · 人工')).toBeTruthy()
+    await fireEvent.click(screen.getAllByRole('button', { name: /给照片分组/ })[0]!)
+    expect(screen.getByText('按地点分组')).toBeTruthy()
+    await fireEvent.click(screen.getByRole('button', { name: '收起详情' }))
+    expect(screen.queryByText('按地点分组')).toBeNull()
+  })
+  it('冲突后的刷新失败不会丢失未保存步骤草稿', async () => {
+    await openPage()
+    await waitFor(() => expect(screen.getByRole('button', { name: '编辑步骤' })).toBeTruthy())
+    await fireEvent.click(screen.getByRole('button', { name: '编辑步骤' }))
+    const description = screen.getAllByRole('textbox', { name: '这一步要做什么' })[0]! as HTMLTextAreaElement
+    await fireEvent.update(description, '本次未保存的改动')
+    put.mockRejectedValueOnce({ response: { status: 409, data: { message: '冲突' } } })
+    await fireEvent.click(screen.getByRole('button', { name: '保存步骤计划' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '刷新后重新编辑' })).toBeTruthy())
+    const original = get.getMockImplementation()!
+    get.mockImplementation((url: string) => url.endsWith('/work-view') ? Promise.reject(new Error('暂时无法读取')) : original(url))
+    await fireEvent.click(screen.getByRole('button', { name: '刷新后重新编辑' }))
+    await flushPromises()
+    await waitFor(() => expect((screen.getAllByRole('textbox', { name: '这一步要做什么' })[0]! as HTMLTextAreaElement).value).toBe('本次未保存的改动'))
+  })
   it('子事项委托提交子标识，同时清楚展示子目标和父共同背景', async () => {
     await openPage()
     await waitFor(() => expect(screen.getByRole('button', { name: '委托 AI' })).toBeTruthy())

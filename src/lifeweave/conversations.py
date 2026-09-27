@@ -226,11 +226,11 @@ class Conversations:
                             run_id = assignment['planRunId']
                             receipts.append({'kind':'development','id':assignment['id'],'itemId':item_id,
                                              'runId':run_id,'title':'开发委托已启动：先形成只读方案'})
-                            decision.reply += '\n\n本次只生成并审阅只读方案，不会自动修改代码；需要实施时请在事项的“开发 Agent”页明确选择允许实施。'
+                            decision.reply += '\n\n本次只生成并审阅只读方案，不会自动修改代码；需要实施时请在事项的“背景与历史 → 开发配置与历史”明确选择允许实施。'
                         else:
                             receipts.append({'kind':'development','id':item_id,'itemId':item_id,
                                              'title':'开发任务已关联事项；请选择项目目录后启动，尚未执行代码'})
-                            decision.reply += '\n\n开发任务已关联此事项。请打开事项的“开发 Agent”页选择项目仓库并启动；目前尚未执行代码。'
+                            decision.reply += '\n\n开发任务已关联此事项。请打开事项的“背景与历史 → 开发配置与历史”选择项目仓库并启动；目前尚未执行代码。'
                     else:
                         _, active = self.runtime.list_runs(workspace,item_id=item_id,limit=1,offset=0,
                             states=('queued','claimed','running','pause_requested','cancelling'))

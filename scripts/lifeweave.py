@@ -26,10 +26,14 @@ def main(argv=None):
     p = commands.add_parser('discover', help='find work by topic; empty query lists existing work')
     p.add_argument('query', nargs='?', default='')
     for name, help_text in [('continue', 'read accepted background, proposals, feedback and outcomes'),
+                            ('work-view', 'read this item\'s actual steps and current outcomes; no execution'),
                             ('development-choices', 'read development options without starting execution'),
                             ('recommend', 'find versioned materials and methods for this work')]:
         p = commands.add_parser(name, help=help_text); p.add_argument('item_id')
         if name == 'recommend': p.add_argument('--query', default='')
+    p = commands.add_parser('work-plan', help='save capability-defined steps from JSON; never starts execution')
+    p.add_argument('item_id')
+    p.add_argument('--file', required=True, help='JSON plan with version, title, provider and nodes; use work-view to read itemVersion first')
     p = commands.add_parser('capture', help='record original idea only; never starts AI')
     p.add_argument('body')
     p = commands.add_parser('read-idea', help='read an idea and its discussions')
@@ -75,9 +79,9 @@ def main(argv=None):
         parser.error('只支持本机 HTTP 服务；远程共享需要正式身份与连接配置。')
     base = args.url.rstrip('/') + '/api/lifeweave/' + args.workspace
 
-    def call(path, data=None):
+    def call(path, data=None, method=None):
         request = Request(base + path, data=json.dumps(data, ensure_ascii=False).encode() if data is not None else None,
-                          headers={'Content-Type': 'application/json', 'Accept': 'application/json'})
+                          headers={'Content-Type': 'application/json', 'Accept': 'application/json'}, method=method)
         with urlopen(request, timeout=30) as response:
             return json.load(response)
 
@@ -87,6 +91,16 @@ def main(argv=None):
             result = call('/work-discovery?' + urlencode({'query': args.query}))
         elif args.command == 'continue':
             result = call(f'/items/{item}/continuation')
+        elif args.command == 'work-view':
+            result = call(f'/items/{item}/work-view')
+        elif args.command == 'work-plan':
+            try:
+                plan = json.loads(Path(args.file).read_text(encoding='utf-8'))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                parser.error(f'无法读取计划 JSON：{exc}')
+            if not isinstance(plan, dict) or not isinstance(plan.get('version'), int) or isinstance(plan.get('version'), bool):
+                parser.error('计划须包含整数 version（work-view 返回的 itemVersion），过期版本不会自动覆盖。')
+            result = call(f'/items/{item}/work-plan', plan, method='PUT')
         elif args.command == 'development-choices':
             result = call(f'/items/{item}/development/choices')
         elif args.command == 'recommend':

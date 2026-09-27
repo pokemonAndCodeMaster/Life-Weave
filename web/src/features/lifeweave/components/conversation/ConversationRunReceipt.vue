@@ -44,7 +44,7 @@ onBeforeUnmount(() => { generation++; clearTimeout(timer) })
     <div class="lw-between"><strong>{{ stateLabel }}</strong><button v-if="active" class="lw-btn ghost sm" type="button" :disabled="cancelling || run?.state === 'cancelling'" @click="cancel">{{ cancelling ? '正在取消…' : '取消运行' }}</button></div>
     <p class="lw-tiny lw-muted">运行 {{ runId }}</p>
     <p v-if="run?.error" role="alert">{{ run.error }}</p><p v-if="error" role="alert">{{ error }}</p>
-    <div v-if="run && !active && (run.itemId || itemId)" class="receipt-output"><p class="lw-small lw-muted">以下展示该事项的当前成果，可能包含后续运行的修订。可用成果版本选择查看历史版本。</p><ResearchOutputPanel :workspace="workspace" :item-id="run.itemId || itemId || ''" :refresh-key="outputRefresh" @quote="quoteForConversation" @feedback-saved="outputRefresh++" @candidate-created="router.push(`/lifeweave/${workspace}/items/${encodeURIComponent(run.itemId || itemId || '')}/outputs`)" /></div>
+    <div v-if="run && !active && (run.itemId || itemId)" class="receipt-output"><p class="lw-small lw-muted">以下展示这次运行的成果；展开历史版本可选读其他修订。</p><ResearchOutputPanel :workspace="workspace" :item-id="run.itemId || itemId || ''" :refresh-key="outputRefresh" :selected-run-id="run.id" @quote="quoteForConversation" @feedback-saved="outputRefresh++" @candidate-created="router.push(`/lifeweave/${workspace}/items/${encodeURIComponent(run.itemId || itemId || '')}/outputs`)" /></div>
     <RouterLink v-if="run?.itemId || itemId" class="lw-text-btn" :to="`/lifeweave/${workspace}/items/${encodeURIComponent(run?.itemId || itemId || '')}/outputs`">打开当前成果与反馈</RouterLink>
   </section>
 </template>

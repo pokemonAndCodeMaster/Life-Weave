@@ -47,6 +47,9 @@ class LifeWeaveService:
                 raise ValueError('正式事项不能在创建时直接完成，必须经过验收')
             if not payload.get('completionKind'):
                 raise ValueError('轻量事项创建为完成时必须写明 completionKind，不能冒充验收')
+            payload = {**payload, 'completedAt': datetime.now(timezone.utc).isoformat()}
+        else:
+            payload = {key: value for key, value in payload.items() if key != 'completedAt'}
         if payload.get('parentId'):
             if self.repository.get_item(workspace, str(payload['parentId'])) is None:
                 raise ValueError('payload.parentId 必须引用同一工作区已有事项；正式继承仍需建立 contributes_to 或 part_of 关系')
@@ -71,6 +74,16 @@ class LifeWeaveService:
                 raise ValueError('正式事项只能通过验收动作完成')
             if not payload.get('completionKind'):
                 raise ValueError('轻量事项完成时必须写明 completionKind，不能冒充验收')
+        next_status = changes.get('status') or item['status']
+        if changes.get('payload') is not None or next_status != item['status']:
+            payload = dict(changes.get('payload') if changes.get('payload') is not None else item['payload'])
+            if next_status == 'completed' and item['status'] != 'completed':
+                payload['completedAt'] = datetime.now(timezone.utc).isoformat()
+            elif next_status == 'completed' and item['payload'].get('completedAt'):
+                payload['completedAt'] = item['payload']['completedAt']
+            else:
+                payload.pop('completedAt', None)
+            changes['payload'] = payload
         return self.repository.update_item(self._workspace(workspace),item_id,version,{k:v for k,v in changes.items() if v is not None},actor_id)
 
     def create_entity(self, workspace:str, *, entity_type:str,title:str,payload:dict[str,Any],actor_id:str)->dict[str,Any]:
@@ -183,7 +196,10 @@ class LifeWeaveService:
         evidence=self.repository.list_evidence(workspace,item_id)
         if not evidence or not any(row['status']=='accepted' for row in evidence):
             raise ValueError('至少需要一条已接受且带产物版本、环境引用的证据才能验收')
-        return self.repository.update_item(workspace,item_id,version,{'status':'completed'},actor_id)
+        changes: dict[str, Any] = {'status': 'completed'}
+        if item['status'] != 'completed':
+            changes['payload'] = {**item['payload'], 'completedAt': datetime.now(timezone.utc).isoformat()}
+        return self.repository.update_item(workspace,item_id,version,changes,actor_id)
 
     def append_activity(self,workspace:str,item_id:str,*,kind:str,body:str,actor_id:str,payload:dict[str,Any]|None=None)->dict[str,Any]:
         workspace=self._workspace(workspace); self.get_item(workspace,item_id)

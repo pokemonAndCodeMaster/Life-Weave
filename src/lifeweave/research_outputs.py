@@ -36,26 +36,47 @@ class ResearchOutputs:
             pass
         return result
 
-    def read(self, workspace: str, item_id: str):
+    def _run_output(self, workspace: str, item: dict, run: dict, *, include_content: bool):
+        content = self._content(run)
+        if not content.strip():
+            return None
+        base = f'/api/lifeweave/{workspace}/runs/{quote(run["id"], safe="")}'
+        storage_note = result_text_storage(run)[1]
+        output = {'id': run['id'], 'kind': 'run', 'title': item['title'],
+                  'version': fingerprint(content), 'runId': run['id'], 'state': run['state'],
+                  'createdAt': run.get('finished_at') or run['created_at'],
+                  'sourceBase': base + '/source', 'assetBase': base + '/assets',
+                  'downloadUrl': base + '/research-output/download',
+                  'bundleUrl': base + '/research-output/bundle',
+                  'storageNote': storage_note,
+                  'rawDownloadUrl': base + '/artifacts/result' if storage_note and run.get('result') is not None else None}
+        if include_content:
+            output['content'] = content
+        return output
+
+    @staticmethod
+    def _manual_output(entity: dict, *, include_content: bool):
+        content = str(entity.get('payload', {}).get('body') or '')
+        if not content.strip():
+            return None
+        output = {'id': entity['id'], 'kind': 'manual', 'title': entity['title'],
+                  'version': fingerprint(content), 'runId': None, 'state': 'manual',
+                  'createdAt': entity['updatedAt'], 'sourceBase': None,
+                  'assetBase': None, 'downloadUrl': None}
+        if include_content:
+            output['content'] = content
+        return output
+
+    def _versions(self, workspace: str, item_id: str, *, include_content: bool):
         item = self.work.get_item(workspace, item_id)
         versions = []
         offset = 0
         while True:
             runs, total = self.runtime.list_runs(workspace, item_id=item_id, limit=100, offset=offset)
             for run in runs:
-                content = self._content(run)
-                if not content.strip():
-                    continue
-                base = f'/api/lifeweave/{workspace}/runs/{quote(run["id"], safe="")}'
-                storage_note = result_text_storage(run)[1]
-                versions.append({'id':run['id'], 'kind':'run', 'title':item['title'],
-                    'content':content, 'version':fingerprint(content), 'runId':run['id'],
-                    'state':run['state'], 'createdAt':run.get('finished_at') or run['created_at'],
-                    'sourceBase':base+'/source', 'assetBase':base+'/assets',
-                    'downloadUrl':base+'/research-output/download',
-                    'bundleUrl':base+'/research-output/bundle',
-                    'storageNote':storage_note,
-                    'rawDownloadUrl':base+'/artifacts/result' if storage_note and run.get('result') is not None else None})
+                output = self._run_output(workspace, item, run, include_content=include_content)
+                if output:
+                    versions.append(output)
             offset += len(runs)
             if offset >= total:
                 break
@@ -67,16 +88,50 @@ class ResearchOutputs:
             entity = self.work.repository.get_entity(workspace, relation['toId'])
             if not entity or entity.get('entityType') != 'artifact':
                 continue
-            content = str(entity.get('payload', {}).get('body') or '')
-            if content.strip():
-                versions.append({'id':entity['id'], 'kind':'manual', 'title':entity['title'],
-                    'content':content, 'version':fingerprint(content), 'runId':None, 'state':'manual',
-                    'createdAt':entity['updatedAt'], 'sourceBase':None, 'assetBase':None, 'downloadUrl':None})
+            output = self._manual_output(entity, include_content=include_content)
+            if output:
+                versions.append(output)
         versions.sort(key=lambda output:str(output['createdAt']), reverse=True)
         current = next((out for out in versions if out['kind'] == 'run' and out['state'] == 'succeeded'), None)
         if current is None:
             current = next((out for out in versions if out['kind'] == 'manual'), None)
         return {'current':current, 'versions':versions}
+
+    def read(self, workspace: str, item_id: str):
+        """Compatibility response for existing consumers."""
+        return self._versions(workspace, item_id, include_content=True)
+
+    def versions(self, workspace: str, item_id: str):
+        """Version catalog; callers load a selected body with read_version."""
+        return self._versions(workspace, item_id, include_content=False)
+
+    def read_version(self, workspace: str, item_id: str, output_id: str):
+        """Read exactly one owned Run or produced manual artifact."""
+        item = self.work.get_item(workspace, item_id)
+        try:
+            run = self.runtime.get_run_snapshot(workspace, output_id)
+        except KeyError:
+            run = None
+        if run is not None:
+            if run['item_id'] != item_id:
+                raise ValueError('此轮成果不属于当前事项')
+            output = self._run_output(workspace, item, run, include_content=True)
+            if output is None:
+                raise KeyError(output_id)
+            return output
+        entity = self.work.repository.get_entity(workspace, output_id)
+        if not entity or entity.get('entityType') != 'artifact':
+            raise KeyError(output_id)
+        owned = any((relation.get('fromKind'), relation.get('fromId'), relation.get('toKind'),
+                     relation.get('toId'), relation.get('relationType')) ==
+                    ('item', item_id, 'entity', output_id, 'produces')
+                    for relation in self.work.repository.list_relations(workspace, item_id))
+        if not owned:
+            raise ValueError('人工成果不属于当前事项')
+        output = self._manual_output(entity, include_content=True)
+        if output is None:
+            raise KeyError(output_id)
+        return output
 
     def _run(self, workspace, item_id, run_id):
         self.work.get_item(workspace, item_id)
@@ -209,6 +264,16 @@ def _call(request, method, *args, **kwargs):
 @router.get('/items/{item_id}/research-output')
 def read(request: Request, workspace: WorkspaceKey, item_id: str):
     return _call(request,'read',workspace,item_id)
+
+
+@router.get('/items/{item_id}/research-output/versions')
+def versions(request: Request, workspace: WorkspaceKey, item_id: str):
+    return _call(request, 'versions', workspace, item_id)
+
+
+@router.get('/items/{item_id}/research-output/versions/{output_id}')
+def read_version(request: Request, workspace: WorkspaceKey, item_id: str, output_id: str):
+    return _call(request, 'read_version', workspace, item_id, output_id)
 
 
 @router.get('/research-catalog')

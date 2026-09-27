@@ -159,6 +159,28 @@ def test_accepted_evidence_is_required_before_item_acceptance() -> None:
     with pytest.raises(ValueError,match='已接受'): app.accept_item('team',item['id'],version=1,actor_id='a')
     app.review_evidence('team',evidence['id'],status='accepted',reason='reviewed',actor_id='a')
     assert app.accept_item('team',item['id'],version=1,actor_id='a')['status'] == 'completed'
+    completed_at = item['payload']['completedAt']
+    app.update_item('team', item['id'], version=item['version'], actor_id='a', payload={'owner': '保持责任人', 'completedAt': 'forged'})
+    assert item['payload']['completedAt'] == completed_at
+    assert item['payload']['owner'] == '保持责任人'
+    app.accept_item('team', item['id'], version=item['version'], actor_id='a')
+    assert item['payload']['completedAt'] == completed_at
+
+
+def test_completion_date_tracks_transition_not_generic_updates() -> None:
+    app, _ = service()
+    item = app.create_item('personal', item_type='personal', title='人工安排', status='open',
+                           payload={'completedAt': 'forged', 'owner': '甲'}, actor_id='a')
+    assert 'completedAt' not in item['payload']
+    app.update_item('personal', item['id'], version=1, actor_id='a', status='completed',
+                    payload={'completionKind': 'self_checked', 'owner': '乙'})
+    stamp = item['payload']['completedAt']
+    assert stamp != 'forged' and 'T' in stamp
+    app.update_item('personal', item['id'], version=2, actor_id='a', title='更新标题')
+    assert item['payload']['completedAt'] == stamp
+    app.update_item('personal', item['id'], version=3, actor_id='a', status='in_progress')
+    assert 'completedAt' not in item['payload']
+    assert item['payload']['owner'] == '乙'
 
 
 def test_evidence_run_must_belong_to_its_workspace_and_item() -> None:

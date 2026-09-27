@@ -107,7 +107,9 @@ function normalizeWorkspace(raw: WorkspaceState, workspace: WorkspaceKind): Work
       activities: (rawItem.activity ?? payload.activities ?? []).map((entry: any) => ({ id: entry.id, itemId: entry.itemId ?? rawItem.id, time: entry.createdAt ?? entry.time, title: entry.title ?? entry.kind ?? '事项更新', text: entry.text ?? entry.body ?? '', actor: entry.actorId, payload: entry.payload })),
       discussions: (rawItem.discussions ?? []).map((entry: any) => ({ id: entry.id, by: entry.createdBy ?? '协作者', text: entry.body, anchor: entry.anchor, createdAt: entry.createdAt })),
       improvements: [...new Map([...(payload.improvements ?? []).map(normalizeImprovement), ...relatedEntities('improvement').map(normalizeImprovement), ...improvementRows.filter((entry: any) => entry.sourceItemId === rawItem.id)].map((entry: any) => [entry.id ?? entry.title, entry])).values()],
-      parentId: payload.parentId ?? null,
+      parentId: itemRelations.find((relation: any) => relation.fromKind === 'item' && relation.toKind === 'item'
+        && relation.fromId === rawItem.id && relation.toId !== rawItem.id
+        && ['part_of', 'contributes_to'].includes(relation.relationType))?.toId ?? payload.parentId ?? null,
       relations: itemRelations,
       context: {
         established: detailIncluded ? Boolean(rawItem.context) : false,

@@ -1,0 +1,13 @@
+
+> lifeweave-web@0.1.0 test
+> vitest run
+
+
+ RUN  v4.1.11 /home/yyh/project/lifeweave/web
+
+
+ Test Files  25 passed (25)
+      Tests  116 passed (116)
+   Start at  11:37:18
+   Duration  4.10s (transform 16.32s, setup 0ms, import 27.97s, tests 6.80s, environment 22.21s)
+

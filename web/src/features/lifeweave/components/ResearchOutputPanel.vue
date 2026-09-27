@@ -7,28 +7,62 @@ import * as library from '../api/library'
 import { apiError } from '../api/lifeweave'
 import { downloadText } from '../utils/download'
 import type { WorkspaceKind } from '../types'
-const props=defineProps<{workspace:WorkspaceKind;itemId:string;refreshKey?:number}>()
+const props=defineProps<{workspace:WorkspaceKind;itemId:string;refreshKey?:number;selectedRunId?:string|null;selectedOutputId?:string|null;compact?:boolean}>()
 const emit=defineEmits<{'feedback-saved':[];'candidate-created':[];quote:[value:{text:string;runId:string|null;anchor:string} ]}>()
 const outputs=shallowRef<research.ResearchOutputs>({current:null,versions:[]})
 const selectedId=shallowRef('');const error=shallowRef('');const message=shallowRef('');const busy=shallowRef(false)
+const historyVersions=shallowRef<research.ResearchOutputVersion[]>([])
+const historyLoaded=shallowRef(false);const historyLoading=shallowRef(false);const selectedHistory=shallowRef<research.ResearchOutput|null>(null);const selectedHistoryLoading=shallowRef(false)
 const quote=shallowRef('');const anchor=shallowRef('');const feedback=shallowRef('');const editing=shallowRef(false)
 const form=reactive({path:'',content:'',reason:'从研究成果提炼可复用知识',baseVersion:'new'})
-const selected=computed(()=>outputs.value.versions.find(out=>out.id===selectedId.value)??outputs.value.current)
+const fixedSelection=computed(()=>!!props.selectedRunId || !!props.selectedOutputId)
+const fixedOutput=computed(()=>outputs.value.versions.find(out => (!!props.selectedRunId && out.runId === props.selectedRunId) || (!!props.selectedOutputId && out.id === props.selectedOutputId)) || null)
+const selected=computed(()=>fixedSelection.value
+ ? selectedId.value ? selectedHistory.value?.id===selectedId.value ? selectedHistory.value : null : fixedOutput.value
+ : outputs.value.versions.find(out=>out.id===selectedId.value)??outputs.value.current)
+const history=computed(()=>historyVersions.value.filter(out=>out.id!==fixedOutput.value?.id))
 let generation=0
+let historyGeneration=0
 let scopeGeneration=0
 let loadedScope=''
 const pendingRequests=new Map<string,{signature:string;id:string}>()
 function requestId(kind:string,payload:unknown){const signature=JSON.stringify([props.workspace,props.itemId,payload]);const existing=pendingRequests.get(kind);if(existing?.signature===signature)return existing.id;const id=crypto.randomUUID();pendingRequests.set(kind,{signature,id});return id}
-watch([()=>props.workspace,()=>props.itemId,()=>props.refreshKey],async()=>{
- const token=++generation;error.value=''
+watch([()=>props.workspace,()=>props.itemId,()=>props.refreshKey,()=>props.selectedRunId,()=>props.selectedOutputId],async()=>{
+ const token=++generation;++historyGeneration;error.value=''
  const scope=props.workspace,id=props.itemId
  if(loadedScope!==scope+':'+id){
   loadedScope=scope+':'+id;message.value='';quote.value='';anchor.value='';editing.value=false
-  outputs.value={current:null,versions:[]};selectedId.value='';pendingRequests.clear()
+  pendingRequests.clear()
  }
- try{const result=await research.getResearchOutput(scope,id);if(token===generation)outputs.value=result}
+ outputs.value={current:null,versions:[]};selectedId.value='';historyVersions.value=[];historyLoaded.value=false;historyLoading.value=false;selectedHistory.value=null;selectedHistoryLoading.value=false
+ try{
+  if(fixedSelection.value){
+   const result=await research.getResearchOutputVersion(scope,id,props.selectedRunId||props.selectedOutputId||'')
+   if(token===generation)outputs.value={current:result,versions:[result]}
+  }else{
+   const result=await research.getResearchOutput(scope,id)
+   if(token===generation)outputs.value=result
+  }
+ }
  catch(e){if(token===generation)error.value=apiError(e).message}
 },{immediate:true})
+async function loadHistory(){
+ if(!fixedSelection.value||historyLoaded.value||historyLoading.value)return
+ const token=++historyGeneration;const scope=props.workspace,id=props.itemId
+ historyLoading.value=true
+ try{const result=await research.getResearchOutputVersions(scope,id);if(token===historyGeneration){historyVersions.value=result.versions;historyLoaded.value=true}}
+ catch(e){if(token===historyGeneration)error.value=apiError(e).message}
+ finally{if(token===historyGeneration)historyLoading.value=false}
+}
+function historyToggle(event:Event){if((event.target as HTMLDetailsElement).open)void loadHistory()}
+async function selectHistory(id:string){
+ if(!id){++historyGeneration;selectedId.value='';selectedHistory.value=null;selectedHistoryLoading.value=false;return}
+ const token=++historyGeneration;const scope=props.workspace,itemId=props.itemId
+ selectedId.value=id;selectedHistory.value=null;selectedHistoryLoading.value=true;error.value=''
+ try{const result=await research.getResearchOutputVersion(scope,itemId,id);if(token===historyGeneration)selectedHistory.value=result}
+ catch(e){if(token===historyGeneration)error.value=apiError(e).message}
+ finally{if(token===historyGeneration)selectedHistoryLoading.value=false}
+}
 function scopeKey(){return `${props.workspace}:${props.itemId}:${selected.value?.id}:${selected.value?.version}`}
 watch(scopeKey,()=>{scopeGeneration++;quote.value='';anchor.value='';feedback.value='';editing.value=false;busy.value=false;pendingRequests.clear()},{flush:'sync'})
 async function action(fn:(current:()=>boolean)=>Promise<void>){
@@ -70,7 +104,8 @@ async function sendFeedback(){await action(async(current)=>{
 </script>
 <template>
  <section class="research-output lw-stack" aria-label="研究成果">
-  <div class="lw-between"><h2>当前成果</h2><select v-if="outputs.versions.length" v-model="selectedId" aria-label="成果版本"><option value="">当前成果</option><option v-for="out in outputs.versions" :key="out.id" :value="out.id">{{ out.kind==='manual'?'人工成果':out.state==='succeeded'?'完成的运行':'未完成的运行' }} · {{ new Date(out.createdAt).toLocaleString() }}</option></select></div>
+  <div v-if="!compact" class="lw-between"><h2>当前成果</h2><select v-if="outputs.versions.length && !fixedSelection" v-model="selectedId" aria-label="成果版本"><option value="">当前成果</option><option v-for="out in outputs.versions" :key="out.id" :value="out.id">{{ out.kind==='manual'?'人工成果':out.state==='succeeded'?'完成的运行':'未完成的运行' }} · {{ new Date(out.createdAt).toLocaleString() }}</option></select></div>
+  <details v-if="fixedSelection" class="research-history" @toggle="historyToggle"><summary>历史版本{{ historyLoaded ? `（${history.length}）` : '' }}</summary><p v-if="historyLoading" role="status">正在读取版本目录…</p><div v-else-if="historyLoaded" class="history-list"><button type="button" class="lw-btn sm" :aria-current="!selectedId ? 'true' : undefined" @click="selectHistory('')">当前成果</button><button v-for="out in history" :key="out.id" type="button" class="lw-btn sm" :aria-current="selectedId === out.id ? 'true' : undefined" @click="selectHistory(out.id)">{{ out.kind==='manual'?'人工成果':out.state==='succeeded'?'完成的运行':'部分运行' }} · {{ new Date(out.createdAt).toLocaleString() }}</button><span v-if="!history.length">暂无其他版本</span></div></details>
   <p v-if="error" role="alert" class="lw-notice warning">{{ error }}</p><p v-if="message" role="status" class="lw-notice">{{ message }}</p>
   <template v-if="selected">
    <p v-if="selected.storageNote" class="lw-notice warning">{{ selected.storageNote }} <a v-if="selected.rawDownloadUrl" :href="selected.rawDownloadUrl" download="原始执行文本.txt">下载原始执行文本</a></p>
@@ -84,9 +119,9 @@ async function sendFeedback(){await action(async(current)=>{
    </div>
    <form v-if="editing" class="lw-stack research-feedback" @submit.prevent="saveKnowledge"><h3>整理为知识候选</h3><label class="lw-label">知识文件路径<input v-model="form.path" :disabled="busy" class="lw-field" required maxlength="1000"/></label><button type="button" class="lw-btn sm" :disabled="busy" @click="loadBase">读取已有知识并准备合并</button><p class="lw-small lw-muted">新文件可直接提交；修订已有知识时，先读取当前版本。来源随候选保存，接受前不会改动知识原文。</p><label class="lw-label">建议正文<textarea v-model="form.content" :disabled="busy" class="lw-field" required maxlength="1000000" rows="12"></textarea></label><label class="lw-label">修改说明<input v-model="form.reason" :disabled="busy" class="lw-field" required maxlength="2000"/></label><div class="lw-inline"><button class="lw-btn primary" :disabled="busy">保存候选，查看差异</button><button type="button" class="lw-btn" @click="editing=false">取消</button></div></form>
   </template>
-  <p v-else class="lw-muted">尚无已完成成果。运行结束或提交人工成果后，可在这里阅读；已有部分结果可从版本列表查看。</p>
+  <p v-else class="lw-muted">{{ selectedHistoryLoading ? '正在读取所选历史版本…' : fixedSelection ? '所选成果版本尚不可读；请核对该运行或人工成果是否仍属于本事项。' : '尚无已完成成果。运行结束或提交人工成果后，可在这里阅读；已有部分结果可从版本列表查看。' }}</p>
  </section>
 </template>
 <style scoped>
-.research-output{min-width:0}.research-output article{min-width:0;line-height:1.8}.research-feedback{border-top:1px solid var(--lw-border,#e4e7ec);padding-top:1rem}.research-feedback blockquote{white-space:pre-wrap;border-left:3px solid #aac3b3;padding-left:1rem;margin:0;max-height:12rem;overflow:auto}
+.research-output{min-width:0}.research-output article{min-width:0;line-height:1.8}.research-history{border:1px solid var(--lw-border,#e4e7ec);border-radius:8px;padding:.6rem .8rem}.research-history summary{cursor:pointer;color:#517294;font-size:12px}.history-list{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px}.history-list [aria-current="true"]{border-color:#507da8;background:#edf5fc}.research-feedback{border-top:1px solid var(--lw-border,#e4e7ec);padding-top:1rem}.research-feedback blockquote{white-space:pre-wrap;border-left:3px solid #aac3b3;padding-left:1rem;margin:0;max-height:12rem;overflow:auto}
 </style>

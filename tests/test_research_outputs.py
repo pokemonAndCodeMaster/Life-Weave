@@ -49,6 +49,48 @@ def test_current_output_preserves_manual_old_and_failed_runs(output_client):
     assert 'attachment' in download.headers['content-disposition']
 
 
+def test_version_catalog_is_metadata_and_single_read_is_scoped_without_history_scan(output_client):
+    c = output_client
+    item = post(c, '/items', {'itemType': 'research', 'title': '按需成果'})['id']
+    other = post(c, '/items', {'itemType': 'research', 'title': '其他事项'})['id']
+    manual = post(c, f'/items/{item}/manual-results', {
+        'title': '人工记录', 'content': 'ONLY_MANUAL_BODY',
+        'verification': '受控fixture', 'environment': '临时库'})
+    old = completed_run(c, item, '# ONLY_OLD_BODY\n\n![旧图](figures/old.png)')
+    latest = completed_run(c, item, '# ONLY_LATEST_BODY\n\n![新图](figures/new.png)')
+    partial = completed_run(c, item, 'ONLY_PARTIAL_BODY ![部分图](figures/partial.png)', 'failed')
+    route = f'/api/lifeweave/personal/items/{item}/research-output/versions'
+    catalog = c.get(route)
+    assert catalog.status_code == 200, catalog.text
+    data = catalog.json()
+    assert data['current']['id'] == latest['id']
+    assert {row['id'] for row in data['versions']} == {
+        old['id'], latest['id'], partial['id'], manual['artifactId']}
+    assert all('content' not in row for row in data['versions'])
+    assert all(token not in catalog.text for token in (
+        'ONLY_OLD_BODY', 'ONLY_LATEST_BODY', 'ONLY_PARTIAL_BODY', 'ONLY_MANUAL_BODY'))
+    runtime = c.app.state.research_outputs.runtime
+    with pytest.MonkeyPatch.context() as patch:
+        def no_scan(*_args, **_kwargs):
+            raise AssertionError('single-version read scanned run history')
+        patch.setattr(runtime, 'list_runs', no_scan)
+        selected = c.get(route + '/' + partial['id'])
+        assert selected.status_code == 200, selected.text
+        assert selected.json()['content'] == 'ONLY_PARTIAL_BODY ![部分图](figures/partial.png)'
+        assert selected.json()['state'] == 'failed'
+        assert selected.json()['assetBase'].endswith('/runs/' + partial['id'] + '/assets')
+        assert 'ONLY_LATEST_BODY' not in selected.text
+        manual_read = c.get(route + '/' + manual['artifactId'])
+        assert manual_read.status_code == 200, manual_read.text
+        assert manual_read.json()['content'] == 'ONLY_MANUAL_BODY'
+        assert manual_read.json()['kind'] == 'manual'
+        assert c.get(f'/api/lifeweave/personal/items/{other}/research-output/versions/{latest["id"]}').status_code == 409
+        assert c.get(f'/api/lifeweave/personal/items/{other}/research-output/versions/{manual["artifactId"]}').status_code == 409
+        assert c.get(route.replace('/personal/', '/team/') + '/' + latest['id']).status_code == 404
+    legacy = c.get(route.removesuffix('/versions'))
+    assert legacy.status_code == 200 and legacy.json()['current']['content'].startswith('# ONLY_LATEST_BODY')
+
+
 def test_candidates_are_atomic_retryable_reviewed_and_reusable(output_client):
     c=output_client
     item=post(c,'/items',{'itemType':'research','title':'稀缺数据研究'})['id']

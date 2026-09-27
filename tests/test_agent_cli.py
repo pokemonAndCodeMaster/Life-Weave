@@ -82,3 +82,62 @@ def test_development_choices_http_error(cli, monkeypatch, capsys):
     assert captured.out == ''
     assert 'LifeWeave HTTP 404' in captured.err
     assert '开发事项不存在' in captured.err
+
+
+def test_work_plan_keeps_explicit_version_and_does_not_start_run(cli, monkeypatch, tmp_path, capsys):
+    plan = {'version': 7, 'title': '研究方案', 'provider': 'research', 'nodes': [
+        {'id': 'source', 'title': '核对原文', 'description': '', 'state': 'planned',
+         'summary': '', 'dependsOn': [], 'outputIds': []}]}
+    source = tmp_path / '计划.json'
+    source.write_text(json.dumps(plan, ensure_ascii=False), encoding='utf-8')
+    requests = []
+
+    def response(request, **_):
+        requests.append(request)
+        return io.BytesIO(b'{"itemVersion":8}')
+
+    monkeypatch.setattr(cli, 'urlopen', response)
+    assert cli.main(['--workspace', 'team', 'work-plan', 'item-123', '--file', str(source)]) == 0
+    assert len(requests) == 1
+    assert requests[0].get_method() == 'PUT'
+    assert requests[0].full_url.endswith('/team/items/item-123/work-plan')
+    assert json.loads(requests[0].data) == plan
+    assert json.loads(capsys.readouterr().out)['itemVersion'] == 8
+
+
+def test_work_plan_conflict_does_not_retry_or_replace_version(cli, monkeypatch, tmp_path, capsys):
+    source = tmp_path / 'plan.json'
+    source.write_text('{"version":1,"title":"旧方案","provider":"manual","nodes":[]}', encoding='utf-8')
+    calls = []
+
+    def response(request, **_):
+        calls.append(request)
+        raise HTTPError(request.full_url, 409, 'Conflict', {}, io.BytesIO(b'{"detail":"stale version"}'))
+
+    monkeypatch.setattr(cli, 'urlopen', response)
+    assert cli.main(['work-plan', 'item-123', '--file', str(source)]) == 1
+    assert len(calls) == 1
+    assert '409' in capsys.readouterr().err
+
+
+def test_work_view_is_read_only(cli, monkeypatch, capsys):
+    calls = []
+
+    def response(request, **_):
+        calls.append(request)
+        return io.BytesIO(b'{"itemVersion":1,"plan":{"nodes":[]}}')
+
+    monkeypatch.setattr(cli, 'urlopen', response)
+    assert cli.main(['work-view', 'item-123']) == 0
+    assert len(calls) == 1 and calls[0].get_method() == 'GET'
+    assert calls[0].full_url.endswith('/items/item-123/work-view')
+    assert json.loads(capsys.readouterr().out)['plan']['nodes'] == []
+
+
+@pytest.mark.parametrize('content', ['[]', '{"version":true}', '{"title":"未固定版本"}', '{invalid'])
+def test_invalid_local_work_plan_never_sends(cli, monkeypatch, tmp_path, content):
+    source = tmp_path / 'plan.json'
+    source.write_text(content, encoding='utf-8')
+    monkeypatch.setattr(cli, 'urlopen', lambda *_args, **_kwargs: pytest.fail('must not send invalid input'))
+    with pytest.raises(SystemExit):
+        cli.main(['work-plan', 'item-123', '--file', str(source)])

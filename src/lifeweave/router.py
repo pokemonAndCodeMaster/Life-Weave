@@ -10,6 +10,8 @@ from src.api.deps import get_actor_id
 from .models import (ActivityCreate, ContextProposalCreate, ContextResolve, DiscussionCreate, EntityCreate, EntityUpdate, EvidenceCreate, EvidenceReview, ItemCreate, ItemUpdate, MeetingConfigUpdate, MeetingNoteCreate, PreferenceUpdate, RelationCreate)
 from .repository import ConcurrentUpdateError
 from .service import LifeWeaveService
+from .work_view import WorkViewService
+from .work_view_models import WorkPlanInput
 
 router = APIRouter(prefix='/api/lifeweave/{workspace}', tags=['lifeweave'])
 Actor = Annotated[str, Depends(get_actor_id)]
@@ -54,6 +56,25 @@ def get_item(workspace:str,item_id:str,service:Service)->dict[str,Any]:
         item=service.get_item(workspace,item_id)
         return {**item,'relations':service.repository.list_relations(workspace,item_id),'discussions':service.repository.list_discussions(workspace,item_id=item_id),'context':service.repository.context(workspace,item_id),'contextProposals':service.repository.list_proposals(workspace,item_id),'evidence':service.repository.list_evidence(workspace,item_id),'activity':service.repository.list_activities(workspace,item_id)}
     except (KeyError,ValueError) as exc: raise _fail(exc) from exc
+
+
+@router.get('/items/{item_id}/work-view')
+def get_work_view(workspace: str, item_id: str, request: Request, service: Service) -> dict[str, Any]:
+    try:
+        return WorkViewService(service, request.app.state.lifeweave_runtime_service,
+                               request.app.state.development).read(workspace, item_id)
+    except (KeyError, ValueError) as exc:
+        raise _fail(exc) from exc
+
+
+@router.put('/items/{item_id}/work-plan')
+def put_work_plan(workspace: str, item_id: str, payload: WorkPlanInput,
+                  request: Request, service: Service, actor_id: Actor) -> dict[str, Any]:
+    try:
+        return WorkViewService(service, request.app.state.lifeweave_runtime_service,
+                               request.app.state.development).save(workspace, item_id, payload, actor_id)
+    except (KeyError, ValueError) as exc:
+        raise _fail(exc) from exc
 
 
 @router.patch('/items/{item_id}')
