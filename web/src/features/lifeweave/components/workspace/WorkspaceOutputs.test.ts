@@ -61,4 +61,19 @@ describe('统一成果阅读', () => {
     expect(development.getDevelopmentDelivery).toHaveBeenCalledWith('personal', 'assignment-1')
     view.unmount()
   })
+  it('后台刷新同一成果不清空已展开差异，也不重复取正文', async () => {
+    vi.mocked(development.getDevelopmentDelivery).mockResolvedValue({ id: 'delivery-1' } as never)
+    vi.mocked(development.getDevelopmentDiff).mockResolvedValue({ patch: 'diff --git a/real b/real', fileCount: 1, truncated: false } as never)
+    vi.mocked(lifeweave.getRun).mockResolvedValue({ result: '# 实施说明' } as never)
+    const output = { id: 'delivery:assignment-1', title: '交付', kind: 'development' as const, summary: '固定交付', assignmentId: 'assignment-1', runId: 'run-1', version: 'v1' }
+    const wrapper = mount(WorkspaceOutputs, { props: { workspace: 'personal', item, view: { ...base, outputs: [output] }, selectedId: output.id }, global: { stubs } })
+    await flushPromises()
+    await wrapper.findAll('button').find(button => button.text() === '查看实际 Git 差异')!.trigger('click'); await flushPromises()
+    await wrapper.setProps({ view: { ...base, outputs: [{ ...output }] } }); await flushPromises()
+    expect(wrapper.find('.diff-preview').text()).toContain('diff --git a/real b/real')
+    expect(development.getDevelopmentDelivery).toHaveBeenCalledOnce()
+    expect(lifeweave.getRun).toHaveBeenCalledOnce()
+    wrapper.unmount()
+  })
+
 })

@@ -2,7 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
   history: createWebHistory(),
-  scrollBehavior(_to, _from, savedPosition) {
+  scrollBehavior(to, from, savedPosition) {
+    // Expanding a step stays within the page; its heading owns focus and scrolling.
+    if (to.name === 'item-detail' && to.path === from.path) return savedPosition ?? false
     return savedPosition ?? { top: 0 }
   },
   routes: [

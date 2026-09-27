@@ -1,0 +1,22 @@
+{
+  "gssm": {
+    "inlineBodyChars": 11421,
+    "images": 1,
+    "imageWidths": [
+      848
+    ],
+    "zipFiles": 32,
+    "zipPictures": 8
+  },
+  "navigation": "键盘打开、聚焦、成果页返回、刷新选中、收起还原焦点均通过",
+  "mobile390": "无页面横向溢出，节点正文可读",
+  "development": {
+    "planChars": 1953,
+    "zipFiles": 3,
+    "manifestFiles": 3,
+    "selection": "两个产物切换，正文和交付不串；真实差异可读"
+  },
+  "manual": "无产物说明、人工 Markdown 正文、讨论草稿中的步骤及成果引用均核对；未发送",
+  "writes": [],
+  "pageErrors": []
+}

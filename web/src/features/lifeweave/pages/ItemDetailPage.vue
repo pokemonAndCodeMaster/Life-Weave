@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, shallowRef, watch } from 'vue'
+import { computed, nextTick, shallowRef, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import PageHeader from '../components/PageHeader.vue'
 import LoadingState from '../components/LoadingState.vue'
@@ -28,9 +28,12 @@ const rootItem = computed(() => item.value ? rootOf(item.value) : undefined)
 const tab = computed<ItemTab>(() => (['overview', 'context', 'outputs', 'activity', 'retro', 'development'].includes(String(route.params.tab)) ? route.params.tab : 'overview') as ItemTab)
 const secondary = computed(() => !['overview', 'outputs'].includes(tab.value))
 const { view, loading: viewLoading, error: viewError, saving, conflict, refresh: refreshWork, save: saveWork } = useItemWorkView(activeWorkspace, itemId)
-const selectedNodeId = shallowRef<string | null>(null)
+const selectedNodeId = computed(() => typeof route.query.step === 'string' ? route.query.step : null)
+const graph = shallowRef<InstanceType<typeof WorkGraph> | null>(null)
+const nodeDetail = shallowRef<InstanceType<typeof WorkNodeDetail> | null>(null)
 const selectedOutputId = shallowRef<string | null>(null)
 const editingPlan = shallowRef(false)
+const planEditor = shallowRef<InstanceType<typeof WorkPlanEditor> | null>(null)
 const editorReset = shallowRef(0)
 const selectedNode = computed<WorkStep | null>(() => view.value?.plan.nodes.find(node => node.id === selectedNodeId.value) || null)
 const primaryOutput = computed(() => view.value?.outputs[0] || null)
@@ -43,15 +46,10 @@ function providerLabel(provider: string): string {
 }
 
 watch([() => activeWorkspace.value, itemId], ([, id]) => {
-  selectedNodeId.value = null
   selectedOutputId.value = null
   editingPlan.value = false
   if (id) void loadDetail(id)
 }, { immediate: true })
-watch(() => view.value?.plan.nodes, nodes => {
-  if (!nodes?.length) { selectedNodeId.value = null; return }
-  if (selectedNodeId.value && !nodes.some(node => node.id === selectedNodeId.value)) selectedNodeId.value = null
-})
 watch(() => view.value?.outputs, outputs => {
   if (!outputs?.length) { selectedOutputId.value = null; return }
   if (!outputs.some(output => output.id === selectedOutputId.value)) selectedOutputId.value = outputs[0]!.id
@@ -64,7 +62,24 @@ async function loadDetail(id: string) {
   if (detail?.parentId && !itemDetails.value[detail.parentId]) await loadItem(detail.parentId, true)
 }
 function setTab(value: ItemTab) {
-  void router.push('/lifeweave/' + activeWorkspace.value + '/items/' + encodeURIComponent(itemId.value) + '/' + value)
+  void router.push({ path: '/lifeweave/' + activeWorkspace.value + '/items/' + encodeURIComponent(itemId.value) + '/' + value, query: route.query })
+}
+async function selectNode(id: string) {
+  await router.push({ query: { ...route.query, step: id } })
+  await nextTick()
+  nodeDetail.value?.focus()
+}
+async function closeNode() {
+  const id = selectedNodeId.value
+  const { step: _step, ...query } = route.query
+  await router.push({ query })
+  await nextTick()
+  if (id) graph.value?.focusNode(id)
+}
+async function editSelectedNode() {
+  editingPlan.value = true
+  await nextTick()
+  if (selectedNodeId.value) planEditor.value?.focusStep(selectedNodeId.value)
 }
 function delegateCurrentItem() {
   if (!item.value || !rootItem.value) return
@@ -74,7 +89,7 @@ function delegateCurrentItem() {
 function quoteForConversation(quote: { text: string; runId: string | null; anchor: string }) {
   try { sessionStorage.setItem('lifeweave:quote:' + activeWorkspace.value + ':' + itemId.value, JSON.stringify(quote)) }
   catch { notify('浏览器未能保存引用，请复制段落后打开对话继续。'); return }
-  void router.push({ path: '/lifeweave/' + activeWorkspace.value + '/conversation', query: { itemId: itemId.value } })
+  void router.push({ path: '/lifeweave/' + activeWorkspace.value + '/conversation', query: { itemId: itemId.value, mode: 'discuss' } })
 }
 function selectOutput(id: string) { selectedOutputId.value = id; setTab('outputs') }
 async function savePlan(value: { version: number; title: string; provider: string; nodes: WorkStep[] }) {
@@ -93,17 +108,17 @@ async function refreshAll() { await Promise.all([loadDetail(itemId.value), refre
     </PageHeader>
     <div class="workspace-meta"><span>事项状态 <StatusBadge :value="item.state" /></span><span>{{ item.owner === 'local-user' ? '我' : item.owner }}</span><span v-if="item.due">目标 {{ item.due }}</span><span v-if="item.parentId">子事项 · 继承上层背景</span><button type="button" class="meta-action" @click="openModal('relations', { item })">关系</button></div>
     <details v-if="item.goal" class="item-description"><summary>事项说明</summary><p>{{ item.goal }}</p></details>
-    <nav class="workspace-nav" aria-label="事项内容"><button type="button" :class="{ active: tab === 'overview' }" :aria-current="tab === 'overview' ? 'page' : undefined" @click="setTab('overview')">工作</button><button type="button" :class="{ active: tab === 'outputs' }" :aria-current="tab === 'outputs' ? 'page' : undefined" @click="setTab('outputs')">成果 <span v-if="view?.outputs.length">{{ view.outputs.length }}</span></button><details class="secondary-nav" :open="secondary || undefined"><summary>背景与历史</summary><div class="secondary-links"><button type="button" :class="{ active: tab === 'context' }" @click="setTab('context')">背景</button><button type="button" :class="{ active: tab === 'activity' }" @click="setTab('activity')">过程记录</button><button type="button" :class="{ active: tab === 'retro' }" @click="setTab('retro')">复盘</button><button v-if="item.itemType === 'requirement' || item.itemType === 'fix'" type="button" :class="{ active: tab === 'development' }" @click="setTab('development')">开发配置与历史</button></div></details><button type="button" class="refresh-action" @click="refreshAll">刷新</button></nav>
+    <nav class="workspace-nav" aria-label="事项内容"><button type="button" :class="{ active: tab === 'overview' }" :aria-current="tab === 'overview' ? 'page' : undefined" @click="setTab('overview')">概览</button><button type="button" :class="{ active: tab === 'outputs' }" :aria-current="tab === 'outputs' ? 'page' : undefined" @click="setTab('outputs')">成果 <span v-if="view?.outputs.length">{{ view.outputs.length }}</span></button><details class="secondary-nav" :open="secondary || undefined"><summary>背景与历史</summary><div class="secondary-links"><button type="button" :class="{ active: tab === 'context' }" @click="setTab('context')">背景</button><button type="button" :class="{ active: tab === 'activity' }" @click="setTab('activity')">过程记录</button><button type="button" :class="{ active: tab === 'retro' }" @click="setTab('retro')">复盘</button><button v-if="item.itemType === 'requirement' || item.itemType === 'fix'" type="button" :class="{ active: tab === 'development' }" @click="setTab('development')">开发配置与历史</button></div></details><button type="button" class="refresh-action" @click="refreshAll">刷新</button></nav>
     <main class="workspace-main">
       <template v-if="tab === 'overview'">
         <p v-if="viewError" role="alert" class="lw-notice warning">{{ viewError }} <button type="button" class="lw-btn sm" @click="refreshWork()">重试</button></p>
         <div v-if="viewLoading && !view" class="loading-block" role="status">正在读取当前工作…</div>
         <template v-else-if="view">
           <section class="current-situation" aria-label="当前局面"><div class="situation-head"><div><span class="section-kicker">当前局面</span><h2>{{ view.current.label }}</h2></div></div><p v-if="view.current.summary && view.current.summary !== view.current.label">{{ shortSummary(view.current.summary) }}</p><span v-if="view.current.updatedAt" class="updated-at">更新于 {{ new Date(view.current.updatedAt).toLocaleString('zh-CN') }}</span></section>
-          <section class="work-section" aria-label="工作步骤"><div class="section-head"><div><span class="section-kicker">工作路径</span><h2>{{ view.plan.title || '工作步骤' }}</h2><p v-if="view.plan.source !== 'empty'">{{ view.plan.source === 'observed' ? '来自实际记录' : '已声明计划' }}<template v-if="view.plan.provider !== 'observed'"> · {{ providerLabel(view.plan.provider) }}</template></p></div><button type="button" class="lw-btn sm" @click="editingPlan = !editingPlan">{{ editingPlan ? '收起编辑' : view.plan.source === 'observed' ? '另存为可编辑计划' : '编辑步骤' }}</button></div>
-            <div v-if="view.plan.nodes.length" class="graph-and-detail"><WorkGraph :nodes="view.plan.nodes" :selected-id="selectedNodeId" @select="selectedNodeId = selectedNodeId === $event ? null : $event" /><WorkNodeDetail v-if="selectedNode" :node="selectedNode" :outputs="view.outputs" @output="selectOutput" @run="openModal('run-detail', { runId: $event })" @edit="editingPlan = true" @close="selectedNodeId = null" /></div>
+          <section class="work-section" aria-label="工作步骤"><div class="section-head"><div><span class="section-kicker">步骤图</span><h2>{{ view.plan.title || '工作步骤' }}</h2><p v-if="view.plan.source !== 'empty'">{{ view.plan.source === 'observed' ? '来自实际记录' : '已声明计划' }}<template v-if="view.plan.provider !== 'observed'"> · {{ providerLabel(view.plan.provider) }}</template></p></div><button type="button" class="lw-btn sm" @click="editingPlan = !editingPlan">{{ editingPlan ? '收起编辑' : view.plan.source === 'observed' ? '另存为可编辑计划' : '编辑步骤' }}</button></div>
+            <div v-if="view.plan.nodes.length" class="graph-and-detail"><WorkGraph ref="graph" :nodes="view.plan.nodes" :selected-id="selectedNodeId" @select="selectNode" /><p v-if="!selectedNode" class="graph-hint">点击步骤，展开本步内容与产物。</p><WorkNodeDetail v-if="selectedNode" ref="nodeDetail" :workspace="activeWorkspace" :item-id="itemId" :node="selectedNode" :nodes="view.plan.nodes" :outputs="view.outputs" :observed="view.plan.source === 'observed'" @output="selectOutput" @run="openModal('run-detail', { runId: $event })" @edit="editSelectedNode" @close="closeNode" @select="selectNode" @context="setTab('context')" @updated="refreshAll" @quote="quoteForConversation" /></div>
             <div v-else class="empty-plan"><strong>还没有步骤记录</strong><p>可以登记一两步当前真正要做的事；页面不会据此自动启动 Agent。</p><button type="button" class="lw-btn sm" @click="editingPlan = true">添加第一步</button></div>
-            <WorkPlanEditor v-if="editingPlan" :view="view" :outputs="view.outputs" :saving="saving" :error="viewError" :conflict="conflict" :reset-key="editorReset" @save="savePlan" @cancel="editingPlan = false" @reload="reloadEditor" />
+            <WorkPlanEditor v-if="editingPlan" ref="planEditor" :view="view" :outputs="view.outputs" :saving="saving" :error="viewError" :conflict="conflict" :reset-key="editorReset" @save="savePlan" @cancel="editingPlan = false" @reload="reloadEditor" />
           </section>
           <section class="current-output" aria-label="主要成果"><div><span class="section-kicker">主要成果</span><h2>{{ primaryOutput?.title || '尚无成果' }}</h2><p>{{ shortSummary(primaryOutput?.summary) || '人工工作与 AI 委托的成果会在同一目录中出现。' }}</p></div><button type="button" class="lw-btn sm" @click="primaryOutput ? selectOutput(primaryOutput.id) : setTab('outputs')">{{ primaryOutput ? '阅读成果' : '登记或查看成果' }}</button></section>
           <details v-if="view.warnings.length" class="workspace-background"><summary>记录边界与提醒（{{ view.warnings.length }}）</summary><ul><li v-for="warning in view.warnings" :key="warning">{{ warning }}</li></ul></details>
@@ -146,6 +161,7 @@ async function refreshAll() { await Promise.all([loadDetail(itemId.value), refre
 .situation-head h2,.section-head h2,.current-output h2 { margin: 5px 0 0; font-size: 19px; color: #263a4f; }
 .current-situation p,.current-output p { margin: 11px 0 0; line-height: 1.65; color: #35495e; white-space: pre-wrap; }
 .section-head p,.updated-at { display: block; margin-top: 6px; color: #748497; font-size: 11px; }
+.graph-hint { margin: 0; color: #6c8295; font-size: 12px; }
 .graph-and-detail { display: grid; gap: 14px; margin-top: 16px; min-width: 0; }
 .empty-plan { margin-top: 16px; padding: 22px; border: 1px dashed #cbd9e6; border-radius: 9px; background: #f9fbfd; }
 .empty-plan p { color: #62788d; font-size: 13px; }

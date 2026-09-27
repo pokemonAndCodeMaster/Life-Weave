@@ -82,6 +82,14 @@ describe('研究操作的结果不确定和切换事项',()=>{
   expect(research.getResearchOutputVersion).toHaveBeenLastCalledWith('personal','item-1','run-1')
   view.unmount()
  })
+ it('步骤范围只读固定产物，不提供整件事项的历史切换',async()=>{
+  vi.mocked(research.getResearchOutputVersion).mockResolvedValue(output)
+  const view=mount(ResearchOutputPanel,{props:{workspace:'personal',itemId:'item-1',selectedRunId:'run-1',compact:true,allowHistory:false}});await flushPromises()
+  expect(view.text()).toContain('正文')
+  expect(view.find('details.research-history').exists()).toBe(false)
+  expect(research.getResearchOutputVersions).not.toHaveBeenCalled()
+  view.unmount()
+ })
  it('快速切换历史版本时忽略迟到正文',async()=>{
   const oldA={...output,id:'run-a',runId:'run-a',content:'# A 正文'}
   const oldB={...output,id:'run-b',runId:'run-b',content:'# B 正文'}

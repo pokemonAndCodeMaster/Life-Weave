@@ -1,0 +1,17 @@
+{
+  "itemId": "item-7547b65b4f704829",
+  "results": {
+    "design": {
+      "artifactId": "result-d8b1d4ac9a4abb2a161ac44a",
+      "evidenceId": "evidence-d8b1d4ac9a4abb2a161ac44a",
+      "version": "59de8978fbc71c1c031b93f90e0ad128ffb79edd7bccbc724985964ae8d53937"
+    },
+    "delivery": {
+      "artifactId": "result-8b5ca755f8c41a5f1666851f",
+      "evidenceId": "evidence-8b5ca755f8c41a5f1666851f",
+      "version": "37fa1aaf03337cfd5f01426dc14dd00901be483d519f14b6f55e346be3cbb824"
+    }
+  },
+  "itemVersion": 5,
+  "itemState": "awaiting_acceptance"
+}

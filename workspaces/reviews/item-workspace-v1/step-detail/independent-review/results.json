@@ -1,0 +1,1430 @@
+{
+  "started": "2026-09-27T19:26:14+0800",
+  "mobile": {
+    "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-de7785d0790445d8/overview?step=run:gzrun-20260919-130600-2cabbf3e",
+    "initial_size": {
+      "viewport": 390,
+      "document": 390,
+      "body": 390,
+      "x": 0,
+      "y": 771
+    },
+    "hash": {
+      "text": "0ee2542eb28e50948cae8561332365d5f76e29d4",
+      "length": 40,
+      "rects": [
+        {
+          "x": 49,
+          "y": 401.140625,
+          "width": 285.765625,
+          "height": 17,
+          "top": 401.140625,
+          "right": 334.765625,
+          "bottom": 418.140625,
+          "left": 49
+        },
+        {
+          "x": 49,
+          "y": 426.484375,
+          "width": 35.3125,
+          "height": 17,
+          "top": 426.484375,
+          "right": 84.3125,
+          "bottom": 443.484375,
+          "left": 49
+        }
+      ],
+      "overflowWrap": "anywhere",
+      "whiteSpace": "normal",
+      "screenshot": "mobile-hash.png",
+      "size": {
+        "viewport": 390,
+        "document": 390,
+        "body": 390,
+        "x": 0,
+        "y": 1655
+      }
+    },
+    "formulas": [
+      {
+        "clientWidth": 292,
+        "scrollWidth": 508,
+        "rect": {
+          "x": 49,
+          "y": 405.671875,
+          "width": 292,
+          "height": 32.5,
+          "top": 405.671875,
+          "right": 341,
+          "bottom": 438.171875,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "S\\mid X\\sim\\operatorname{LogNormal}(\\mu(X),\\sigma^2(X)),\n\\qquad\n\\ln S\\mid X\\sim\\mathcal N(\\mu(X),\\sigma^2(X)).",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 2178
+        },
+        "scrolled": {
+          "left": 216,
+          "max": 216
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 2178
+        },
+        "screenshot": "mobile-formulas-0-right.png",
+        "screenshot_left": "mobile-formulas-0-left.png"
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 355,
+        "rect": {
+          "x": 49,
+          "y": 768.953125,
+          "width": 292,
+          "height": 51.828125,
+          "top": 768.953125,
+          "right": 341,
+          "bottom": 820.78125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "\\begin{pmatrix}x_{ij}\\\\y_{ij}\\end{pmatrix}\n=\n\\frac1{\\sqrt{a^2+b^2}}\n\\begin{pmatrix}b&-a\\\\a&b\\end{pmatrix}\n\\left(\n\\begin{pmatrix}x_j\\\\y_j\\end{pmatrix}\n-\n\\begin{pmatrix}x_i\\\\y_i\\end{pmatrix}\n\\right),",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 2178
+        },
+        "scrolled": {
+          "left": 63,
+          "max": 63
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 2178
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 801.78125,
+          "width": 292,
+          "height": 42.34375,
+          "top": 801.78125,
+          "right": 341,
+          "bottom": 844.125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "s=\\sqrt{x_{ij}^2+y_{ij}^2},\n\\qquad\n\\rho=\\operatorname{atan2}(y_{ij},x_{ij}).",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 2211
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 2211
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 568,
+        "rect": {
+          "x": 49,
+          "y": 395.875,
+          "width": 292,
+          "height": 51.828125,
+          "top": 395.875,
+          "right": 341,
+          "bottom": 447.703125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "F(s\\mid X)=\\Pr(S\\le s\\mid X)\n=\\Phi\\!\\left(\\frac{\\ln s-\\mu(X)}{\\sigma(X)}\\right),\n\\qquad\nq(s\\mid X)=1-F(s\\mid X).",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 3559
+        },
+        "scrolled": {
+          "left": 276,
+          "max": 276
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 3559
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 589.078125,
+          "width": 292,
+          "height": 32.5,
+          "top": 589.078125,
+          "right": 341,
+          "bottom": 621.578125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "\\Pr\\{\\min(S_1,\\ldots,S_n)>s\\mid X\\}=q^n.",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 3559
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 3559
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 794.640625,
+          "width": 292,
+          "height": 49.328125,
+          "top": 794.640625,
+          "right": 341,
+          "bottom": 843.96875,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "\\hat n=\\frac{\\ln0.5}{\\ln q},\n\\qquad\nM=\\log_{10}\\hat n.",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 3578
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 3578
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 405.6875,
+          "width": 292,
+          "height": 32.5,
+          "top": 405.6875,
+          "right": 341,
+          "bottom": 438.1875,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "M\\approx\\log_{10}(0.693/F),",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 4183
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 4183
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 395.875,
+          "width": 292,
+          "height": 51.828125,
+          "top": 395.875,
+          "right": 341,
+          "bottom": 447.703125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "M=\\log_{10}\\left[\\frac{\\ln0.5}{\\ln0.97725}\\right]\\approx1.479.",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 5005
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 5005
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 362,
+        "rect": {
+          "x": 49,
+          "y": 395.296875,
+          "width": 292,
+          "height": 52.53125,
+          "top": 395.296875,
+          "right": 341,
+          "bottom": 447.828125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "\\ell_i=\\ln s_i+\\frac12\\left[\n\\ln(2\\pi)+\\ln v_i+\n\\frac{(\\ln s_i-\\mu(X_i))^2}{v_i}\n\\right].",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 6019
+        },
+        "scrolled": {
+          "left": 70,
+          "max": 70
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 6019
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 512,
+        "rect": {
+          "x": 49,
+          "y": 398.28125,
+          "width": 292,
+          "height": 47.25,
+          "top": 398.28125,
+          "right": 341,
+          "bottom": 445.53125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "\\mathrm{Recall}=\\frac{TP}{TP+FN},\n\\quad\n\\mathrm{Precision}=\\frac{TP}{TP+FP},\n\\quad\n\\mathrm{FPR}=\\frac{FP}{FP+TN}.",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 9329
+        },
+        "scrolled": {
+          "left": 220,
+          "max": 220
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 9329
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 380,
+        "rect": {
+          "x": 49,
+          "y": 688.28125,
+          "width": 292,
+          "height": 53.125,
+          "top": 688.28125,
+          "right": 341,
+          "bottom": 741.40625,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "A_R^{\\mathrm{ROC}}\n=\n\\frac1{1-R}\\int_R^1[1-\\mathrm{FPR}(r)]\\,dr,\n\\qquad\nr=\\mathrm{Recall}.",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 9329
+        },
+        "scrolled": {
+          "left": 88,
+          "max": 88
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 9329
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 413,
+        "rect": {
+          "x": 49,
+          "y": 405.625,
+          "width": 292,
+          "height": 32.5,
+          "top": 405.625,
+          "right": 341,
+          "bottom": 438.125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "\\mathrm{TTI}\n=\nt_{\\mathrm{impact}}-\n\\max\\{t\\le t_{\\mathrm{impact}}:\nM_t>m_*,\\ M_{t-1}\\le m_*\\}.",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 10273
+        },
+        "scrolled": {
+          "left": 121,
+          "max": 121
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 10273
+        },
+        "screenshot": "mobile-formulas-11-right.png",
+        "screenshot_left": "mobile-formulas-11-left.png"
+      }
+    ],
+    "tables": [
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 225.25,
+          "width": 292,
+          "height": 392.90625,
+          "top": 225.25,
+          "right": 341,
+          "bottom": 618.15625,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "X_C",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 3184
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 3184
+        },
+        "screenshot": "mobile-tables-0-right.png",
+        "screenshot_left": "mobile-tables-0-left.png"
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 260.65625,
+          "width": 292,
+          "height": 323.53125,
+          "top": 260.65625,
+          "right": 341,
+          "bottom": 584.1875,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "s",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 4752
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 4752
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 239.109375,
+          "width": 292,
+          "height": 366.71875,
+          "top": 239.109375,
+          "right": 341,
+          "bottom": 605.828125,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "p(X)",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 5441
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 5441
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 141.484375,
+          "width": 292,
+          "height": 561.0625,
+          "top": 141.484375,
+          "right": 341,
+          "bottom": 702.546875,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "\n\n\n数据\n用途与来源\n规模和切分证据\n\n\n\nSafeBaseline\nSHRP2美国自然驾驶中的安全基线；重建后3893个安全事件，含道路和城区交互\n源码注释：427674训练片段、105671验证片段\n\n\nArgoverseHV\n从Argoverse相关数据提取的人类参与者交互，主要补充城市交叉／转弯；论文记为美国2019年采集\n源码注释：439175训练片段、109462验证片段\n\n\nhighD\n德国高速公路无人机轨迹中的换道交互，论文记为2018年采集\n源码注释：420077训练片段、102853验证片段\n\n\nSHRP2碰撞／近碰撞\n安全效果评测；与SafeBaseline事件用途分离\n最终2591个正样本事件，另有3777个安全对象时段\n\n",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 7225
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 7225
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 217.328125,
+          "width": 292,
+          "height": 409.90625,
+          "top": 217.328125,
+          "right": 341,
+          "bottom": 627.234375,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "\n\n\n阶段\n碰撞\n近碰撞\n合计\n原因或用途\n\n\n\n原始安全关键事件\n1942\n6953\n8895\n不含安全基线\n\n\n能重建自车及至少一个周边对象\n1402\n5262\n6664\n去除缺失或无法重建的数据\n\n\n初步有效测试事件\n282\n4593\n4875\n要求对象观察够长，排除后方对象、无形障碍等\n\n\n投票确定冲突对象\n110\n2481\n2591\n用于主要比较\n\n",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 8025
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 8025
+        }
+      },
+      {
+        "clientWidth": 292,
+        "scrollWidth": 292,
+        "rect": {
+          "x": 49,
+          "y": 155.03125,
+          "width": 292,
+          "height": 534.875,
+          "top": 155.03125,
+          "right": 341,
+          "bottom": 689.90625,
+          "left": 49
+        },
+        "overflowX": "auto",
+        "text": "A_{90\\%}^{ROC}",
+        "before_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 11213
+        },
+        "scrolled": {
+          "left": 0,
+          "max": 0
+        },
+        "after_size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 11213
+        },
+        "screenshot": "mobile-tables-5-right.png",
+        "screenshot_left": "mobile-tables-5-left.png"
+      }
+    ],
+    "images": [
+      {
+        "src": "http://127.0.0.1:8010/api/lifeweave/personal/runs/gzrun-20260919-130600-2cabbf3e/assets?path=research%2Ffigures%2Fshrp2-event-counts-original.png",
+        "complete": true,
+        "naturalWidth": 848,
+        "naturalHeight": 458,
+        "rect": {
+          "x": 49,
+          "y": 343.234375,
+          "width": 291.984375,
+          "height": 157.703125,
+          "top": 343.234375,
+          "right": 340.984375,
+          "bottom": 500.9375,
+          "left": 49
+        },
+        "size": {
+          "viewport": 390,
+          "document": 390,
+          "body": 390,
+          "x": 0,
+          "y": 8309
+        },
+        "screenshot": "mobile-image-0.png"
+      }
+    ],
+    "end_size": {
+      "viewport": 390,
+      "document": 390,
+      "body": 390,
+      "x": 0,
+      "y": 14589
+    },
+    "end_screenshot": "mobile-end.png",
+    "errors": [],
+    "network": [
+      {
+        "time": 1790508375.23331,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-de7785d0790445d8/overview"
+      },
+      {
+        "time": 1790508375.2517178,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/index-DeSjzAfm.js"
+      },
+      {
+        "time": 1790508375.2525508,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/lifeweave-8o-1XHj0.js"
+      },
+      {
+        "time": 1790508375.2535462,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/index-Bx19EDMp.css"
+      },
+      {
+        "time": 1790508375.320504,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/ItemDetailPage-BAolpmbc.js"
+      },
+      {
+        "time": 1790508375.3216558,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/PageHeader-Y9iJ0Gln.js"
+      },
+      {
+        "time": 1790508375.322269,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-DrquCv3M.js"
+      },
+      {
+        "time": 1790508375.323214,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/library-BAa0XiI8.js"
+      },
+      {
+        "time": 1790508375.3240201,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-C_qa2wWs.css"
+      },
+      {
+        "time": 1790508375.324835,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/plugins-IP8Jysvf.js"
+      },
+      {
+        "time": 1790508375.3261526,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/RunTrace-0KwpTwM5.js"
+      },
+      {
+        "time": 1790508375.3278008,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/RunTrace-DS4nT913.css"
+      },
+      {
+        "time": 1790508375.328957,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/ItemDetailPage-OvqD3jp6.css"
+      },
+      {
+        "time": 1790508375.41828,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/config"
+      },
+      {
+        "time": 1790508375.419324,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/favicon.svg"
+      },
+      {
+        "time": 1790508375.4332209,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/state"
+      },
+      {
+        "time": 1790508375.4341166,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs"
+      },
+      {
+        "time": 1790508375.4352508,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/machines"
+      },
+      {
+        "time": 1790508375.5439966,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-de7785d0790445d8/work-view"
+      },
+      {
+        "time": 1790508375.5449853,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-de7785d0790445d8"
+      },
+      {
+        "time": 1790508376.2028935,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-de7785d0790445d8/research-output/versions/gzrun-20260919-130600-2cabbf3e"
+      },
+      {
+        "time": 1790508376.3070874,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs/gzrun-20260919-130600-2cabbf3e/archive"
+      },
+      {
+        "time": 1790508376.4918187,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/KaTeX_Math-Italic-t53AETM-.woff2"
+      },
+      {
+        "time": 1790508376.4931629,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/KaTeX_Main-Regular-B22Nviop.woff2"
+      },
+      {
+        "time": 1790508376.4944072,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/KaTeX_Caligraphic-Regular-Di6jR-x-.woff2"
+      },
+      {
+        "time": 1790508376.4953458,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/KaTeX_Math-BoldItalic-CZnvNsCZ.woff2"
+      },
+      {
+        "time": 1790508376.4963772,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/assets/KaTeX_Size2-Regular-Dy4dx90m.woff2"
+      },
+      {
+        "time": 1790508377.2525215,
+        "method": "GET",
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs/gzrun-20260919-130600-2cabbf3e/assets?path=research%2Ffigures%2Fshrp2-event-counts-original.png"
+      }
+    ],
+    "pass": true
+  },
+  "development": {
+    "overview": {
+      "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-62fe9c309d994457/overview?step=dev-80a91560b8d1aaa9fab35dd13504e970:implementation",
+      "before": {
+        "detailsOpen": true,
+        "bodyChars": 442,
+        "diffChars": 13345,
+        "scroll": 180,
+        "body_sha256": "61ee483aefdb15b524c2a724c5e1f80be0a81649b1cf9d94143f2968a47a87b3"
+      },
+      "before_screenshot": "development-overview-before.png",
+      "request_count_before": 23,
+      "poll": {
+        "status": 200,
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view",
+        "elapsed_seconds": 11.935133934020996,
+        "body_sha256": "7c92403c1d886c31f40955b88a000a916fa6a1a89ff731c472cffd533aa8e384"
+      },
+      "after": {
+        "readerSame": true,
+        "markdownSame": true,
+        "paragraphSame": true,
+        "diffSame": true,
+        "diffConnected": true,
+        "detailsOpen": true,
+        "bodyChars": 442,
+        "diffChars": 13345,
+        "scroll": 180,
+        "removed": [],
+        "body_sha256": "61ee483aefdb15b524c2a724c5e1f80be0a81649b1cf9d94143f2968a47a87b3"
+      },
+      "after_screenshot": "development-overview-after.png",
+      "network": [
+        {
+          "time": 1790508378.3519263,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-62fe9c309d994457/overview"
+        },
+        {
+          "time": 1790508378.365245,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/index-DeSjzAfm.js"
+        },
+        {
+          "time": 1790508378.3660696,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/lifeweave-8o-1XHj0.js"
+        },
+        {
+          "time": 1790508378.3669536,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/index-Bx19EDMp.css"
+        },
+        {
+          "time": 1790508378.4343343,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/ItemDetailPage-BAolpmbc.js"
+        },
+        {
+          "time": 1790508378.435437,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/PageHeader-Y9iJ0Gln.js"
+        },
+        {
+          "time": 1790508378.4364116,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-DrquCv3M.js"
+        },
+        {
+          "time": 1790508378.4373124,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/library-BAa0XiI8.js"
+        },
+        {
+          "time": 1790508378.4381986,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-C_qa2wWs.css"
+        },
+        {
+          "time": 1790508378.439094,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/plugins-IP8Jysvf.js"
+        },
+        {
+          "time": 1790508378.4398699,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/RunTrace-0KwpTwM5.js"
+        },
+        {
+          "time": 1790508378.4406092,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/RunTrace-DS4nT913.css"
+        },
+        {
+          "time": 1790508378.4419074,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/ItemDetailPage-OvqD3jp6.css"
+        },
+        {
+          "time": 1790508378.521817,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/config"
+        },
+        {
+          "time": 1790508378.5226097,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/favicon.svg"
+        },
+        {
+          "time": 1790508378.5391269,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/state"
+        },
+        {
+          "time": 1790508378.5400164,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs"
+        },
+        {
+          "time": 1790508378.5408838,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/machines"
+        },
+        {
+          "time": 1790508378.6452026,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        },
+        {
+          "time": 1790508378.6458921,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457"
+        },
+        {
+          "time": 1790508379.2827017,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/development/dev-80a91560b8d1aaa9fab35dd13504e970/delivery"
+        },
+        {
+          "time": 1790508379.284186,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs/gzrun-20260926-180338-933231d9"
+        },
+        {
+          "time": 1790508379.3865135,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/development/dev-80a91560b8d1aaa9fab35dd13504e970/diff"
+        },
+        {
+          "time": 1790508391.3690724,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        }
+      ],
+      "responses": [
+        {
+          "time": 1790508378.3592305,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-62fe9c309d994457/overview"
+        },
+        {
+          "time": 1790508378.3804228,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/index-Bx19EDMp.css"
+        },
+        {
+          "time": 1790508378.3892992,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/lifeweave-8o-1XHj0.js"
+        },
+        {
+          "time": 1790508378.404732,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/index-DeSjzAfm.js"
+        },
+        {
+          "time": 1790508378.4541886,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-C_qa2wWs.css"
+        },
+        {
+          "time": 1790508378.4579358,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/library-BAa0XiI8.js"
+        },
+        {
+          "time": 1790508378.4585376,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/PageHeader-Y9iJ0Gln.js"
+        },
+        {
+          "time": 1790508378.4606485,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/plugins-IP8Jysvf.js"
+        },
+        {
+          "time": 1790508378.4609368,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-DrquCv3M.js"
+        },
+        {
+          "time": 1790508378.466369,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/ItemDetailPage-OvqD3jp6.css"
+        },
+        {
+          "time": 1790508378.4666016,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/ItemDetailPage-BAolpmbc.js"
+        },
+        {
+          "time": 1790508378.4672885,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/RunTrace-DS4nT913.css"
+        },
+        {
+          "time": 1790508378.4698136,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/RunTrace-0KwpTwM5.js"
+        },
+        {
+          "time": 1790508378.5306158,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/config"
+        },
+        {
+          "time": 1790508378.530886,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/favicon.svg"
+        },
+        {
+          "time": 1790508378.5535665,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/machines"
+        },
+        {
+          "time": 1790508378.5628734,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/state"
+        },
+        {
+          "time": 1790508378.6213822,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs"
+        },
+        {
+          "time": 1790508378.6635842,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457"
+        },
+        {
+          "time": 1790508378.7063804,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        },
+        {
+          "time": 1790508379.2962778,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/development/dev-80a91560b8d1aaa9fab35dd13504e970/delivery"
+        },
+        {
+          "time": 1790508379.3003979,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs/gzrun-20260926-180338-933231d9"
+        },
+        {
+          "time": 1790508379.4119012,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/development/dev-80a91560b8d1aaa9fab35dd13504e970/diff"
+        },
+        {
+          "time": 1790508391.4105422,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        }
+      ],
+      "requests_after_open": [
+        {
+          "time": 1790508391.3690724,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        }
+      ],
+      "errors": [],
+      "pass": true
+    },
+    "output_entries": [
+      "代码交付\n代码交付包",
+      "开发记录\n实施运行结果",
+      "开发记录\n方案审阅",
+      "开发记录\n开发方案"
+    ],
+    "outputs": {
+      "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-62fe9c309d994457/outputs",
+      "before": {
+        "detailsOpen": true,
+        "bodyChars": 442,
+        "diffChars": 13345,
+        "scroll": 180,
+        "body_sha256": "61ee483aefdb15b524c2a724c5e1f80be0a81649b1cf9d94143f2968a47a87b3"
+      },
+      "before_screenshot": "development-outputs-before.png",
+      "request_count_before": 23,
+      "poll": {
+        "status": 200,
+        "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view",
+        "elapsed_seconds": 11.25326681137085,
+        "body_sha256": "7c92403c1d886c31f40955b88a000a916fa6a1a89ff731c472cffd533aa8e384"
+      },
+      "after": {
+        "readerSame": true,
+        "markdownSame": true,
+        "paragraphSame": true,
+        "diffSame": true,
+        "diffConnected": true,
+        "detailsOpen": true,
+        "bodyChars": 442,
+        "diffChars": 13345,
+        "scroll": 180,
+        "removed": [],
+        "body_sha256": "61ee483aefdb15b524c2a724c5e1f80be0a81649b1cf9d94143f2968a47a87b3"
+      },
+      "after_screenshot": "development-outputs-after.png",
+      "network": [
+        {
+          "time": 1790508392.7451463,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-62fe9c309d994457/outputs"
+        },
+        {
+          "time": 1790508392.7581573,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/index-DeSjzAfm.js"
+        },
+        {
+          "time": 1790508392.7589474,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/lifeweave-8o-1XHj0.js"
+        },
+        {
+          "time": 1790508392.759824,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/index-Bx19EDMp.css"
+        },
+        {
+          "time": 1790508392.825772,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/ItemDetailPage-BAolpmbc.js"
+        },
+        {
+          "time": 1790508392.826823,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/PageHeader-Y9iJ0Gln.js"
+        },
+        {
+          "time": 1790508392.827604,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-DrquCv3M.js"
+        },
+        {
+          "time": 1790508392.828439,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/library-BAa0XiI8.js"
+        },
+        {
+          "time": 1790508392.8292859,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-C_qa2wWs.css"
+        },
+        {
+          "time": 1790508392.8301141,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/plugins-IP8Jysvf.js"
+        },
+        {
+          "time": 1790508392.8310795,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/RunTrace-0KwpTwM5.js"
+        },
+        {
+          "time": 1790508392.8318348,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/RunTrace-DS4nT913.css"
+        },
+        {
+          "time": 1790508392.832693,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/assets/ItemDetailPage-OvqD3jp6.css"
+        },
+        {
+          "time": 1790508392.9277248,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/config"
+        },
+        {
+          "time": 1790508392.928419,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/favicon.svg"
+        },
+        {
+          "time": 1790508392.9434574,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/state"
+        },
+        {
+          "time": 1790508392.9441366,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs"
+        },
+        {
+          "time": 1790508392.9450877,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/machines"
+        },
+        {
+          "time": 1790508393.0513482,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        },
+        {
+          "time": 1790508393.052056,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457"
+        },
+        {
+          "time": 1790508393.1147795,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/development/dev-80a91560b8d1aaa9fab35dd13504e970/delivery"
+        },
+        {
+          "time": 1790508393.11542,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs/gzrun-20260926-180338-933231d9"
+        },
+        {
+          "time": 1790508393.798299,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/development/dev-80a91560b8d1aaa9fab35dd13504e970/diff"
+        },
+        {
+          "time": 1790508405.0975718,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        }
+      ],
+      "responses": [
+        {
+          "time": 1790508392.7523084,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-62fe9c309d994457/outputs"
+        },
+        {
+          "time": 1790508392.7701752,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/index-Bx19EDMp.css"
+        },
+        {
+          "time": 1790508392.7851484,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/lifeweave-8o-1XHj0.js"
+        },
+        {
+          "time": 1790508392.800773,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/index-DeSjzAfm.js"
+        },
+        {
+          "time": 1790508392.8459902,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-C_qa2wWs.css"
+        },
+        {
+          "time": 1790508392.8469007,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/PageHeader-Y9iJ0Gln.js"
+        },
+        {
+          "time": 1790508392.8477678,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/ResearchOutputPanel-DrquCv3M.js"
+        },
+        {
+          "time": 1790508392.8508182,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/library-BAa0XiI8.js"
+        },
+        {
+          "time": 1790508392.8524568,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/ItemDetailPage-BAolpmbc.js"
+        },
+        {
+          "time": 1790508392.854819,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/plugins-IP8Jysvf.js"
+        },
+        {
+          "time": 1790508392.8550756,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/RunTrace-DS4nT913.css"
+        },
+        {
+          "time": 1790508392.8566968,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/ItemDetailPage-OvqD3jp6.css"
+        },
+        {
+          "time": 1790508392.8790023,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/assets/RunTrace-0KwpTwM5.js"
+        },
+        {
+          "time": 1790508392.9432478,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/config"
+        },
+        {
+          "time": 1790508392.946144,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/favicon.svg"
+        },
+        {
+          "time": 1790508392.9573815,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/machines"
+        },
+        {
+          "time": 1790508392.9671123,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/state"
+        },
+        {
+          "time": 1790508393.024551,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs"
+        },
+        {
+          "time": 1790508393.0698328,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457"
+        },
+        {
+          "time": 1790508393.1144998,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        },
+        {
+          "time": 1790508393.1294386,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/development/dev-80a91560b8d1aaa9fab35dd13504e970/delivery"
+        },
+        {
+          "time": 1790508393.1700962,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/runs/gzrun-20260926-180338-933231d9"
+        },
+        {
+          "time": 1790508393.8218098,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/development/dev-80a91560b8d1aaa9fab35dd13504e970/diff"
+        },
+        {
+          "time": 1790508405.1399798,
+          "status": 200,
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        }
+      ],
+      "requests_after_open": [
+        {
+          "time": 1790508405.0975718,
+          "method": "GET",
+          "url": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-62fe9c309d994457/work-view"
+        }
+      ],
+      "errors": [],
+      "pass": true
+    }
+  },
+  "blocked_writes": []
+}

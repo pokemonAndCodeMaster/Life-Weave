@@ -1,16 +1,22 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, shallowRef } from 'vue'
 import type { WorkStep } from '../../api/workView'
 import { layoutWorkGraph, stepStateLabel } from './workGraphLayout'
 
 const props = defineProps<{ nodes: WorkStep[]; selectedId: string | null }>()
 const emit = defineEmits<{ select: [id: string] }>()
 const layout = computed(() => layoutWorkGraph(props.nodes))
+const root = shallowRef<HTMLElement | null>(null)
+function focusNode(id: string) {
+  const buttons = root.value?.parentElement?.querySelectorAll<HTMLButtonElement>('[data-step-id]') || []
+  Array.from(buttons).find(button => button.dataset.stepId === id && button.getClientRects().length)?.focus()
+}
+defineExpose({ focusNode })
 const titles = computed(() => new Map(props.nodes.map(node => [node.id, node.title])))
 </script>
 
 <template>
-  <div class="graph-desktop" role="group" aria-label="工作步骤依赖图">
+  <div ref="root" class="graph-desktop" role="group" aria-label="工作步骤依赖图">
     <div class="graph-scroll">
       <div class="graph-canvas" :style="{ width: `${layout.width}px`, height: `${layout.height}px` }">
         <svg class="graph-lines" :width="layout.width" :height="layout.height" aria-hidden="true">
@@ -19,18 +25,18 @@ const titles = computed(() => new Map(props.nodes.map(node => [node.id, node.tit
         </svg>
         <button v-for="node in layout.nodes" :key="node.step.id" type="button" class="graph-node"
           :class="[{ selected: node.step.id === selectedId }, `state-${node.step.state}`]"
-          :style="{ left: `${node.x}px`, top: `${node.y}px` }" :aria-pressed="node.step.id === selectedId"
-          :aria-label="`${node.step.title}，${stepStateLabel[node.step.state]}${node.step.dependsOn.length ? `，依赖 ${node.step.dependsOn.map(id => titles.get(id) || id).join('、')}` : ''}`"
+          :style="{ left: `${node.x}px`, top: `${node.y}px` }" :data-step-id="node.step.id" :aria-expanded="node.step.id === selectedId" :aria-controls="node.step.id === selectedId ? 'work-step-detail' : undefined"
+          :aria-label="`${node.step.title}，${stepStateLabel[node.step.state]}，${node.step.outputIds.length} 份产物${node.step.dependsOn.length ? `，依赖 ${node.step.dependsOn.map(id => titles.get(id) || id).join('、')}` : ''}`"
           @click="emit('select', node.step.id)">
-          <span class="node-title" :title="node.step.title">{{ node.step.title }}</span><span class="node-state">{{ stepStateLabel[node.step.state] }}</span>
+          <span class="node-title" :title="node.step.title">{{ node.step.title }}</span><span class="node-state">{{ stepStateLabel[node.step.state] }} · {{ node.step.outputIds.length ? `${node.step.outputIds.length} 份产物` : '暂无产物' }}</span>
         </button>
       </div>
     </div>
   </div>
   <ol class="graph-mobile" aria-label="工作步骤与依赖">
     <li v-for="node in layout.nodes" :key="node.step.id">
-      <button type="button" class="mobile-node" :class="{ selected: node.step.id === selectedId }" :aria-pressed="node.step.id === selectedId" @click="emit('select', node.step.id)">
-        <span class="mobile-head"><strong>{{ node.step.title }}</strong><small>{{ stepStateLabel[node.step.state] }}</small></span>
+      <button type="button" class="mobile-node" :class="{ selected: node.step.id === selectedId }" :data-step-id="node.step.id" :aria-expanded="node.step.id === selectedId" :aria-controls="node.step.id === selectedId ? 'work-step-detail' : undefined" @click="emit('select', node.step.id)">
+        <span class="mobile-head"><strong>{{ node.step.title }}</strong><small>{{ stepStateLabel[node.step.state] }} · {{ node.step.outputIds.length }} 份产物</small></span>
         <span v-if="node.step.dependsOn.length" class="mobile-deps">依赖：{{ node.step.dependsOn.map(id => titles.get(id) || id).join('、') }}</span>
       </button>
     </li>

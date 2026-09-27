@@ -54,11 +54,12 @@ async function openPage(id = 'child-1', parentEstablished = true) {
   await workspace.load('personal')
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: [{ path: '/lifeweave/:workspace/items/:itemId/:tab', component: Harness }],
+    routes: [{ path: '/lifeweave/:workspace/items/:itemId/:tab', component: Harness }, { path: '/lifeweave/:workspace/conversation', component: { template: '<div />' } }],
   })
   await router.push('/lifeweave/personal/items/' + id + '/overview')
   await router.isReady()
   render(Harness, { global: { plugins: [router] } })
+  return router
 }
 
 beforeEach(() => {
@@ -79,9 +80,28 @@ describe('事项页委托', () => {
     expect(screen.getByText('等待整理照片')).toBeTruthy()
     expect(screen.getByText('已声明计划 · 人工')).toBeTruthy()
     await fireEvent.click(screen.getAllByRole('button', { name: /给照片分组/ })[0]!)
-    expect(screen.getByText('按地点分组')).toBeTruthy()
+    await waitFor(() => expect(screen.getByText('按地点分组')).toBeTruthy())
     await fireEvent.click(screen.getByRole('button', { name: '收起详情' }))
-    expect(screen.queryByText('按地点分组')).toBeNull()
+    await waitFor(() => expect(screen.queryByText('按地点分组')).toBeNull())
+  })
+  it('节点链接恢复、依赖切换、编辑定位与讨论携带同一步引用', async () => {
+    const router = await openPage()
+    await router.push({ query: { step: 'group' } })
+    const detail = await screen.findByRole('region', { name: '所选步骤' })
+    expect(within(detail).getByText('按地点分组')).toBeTruthy()
+    await fireEvent.click(within(detail).getByRole('button', { name: /挑选照片/ }))
+    await waitFor(() => expect(router.currentRoute.value.query.step).toBe('select'))
+    expect(within(detail).getByRole('heading', { name: '挑选照片' })).toBeTruthy()
+    await fireEvent.click(within(detail).getByRole('button', { name: '编辑本步与成果关联' }))
+    await waitFor(() => expect((document.activeElement as HTMLInputElement)?.value).toBe('挑选照片'))
+    await fireEvent.click(within(detail).getByRole('button', { name: '讨论这一步' }))
+    await waitFor(() => expect(router.currentRoute.value.query.mode).toBe('discuss'))
+    expect(router.currentRoute.value.query.itemId).toBe('child-1')
+    const quote = JSON.parse(sessionStorage.getItem('lifeweave:quote:personal:child-1')!)
+    expect(quote.text).toContain('选出要留下的照片')
+    expect(quote.anchor).toBe('步骤：挑选照片 [select]')
+    expect(post).not.toHaveBeenCalled()
+    expect(put).not.toHaveBeenCalled()
   })
   it('冲突后的刷新失败不会丢失未保存步骤草稿', async () => {
     await openPage()

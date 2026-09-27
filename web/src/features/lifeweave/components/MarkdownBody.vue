@@ -84,6 +84,7 @@ function failedImage(event:Event){
 </script>
 <template><div><p v-for="warning in references?.warnings||[]" :key="warning" class="lw-notice warning">{{ warning }}</p><div class="lw-markdown" @error.capture="failedImage" v-html="html"></div></div></template>
 <style scoped>
+.lw-markdown{min-width:0;overflow-wrap:anywhere}
 .lw-markdown :deep(img){max-width:100%;height:auto}
 .lw-markdown :deep(.katex-display){max-width:100%;overflow-x:auto;overflow-y:hidden;padding:.4em 0}
 .lw-markdown :deep(.lw-image-unavailable){display:inline-block;color:var(--lw-muted,#667085);font-size:.9em}

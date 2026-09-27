@@ -4,6 +4,13 @@ import type { ItemWorkView, WorkStep, WorkStepState } from '../../api/workView'
 
 const props = defineProps<{ view: ItemWorkView; saving: boolean; error: string; conflict: boolean; outputs: Array<{ id: string; title: string }>; resetKey?: number }>()
 const emit = defineEmits<{ save: [value: { version: number; title: string; provider: string; nodes: WorkStep[] }]; cancel: []; reload: [] }>()
+const element = shallowRef<HTMLElement | null>(null)
+function focusStep(id: string) {
+  const step = Array.from(element.value?.querySelectorAll<HTMLElement>('[data-editor-step]') || []).find(el => el.dataset.editorStep === id)
+  step?.scrollIntoView?.({ block: 'center' })
+  step?.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true })
+}
+defineExpose({ focusStep })
 const form = reactive({ title: '', provider: '' })
 const nodes = shallowRef<WorkStep[]>([])
 const localError = shallowRef('')
@@ -66,12 +73,12 @@ const states: Array<{ value: WorkStepState; label: string }> = [
 </script>
 
 <template>
-  <form class="plan-editor" @submit.prevent="submit">
+  <form ref="element" class="plan-editor" @submit.prevent="submit">
     <div class="editor-heading"><div><h3>{{ observed ? '将观察记录另存为声明计划' : '编辑步骤计划' }}</h3><p v-if="observed" class="editor-note">会保留当前节点的运行与成果引用；原始执行记录不会被改写。</p></div><button type="button" class="lw-btn ghost sm" @click="emit('cancel')">关闭</button></div>
     <p v-if="error || localError" role="alert" class="lw-notice warning">{{ localError || error }}</p>
     <button v-if="conflict" type="button" class="lw-btn sm" @click="emit('reload')">刷新后重新编辑</button>
     <div class="plan-fields"><label class="lw-label">计划名称<input v-model="form.title" class="lw-field" maxlength="200" required /></label><label class="lw-label">能力来源<input v-model="form.provider" class="lw-field" maxlength="100" required placeholder="例如：人工、研究方法、开发 Agent" /></label></div>
-    <ol class="editor-steps"><li v-for="node in nodes" :key="node.id" class="editor-step">
+    <ol class="editor-steps"><li v-for="node in nodes" :key="node.id" class="editor-step" :data-editor-step="node.id">
       <div class="editor-heading"><strong>{{ node.title || '新步骤' }}</strong><button type="button" class="lw-btn ghost sm" @click="remove(node.id)">删除步骤</button></div>
       <div class="plan-fields"><label class="lw-label">步骤名称<input :value="node.title" class="lw-field" maxlength="200" required @input="update(node.id, { title: ($event.target as HTMLInputElement).value })" /></label><label class="lw-label">记录状态<select :value="node.state" class="lw-field" aria-label="记录状态" @change="update(node.id, { state: ($event.target as HTMLSelectElement).value as WorkStepState })"><option v-for="state in states" :key="state.value" :value="state.value">{{ state.label }}</option></select></label></div>
       <label class="lw-label">这一步要做什么<textarea :value="node.description" class="lw-field" maxlength="5000" rows="2" @input="update(node.id, { description: ($event.target as HTMLTextAreaElement).value })"></textarea></label>

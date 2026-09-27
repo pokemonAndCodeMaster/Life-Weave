@@ -7,7 +7,7 @@ import * as library from '../api/library'
 import { apiError } from '../api/lifeweave'
 import { downloadText } from '../utils/download'
 import type { WorkspaceKind } from '../types'
-const props=defineProps<{workspace:WorkspaceKind;itemId:string;refreshKey?:number;selectedRunId?:string|null;selectedOutputId?:string|null;compact?:boolean}>()
+const props=withDefaults(defineProps<{workspace:WorkspaceKind;itemId:string;refreshKey?:number;selectedRunId?:string|null;selectedOutputId?:string|null;compact?:boolean;allowHistory?:boolean}>(), {allowHistory:true})
 const emit=defineEmits<{'feedback-saved':[];'candidate-created':[];quote:[value:{text:string;runId:string|null;anchor:string} ]}>()
 const outputs=shallowRef<research.ResearchOutputs>({current:null,versions:[]})
 const selectedId=shallowRef('');const error=shallowRef('');const message=shallowRef('');const busy=shallowRef(false)
@@ -105,12 +105,12 @@ async function sendFeedback(){await action(async(current)=>{
 <template>
  <section class="research-output lw-stack" aria-label="研究成果">
   <div v-if="!compact" class="lw-between"><h2>当前成果</h2><select v-if="outputs.versions.length && !fixedSelection" v-model="selectedId" aria-label="成果版本"><option value="">当前成果</option><option v-for="out in outputs.versions" :key="out.id" :value="out.id">{{ out.kind==='manual'?'人工成果':out.state==='succeeded'?'完成的运行':'未完成的运行' }} · {{ new Date(out.createdAt).toLocaleString() }}</option></select></div>
-  <details v-if="fixedSelection" class="research-history" @toggle="historyToggle"><summary>历史版本{{ historyLoaded ? `（${history.length}）` : '' }}</summary><p v-if="historyLoading" role="status">正在读取版本目录…</p><div v-else-if="historyLoaded" class="history-list"><button type="button" class="lw-btn sm" :aria-current="!selectedId ? 'true' : undefined" @click="selectHistory('')">当前成果</button><button v-for="out in history" :key="out.id" type="button" class="lw-btn sm" :aria-current="selectedId === out.id ? 'true' : undefined" @click="selectHistory(out.id)">{{ out.kind==='manual'?'人工成果':out.state==='succeeded'?'完成的运行':'部分运行' }} · {{ new Date(out.createdAt).toLocaleString() }}</button><span v-if="!history.length">暂无其他版本</span></div></details>
+  <details v-if="fixedSelection && allowHistory !== false" class="research-history" @toggle="historyToggle"><summary>历史版本{{ historyLoaded ? `（${history.length}）` : '' }}</summary><p v-if="historyLoading" role="status">正在读取版本目录…</p><div v-else-if="historyLoaded" class="history-list"><button type="button" class="lw-btn sm" :aria-current="!selectedId ? 'true' : undefined" @click="selectHistory('')">当前成果</button><button v-for="out in history" :key="out.id" type="button" class="lw-btn sm" :aria-current="selectedId === out.id ? 'true' : undefined" @click="selectHistory(out.id)">{{ out.kind==='manual'?'人工成果':out.state==='succeeded'?'完成的运行':'部分运行' }} · {{ new Date(out.createdAt).toLocaleString() }}</button><span v-if="!history.length">暂无其他版本</span></div></details>
   <p v-if="error" role="alert" class="lw-notice warning">{{ error }}</p><p v-if="message" role="status" class="lw-notice">{{ message }}</p>
   <template v-if="selected">
    <p v-if="selected.storageNote" class="lw-notice warning">{{ selected.storageNote }} <a v-if="selected.rawDownloadUrl" :href="selected.rawDownloadUrl" download="原始执行文本.txt">下载原始执行文本</a></p>
    <div class="lw-between"><span class="lw-small lw-muted">{{ selected.kind==='manual'?'人工提交':'运行成果' }} · 版本 {{ selected.version.slice(0,12) }}<template v-if="selected.state!=='succeeded'&&selected.kind==='run'"> · {{ selected.state }}，保留的部分结果</template></span><button class="lw-btn sm" @click="downloadText(selected!.content,'研究成果.md','text/markdown;charset=utf-8')">仅下载 Markdown</button><a v-if="selected.bundleUrl&&selected.state==='succeeded'" class="lw-btn sm" :href="selected.bundleUrl" download>下载完整包（含图片）</a></div>
-   <ResearchArchiveStatus v-if="selected.runId&&selected.state==='succeeded'" :workspace="workspace" :run-id="selected.runId" />
+   <component :is="compact ? 'details' : 'div'" v-if="selected.runId&&selected.state==='succeeded'" class="research-archive"><summary v-if="compact">归档与同步状态</summary><ResearchArchiveStatus :workspace="workspace" :run-id="selected.runId" /></component>
    <article @mouseup="capture" @keyup="capture"><MarkdownBody :content="selected.content" :source-base="selected.sourceBase??undefined" :asset-base="selected.assetBase??undefined"/></article>
    <div class="lw-stack research-feedback"><p class="lw-small lw-muted">选中正文中的一段文字，留下定位反馈或引用到讨论。</p><blockquote v-if="quote">{{ quote }}</blockquote>
     <button v-if="quote" class="lw-btn sm" @click="emit('quote',{text:quote,runId:selected.runId,anchor})">引用到讨论</button>
@@ -123,5 +123,5 @@ async function sendFeedback(){await action(async(current)=>{
  </section>
 </template>
 <style scoped>
-.research-output{min-width:0}.research-output article{min-width:0;line-height:1.8}.research-history{border:1px solid var(--lw-border,#e4e7ec);border-radius:8px;padding:.6rem .8rem}.research-history summary{cursor:pointer;color:#517294;font-size:12px}.history-list{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px}.history-list [aria-current="true"]{border-color:#507da8;background:#edf5fc}.research-feedback{border-top:1px solid var(--lw-border,#e4e7ec);padding-top:1rem}.research-feedback blockquote{white-space:pre-wrap;border-left:3px solid #aac3b3;padding-left:1rem;margin:0;max-height:12rem;overflow:auto}
+.research-archive summary{cursor:pointer;color:#517294;font-size:12px}.research-output{min-width:0}.research-output article{min-width:0;line-height:1.8}.research-history{border:1px solid var(--lw-border,#e4e7ec);border-radius:8px;padding:.6rem .8rem}.research-history summary{cursor:pointer;color:#517294;font-size:12px}.history-list{display:flex;flex-wrap:wrap;gap:6px;padding-top:10px}.history-list [aria-current="true"]{border-color:#507da8;background:#edf5fc}.research-feedback{border-top:1px solid var(--lw-border,#e4e7ec);padding-top:1rem}.research-feedback blockquote{white-space:pre-wrap;border-left:3px solid #aac3b3;padding-left:1rem;margin:0;max-height:12rem;overflow:auto}
 </style>
