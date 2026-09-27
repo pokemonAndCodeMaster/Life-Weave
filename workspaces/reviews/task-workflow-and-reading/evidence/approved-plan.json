@@ -3,5 +3,6 @@
   "planBlob": "4554ea26e240b3d1bdcdf2404891b9a20c222957",
   "planCommit": "f108a48a9a80f5256b99514c28776fce2e32fa26",
   "path": "workspaces/reviews/task-workflow-and-reading/review.md",
-  "approval": "用户在方案交付后回复：开干吧；手机访问后置。"
+  "approval": "用户在方案交付后回复：开干吧；手机访问后置。",
+  "archivedCopy": "evidence/approved-plan.md"
 }

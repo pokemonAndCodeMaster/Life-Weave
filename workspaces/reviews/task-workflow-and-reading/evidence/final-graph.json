@@ -1,0 +1,15 @@
+{
+  "mainStates": {
+    "workflow-plan": "succeeded",
+    "workflow-protocol": "succeeded",
+    "workflow-artifacts": "succeeded",
+    "workflow-modal": "succeeded",
+    "workflow-reading": "succeeded",
+    "workflow-validation": "succeeded",
+    "workflow-acceptance": "planned"
+  },
+  "childStates": {
+    "integration": "succeeded"
+  },
+  "userAccepted": false
+}

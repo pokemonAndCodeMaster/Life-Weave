@@ -1,0 +1,18 @@
+{
+  "item-7547b65b4f704829": {
+    "artifact": {
+      "artifactId": "result-81d0aa65983bd9b6534e9c43",
+      "evidenceId": "evidence-81d0aa65983bd9b6534e9c43",
+      "version": "05d69c098605c84e65ebc13ac5452ca85d12d8688566a829f618161787f19cf1"
+    },
+    "reportId": "step-report-c069c5023fc9bb7009eb2d7def882dfd"
+  },
+  "item-2a56f97ea1074d71": {
+    "artifact": {
+      "artifactId": "result-065895e443e5e0c21c7a855c",
+      "evidenceId": "evidence-065895e443e5e0c21c7a855c",
+      "version": "05d69c098605c84e65ebc13ac5452ca85d12d8688566a829f618161787f19cf1"
+    },
+    "reportId": "step-report-2543b27a0f9d0d1f7bb9aa8cac72f1ba"
+  }
+}
