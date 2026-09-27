@@ -1,0 +1,97 @@
+{
+  "workflow-protocol": {
+    "artifactId": "output-094b172d09b65c49efd2a34cb94074a8",
+    "outputId": "artifact:output-094b172d09b65c49efd2a34cb94074a8",
+    "version": "3280208d135da5f985a35bdccbef3133200e5d604d801ab8ab71a9d385d35903",
+    "selectedPaths": [
+      "scripts/lifeweave.py",
+      "src/lifeweave/continuation.py",
+      "src/lifeweave/conversations.py",
+      "src/lifeweave/development.py",
+      "src/lifeweave/development_router.py",
+      "src/lifeweave/external_development.py",
+      "src/lifeweave/router.py",
+      "src/lifeweave/work_view.py",
+      "src/lifeweave/work_view_models.py",
+      "tests/test_development.py",
+      "tests/test_work_view.py",
+      "src/lifeweave/work_binding.py",
+      "src/lifeweave/work_step_reports.py",
+      "tests/test_workflow_protocol.py",
+      "methods/lifeweave-development/SKILL.md"
+    ]
+  },
+  "workflow-artifacts": {
+    "artifactId": "output-49ae40cec72d0f1fc4391a1584867802",
+    "outputId": "artifact:output-49ae40cec72d0f1fc4391a1584867802",
+    "version": "ecb02b3d581cd749386b65a87242d1652d5845b003b586efd089fc7f0e60bbad",
+    "selectedPaths": [
+      "src/api/app.py",
+      "src/lifeweave/development_delivery.py",
+      "src/lifeweave/manual_results.py",
+      "src/lifeweave/external_delivery.py",
+      "src/lifeweave/output_files.py",
+      "src/lifeweave/output_files_router.py",
+      "tests/test_output_files.py"
+    ]
+  },
+  "workflow-modal": {
+    "artifactId": "output-ac40015fca565f4cb7e7387403ee9661",
+    "outputId": "artifact:output-ac40015fca565f4cb7e7387403ee9661",
+    "version": "8c712cb7d532cc4787ad79747625c2f80a7795bb5ebf3d7a935049895cf24b91",
+    "selectedPaths": [
+      "web/src/features/lifeweave/api/development.ts",
+      "web/src/features/lifeweave/api/lifeweave.test.ts",
+      "web/src/features/lifeweave/api/lifeweave.ts",
+      "web/src/features/lifeweave/api/workView.ts",
+      "web/src/features/lifeweave/components/DevelopmentDelivery.vue",
+      "web/src/features/lifeweave/components/DevelopmentPanel.vue",
+      "web/src/features/lifeweave/components/LifeWeaveModalHost.vue",
+      "web/src/features/lifeweave/components/workspace/WorkNodeDetail.test.ts",
+      "web/src/features/lifeweave/components/workspace/WorkNodeDetail.vue",
+      "web/src/features/lifeweave/components/workspace/WorkOutputReader.vue",
+      "web/src/features/lifeweave/components/workspace/WorkPlanEditor.vue",
+      "web/src/features/lifeweave/components/workspace/WorkspaceOutputs.test.ts",
+      "web/src/features/lifeweave/components/workspace/WorkspaceOutputs.vue",
+      "web/src/features/lifeweave/components/workspace/workOutputLabels.ts",
+      "web/src/features/lifeweave/composables/useLifeWeaveWorkspace.ts",
+      "web/src/features/lifeweave/pages/ItemDetailPage.test.ts",
+      "web/src/features/lifeweave/pages/ItemDetailPage.vue",
+      "web/src/features/lifeweave/api/outputFiles.ts",
+      "web/src/features/lifeweave/components/DevelopmentPanel.test.ts",
+      "web/src/features/lifeweave/components/workspace/WorkFileDiff.vue",
+      "web/src/features/lifeweave/components/workspace/WorkFileTree.vue",
+      "web/src/features/lifeweave/components/workspace/WorkOutputCatalog.test.ts",
+      "web/src/features/lifeweave/components/workspace/WorkOutputCatalog.vue",
+      "web/src/features/lifeweave/components/workspace/WorkPlanEditor.test.ts",
+      "web/src/features/lifeweave/components/workspace/WorkStepDialog.test.ts",
+      "web/src/features/lifeweave/components/workspace/WorkStepDialog.vue",
+      "web/src/features/lifeweave/components/workspace/workOutputCatalog.ts"
+    ]
+  },
+  "workflow-reading": {
+    "artifactId": "output-fbe22228380fe98c2f0ffc5891f6ca26",
+    "outputId": "artifact:output-fbe22228380fe98c2f0ffc5891f6ca26",
+    "version": "c862c1b37e29d631b2c23d3819268467aaf34164c9111f1e76d52cc499670930",
+    "selectedPaths": [
+      "src/lifeweave_knowledge/library.py",
+      "src/lifeweave_knowledge/library_router.py",
+      "web/package-lock.json",
+      "web/package.json",
+      "web/src/features/lifeweave/api/library.ts",
+      "web/src/features/lifeweave/components/MarkdownBody.vue",
+      "web/src/features/lifeweave/pages/KnowledgePage.test.ts",
+      "web/src/features/lifeweave/pages/KnowledgePage.vue",
+      "web/src/features/lifeweave/utils/readingExport.ts",
+      "src/lifeweave_knowledge/document_assets.py",
+      "tests/test_library_assets.py",
+      "web/src/features/lifeweave/components/reading/MarkdownReading.test.ts",
+      "web/src/features/lifeweave/components/reading/MermaidDiagram.vue",
+      "web/src/features/lifeweave/components/reading/ReadingMediaDialog.vue",
+      "web/src/features/lifeweave/pages/KnowledgeDocumentPage.test.ts",
+      "web/src/features/lifeweave/utils/mermaidRenderer.test.ts",
+      "web/src/features/lifeweave/utils/mermaidRenderer.ts",
+      "web/src/features/lifeweave/utils/readingNavigation.ts"
+    ]
+  }
+}

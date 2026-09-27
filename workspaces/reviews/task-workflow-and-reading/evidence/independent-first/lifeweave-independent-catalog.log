@@ -1,0 +1,12 @@
+artifact:output-807d5e59db6580578aebf0e63e064788 code version bb34dce7a2153ee86d5315c5a56ef89939e8732695dff48f940ea42001c65542 catalog 15 manifest 14 binary 0 zip 260536 warnings []
+  examples [('scripts/lifeweave.py', 'modified', 78, 4), ('src/lifeweave/continuation.py', 'modified', 2, 0), ('src/lifeweave/conversations.py', 'modified', 29, 4)]
+  diff scripts/lifeweave.py length 10494 after 18779
+artifact:output-49ae40cec72d0f1fc4391a1584867802 code version ecb02b3d581cd749386b65a87242d1652d5845b003b586efd089fc7f0e60bbad catalog 8 manifest 7 binary 0 zip 82246 warnings []
+  examples [('src/api/app.py', 'modified', 11, 0), ('src/lifeweave/development_delivery.py', 'modified', 110, 8), ('src/lifeweave/external_delivery.py', 'added', 138, 0)]
+  diff src/api/app.py length 2094 after 12214
+artifact:output-ce53de7a6fcc8301a25b37856e32e690 code version 0a8565fd6634e20f7147b8be4b0a029a12a95ee3097c1fa8d8c9bbcf89bd17c0 catalog 28 manifest 27 binary 0 zip 342174 warnings []
+  examples [('web/src/features/lifeweave/api/development.ts', 'modified', 1, 0), ('web/src/features/lifeweave/api/lifeweave.test.ts', 'modified', 8, 1), ('web/src/features/lifeweave/api/lifeweave.ts', 'modified', 2, 2)]
+  diff web/src/features/lifeweave/api/development.ts length 663 after 4894
+artifact:output-fbe22228380fe98c2f0ffc5891f6ca26 code version c862c1b37e29d631b2c23d3819268467aaf34164c9111f1e76d52cc499670930 catalog 19 manifest 18 binary 0 zip 319050 warnings []
+  examples [('src/lifeweave_knowledge/document_assets.py', 'added', 109, 0), ('src/lifeweave_knowledge/library.py', 'modified', 45, 2), ('src/lifeweave_knowledge/library_router.py', 'modified', 11, 1)]
+  diff src/lifeweave_knowledge/document_assets.py length 5027 after 4806

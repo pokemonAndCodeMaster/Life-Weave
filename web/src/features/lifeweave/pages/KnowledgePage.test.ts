@@ -21,3 +21,14 @@ describe('真实中文链接', () => {
     expect(resolveKnowledgePath('index.md', '%2E%2E/outside.md')).toBeNull()
   })
 })
+
+import { safeReadingReturn } from '../utils/readingNavigation'
+describe('reading return scope',()=>{
+ it('preserves the original item step and file but rejects another workspace or external URL',()=>{
+  const path='/lifeweave/personal/items/i/overview?step=design&output=o&file=docs%2Fplan.md'
+  expect(safeReadingReturn(path,'personal')).toBe(path)
+  expect(safeReadingReturn(path,'team')).toBeNull()
+  expect(safeReadingReturn('https://external.test/'+path,'personal')).toBeNull()
+  expect(safeReadingReturn('/lifeweave/personal/items/i/../../settings','personal')).toBeNull()
+ })
+})

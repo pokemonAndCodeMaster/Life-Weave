@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { computed, shallowRef, watch } from 'vue'
+import { computed } from 'vue'
 import type { WorkOutputRef, WorkStep } from '../../api/workView'
+import type { OutputDocumentRef } from '../../api/outputFiles'
 import type { WorkspaceKind } from '../../types'
 import MarkdownBody from '../MarkdownBody.vue'
 import WorkOutputReader from './WorkOutputReader.vue'
@@ -8,18 +9,15 @@ import { stepStateLabel } from './workGraphLayout'
 import { safeWorkLink } from './safeWorkLink'
 import { kindLabel } from './workOutputLabels'
 
-const props = defineProps<{ workspace: WorkspaceKind; itemId: string; node: WorkStep; nodes: WorkStep[]; outputs: WorkOutputRef[]; observed: boolean }>()
+const props = defineProps<{ workspace: WorkspaceKind; itemId: string; node: WorkStep; nodes: WorkStep[]; outputs: WorkOutputRef[]; observed: boolean; selectedOutputId?: string | null; selectedPath?: string | null }>()
 const emit = defineEmits<{
-  output: [id: string]; run: [id: string]; edit: []; close: []; select: [id: string]; context: []; updated: []
+  output: [id: string]; selectOutput: [id: string]; run: [id: string]; edit: []; context: []; updated: []; selectFile: [path: string]; readDocument: [document: OutputDocumentRef]
   quote: [value: { text: string; runId: string | null; anchor: string }]
 }>()
-const heading = shallowRef<HTMLElement | null>(null)
-const selectedId = shallowRef<string | null>(null)
 const linked = computed(() => props.node.outputIds.map(id => props.outputs.find(output => output.id === id)).filter((output): output is WorkOutputRef => !!output))
-const selected = computed(() => linked.value.find(output => output.id === selectedId.value) || linked.value[0] || null)
+const selected = computed(() => linked.value.find(output => output.id === props.selectedOutputId) || linked.value[0] || null)
 const missingOutputs = computed(() => props.node.outputIds.length - linked.value.length)
 const previous = computed(() => props.nodes.filter(node => props.node.dependsOn.includes(node.id)))
-const following = computed(() => props.nodes.filter(node => node.dependsOn.includes(props.node.id)))
 const provenanceLabel = computed(() => props.node.provenance === 'declared' ? '计划记录' : props.node.provenance === 'observed' ? '实际记录' : props.node.provenance || '步骤记录')
 const description = computed(() => props.node.description.trim() !== props.node.summary.trim() ? props.node.description : '')
 const emptyReason = computed(() => {
@@ -29,7 +27,8 @@ const emptyReason = computed(() => {
   if (props.node.state === 'succeeded') return '这一步标记为已完成，但没有关联成果。完成状态本身不代表已有可读产物。'
   return '这一步尚未关联成果。已有的报告、方案或代码交付，需要关联到这一步后才会显示。'
 })
-watch(() => `${props.workspace}:${props.itemId}:${props.node.id}`, () => { selectedId.value = null })
+const expectedKindLabels: Record<string, string> = { plan: '计划', document: '文档', code: '代码', validation: '验证', finding: '发现', decision: '决定', operation: '操作', attachment: '附件' }
+const deliveryLabel = computed(() => ({ complete: '交付已登记', missing: '缺少必要交付', pending: '待交付', legacy_unverified: '旧记录未核实交付' } as Record<string, string>)[props.node.deliveryStatus || ''] || '')
 function discuss() {
   const node = props.node
   // Keep the full description/conclusion and leave room for a question in the 20k composer.
@@ -44,34 +43,31 @@ function discuss() {
   ].filter(Boolean).join('\n\n')
   emit('quote', { text, runId: node.runId || null, anchor: `步骤：${node.title} [${node.id}]` })
 }
-function focus() {
-  heading.value?.focus({ preventScroll: true })
-  heading.value?.scrollIntoView?.({ block: 'start', behavior: 'instant' })
-}
-defineExpose({ focus })
 </script>
 
 <template>
-  <section id="work-step-detail" class="node-detail" aria-label="所选步骤">
+  <section class="node-detail" aria-label="步骤内容">
     <header class="detail-top">
-      <div><p class="eyebrow">{{ provenanceLabel }} · {{ stepStateLabel[node.state] }}</p><h3 ref="heading" tabindex="-1">{{ node.title }}</h3></div>
-      <button class="lw-btn ghost sm" type="button" @click="emit('close')">收起详情</button>
+      <div><p class="eyebrow">{{ provenanceLabel }} · {{ stepStateLabel[node.state] }}</p><h3>本步工作</h3></div>
     </header>
     <p v-if="description" class="step-description">{{ description }}</p>
     <div v-if="node.summary" class="step-summary"><span class="field-label">{{ node.state === 'succeeded' ? '本步结论' : '当前进展' }}</span><MarkdownBody :content="node.summary" /></div>
+    <section v-if="node.expectedOutputs?.length || node.acceptance || deliveryLabel" class="step-delivery" aria-label="预期与实际交付">
+      <h4>交付与验收</h4>
+      <p v-if="deliveryLabel" class="delivery-state" :class="node.deliveryStatus">{{ deliveryLabel }}</p>
+      <ul v-if="node.expectedOutputs?.length"><li v-for="expected in node.expectedOutputs" :key="expected.id"><span>{{ expectedKindLabels[expected.kind] || expected.kind }} · {{ expected.title }}</span><small>{{ expected.required ? '必需' : '可选' }}</small></li></ul>
+      <p v-if="node.acceptance" class="acceptance"><span class="field-label">怎样验收</span>{{ node.acceptance }}</p>
+      <ul v-if="node.missingRequirements?.length" class="missing"><li v-for="requirement in node.missingRequirements" :key="requirement">{{ requirement }}</li></ul>
+    </section>
     <div class="step-actions">
       <button class="lw-btn sm" type="button" @click="discuss">讨论这一步</button>
       <button class="text-action" type="button" @click="emit('edit')">{{ observed ? '另存计划并补充关联' : '编辑本步与成果关联' }}</button>
     </div>
-    <div v-if="previous.length || following.length" class="step-neighbors">
-      <div v-if="previous.length"><span class="field-label">前置步骤</span><div class="neighbor-links"><button v-for="step in previous" :key="step.id" type="button" @click="emit('select', step.id)">{{ step.title }} <small>{{ stepStateLabel[step.state] }}</small></button></div></div>
-      <div v-if="following.length"><span class="field-label">后续步骤</span><div class="neighbor-links"><button v-for="step in following" :key="step.id" type="button" @click="emit('select', step.id)">{{ step.title }} <small>{{ stepStateLabel[step.state] }}</small></button></div></div>
-    </div>
     <section class="step-outputs" aria-label="本步产物">
       <div class="outputs-heading"><h4>本步产物 <span v-if="linked.length">{{ linked.length }}</span></h4><button v-if="selected" class="text-action" type="button" @click="emit('output', selected.id)">在成果页阅读 ↗</button></div>
-      <nav v-if="linked.length > 1" class="output-choices" aria-label="选择本步产物"><button v-for="output in linked" :key="output.id" type="button" :aria-current="selected?.id === output.id ? 'true' : undefined" @click="selectedId = output.id"><small>{{ kindLabel(output) }}</small>{{ output.title }}</button></nav>
+      <nav v-if="linked.length > 1" class="output-choices" aria-label="选择本步产物"><button v-for="output in linked" :key="output.id" type="button" :aria-current="selected?.id === output.id ? 'true' : undefined" @click="emit('selectOutput', output.id)"><small>{{ kindLabel(output) }}</small>{{ output.title }}</button></nav>
       <p v-if="missingOutputs && linked.length" class="muted" role="status">另有 {{ missingOutputs }} 份关联成果目前不可读取。</p>
-      <WorkOutputReader v-if="selected" :workspace="workspace" :item-id="itemId" :output="selected" :allow-history="false" @updated="emit('updated')" @quote="emit('quote', $event)" />
+      <WorkOutputReader v-if="selected" :workspace="workspace" :item-id="itemId" :output="selected" :selected-path="selectedPath" :allow-history="false" @updated="emit('updated')" @select-file="emit('selectFile', $event)" @read-document="emit('readDocument', $event)" @quote="emit('quote', $event)" />
       <p v-else class="output-empty">{{ emptyReason }}</p>
     </section>
     <details class="step-background">
@@ -83,26 +79,31 @@ defineExpose({ focus })
         <p v-if="node.assignmentId" class="technical-ref">开发委托：{{ node.assignmentId }}</p>
       </div>
     </details>
+    <details v-if="node.attempts?.length" class="step-background"><summary>执行尝试与检查 · {{ node.attempts.length }}</summary><ol class="attempts"><li v-for="attempt in node.attempts" :key="attempt.id"><strong>{{ attempt.applied ? '已用于当前步骤' : '历史尝试' }} · {{ attempt.outcome }}</strong><span v-if="attempt.createdAt"> · {{ new Date(attempt.createdAt).toLocaleString('zh-CN') }}</span><p>{{ attempt.summary }}</p><ul v-if="attempt.issues.length"><li v-for="issue in attempt.issues" :key="issue">{{ issue }}</li></ul></li></ol></details>
   </section>
 </template>
 
 <style scoped>
-.node-detail { min-width: 0; border: 1px solid #b9cfe1; border-radius: 12px; background: #fff; padding: 24px; }
+.node-detail { min-width: 0; }
 .detail-top,.outputs-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
 .eyebrow { margin: 0 0 6px; color: #597895; font-size: 12px; }
 h3 { margin: 0; font-size: 21px; color: #273e53; overflow-wrap: anywhere; scroll-margin-top: 28px; }
-h3:focus { outline: none; }
 h4 { margin: 0; font-size: 15px; } h4 span { color: #617990; font-size: 12px; margin-left: 6px; }
 .step-description,.step-summary p { margin: 12px 0 0; color: #3a5064; white-space: pre-wrap; overflow-wrap: anywhere; line-height: 1.75; font-size: 14px; }
 .step-summary { margin-top: 18px; } .step-summary :deep(.lw-markdown) { margin-top: 5px; font-size: 14px; line-height: 1.75; color: #3a5064; }
+.step-delivery { margin-top: 18px; padding: 15px; border: 1px solid #dfe9f1; border-radius: 9px; background: #f9fbfd; }
+.step-delivery h4 { margin: 0 0 8px; }
+.step-delivery ul { margin: 8px 0; padding-inline-start: 19px; }
+.step-delivery li { margin-top: 5px; color: #39576e; font-size: 13px; }
+.step-delivery li small { margin-inline-start: 8px; color: #6b8295; }
+.delivery-state { margin: 7px 0; color: #426d52; font-size: 12px; }
+.delivery-state.missing,.delivery-state.legacy_unverified { color: #9b5b39; }
+.acceptance { display: grid; gap: 4px; margin: 10px 0 0; color: #3b5368; font-size: 13px; white-space: pre-wrap; }
+.step-delivery .missing { color: #9b5b39; }
 .field-label { font-size: 12px; font-weight: 650; color: #61768b; }
 .step-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 15px; margin-top: 16px; }
 .text-action { border: 0; padding: 3px 0; color: #38688e; background: none; cursor: pointer; font-size: 12px; text-align: left; }
 .text-action:hover { text-decoration: underline; }
-.step-neighbors { display: grid; gap: 12px; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e6edf2; }
-.neighbor-links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 7px; }
-.neighbor-links button { padding: 7px 10px; border: 1px solid #dfe7ef; border-radius: 7px; background: #fafcfe; color: #37516a; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
-.neighbor-links small { margin-left: 7px; color: #6e8295; }
 .step-outputs { display: grid; gap: 12px; min-width: 0; margin-top: 22px; padding-top: 20px; border-top: 1px solid #e6edf2; }
 .step-outputs :deep(.output-reader) { padding: 0; border: 0; border-radius: 0; }
 .output-choices { display: flex; gap: 8px; overflow-x: auto; padding: 2px; }
@@ -115,5 +116,7 @@ h4 { margin: 0; font-size: 15px; } h4 span { color: #617990; font-size: 12px; ma
 .step-background summary { cursor: pointer; color: #59728b; font-size: 12px; }
 .background-content { margin-top: 12px; font-size: 13px; } .background-content li { margin-top: 6px; overflow-wrap: anywhere; }
 .technical-ref { color: #8594a2; font-size: 11px; overflow-wrap: anywhere; }
+.attempts { padding-inline-start: 20px; color: #526d82; font-size: 12px; }
+.attempts li { margin-top: 9px; }.attempts p { margin: 5px 0; }
 @media(max-width:720px){ .node-detail { padding: 16px; } .detail-top { flex-wrap: wrap; } .outputs-heading { align-items: center; } }
 </style>

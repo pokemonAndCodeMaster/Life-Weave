@@ -13,11 +13,19 @@ MAX_STEP_DEPENDENCIES = MAX_WORK_STEPS - 1
 WorkStepState = Literal['planned', 'running', 'waiting', 'succeeded', 'failed', 'cancelled', 'unobserved']
 StepId = Annotated[str, Field(min_length=1, max_length=128)]
 OutputId = Annotated[str, Field(min_length=1, max_length=256)]
+OutputKind = Literal['plan', 'document', 'code', 'validation', 'finding', 'decision', 'operation', 'attachment']
 
 
 class WorkContextRef(WireModel):
     title: str = Field(min_length=1, max_length=256)
     uri: str | None = Field(default=None, max_length=2048)
+
+
+class ExpectedOutput(WireModel):
+    id: Annotated[str, Field(min_length=1, max_length=128)]
+    title: str = Field(min_length=1, max_length=256)
+    kind: OutputKind
+    required: bool = True
 
 
 class WorkStepInput(WireModel):
@@ -32,6 +40,20 @@ class WorkStepInput(WireModel):
     assignment_id: str | None = Field(default=None, alias='assignmentId', max_length=128)
     context_refs: list[WorkContextRef] = Field(default_factory=list, alias='contextRefs', max_length=20)
     provenance: str | None = Field(default=None, max_length=256)
+    expected_outputs: list[ExpectedOutput] = Field(default_factory=list, alias='expectedOutputs', max_length=MAX_WORK_STEPS)
+    acceptance: str = Field(default='', max_length=5000)
+    # Projection-only fields are accepted when a caller edits a read work-view,
+    # but never persisted as client-authored report state.
+    delivery_status: str | None = Field(default=None, alias='deliveryStatus', exclude=True)
+    missing_requirements: list[str] = Field(default_factory=list, alias='missingRequirements', exclude=True)
+    attempts: list[dict] = Field(default_factory=list, exclude=True)
+
+    @model_validator(mode='after')
+    def unique_expected_outputs(self) -> 'WorkStepInput':
+        identities = [row.id for row in self.expected_outputs]
+        if len(identities) != len(set(identities)):
+            raise ValueError(f'步骤 {self.id} 的预期产物 ID 不能重复')
+        return self
 
 
 class WorkPlanInput(WireModel):
@@ -39,6 +61,7 @@ class WorkPlanInput(WireModel):
     title: str = Field(min_length=1, max_length=256)
     provider: str = Field(min_length=1, max_length=128)
     nodes: list[WorkStepInput] = Field(max_length=MAX_WORK_STEPS)
+    revision_reason: str = Field(default='', alias='revisionReason', max_length=2000)
 
     @model_validator(mode='after')
     def valid_graph(self) -> 'WorkPlanInput':

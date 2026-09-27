@@ -33,6 +33,8 @@ const loading = shallowRef(false)
 const runtimeLoading = shallowRef(false)
 const error = shallowRef<ApiErrorShape | null>(null)
 const toast = shallowRef('')
+const createCandidates = shallowRef<Array<{ id: string; title: string }>>([])
+const creationRequests = new Map<string, string>()
 let toastTimer: ReturnType<typeof setTimeout> | undefined
 const scrollPositions = new Map<string, number>()
 let meetingSessionWorkspace: WorkspaceKind | null = null
@@ -142,6 +144,8 @@ function notify(message: string) {
 }
 
 function openModal(type: string, payload: Record<string, unknown> = {}) {
+  createCandidates.value = []
+  creationRequests.clear()
   modal.type = type
   modal.payload = payload
 }
@@ -274,22 +278,33 @@ async function discussIdea(idea: Idea, text: string) {
   } catch (caught) { const problem = apiError(caught); notify(problem.message); throw problem }
 }
 
-async function createItem(payload: Record<string, unknown>, ideaId?: string) {
+async function createItem(payload: Record<string, unknown>, ideaId?: string, distinctGoal = false) {
   const { title, itemType, ...details } = payload
+  const workspace = activeWorkspace.value
+  const fingerprint = JSON.stringify({ workspace, payload, ideaId, distinctGoal })
+  const requestId = creationRequests.get(fingerprint) || crypto.randomUUID()
+  creationRequests.set(fingerprint, requestId)
   try {
-    const item = await mutateWorkspace<WorkItem>(activeWorkspace.value, '/items', 'post', {
-      itemType, title, payload: details,
+    const binding = await mutateWorkspace<{ action: string; itemId: string | null; candidates: Array<{ id: string; title: string }> }>(workspace, '/work-bindings/resolve', 'post', {
+      requestId, decision: details.parentId ? 'child' : 'new', parentId: details.parentId || null,
+      itemType, title, goal: details.goal || title, payload: details, distinctGoal,
       initialContext: { goal: details.goal || title, scope: details.scope || '' },
       provenance: ideaId ? [{ sourceEntityId: ideaId, relation: 'formed_from' }] : [{ source: '用户创建事项' }],
     })
-    if (ideaId && item?.id) {
-      await mutateWorkspace(activeWorkspace.value, '/relations', 'post', { fromKind: 'item', fromId: item.id, toKind: 'entity', toId: ideaId, relationType: 'formed_from' })
-      const idea = state.value?.ideas.find((entry) => entry.id === ideaId)
-      if (idea) await mutateWorkspace(activeWorkspace.value, `/entities/${encodeURIComponent(ideaId)}`, 'patch', { version: idea.version ?? 1, title: idea.title, payload: { ...(idea.payload ?? {}), body: idea.body, scope: idea.scope, state: '已有后续', related: item.id } })
+    if (!binding.itemId) {
+      createCandidates.value = binding.candidates
+      notify('找到已有事项，请选择接续，或明确创建独立目标。')
+      return null
     }
-    if (details.parentId && item?.id) await mutateWorkspace(activeWorkspace.value, '/relations', 'post', { fromKind: 'item', fromId: item.id, toKind: 'item', toId: details.parentId, relationType: 'contributes_to' })
-    await load(activeWorkspace.value, true)
-    closeModal(); notify('事项与初始上下文已建立，尚未自动排期或运行。')
+    const item = await getItemDetail(workspace, binding.itemId) as unknown as WorkItem
+    if (ideaId && item?.id) {
+      await mutateWorkspace(workspace, '/relations', 'post', { fromKind: 'item', fromId: item.id, toKind: 'entity', toId: ideaId, relationType: 'formed_from' })
+      const idea = state.value?.ideas.find((entry) => entry.id === ideaId)
+      if (idea) await mutateWorkspace(workspace, `/entities/${encodeURIComponent(ideaId)}`, 'patch', { version: idea.version ?? 1, title: idea.title, payload: { ...(idea.payload ?? {}), body: idea.body, scope: idea.scope, state: '已有后续', related: item.id } })
+    }
+    // Parent relation and creation belong to the shared binding transaction.
+    if (activeWorkspace.value === workspace) await load(workspace, true)
+    if (activeWorkspace.value === workspace) closeModal(); notify('事项与初始上下文已建立，尚未自动排期或运行。')
     return item
   } catch (caught) { const problem = apiError(caught); notify(problem.message); throw problem }
 }
@@ -506,6 +521,7 @@ export function useLifeWeaveWorkspace() {
     createIdea,
     discussIdea,
     createItem,
+    createCandidates,
     createEntity,
     establishContext,
     updateRelations,

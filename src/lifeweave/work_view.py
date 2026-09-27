@@ -88,7 +88,9 @@ def _node(identity: str, title: str, description: str = '', state: str = 'planne
     return {'id': identity, 'title': title, 'description': description, 'state': state,
             'summary': _brief(summary, 2000), 'dependsOn': depends_on or [],
             'outputIds': output_ids or [], 'runId': run_id, 'assignmentId': assignment_id,
-            'contextRefs': [], 'provenance': provenance}
+            'contextRefs': [], 'provenance': provenance, 'expectedOutputs': [],
+            'acceptance': '', 'deliveryStatus': 'pending', 'missingRequirements': [],
+            'attempts': []}
 
 
 class WorkViewService:
@@ -224,12 +226,17 @@ class WorkViewService:
             if not entity or entity.get('entityType') != 'artifact' or entity['id'] in seen:
                 continue
             body = entity.get('payload', {}).get('body')
-            if not isinstance(body, str) or not body.strip():
+            fixed_delivery = entity.get('payload', {}).get('fixedDelivery')
+            if (not isinstance(body, str) or not body.strip()) and not fixed_delivery:
                 continue
             seen.add(entity['id'])
-            outputs.append({'id': f'artifact:{entity["id"]}', 'title': entity['title'], 'kind': 'artifact',
-                            'summary': _brief(body), 'state': 'manual', 'createdAt': _stamp(entity.get('updatedAt')),
-                            'version': str(entity.get('version')) if entity.get('version') is not None else None,
+            payload = entity.get('payload') or {}
+            version = (fixed_delivery or {}).get('sha256') if isinstance(fixed_delivery, dict) else None
+            version = version or payload.get('artifactVersion')
+            outputs.append({'id': f'artifact:{entity["id"]}', 'title': entity['title'],
+                            'kind': payload.get('resultKind') or 'document',
+                            'summary': _brief(body or '固定交付'), 'state': 'manual', 'createdAt': _stamp(entity.get('updatedAt')),
+                            'version': str(version) if version else None,
                             'runId': None, 'assignmentId': None, 'artifactId': entity['id'],
                             'uri': f'/api/lifeweave/{workspace}/items/{quote(item_id, safe="")}/research-output'})
         outputs.sort(key=lambda output: output['createdAt'] or '', reverse=True)
@@ -270,6 +277,24 @@ class WorkViewService:
                 raise ValueError('事项中的工作计划格式无效')
             WorkPlanInput.model_validate({'version': item['version'], 'title': raw_plan.get('title'),
                                           'provider': raw_plan.get('provider'), 'nodes': raw_plan.get('nodes')})
+        reports_by_step: dict[str, list[dict[str, Any]]] = {}
+        if hasattr(self.work.repository, 'list_activities'):
+            for activity in self.work.repository.list_activities(workspace, item_id):
+                if activity.get('kind') != 'work_step_report':
+                    continue
+                report = (activity.get('payload') or {}).get('report') or {}
+                step_id = report.get('stepId')
+                if not isinstance(step_id, str):
+                    continue
+                reports_by_step.setdefault(step_id, []).append({
+                    'id': activity['id'], 'planVersion': report.get('planVersion'),
+                    'outcome': report.get('outcome'), 'applied': report.get('applied', False),
+                    'summary': report.get('summary', ''), 'createdAt': _stamp(activity.get('createdAt')),
+                    'runId': report.get('runId'), 'assignmentId': report.get('assignmentId'),
+                    'sessionId': report.get('sessionId'), 'outputIds': report.get('outputIds') or [],
+                    'issues': report.get('issues') or [], 'checks': report.get('checks') or [],
+                    'fixedDeliveries': report.get('fixedDeliveries') or [],
+                })
         assignments = self.development.list(workspace, item_id)
         assignment = assignments[0] if assignments else None
         assignment_run_ids = {str(row[key]) for row in assignments for key in
@@ -326,26 +351,28 @@ class WorkViewService:
                         stage_cache[assignment_id] = {stage_node['id']: stage_node for stage_node in stage_nodes}
                     actual_stage = stage_cache[assignment_id].get(node['id'])
                     if actual_stage:
-                        node['state'] = actual_stage['state']
+                        if not node.get('expectedOutputs'):
+                            node['state'] = actual_stage['state']
                         node['runId'] = actual_stage['runId']
-                        node['outputIds'] = list(dict.fromkeys([*node.get('outputIds', []),
-                                                                 *actual_stage['outputIds']]))
+                        if not node.get('expectedOutputs'):
+                            node['outputIds'] = list(dict.fromkeys([*node.get('outputIds', []),
+                                                                     *actual_stage['outputIds']]))
                         run_id = node['runId']
                     if run_id and run_id not in {bound_assignment.get(key) for key in
                                                  ('planRunId', 'reviewRunId', 'implementationRunId')}:
                         raise ValueError('关联运行不属于所选开发委托')
-                    if not run_id and not actual_stage:
+                    if not run_id and not actual_stage and not node.get('expectedOutputs'):
                         node['state'] = ASSIGNMENT_STATES.get(bound_assignment['status'], 'unobserved')
                 if run_id:
                     run = self._owned_run(workspace, item_id, run_id)
-                    if actual_stage is None:
+                    if actual_stage is None and not node.get('expectedOutputs'):
                         node['state'] = RUN_STATES.get(run['state'], 'unobserved')
                     output = self._run_output(workspace, run, 'development' if assignment_id else 'research',
                                               '开发运行结果' if assignment_id else '研究成果')
                     if output and output['id'] not in output_index:
                         output_index[output['id']] = output
                         outputs.append(output)
-                    if output and output['id'] not in node['outputIds']:
+                    if output and output['id'] not in node['outputIds'] and not node.get('expectedOutputs'):
                         node['outputIds'].append(output['id'])
                 for output_id in node.get('outputIds') or []:
                     if output_id in output_index:
@@ -359,8 +386,37 @@ class WorkViewService:
                     warnings.append(f'步骤 {node["id"]} 的成果引用已失效：{sorted(missing)[0]}')
                     node['outputIds'] = [value for value in node['outputIds'] if value in output_index]
                 node['provenance'] = 'observed' if run_id or assignment_id else 'declared'
+                node['expectedOutputs'] = node.get('expectedOutputs') or []
+                node['acceptance'] = node.get('acceptance') or ''
+                node['attempts'] = sorted(reports_by_step.get(node['id'], []),
+                                          key=lambda attempt: attempt['createdAt'] or '', reverse=True)
+                # The current reader opens the first linked output. Prefer the last
+                # applied successful delivery, while keeping older versions available.
+                # Late/rejected reports must never displace an accepted delivery.
+                successful = next((attempt for attempt in node['attempts']
+                                   if attempt['applied'] and attempt['outcome'] == 'succeeded'
+                                   and any(value in node['outputIds'] for value in attempt['outputIds'])), None)
+                if successful:
+                    current_ids = [value for value in successful['outputIds'] if value in node['outputIds']]
+                    node['outputIds'] = list(dict.fromkeys([*current_ids, *node['outputIds']]))
+                current_reports = [attempt for attempt in node['attempts']
+                                   if attempt['planVersion'] == raw_plan['version']]
+                latest_report = current_reports[0] if current_reports else None
+                if node['state'] == 'succeeded' and not node['expectedOutputs']:
+                    node['deliveryStatus'] = 'legacy_unverified'
+                    node['missingRequirements'] = ['旧记录未登记预期产物与固定交付']
+                elif node['state'] == 'succeeded':
+                    node['deliveryStatus'] = 'complete'
+                    node['missingRequirements'] = []
+                elif latest_report and latest_report['issues']:
+                    node['deliveryStatus'] = 'missing'
+                    node['missingRequirements'] = latest_report['issues']
+                else:
+                    node['deliveryStatus'] = 'pending'
+                    node['missingRequirements'] = []
             plan = {'id': raw_plan['id'], 'title': raw_plan['title'], 'provider': raw_plan['provider'],
-                    'source': 'declared', 'version': raw_plan['version'], 'editable': True, 'nodes': nodes}
+                    'source': 'declared', 'version': raw_plan['version'], 'editable': True,
+                    'revisionReason': raw_plan.get('revisionReason', ''), 'nodes': nodes}
         elif observed_nodes:
             plan = {'id': f'observed:{item_id}', 'title': '当前工作步骤',
                     'provider': 'observed', 'source': 'observed', 'version': 0,
@@ -372,7 +428,13 @@ class WorkViewService:
         outputs.sort(key=lambda output: output.get('createdAt') or '', reverse=True)
         outputs.sort(key=output_priority)
         item_label = ITEM_LABELS.get(item['status'], item['status'])
-        if assignment:
+        if raw_plan is not None:
+            pending = next((node for node in plan['nodes'] if node['state'] in {'running', 'waiting', 'failed', 'blocked'}), None)
+            if pending is None:
+                pending = next((node for node in plan['nodes'] if node['state'] == 'planned'), None)
+            current_label = pending['title'] if pending else '计划步骤已报告，等待事项验收'
+            current_summary = f'业务计划含 {len(plan["nodes"])} 个步骤，版本 {plan["version"]}；事项正式状态为{item_label}。'
+        elif assignment:
             current_label = ASSIGNMENT_LABELS.get(assignment['status'], assignment['status'])
             current_summary = f'最近一次开发委托的实际状态；事项正式状态为{item_label}。'
         elif latest_run:
@@ -380,12 +442,6 @@ class WorkViewService:
             current_summary = (f'已有较早的完整成果可阅读；最新一轮仍需处理。事项正式状态为{item_label}。'
                                if latest_output_run and latest_output_run['id'] != latest_run['id'] else
                                f'最近一次委托的实际状态；事项正式状态为{item_label}。')
-        elif raw_plan is not None:
-            pending = next((node for node in plan['nodes'] if node['state'] in {'running', 'waiting', 'failed'}), None)
-            if pending is None:
-                pending = next((node for node in plan['nodes'] if node['state'] == 'planned'), None)
-            current_label = pending['title'] if pending else '已登记工作步骤'
-            current_summary = f'已登记 {len(plan["nodes"])} 个步骤；事项正式状态为{item_label}。'
         elif manual_outputs:
             current_label = '已有手工成果'
             current_summary = f'成果目录中有 {len(manual_outputs)} 份人工记录；事项正式状态为{item_label}。'
@@ -407,7 +463,9 @@ class WorkViewService:
             raise ConcurrentUpdateError('事项已被其他人更新，请刷新后重试')
         previous = (item.get('payload') or {}).get('workPlan')
         previous_version = int(previous.get('version', 0)) if isinstance(previous, dict) else 0
-        owned_output_ids = {output['id'] for output in self.read(workspace, item_id)['outputs']}
+        previous_nodes = {node['id']: node for node in previous.get('nodes', [])} if isinstance(previous, dict) else {}
+        before_view = self.read(workspace, item_id)
+        owned_output_ids = {output['id'] for output in before_view['outputs']}
         for node in input.nodes:
             for ref in node.context_refs:
                 _safe_uri(ref.uri)
@@ -430,10 +488,47 @@ class WorkViewService:
                     actual.add(f'delivery:{node.assignment_id}')
                 if set(node.output_ids) - actual:
                     raise ValueError(f'步骤 {node.id} 的成果引用不属于关联运行或交付')
+        nodes = [node.model_dump(by_alias=True) for node in input.nodes]
+        for node in nodes:
+            prior = previous_nodes.get(node['id'])
+            same_requirements = bool(prior and (prior.get('expectedOutputs') or []) == node['expectedOutputs']
+                                     and (prior.get('acceptance') or '') == node['acceptance'])
+            if (node['expectedOutputs'] and node['state'] == 'succeeded' and
+                    not (prior and same_requirements and prior.get('state') == 'succeeded')):
+                raise ValueError(f'步骤 {node["id"]} 只能由经过产物和检查核验的报告标记完成')
+            if prior and not same_requirements:
+                # An earlier success proves the old requirement only.
+                node['state'] = 'planned'
+                node['summary'] = ''
+                node['outputIds'] = []
+                node['runId'] = None
+                node['assignmentId'] = None
+            elif node['expectedOutputs'] and prior and same_requirements:
+                # Progress and actual outputs belong to immutable step reports.
+                node['state'] = prior.get('state', 'planned')
+                node['summary'] = prior.get('summary', '')
+                node['outputIds'] = prior.get('outputIds') or []
+                node['runId'] = prior.get('runId')
+                node['assignmentId'] = prior.get('assignmentId')
+            elif node['expectedOutputs'] and not prior and node['state'] != 'planned':
+                raise ValueError(f'步骤 {node["id"]} 开始时须为 planned；状态由步骤报告更新')
+            elif node['state'] == 'succeeded':
+                previously_reported = bool(prior and prior.get('state') == 'succeeded' and same_requirements and
+                                           prior.get('outputIds', []) == node['outputIds'] and
+                                           prior.get('runId') == node['runId'] and
+                                           prior.get('assignmentId') == node['assignmentId'])
+                observed_legacy = bool(
+                    not prior and not node['expectedOutputs'] and not node['acceptance'] and
+                    before_view['plan']['source'] == 'observed' and
+                    any(row['id'] == node['id'] and row['state'] == 'succeeded'
+                        for row in before_view['plan']['nodes']))
+                if not (previously_reported or observed_legacy):
+                    raise ValueError(f'步骤 {node["id"]} 只能由经过产物和检查核验的报告标记完成')
         plan = {'id': previous.get('id', f'plan:{item_id}') if isinstance(previous, dict) else f'plan:{item_id}',
                 'title': input.title, 'provider': input.provider,
                 'version': previous_version + 1,
-                'nodes': [node.model_dump(by_alias=True) for node in input.nodes]}
+                'revisionReason': input.revision_reason,
+                'nodes': nodes}
         postgres = getattr(self.work.repository, '_postgres', None)
         with postgres.atomic() if postgres is not None else nullcontext():
             self.work.update_item(workspace, item_id, version=input.version, actor_id=actor_id,

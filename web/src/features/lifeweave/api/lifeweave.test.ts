@@ -3,10 +3,17 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 const { get, post } = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }))
 vi.mock('@/shared/api/http', () => ({ http: { get, post, request: vi.fn() } }))
 
-import { createRun, getRunArtifactResult, getRunEvents, machineAction, runAction } from './lifeweave'
+import { apiError, createRun, getRunArtifactResult, getRunEvents, machineAction, runAction } from './lifeweave'
 
 describe('lifeweave runtime API contract', () => {
   beforeEach(() => { get.mockReset(); post.mockReset() })
+
+  it('Axios 同时带 status/message 时仍优先显示服务返回的具体错误', () => {
+    const problem = { message: 'Request failed with status code 409', status: 409,
+      response: { status: 409, data: { detail: '指定成果版本与保存的交付不一致' } } }
+    expect(apiError(problem).message).toBe('指定成果版本与保存的交付不一致')
+    expect(apiError(null).status).toBe(0)
+  })
 
   it('从独立事件与固定结果端点读取真实运行数据', async () => {
     get.mockResolvedValueOnce({ data: { items: [{ sequence: 1, type: 'started' }], nextSequence: 2 } })

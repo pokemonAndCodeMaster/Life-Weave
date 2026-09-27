@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, shallowRef, watch } from 'vue'
 import type { ItemWorkView } from '../../api/workView'
+import type { OutputDocumentRef } from '../../api/outputFiles'
 import type { WorkItem, WorkspaceKind } from '../../types'
 import { useLifeWeaveWorkspace } from '../../composables/useLifeWeaveWorkspace'
 import ResearchKnowledgeReview from '../ResearchKnowledgeReview.vue'
@@ -8,8 +9,8 @@ import WorkOutputReader from './WorkOutputReader.vue'
 import { kindLabel } from './workOutputLabels'
 import ManualResultEditor from '../ManualResultEditor.vue'
 
-const props = defineProps<{ workspace: WorkspaceKind; item: WorkItem; view: ItemWorkView; selectedId: string | null }>()
-const emit = defineEmits<{ select: [id: string]; updated: []; quote: [value: { text: string; runId: string | null; anchor: string }] }>()
+const props = defineProps<{ workspace: WorkspaceKind; item: WorkItem; view: ItemWorkView; selectedId: string | null; selectedPath?: string | null }>()
+const emit = defineEmits<{ select: [id: string]; selectFile: [path: string]; readDocument: [document: OutputDocumentRef]; updated: []; quote: [value: { text: string; runId: string | null; anchor: string }] }>()
 const { openModal } = useLifeWeaveWorkspace()
 const selected = computed(() => props.view.outputs.find(output => output.id === props.selectedId) || props.view.outputs[0] || null)
 const showManualEditor = shallowRef(false)
@@ -25,7 +26,7 @@ watch(() => selected.value?.id, () => { showKnowledge.value = false })
     <ManualResultEditor v-if="showManualEditor" :item="item" @close="showManualEditor=false" @saved="showManualEditor=false; emit('updated')" />
     <div v-if="view.outputs.length" class="outputs-layout">
       <nav class="outputs-index" aria-label="成果列表"><button v-for="output in view.outputs" :key="output.id" type="button" class="index-entry" :class="{ active: selected?.id === output.id }" :aria-current="selected?.id === output.id ? 'true' : undefined" @click="emit('select', output.id)"><span class="entry-kind">{{ kindLabel(output) }}</span><strong>{{ output.title }}</strong></button></nav>
-      <WorkOutputReader v-if="selected" :workspace="workspace" :item-id="item.id" :output="selected" @updated="emit('updated')" @quote="emit('quote', $event)" />
+      <WorkOutputReader v-if="selected" :workspace="workspace" :item-id="item.id" :output="selected" :selected-path="selectedPath" @updated="emit('updated')" @select-file="emit('selectFile', $event)" @read-document="emit('readDocument', $event)" @quote="emit('quote', $event)" />
     </div>
     <p v-else class="output-empty">尚无成果。可以先登记人工成果，也可以在工作步骤中继续推进。</p>
     <details v-if="selected?.kind === 'research'" class="secondary"><summary @click="showKnowledge = !showKnowledge">研究知识修订</summary><ResearchKnowledgeReview v-if="showKnowledge" :workspace="workspace" :item-id="item.id" @changed="emit('updated')" /></details>

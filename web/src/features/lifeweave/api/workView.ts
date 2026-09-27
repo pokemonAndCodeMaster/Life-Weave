@@ -2,10 +2,28 @@ import { http } from '@/shared/api/http'
 import type { WorkspaceKind } from '../types'
 
 export type WorkStepState = 'planned' | 'running' | 'waiting' | 'succeeded' | 'failed' | 'cancelled' | 'unobserved'
+export interface ExpectedWorkOutput {
+  id: string
+  title: string
+  kind: 'plan' | 'document' | 'code' | 'validation' | 'finding' | 'decision' | 'operation' | 'attachment'
+  required: boolean
+}
+export interface WorkStepAttempt {
+  id: string
+  outcome: string
+  applied: boolean
+  summary: string
+  createdAt: string
+  runId?: string | null
+  assignmentId?: string | null
+  sessionId?: string | null
+  outputIds: string[]
+  issues: string[]
+}
 export interface WorkOutputRef {
   id: string
   title: string
-  kind: 'research' | 'development' | 'artifact' | 'note'
+  kind: 'research' | 'development' | 'artifact' | 'note' | 'plan' | 'document' | 'code' | 'validation' | 'finding' | 'decision' | 'operation' | 'attachment'
   summary: string
   state?: string
   createdAt?: string | null
@@ -23,6 +41,11 @@ export interface WorkStep {
   summary: string
   dependsOn: string[]
   outputIds: string[]
+  expectedOutputs?: ExpectedWorkOutput[]
+  acceptance?: string
+  deliveryStatus?: 'pending' | 'complete' | 'missing' | 'legacy_unverified'
+  missingRequirements?: string[]
+  attempts?: WorkStepAttempt[]
   runId?: string | null
   assignmentId?: string | null
   contextRefs?: Array<{ title: string; uri?: string | null }>
@@ -49,6 +72,7 @@ export interface WorkPlanInput {
   title: string
   provider: string
   nodes: WorkStep[]
+  revisionReason?: string
 }
 const root = (workspace: WorkspaceKind, itemId: string) => `/lifeweave/${workspace}/items/${encodeURIComponent(itemId)}`
 export async function getWorkView(workspace: WorkspaceKind, itemId: string) {

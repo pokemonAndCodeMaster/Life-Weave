@@ -1,0 +1,15 @@
+{
+  "page": "https://app.notion.com/p/3e8af68286448159aa7ac5acdb1acb6a",
+  "date": "2026-09-27",
+  "method": "interactive Notion MCP update_content then fetch",
+  "source": "docs/item-workspace-design.md",
+  "verifiedSections": [
+    "大型弹窗",
+    "work_step_reports.py",
+    "本轮工作流与阅读交付"
+  ],
+  "imageUploaded": true,
+  "imageReferenceReadBack": true,
+  "authenticatedBrowserDisplayChecked": false,
+  "backendAutomaticMirrorConfigured": false
+}

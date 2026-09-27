@@ -25,6 +25,8 @@ class DevelopmentCreate(BaseModel):
     reviewMode: Literal["independent", "self"] = "independent"
     executionScope: Literal["plan_only", "implement"] = "plan_only"
     acknowledgeExcludedChanges: bool = False
+    stepId: str | None = Field(default=None, min_length=1, max_length=128)
+    planVersion: int | None = Field(default=None, ge=1)
 
 
 class IntegrationCheck(BaseModel):
@@ -72,7 +74,8 @@ def create(request: Request, workspace: WorkspaceKey, body: DevelopmentCreate):
             engine=body.engine, model=body.model, method_id=body.methodId,
             knowledge_refs=body.knowledgeRefs, review_mode=body.reviewMode,
             execution_scope=body.executionScope,
-            acknowledge_excluded_changes=body.acknowledgeExcludedChanges)
+            acknowledge_excluded_changes=body.acknowledgeExcludedChanges,
+            step_id=body.stepId, plan_version=body.planVersion)
     except (ValueError, KeyError, OSError) as exc:
         raise error(exc) from exc
 

@@ -1,0 +1,20 @@
+/home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+  from starlette.testclient import TestClient as TestClient  # noqa
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+item item-32e92ee44f534763 feedback feedback-34917fb2e59664b9ea095f43cddc73ac8975a17b plan 1 -> 2 failed report applied True late old report applied False new reports applied True True attempts 4 outputIds ['artifact:result-1e6e4b88109ed1700355d4e2', 'artifact:result-7293af05afb8ac43f213f125'] last report output artifact:result-7293af05afb8ac43f213f125

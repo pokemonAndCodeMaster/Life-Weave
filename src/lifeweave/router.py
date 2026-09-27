@@ -12,6 +12,8 @@ from .repository import ConcurrentUpdateError
 from .service import LifeWeaveService
 from .work_view import WorkViewService
 from .work_view_models import WorkPlanInput
+from .work_step_reports import StepReportInput, StepReportService
+from .work_binding import WorkBindingInput, WorkBindingService
 
 router = APIRouter(prefix='/api/lifeweave/{workspace}', tags=['lifeweave'])
 Actor = Annotated[str, Depends(get_actor_id)]
@@ -44,6 +46,15 @@ def list_items(workspace:str,service:Service,query:str|None=None,status_filter:A
     except ValueError as exc: raise _fail(exc) from exc
 
 
+@router.post('/work-bindings/resolve')
+def resolve_work_binding(workspace: str, payload: WorkBindingInput,
+                         service: Service, actor_id: Actor) -> dict[str, Any]:
+    try:
+        return WorkBindingService(service).resolve(workspace, payload, actor_id)
+    except (KeyError, ValueError) as exc:
+        raise _fail(exc) from exc
+
+
 @router.post('/items',status_code=status.HTTP_201_CREATED)
 def create_item(workspace:str,payload:ItemCreate,service:Service,actor_id:Actor)->dict[str,Any]:
     try: return service.create_item(workspace,actor_id=actor_id,**payload.model_dump())
@@ -73,6 +84,19 @@ def put_work_plan(workspace: str, item_id: str, payload: WorkPlanInput,
     try:
         return WorkViewService(service, request.app.state.lifeweave_runtime_service,
                                request.app.state.development).save(workspace, item_id, payload, actor_id)
+    except (KeyError, ValueError) as exc:
+        raise _fail(exc) from exc
+
+
+@router.post('/items/{item_id}/work-plan/steps/{step_id}/reports', status_code=status.HTTP_201_CREATED)
+def report_work_step(workspace: str, item_id: str, step_id: str, payload: StepReportInput,
+                     request: Request, service: Service, actor_id: Actor) -> dict[str, Any]:
+    try:
+        if payload.step_id != step_id:
+            raise ValueError('路径步骤与报告步骤不一致')
+        reporter = StepReportService(service, request.app.state.lifeweave_runtime_service,
+                                     request.app.state.development, request.app.state.output_files)
+        return reporter.submit(workspace, item_id, payload, actor_id)
     except (KeyError, ValueError) as exc:
         raise _fail(exc) from exc
 

@@ -1,0 +1,294 @@
+[
+  {
+    "outputId": "artifact:output-807d5e59db6580578aebf0e63e064788",
+    "version": "bb34dce7a2153ee86d5315c5a56ef89939e8732695dff48f940ea42001c65542",
+    "bundleSha256": "bb34dce7a2153ee86d5315c5a56ef89939e8732695dff48f940ea42001c65542",
+    "files": [
+      {
+        "path": "scripts/lifeweave.py",
+        "sha256": "3e88b13239e16f232e82f626da560d73e8769a1df00c9202d096f4d368ffdc5c"
+      },
+      {
+        "path": "src/lifeweave/continuation.py",
+        "sha256": "ae7ca4b836f40576e00ff6a505e7b96ffefc514987faaa796123d5c140734a04"
+      },
+      {
+        "path": "src/lifeweave/conversations.py",
+        "sha256": "2f217bf2d0fd7c4a25484e7f4d04551d6f0da368bf51240b372395a131e2015b"
+      },
+      {
+        "path": "src/lifeweave/development.py",
+        "sha256": "52aca8e277b0f9226628df6908337160d6ab580a7a0682a353a6cd493bf0c587"
+      },
+      {
+        "path": "src/lifeweave/development_router.py",
+        "sha256": "ad0320e918f6f318e1687ebacec98d1d7b7b26917173c6b3a63f8787cf28ea02"
+      },
+      {
+        "path": "src/lifeweave/external_development.py",
+        "sha256": "a43ab13b4aacc1f00c70bca3e554d8511a75d63372d17b3896e7baa25db14aa3"
+      },
+      {
+        "path": "src/lifeweave/router.py",
+        "sha256": "ec2171d11c9c03f2f54f7201c9abb6a3b2038f3e1995994f7cf59f38f9850c30"
+      },
+      {
+        "path": "src/lifeweave/work_binding.py",
+        "sha256": "0fdfd4988969b82df8b9169cb5dacd9c92f02d47cc7530142d4eec604ed4a1e2"
+      },
+      {
+        "path": "src/lifeweave/work_step_reports.py",
+        "sha256": "eeb33c3d5f46047dc64e8c700490fd11a285b6cc3169e3dbf2e504a891048030"
+      },
+      {
+        "path": "src/lifeweave/work_view.py",
+        "sha256": "1900b06f075a8298755a445900b59ccb34989b4c6b9e0a1d0c094c89d29f3f12"
+      },
+      {
+        "path": "src/lifeweave/work_view_models.py",
+        "sha256": "325718de410079ee615eba6ec0f89153c517fe5d825653de4bb01c1bff812f69"
+      },
+      {
+        "path": "tests/test_development.py",
+        "sha256": "25e31100c9ac096321affc1f2cb37376d6281a8c44e37ab9c69e6c028f55ba46"
+      },
+      {
+        "path": "tests/test_work_view.py",
+        "sha256": "e08d8ab14a26573403383f4cc5a793c16c65138f935a807dcac8bdf6bac5581a"
+      },
+      {
+        "path": "tests/test_workflow_protocol.py",
+        "sha256": "9c8d4bd1a2cadc34a205f4cc62e013f709427a662d9d9befdec9ac96047373e2"
+      }
+    ]
+  },
+  {
+    "outputId": "artifact:output-49ae40cec72d0f1fc4391a1584867802",
+    "version": "ecb02b3d581cd749386b65a87242d1652d5845b003b586efd089fc7f0e60bbad",
+    "bundleSha256": "ecb02b3d581cd749386b65a87242d1652d5845b003b586efd089fc7f0e60bbad",
+    "files": [
+      {
+        "path": "src/api/app.py",
+        "sha256": "baccc37e11b0ac7aec0ab1466162632daa3e56b331b647c78ccf3c7a40a007d8"
+      },
+      {
+        "path": "src/lifeweave/development_delivery.py",
+        "sha256": "aa02e638c2e61a3085755b59600c00c96125a4964193b468cca55afab7dcc520"
+      },
+      {
+        "path": "src/lifeweave/external_delivery.py",
+        "sha256": "f95f2d1da211ac38deb6c5ba7630487547f9b4ad683b4061cdd8a20bdd491c81"
+      },
+      {
+        "path": "src/lifeweave/manual_results.py",
+        "sha256": "334730e5c09cc6fd2fe5cfe606840e9eceef0b2dbe7f46ec38515f73e3c8d54d"
+      },
+      {
+        "path": "src/lifeweave/output_files.py",
+        "sha256": "4f71d92555b42d277a49753a39416c9f21e9ecc8c986b9d83c3d1db5c8c6dc40"
+      },
+      {
+        "path": "src/lifeweave/output_files_router.py",
+        "sha256": "3b58d6a80059988be3b70d4d10b0619c6803bb8943e15d820dca72f645a07f04"
+      },
+      {
+        "path": "tests/test_output_files.py",
+        "sha256": "5e5b110d9ff16df353f1ab1e070cb179f4ae8b43ca40538e44679109c859b1ff"
+      }
+    ]
+  },
+  {
+    "outputId": "artifact:output-ce53de7a6fcc8301a25b37856e32e690",
+    "version": "0a8565fd6634e20f7147b8be4b0a029a12a95ee3097c1fa8d8c9bbcf89bd17c0",
+    "bundleSha256": "0a8565fd6634e20f7147b8be4b0a029a12a95ee3097c1fa8d8c9bbcf89bd17c0",
+    "files": [
+      {
+        "path": "web/src/features/lifeweave/api/development.ts",
+        "sha256": "210104e1bb8b2acafb7d4a48af8f8c0fc7fdd070537a5c80fc5b3c9c305b76ee"
+      },
+      {
+        "path": "web/src/features/lifeweave/api/lifeweave.test.ts",
+        "sha256": "4a31e088fdc694d95e7bf8961fac9b205fd33367c16dbe0b0e51af9289735c81"
+      },
+      {
+        "path": "web/src/features/lifeweave/api/lifeweave.ts",
+        "sha256": "75ac278166eb09f9c2b00f4982de88058017a7d9ed9317525085e68140b66b21"
+      },
+      {
+        "path": "web/src/features/lifeweave/api/outputFiles.ts",
+        "sha256": "db6503fe0074ec2a81563c849e651ca9831beff9fb320b6c39f2883292c1c556"
+      },
+      {
+        "path": "web/src/features/lifeweave/api/workView.ts",
+        "sha256": "689c12b2df02c7f1fafee924fdb9cdcf8130c003ce599917948b9718f8233bb4"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/DevelopmentDelivery.vue",
+        "sha256": "0d6e084683e1022eb4e2c1feade99a1408650ac6ccbbb53ba3230d747d222eb7"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/DevelopmentPanel.test.ts",
+        "sha256": "59dbc3f5d26f0836a402bfa90c5da356649efaa1d82616b810d0191c17a12131"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/DevelopmentPanel.vue",
+        "sha256": "e6cfb7ec51a0b6aea6630062e52b77fa19efafbda2f1f68c2922c15b06c07f1d"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/LifeWeaveModalHost.vue",
+        "sha256": "4fd3ef10ba725cef83c4f718356aab8617b7e9080035612ec3411b8cb433b6ab"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkFileDiff.vue",
+        "sha256": "0b78aafac5b1f14ea512fec9c289b07f6209f03ba9c41f257bbfa060fd0be965"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkFileTree.vue",
+        "sha256": "3ea45f0a084dc99b727192fa1e14bd0144fd472e388d0905e2686a0bb930b07e"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkNodeDetail.test.ts",
+        "sha256": "59ca307a4f25dc7b1f6b0a86aae0ce2fb556c5df9eceb6e3238135bab0055edb"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkNodeDetail.vue",
+        "sha256": "a84f1cab990ffdb1f12b655def155852ffe4a6738dbd2025c5dfb6563326cc6a"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkOutputCatalog.test.ts",
+        "sha256": "c1cecc7754d251363ae01b9e43fde62f1849bf581fd88f8a343842d049ffcff8"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkOutputCatalog.vue",
+        "sha256": "6a06cb82f1b241095a523118b28e3ca6bb3d7086b384c5886052b7a0abc49cd7"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkOutputReader.vue",
+        "sha256": "e595d069ced58342629232dd7b023f1c1883fbeaf3b309466d6ea2459175ab53"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkPlanEditor.test.ts",
+        "sha256": "9f095a4a681c47d9abd360ec93e6c498cdf30117fa7ff081bf194eae0cdf6f04"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkPlanEditor.vue",
+        "sha256": "091c3a22f729c6e6d8176c87539ddecc6045a15dd893981d0a0126ff27c4631f"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkStepDialog.test.ts",
+        "sha256": "742047e8346fdbd47e2ff92d075871b30da814221a91df9e1f287295339d68f3"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkStepDialog.vue",
+        "sha256": "adad49406a9689cba808a571a7446ec2423bb75f9a2f4547a1a8592fd8f299ae"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkspaceOutputs.test.ts",
+        "sha256": "9878148783a235254ca7e1c9dfb2d03391a9ac4febec6bc04c2416fc56738d7e"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/WorkspaceOutputs.vue",
+        "sha256": "f00b864b1940680d9637d31afdf4e574d5475744ad700d28312668f239183d06"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/workOutputCatalog.ts",
+        "sha256": "74afddac5defdfbe81be78d17e4b3b3e413fc0af2e2cd99f9af2fefa37c05dcc"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/workspace/workOutputLabels.ts",
+        "sha256": "75cd3a243f2b404e9d341aeebe4422768b7bc9d3ed4f064e5a12acb68b3dd14a"
+      },
+      {
+        "path": "web/src/features/lifeweave/composables/useLifeWeaveWorkspace.ts",
+        "sha256": "dad05b90645082031cae3c449003a826bbee30e83dabd0042459e0f857f09326"
+      },
+      {
+        "path": "web/src/features/lifeweave/pages/ItemDetailPage.test.ts",
+        "sha256": "6efa75f923189c305fe32a174baccacf44db9549c631011eb3b7e4d1d62e9687"
+      },
+      {
+        "path": "web/src/features/lifeweave/pages/ItemDetailPage.vue",
+        "sha256": "a802e1e442db93abffc3c36501dfcd19992d8b5c1395fd3c11a323a711d83e94"
+      }
+    ]
+  },
+  {
+    "outputId": "artifact:output-fbe22228380fe98c2f0ffc5891f6ca26",
+    "version": "c862c1b37e29d631b2c23d3819268467aaf34164c9111f1e76d52cc499670930",
+    "bundleSha256": "c862c1b37e29d631b2c23d3819268467aaf34164c9111f1e76d52cc499670930",
+    "files": [
+      {
+        "path": "src/lifeweave_knowledge/document_assets.py",
+        "sha256": "ed0b9e2971d34517cd10cdfc842e442c41eac0c8bcd6a4271ba79d17a989e526"
+      },
+      {
+        "path": "src/lifeweave_knowledge/library.py",
+        "sha256": "f62a156e2f1d30c90f1fd43868f9fc6c593f5cf4efe7d5fe5431631cef87c819"
+      },
+      {
+        "path": "src/lifeweave_knowledge/library_router.py",
+        "sha256": "8f4b9012d4107a89c8f3f7ee266a97729535ecacd00431fcc900195fe3435d64"
+      },
+      {
+        "path": "tests/test_library_assets.py",
+        "sha256": "6e134767d8b8b9420375fd943bf6918693f592555064ade978e6f217da5b88ea"
+      },
+      {
+        "path": "web/package-lock.json",
+        "sha256": "ad09062e5128a511fd4ac85fbd8bec42c06f2a3c858d2f8cadbb5a4b92340974"
+      },
+      {
+        "path": "web/package.json",
+        "sha256": "19a22d702ef1ba6b4f5f2b9902d959789719a8866fe894c6dc7c6a01ed91db70"
+      },
+      {
+        "path": "web/src/features/lifeweave/api/library.ts",
+        "sha256": "f154d227f4dd33eaedf143160f419d6763c00dfa3188b2f4397cb1f82b529dc4"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/MarkdownBody.vue",
+        "sha256": "bf78cada46ac71492bed73504707f7f3d1adc4439f22ec350484457effa108ca"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/reading/MarkdownReading.test.ts",
+        "sha256": "fa151a27a3f092e9088556db75f3d19548ea1e525f45083f61bc886124b6bc82"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/reading/MermaidDiagram.vue",
+        "sha256": "08d2533adca098d84d73c11c2a79aa367a779ffc6e31222e385e652c9f0f3ebc"
+      },
+      {
+        "path": "web/src/features/lifeweave/components/reading/ReadingMediaDialog.vue",
+        "sha256": "cfae658c04a96d629ec0421321d8788aaa7416f0c4f47b8c1b11ba78f21e9ce2"
+      },
+      {
+        "path": "web/src/features/lifeweave/pages/KnowledgeDocumentPage.test.ts",
+        "sha256": "2754f220a2715bfa9017e1974708befbcc73c0ea2c5ca260edf4bdbb5d780e32"
+      },
+      {
+        "path": "web/src/features/lifeweave/pages/KnowledgePage.test.ts",
+        "sha256": "6ec445c404a833f23e0e10d47e01c47c75ab822cdc72dfa2664fc1d3d0cbcbeb"
+      },
+      {
+        "path": "web/src/features/lifeweave/pages/KnowledgePage.vue",
+        "sha256": "ea7151a939bc278cd53e90cece40288a46d6be425a679e37e19933d07fd903e8"
+      },
+      {
+        "path": "web/src/features/lifeweave/utils/mermaidRenderer.test.ts",
+        "sha256": "2dfb04264acbb9ea0239af9371d69a8b7bfd6c6d05e84e730713503f0a623feb"
+      },
+      {
+        "path": "web/src/features/lifeweave/utils/mermaidRenderer.ts",
+        "sha256": "808480a191406cb3f430c31c73f88e8138cf6794d75df5346186b31f18e396b0"
+      },
+      {
+        "path": "web/src/features/lifeweave/utils/readingExport.ts",
+        "sha256": "6f4819feffb5d601f64b4257036630223d09eeeb272d2c9579dc0d344ac8a22c"
+      },
+      {
+        "path": "web/src/features/lifeweave/utils/readingNavigation.ts",
+        "sha256": "162723777e33a8b0215491d24d1635c66698b7373e44a116b43cf6ef96cfd5e8"
+      }
+    ]
+  }
+]

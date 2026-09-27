@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, HTTPException, Response
 from pydantic import BaseModel, Field, ConfigDict
 from src.lifeweave.models import WorkspaceKey
 
@@ -72,3 +72,13 @@ def propose(request:Request,workspace:WorkspaceKey,body:RevisionCreate):
 @router.post('/revisions/{revision_id}/decision')
 def decide(request:Request,workspace:WorkspaceKey,revision_id:str,body:Decision):
     return call(request,'decide',workspace,revision_id,body.accept)
+
+
+@router.get('/asset')
+def asset(request: Request, workspace: WorkspaceKey, sourceId: str, documentPath: str, version: str, path: str):
+    data, media_type = call(request, 'asset', workspace, sourceId, documentPath, version, path)
+    return Response(data, media_type=media_type, headers={
+        'X-Content-Type-Options': 'nosniff',
+        'Content-Security-Policy': "sandbox; default-src 'none'; style-src 'unsafe-inline'",
+        'Cache-Control': 'private, no-cache',
+    })

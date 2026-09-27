@@ -1,6 +1,8 @@
 import { resolveKnowledgePath } from './knowledgeLinks'
 export function readingHtml(element:HTMLElement,workspace:string,path:string,sourceId:string) {
  const copy=element.cloneNode(true) as HTMLElement
+ for(const button of copy.querySelectorAll('button')) { if(button.classList.contains('reading-image-open'))button.replaceWith(...button.childNodes);else button.remove() }
+ for(const outline of copy.querySelectorAll('.reading-outline'))outline.remove()
  for(const anchor of copy.querySelectorAll<HTMLAnchorElement>('a[href]')) {
   const href=anchor.getAttribute('href')||''
   if(href.startsWith('#'))continue

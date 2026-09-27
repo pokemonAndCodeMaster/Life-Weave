@@ -108,6 +108,21 @@ def test_maximum_legal_graph_persists_and_preserves_other_payload():
         service.save('personal', 'main', plan(nodes), 'tester')
 
 
+def test_legacy_completed_step_survives_unrelated_edit_without_gaining_new_proof():
+    service, work, _, _ = fixture()
+    work.items['personal', 'main']['payload']['workPlan'] = {
+        'id': 'plan:main', 'version': 1, 'title': '旧工作计划', 'provider': 'manual',
+        'nodes': [step(0, state='succeeded', summary='旧记录称完成')],
+    }
+    before = service.read('personal', 'main')['plan']['nodes'][0]
+    assert before['deliveryStatus'] == 'legacy_unverified'
+    edited = service.save('personal', 'main', plan([
+        step(0, state='succeeded', summary='旧记录称完成', description='补充步骤说明')]), 'tester')
+    node = edited['plan']['nodes'][0]
+    assert node['state'] == 'succeeded'
+    assert node['deliveryStatus'] == 'legacy_unverified'
+
+
 @pytest.mark.parametrize('nodes, message', [
     ([step(0), step(0)], '重复'),
     ([step(0, ['s0'])], '自身'),

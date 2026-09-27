@@ -1,0 +1,8 @@
+gssm url http://127.0.0.1:8010/lifeweave/personal/knowledge?item=item-de7785d0790445d8&output=run%3Agzrun-20260919-130600-2cabbf3e&path=report.md&version=fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520 body length 11421 formula 87 diagrams 0 svgs 2 images 1 tables 6 copy 0 body-overflow 0
+gssm notices [] image-states [[False, 0, '']]
+architecture url http://127.0.0.1:8010/lifeweave/personal/knowledge?source=lifeweave-project&path=docs%2Farchitecture.md body length 11184 formula 0 diagrams 0 svgs 2 images 0 tables 2 copy 0 body-overflow 0
+architecture notices [] image-states []
+fixed_doc url http://127.0.0.1:8010/lifeweave/personal/knowledge?item=item-7547b65b4f704829&output=artifact%3Aoutput-fb94bb45d3bef28f4faf0706fd1d7e8b&path=docs%2Fitem-workspace-design.md&version=0d1a1d0377aca95848e2ca79a48810e1aa8b1c18ce50be1fe87038771e2c5451 body length 5570 formula 0 diagrams 0 svgs 0 images 1 tables 0 copy 0 body-overflow 0
+fixed_doc notices [] image-states [[False, 0, '']]
+fixed current original buttons 1 return ['点击节点打开大型弹窗，标题与相邻步骤固定，正文在弹窗内部滚动，概览不被撑长。关闭或 Escape 返回原节点；焦点不逃入背景。step、output、file 参数定位所选步骤、产物和文件，目录展开及筛选在同一交付版本下恢复。窄屏使用全视口弹窗；这里只说明布局适配，手机网络访问仍未提供。', '预期与实际交付是什么：显示预期产物、必需性与验收要求；只读本步 outputIds。默认按文档、代码变更、验证材料、附件、决策与操作分类，目录折叠；搜索、状态筛选和增删行数来自完整固定清单。选代码后按需读取单文件 diff，文档进入内部知识阅读页的指定交付版本，返回恢复原步骤。研究 ZIP、代码 ZIP 和历史正文入口保留，默认不展开长报告。', 'GET /api/lifeweave/{workspace}/items/{itemId}/work-view 返回当前局面、计划节点与成果引用。PUT .../work-plan 用事项版本保存能力声明的计划，合并保留其他 payload，并留下修改记录；冲突返回 409。']
+errors [] failed []

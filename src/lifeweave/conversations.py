@@ -182,11 +182,36 @@ class Conversations:
                 if not item_id:
                     if decision.intent in {'feedback','context','knowledge'}:
                         raise ValueError('需要先关联明确的事项或成果，原话已保存')
-                    item = self.work.create_item(workspace,item_type=decision.itemType,title=decision.title,
-                        status='open',payload={'originalRequest':turn['body'],'conversationId':cid},actor_id=actor,
-                        initial_context={'goal':turn['body']},provenance=[{'conversationId':cid,'turnId':tid}])
-                    item_id = item['id']
+                    from .work_binding import WorkBindingInput, WorkBindingService
+                    same_title, _ = self.work.list_items(workspace, query=decision.title, limit=None, offset=0)
+                    exact = [row for row in same_title
+                             if row['title'].strip().casefold() == decision.title.strip().casefold()]
+                    # A null model choice means a new topic only when prior
+                    # same-title goals are known and differ from this request.
+                    distinct_goal = bool(exact and all(
+                        (row.get('payload') or {}).get('originalRequest') and
+                        (row.get('payload') or {}).get('originalRequest') != turn['body']
+                        for row in exact))
+                    binding = WorkBindingService(self.work).resolve(workspace, WorkBindingInput.model_validate({
+                        'requestId': f'conversation:{tid}', 'decision': 'new',
+                        'sessionId': f'conversation-turn:{tid}', 'title': decision.title,
+                        'goal': turn['body'], 'itemType': decision.itemType,
+                        'distinctGoal': distinct_goal,
+                        'payload': {'originalRequest': turn['body'], 'conversationId': cid},
+                        'initialContext': {'goal': turn['body']},
+                        'provenance': [{'conversationId': cid, 'turnId': tid}],
+                    }), actor)
+                    if binding['action'] == 'needs_choice':
+                        ids = ', '.join(row['id'] for row in binding['candidates'][:5])
+                        raise ValueError(f'发现可能相同的事项，请明确选择接续或新建：{ids}')
+                    item_id = binding['itemId']
                     receipts.append({'kind':'item','id':item_id,'itemId':item_id,'title':'已建立持续事项'})
+                elif decision.intent in {'execute', 'feedback', 'context', 'knowledge'}:
+                    from .work_binding import WorkBindingInput, WorkBindingService
+                    WorkBindingService(self.work).resolve(workspace, WorkBindingInput.model_validate({
+                        'requestId': f'conversation:{tid}', 'decision': 'continue',
+                        'itemId': item_id, 'sessionId': f'conversation-turn:{tid}',
+                    }), actor)
                 item = self.work.get_item(workspace,item_id)
                 if (decision.intent in {'execute','context','knowledge'} and
                         (context.get('currentItem') or {}).get('id') == item_id and

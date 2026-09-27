@@ -103,13 +103,117 @@ class DevelopmentService:
                  "sourcePath": entry["sourcePath"]}
                 for entry in self.sources.snapshot(workspace, method_id, refs)]
 
+    def _bind_business_plan(self, workspace: str, item_id: str, assignment_id: str,
+                            execution_scope: str, review_mode: str,
+                            step_id: str | None, plan_version: int | None) -> dict[str, Any]:
+        """Make the item plan authoritative and retain the assignment's plan identity."""
+        from .work_view import WorkViewService
+        from .work_view_models import WorkPlanInput
+
+        item = self.work.get_item(workspace, item_id)
+        raw = (item.get('payload') or {}).get('workPlan')
+        if raw:
+            if plan_version is not None and raw['version'] != plan_version:
+                raise ValueError('业务计划版本已变更，请刷新步骤后重试')
+            nodes = raw.get('nodes') or []
+            if step_id:
+                selected = next((node for node in nodes if node['id'] == step_id), None)
+                if not selected:
+                    raise ValueError('所选步骤不在当前业务计划中')
+            else:
+                required_kind = 'code' if execution_scope == 'implement' else 'plan'
+                possible = [node for node in nodes if node.get('state') not in {'cancelled'} and
+                            any(row.get('kind') == required_kind for row in node.get('expectedOutputs', []))]
+                if len(possible) != 1:
+                    raise ValueError('业务计划中无法唯一确定开发步骤，请指定 stepId 和 planVersion')
+                selected = possible[0]
+            return {'planId': raw['id'], 'planVersion': raw['version'],
+                    'stageSteps': {'plan': selected['id'], 'review': selected['id'],
+                                   'implementation': selected['id']}}
+        if step_id or plan_version:
+            raise ValueError('事项尚无业务计划，不能指定步骤或计划版本')
+
+        # The plan is committed before the first Run is launched. Its expected
+        # results remain visible even if the worker never starts.
+        plan_step = f'{assignment_id}:plan'
+        review_step = f'{assignment_id}:review'
+        implementation_step = f'{assignment_id}:implementation'
+        nodes = [{
+            'id': plan_step, 'title': '形成方案', 'description': '明确范围、步骤和验证办法',
+            'state': 'planned', 'dependsOn': [], 'assignmentId': assignment_id,
+            'expectedOutputs': [{'id': 'plan', 'title': '固定版本开发方案', 'kind': 'plan', 'required': True}],
+            'acceptance': '方案说明用户结果、受影响模块、实施顺序、验证和未决风险',
+        }]
+        last = plan_step
+        if review_mode == 'independent':
+            nodes.append({
+                'id': review_step, 'title': '独立审阅方案', 'description': '独立核对方案与原目标',
+                'state': 'planned', 'dependsOn': [plan_step], 'assignmentId': assignment_id,
+                'expectedOutputs': [{'id': 'review', 'title': '固定版本审阅结论',
+                                     'kind': 'decision', 'required': True}],
+                'acceptance': '审阅结论明确通过或需修订，并说明依据',
+            })
+            last = review_step
+        if execution_scope == 'implement':
+            nodes.append({
+                'id': implementation_step, 'title': '实施与交付', 'description': '在隔离工作树实施并固定代码交付',
+                'state': 'planned', 'dependsOn': [last], 'assignmentId': assignment_id,
+                'expectedOutputs': [{'id': 'code', 'title': '固定版本代码变更', 'kind': 'code', 'required': True}],
+                'acceptance': '交付包包含完整变更清单、差异、必要文件快照和实际检查证据',
+            })
+        view = WorkViewService(self.work, self.runtime, self).save(
+            workspace, item_id, WorkPlanInput.model_validate({
+                'version': item['version'], 'title': '开发工作步骤', 'provider': 'development',
+                'revisionReason': '受管开发启动时登记预期交付', 'nodes': nodes}), 'development-agent')
+        return {'planId': view['plan']['id'], 'planVersion': view['plan']['version'],
+                'stageSteps': {'plan': plan_step, 'review': review_step if review_mode == 'independent' else plan_step,
+                               'implementation': implementation_step if execution_scope == 'implement' else plan_step}}
+
+    def _business_binding(self, row: dict[str, Any]) -> dict[str, Any] | None:
+        activity = self.db.fetch_one(
+            "SELECT payload FROM workbench.t_lifeweave_activity WHERE workspace_key=%s AND item_id=%s "
+            "AND kind='work_assignment_binding' AND payload->>'assignmentId'=%s ORDER BY created_at DESC LIMIT 1",
+            (row['workspace'], row['item_id'], row['id']))
+        return activity['payload'] if activity else None
+
+    def _report_business_stage(self, row: dict[str, Any], stage: str, run_id: str,
+                               outcome: str, summary: str) -> None:
+        binding = self._business_binding(row)
+        if not binding:
+            return  # Assignments created before the shared protocol remain readable.
+        from .work_step_reports import StepReportInput, StepReportService
+
+        expected_kind = {'plan': 'plan', 'review': 'decision', 'implementation': 'code'}[stage]
+        step_id = binding['stageSteps'][stage]
+        plan = (self.work.get_item(row['workspace'], row['item_id']).get('payload') or {}).get('workPlan') or {}
+        step = next((node for node in plan.get('nodes', []) if node['id'] == step_id), None)
+        requirement = next((value for value in (step or {}).get('expectedOutputs', [])
+                            if value.get('kind') == expected_kind), None)
+        output_id = (f'delivery:{row["id"]}' if stage == 'implementation' else f'run:{run_id}')
+        deliverables = ([{'expectationId': requirement['id'], 'outputId': output_id}]
+                        if outcome == 'succeeded' and requirement else [])
+        # Intermediate stages of one business step are attempts, not completion.
+        business_outcome = outcome if outcome != 'succeeded' or requirement else 'running'
+        body = StepReportInput.model_validate({
+            'requestId': f'managed:{row["id"]}:{stage}:{run_id}:{outcome}',
+            'planVersion': binding['planVersion'], 'stepId': step_id,
+            'outcome': business_outcome, 'summary': summary or f'{stage} 阶段已结束',
+            'deliverables': deliverables,
+            'checks': ([{'label': f'{stage} 阶段实际检查', 'result': 'passed',
+                         'evidence': f'run:{run_id}'}] if business_outcome == 'succeeded' else []),
+            'runId': run_id, 'assignmentId': row['id'],
+        })
+        StepReportService(self.work, self.runtime, self, self.output_files).submit(
+            row['workspace'], row['item_id'], body, 'development-agent')
+
     def create(self, workspace: str, *, item_id: str, request_id: str,
                instruction: str, repository_path: str, engine: str = "codex",
                model: str | None = None, method_id: str | None = None,
                knowledge_refs: list[str] | None = None,
                review_mode: str = "independent",
                execution_scope: str = "plan_only",
-               acknowledge_excluded_changes: bool = False) -> dict[str, Any]:
+               acknowledge_excluded_changes: bool = False,
+               step_id: str | None = None, plan_version: int | None = None) -> dict[str, Any]:
         if engine not in {"codex", "opencode"}:
             raise ValueError("执行器必须是 Codex 或 OpenCode")
         if review_mode not in {"independent", "self"}:
@@ -125,12 +229,15 @@ class DevelopmentService:
         elif not self.runtime.executors["codex"].health().available:
             raise ValueError("Codex CLI 不可用，请先检查本机执行设置")
         self.work.get_item(workspace, item_id)
-        fingerprint = hashlib.sha256(json.dumps({
+        request_content = {
             "instruction": instruction, "repositoryPath": str(Path(repository_path).expanduser().resolve()),
             "engine": engine, "model": model, "methodId": method_id,
             "knowledgeRefs": knowledge_refs, "reviewMode": review_mode,
             "executionScope": execution_scope,
-        }, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
+        }
+        if step_id is not None or plan_version is not None:
+            request_content.update({'stepId': step_id, 'planVersion': plan_version})
+        fingerprint = hashlib.sha256(json.dumps(request_content, ensure_ascii=False, sort_keys=True).encode()).hexdigest()
         existing = self.db.fetch_one("SELECT * FROM workbench.lifeweave_development_assignment "
                                      "WHERE workspace=%s AND item_id=%s AND request_id=%s",
                                      (workspace, item_id, request_id))
@@ -169,6 +276,11 @@ class DevelopmentService:
                                   "FOR UPDATE", (workspace, item_id)).fetchone()
             if active:
                 raise ValueError("此事项仍有开发委托进行中，请先查看原委托")
+            from .work_binding import WorkBindingInput, WorkBindingService
+            WorkBindingService(self.work).resolve(workspace, WorkBindingInput.model_validate({
+                'requestId': f'development:{request_id}', 'decision': 'continue',
+                'itemId': item_id,
+            }), 'development-agent')
             row = conn.execute("INSERT INTO workbench.lifeweave_development_assignment "
                                "(id,workspace,item_id,request_id,request_fingerprint,instruction,agent_id,agent_version,"
                                "engine,model,repository_path,repository_revision,working_tree_excluded,context_version_id,"
@@ -178,11 +290,19 @@ class DevelopmentService:
                                 next((entry["version"] for entry in versions if entry["id"] == method_id), "unknown"),
                                 engine, model, root, revision, dirty, context["versionId"], method_id,
                                 Jsonb(refs), Jsonb(versions), review_mode, execution_scope)).fetchone()
+            binding = self._bind_business_plan(workspace, item_id, identity,
+                                               execution_scope, review_mode, step_id, plan_version)
             self.plugins.create_development_plan(conn, row)
             run = self._stage_run(row, "plan", instruction)
             row = conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                "SET plan_run_id=%s,updated_at=now() WHERE id=%s RETURNING *",
                                (run["id"], identity)).fetchone()
+            self.work.append_activity(workspace, item_id, kind='work_assignment_binding',
+                                      body='受管开发已绑定业务计划步骤',
+                                      payload={**binding, 'assignmentId': identity,
+                                               'planRunId': run['id']},
+                                      actor_id='development-agent')
+            self._report_business_stage(row, 'plan', run['id'], 'running', '受管开发已启动方案阶段')
         return self._wire(row)
 
     def _stage_run(self, assignment: dict[str, Any], stage: str, instruction: str) -> dict[str, Any]:
@@ -290,6 +410,14 @@ class DevelopmentService:
                 self.plugin_host.complete_development_stage(
                     workspace=row["workspace"], assignment_id=identity,
                     run_id=run_id, outcome=outcome)
+                stage = {'planning': 'plan', 'reviewing': 'review',
+                         'implementing': 'implementation'}[status]
+                report_outcome = ('succeeded' if outcome == 'succeeded' else
+                                  'cancelled' if outcome == 'interrupted' else 'failed')
+                result = str(run.get('result') or '').strip()
+                summary = (f'{stage} 阶段完成：{result[:3800]}' if report_outcome == 'succeeded' else
+                           f'{stage} 阶段未完成：{str(run.get("error") or outcome)[:3800]}')
+                self._report_business_stage(row, stage, run_id, report_outcome, summary)
             if run["state"] != "succeeded":
                 target = "cancelled" if run["state"] == "cancelled" else "failed"
                 conn.execute("UPDATE workbench.lifeweave_development_assignment "
@@ -328,6 +456,8 @@ class DevelopmentService:
                     conn.execute("UPDATE workbench.lifeweave_development_assignment "
                                  "SET status='delivery_failed',error=%s,updated_at=now() WHERE id=%s",
                                  (f"实施已结束，但交付包生成失败：{str(exc)[:1200]}", identity))
+                    complete("failed")
+                    return
                 complete("succeeded")
                 return
             result = str(run.get("result") or "").strip()
@@ -363,6 +493,7 @@ class DevelopmentService:
                              "SET status='reviewing',review_run_id=%s,updated_at=now() WHERE id=%s",
                              (review["id"], identity))
                 complete("succeeded")
+                self._report_business_stage(row, 'review', review['id'], 'running', '独立方案审阅已启动')
                 return
             if status == "reviewing":
                 decision = "pass" if re.search(r"^REVIEW_DECISION:\s*PASS\s*$", result, re.I | re.M) else "needs_revision"
@@ -395,6 +526,7 @@ class DevelopmentService:
                          "SET status='implementing',implementation_run_id=%s,updated_at=now() WHERE id=%s",
                          (implementation["id"], identity))
             complete("succeeded")
+            self._report_business_stage(row, 'implementation', implementation['id'], 'running', '受管实施已启动')
 
     def scan(self) -> None:
         rows = self.db.fetch_all("SELECT id FROM workbench.lifeweave_development_assignment "
@@ -466,7 +598,13 @@ class DevelopmentService:
         files = delivery["manifest"]["files"]
         actual = _tree_entries(delivery_git(root, "ls-tree", "-r", "-z", resolved, "--",
                                             *(entry["path"] for entry in files)))
-        mismatches = [entry["path"] for entry in files if actual.get(entry["path"]) != entry["after"]]
+        # Manifest entries also carry captured file bytes and digests. Git tree
+        # identity is the mode/type/oid triple; deleted and rename-source paths
+        # must still be absent from the target tree.
+        git_identity = lambda value: ({key: value.get(key) for key in ('mode', 'type', 'oid')}
+                                      if value is not None else None)
+        mismatches = [entry["path"] for entry in files
+                      if git_identity(actual.get(entry["path"])) != git_identity(entry["after"])]
         if mismatches:
             raise ValueError("目标提交与固定交付文件不一致：" + ", ".join(mismatches[:8]))
         current_head = delivery_git(root, "rev-parse", "HEAD").decode().strip() == resolved

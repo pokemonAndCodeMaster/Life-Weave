@@ -1,0 +1,41 @@
+[
+  {
+    "name": "actual architecture two Mermaid diagrams, keyboard and body scroll restore",
+    "status": "pass",
+    "focus_trapped": true,
+    "body_locked": true,
+    "focus_scroll_restored": true,
+    "diagram_count": 2
+  },
+  {
+    "name": "actual chapter navigation",
+    "status": "pass",
+    "heading": "成果的异地归档"
+  },
+  {
+    "name": "actual fixed plain-text artifact remains literal and copyable",
+    "status": "pass",
+    "path": "files/1a1efb53fc9582b6-code-evidence.txt",
+    "characters": 71594,
+    "version": "fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520"
+  },
+  {
+    "name": "isolated fixture Mermaid/formula/image failure and local table scroll",
+    "status": "pass",
+    "geometry": {
+      "scrollLeft": 40,
+      "body": 1280,
+      "viewport": 1280,
+      "table": 4570,
+      "tableViewport": 670
+    },
+    "external_requests": [],
+    "source_visible": true,
+    "real_production_data": false
+  },
+  {
+    "name": "writes and runtime errors",
+    "writes": [],
+    "errors": []
+  }
+]

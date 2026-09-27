@@ -29,6 +29,10 @@ from src.lifeweave.manual_results import router as results_router
 from src.lifeweave.external_development import router as external_development_router
 from src.lifeweave.development import DevelopmentService
 from src.lifeweave.development_router import router as development_router
+from src.lifeweave.output_files import OutputFiles
+from src.lifeweave.output_files_router import router as output_files_router
+from src.lifeweave.external_delivery import router as external_delivery_router
+from src.lifeweave.work_view import WorkViewService
 from src.lifeweave.router import router as work_router
 from src.lifeweave.continuation import WorkContinuation
 from src.lifeweave.continuation_router import router as continuation_router
@@ -140,7 +144,12 @@ def create_app() -> FastAPI:
     app.state.development.plugin_host = app.state.plugin_host
     app.state.development.plugins = app.state.plugins
     app.state.work_continuation = WorkContinuation(work, runtime)
+    app.state.work_continuation.work_view = WorkViewService(work, runtime, app.state.development)
     app.state.research_outputs = ResearchOutputs(work, runtime, app.state.library, ROOT)
+    app.state.output_files = OutputFiles(work, runtime, app.state.development)
+    app.state.output_files.research = app.state.research_outputs
+    app.state.output_files.library = app.state.library
+    app.state.development.output_files = app.state.output_files
     app.state.research_archive = ResearchArchive(ROOT, app.state.research_outputs, app.state.linear.connection, app.state.notion_mirror)
     app.state.lifeweave_evaluations = Evaluations(EvaluationRepository(manager.postgres()), work, runtime, knowledge)
     app.state.lifeweave_evaluations.plugins = app.state.plugins
@@ -175,6 +184,8 @@ def create_app() -> FastAPI:
     app.include_router(results_router)
     app.include_router(external_development_router)
     app.include_router(development_router)
+    app.include_router(output_files_router)
+    app.include_router(external_delivery_router)
     app.include_router(plugin_router)
     app.include_router(integrations_router)
     app.include_router(notion_mirror_router)

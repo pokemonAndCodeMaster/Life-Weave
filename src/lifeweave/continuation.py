@@ -45,6 +45,7 @@ class WorkContinuation:
         proposals = repo.list_proposals(workspace, item_id)
         external_development = [row for row in repo.list_activities(workspace, item_id)
                                 if row['kind'] in {'external_development_start', 'external_development_event'}]
+        work_view = self.work_view.read(workspace, item_id) if hasattr(self, 'work_view') else None
         parent_id = context.get('inheritedFromItemId')
         inherited = None
         if parent_id:
@@ -53,6 +54,7 @@ class WorkContinuation:
         return {'readAt': datetime.now(timezone.utc).isoformat(), 'item': item, 'context': context,
                 'contextProposals': proposals, 'discussions': discussion, 'inherited': inherited,
                 'externalDevelopment': external_development,
+                'workView': work_view,
                 'feedback': self.work.execution_feedback(workspace, item_id),
                 'evidence': repo.list_evidence(workspace, item_id),
                 'relations': repo.list_relations(workspace, item_id),

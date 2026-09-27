@@ -1,0 +1,45 @@
+{
+  "workflow-plan": {
+    "state": "succeeded",
+    "outputIds": [
+      "artifact:result-4d57418eb05252744e9c2cd6"
+    ]
+  },
+  "workflow-protocol": {
+    "state": "succeeded",
+    "outputIds": [
+      "artifact:output-094b172d09b65c49efd2a34cb94074a8",
+      "artifact:output-807d5e59db6580578aebf0e63e064788",
+      "artifact:output-8ecebcf3e39c7f090962ac15a44ec628"
+    ]
+  },
+  "workflow-artifacts": {
+    "state": "succeeded",
+    "outputIds": [
+      "artifact:output-49ae40cec72d0f1fc4391a1584867802"
+    ]
+  },
+  "workflow-modal": {
+    "state": "succeeded",
+    "outputIds": [
+      "artifact:output-23359112421184d8c9c80faa26b7ef0c",
+      "artifact:output-ce53de7a6fcc8301a25b37856e32e690"
+    ]
+  },
+  "workflow-reading": {
+    "state": "succeeded",
+    "outputIds": [
+      "artifact:output-fbe22228380fe98c2f0ffc5891f6ca26"
+    ]
+  },
+  "workflow-validation": {
+    "state": "failed",
+    "outputIds": [
+      "artifact:result-44ea28d801bc1c40e3f42ab2"
+    ]
+  },
+  "workflow-acceptance": {
+    "state": "planned",
+    "outputIds": []
+  }
+}

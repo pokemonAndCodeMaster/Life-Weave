@@ -1,0 +1,13 @@
+{
+  "items": [
+    "item-810217743bbb4be2",
+    "item-de7785d0790445d8"
+  ],
+  "compared": [
+    "id",
+    "status",
+    "payload"
+  ],
+  "equal": true,
+  "beforeSha256": "4d427f1d77b3b41c1bf0e9ba821017a4ebc74de39902b4079423eba73518b5d4"
+}

@@ -1,0 +1,46 @@
+[
+  {
+    "name": "actual project document relative delivery screenshot",
+    "status": "pass",
+    "identity": "docs/item-workspace-design.md · 版本 ad7a1c49ca2862fe027373478c75febdd2ace0da29816174453de8f8bf30624d",
+    "image": {
+      "src": "http://127.0.0.1:8010/api/lifeweave/personal/library/asset?sourceId=lifeweave-project&documentPath=docs%2Fitem-workspace-design.md&version=ad7a1c49ca2862fe027373478c75febdd2ace0da29816174453de8f8bf30624d&path=..%2Fworkspaces%2Freviews%2Ftask-workflow-and-reading%2Fevidence%2Fstep-modal.png",
+      "width": 1440,
+      "loaded": true
+    },
+    "focus_restored": true
+  },
+  {
+    "name": "actual current asset old-version",
+    "status": "pass",
+    "http_status": 409,
+    "message": {
+      "detail": "文档已变化，图片未按旧正文替换。请重新读取当前文档。"
+    }
+  },
+  {
+    "name": "actual current asset unreferenced",
+    "status": "pass",
+    "http_status": 409,
+    "message": {
+      "detail": "图片未被所选文档引用"
+    }
+  },
+  {
+    "name": "actual current asset traversal",
+    "status": "pass",
+    "http_status": 409,
+    "message": {
+      "detail": "图片未被所选文档引用"
+    }
+  },
+  {
+    "name": "same project source in team uses own registered corpus",
+    "http_status": 200
+  },
+  {
+    "name": "writes and runtime errors",
+    "writes": [],
+    "errors": []
+  }
+]

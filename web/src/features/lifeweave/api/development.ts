@@ -22,6 +22,7 @@ export interface DevelopmentInput {
   requestId: string; itemId: string; instruction: string; repositoryPath: string
   agentId: 'development'; engine: 'codex' | 'opencode'; model?: string | null; methodId?: string | null
   knowledgeRefs?: string[]; reviewMode: 'independent' | 'self'; executionScope: 'plan_only' | 'implement'; acknowledgeExcludedChanges: boolean
+  stepId?: string | null; planVersion?: number | null
 }
 const root = (workspace: WorkspaceKind) => `/lifeweave/${workspace}`
 export async function developmentChoices(workspace: WorkspaceKind, itemId: string) {

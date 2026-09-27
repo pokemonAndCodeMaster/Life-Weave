@@ -28,7 +28,7 @@ import StatusBadge from './StatusBadge.vue'
 const router = useRouter()
 const {
   activeWorkspace, state, machines, rootOf, modal, openModal, closeModal, notify, createIdea, discussIdea,
-  createItem, createEntity, establishContext, saveRelations, updateEntity, addDiscussion, addFeedback, proposeContext, acceptResult,
+  createItem, createCandidates, createEntity, establishContext, saveRelations, updateEntity, addDiscussion, addFeedback, proposeContext, acceptResult,
   createImprovement, saveMeetingConfig, addMeetingNote, createRun, refreshRun, actOnRun, reviewEvidence,
 } = useLifeWeaveWorkspace()
 const taskMethods = shallowRef<{id:string;title:string;description:string}[]>([])
@@ -160,9 +160,9 @@ function downloadArtifactResult() {
 
 function openItem(id: string) { closeModal(); router.push(`/lifeweave/${activeWorkspace.value}/items/${encodeURIComponent(id)}/overview`) }
 
-async function saveItem() {
+async function saveItem(distinctGoal = false) {
   if (!form.title.trim() || !form.goal.trim()) return notify('请填写标题和这次希望得到的结果。')
-  const created = await createItem({ title: form.title.trim(), itemType: form.itemType, goal: form.goal.trim(), owner: form.owner, domains: form.domain ? [form.domain] : [], scope: '范围待继续澄清。', update: '已形成目标，尚未承诺排期', participants: ['我'] }, idea.value?.id) as WorkItem
+  const created = await createItem({ title: form.title.trim(), itemType: form.itemType, goal: form.goal.trim(), owner: form.owner, domains: form.domain ? [form.domain] : [], scope: '范围待继续澄清。', update: '已形成目标，尚未承诺排期', participants: ['我'] }, idea.value?.id, distinctGoal) as WorkItem
   if (created?.id) openItem(created.id)
 }
 
@@ -181,9 +181,9 @@ async function saveEntity() {
   await createEntity(form.entityType, form.title.trim(), form.entityType === 'topic' ? { goal: form.goal, owner: form.owner, due: form.due || null, state: form.entityState, endCondition: form.endCondition } : form.entityType === 'resource' ? { kind: 'link', uri: form.uri, description: form.body } : { description: form.body }, relatedItem.value)
 }
 
-async function saveContribution() {
+async function saveContribution(distinctGoal = false) {
   if (!item.value || !form.title.trim() || !form.owner.trim()) return notify('请填写贡献名称与负责人。')
-  const created = await createItem({ title: form.title, itemType: form.childKind, goal: form.goal, scope: `继承 ${item.value.id} 共享上下文 v${item.value.context.revision}`, owner: form.owner, parentId: item.value.id, contextRef: { itemId: item.value.id, version: item.value.context.revision }, update: '已分派，尚未回传结果', participants: [form.owner] }) as WorkItem
+  const created = await createItem({ title: form.title, itemType: form.childKind, goal: form.goal || form.title, scope: `继承 ${item.value.id} 共享上下文 v${item.value.context.revision}`, owner: form.owner, parentId: item.value.id, contextRef: { itemId: item.value.id, version: item.value.context.revision }, update: '已分派，尚未回传结果', participants: [form.owner] }, undefined, distinctGoal) as WorkItem
   if (created?.id) openItem(created.id)
 }
 
@@ -253,6 +253,11 @@ function meetingSections(): MeetingSectionConfig[] {
     <template v-else-if="type === 'search'"><input v-model="form.body" class="lw-field" aria-label="搜索" autofocus placeholder="输入标题、ID 或进展……" /><div class="lw-search-results"><button v-for="result in searchResults" :key="`${result.kind}-${result.id}`" type="button" @click="result.kind === 'item' ? openItem(result.id) : notify(`${result.kind === 'idea' ? '灵感' : '资源'}：${result.label}`)"><span class="lw-mono lw-muted">{{ result.id }}</span> {{ result.label }}<StatusBadge :value="result.kind" /></button><button v-for="doc in searchDocuments" :key="doc.sourceId+doc.path" @click="openDocument(doc)">{{doc.title}}<StatusBadge value="知识"/></button><div v-if="!searchResults.length && !searchDocuments.length" class="lw-empty">没有找到匹配内容。</div></div><p class="lw-dialog-note">搜索当前空间的事项、灵感、资源及已接入知识正文。</p></template>
     <template v-else-if="type === 'peek' && item"><h2>{{ item.title }}</h2><div class="lw-inline"><StatusBadge :value="item.state" /><span>{{ item.owner }}</span><StatusBadge :value="item.kind" /></div><h3 class="lw-mt-20">目标</h3><p>{{ item.goal }}</p><h3>最近变化</h3><p>{{ item.update }}</p><div class="lw-notice neutral">共享上下文 v{{ item.context.revision }} · {{ item.context.proposals.length }} 个候选修改。关闭后保留当前阅读位置。</div></template>
 
+    <section v-if="['item-create', 'contribution-create'].includes(type) && createCandidates?.length" class="lw-notice neutral lw-mt-14" aria-label="已有事项候选">
+      <p>已有同名事项，可以接着处理；如果交付目标独立，也可以另建。</p>
+      <div class="lw-inline"><button v-for="candidate in createCandidates" :key="candidate.id" type="button" class="lw-btn sm" @click="openItem(candidate.id)">接续：{{ candidate.title }}</button></div>
+      <button type="button" class="lw-btn sm lw-mt-14" :disabled="busy" @click="submit(() => type === 'item-create' ? saveItem(true) : saveContribution(true))">创建独立目标</button>
+    </section>
     <div v-if="modalError" class="lw-notice warning lw-mt-14" role="alert">{{ modalError }}</div>
     <template #footer>
       <button class="lw-btn" type="button" @click="closeModal">关闭</button>

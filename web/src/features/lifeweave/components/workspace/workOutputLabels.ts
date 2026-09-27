@@ -3,6 +3,9 @@ import type { WorkOutputRef } from '../../api/workView'
 export function kindLabel(output: WorkOutputRef): string {
   if (output.kind === 'research') return '研究成果'
   if (output.kind === 'development') return output.id.startsWith('delivery:') ? '代码交付' : '开发记录'
+  const labels: Record<string, string> = { plan: '计划', document: '文档', code: '代码交付', validation: '验证材料', finding: '调查发现', decision: '决定', operation: '操作记录', attachment: '附件' }
+  const label = labels[output.kind]
+  if (label) return label
   if (output.kind === 'artifact') return '人工成果'
   return '记录'
 }

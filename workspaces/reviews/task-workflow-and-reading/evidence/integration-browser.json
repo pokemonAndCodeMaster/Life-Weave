@@ -1,0 +1,21 @@
+[
+  {
+    "check": "真实代码包目录、搜索、diff和轮询",
+    "files": 8,
+    "pageHeight": 1339,
+    "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-7547b65b4f704829/overview?step=workflow-artifacts&file=src/lifeweave/output_files.py"
+  },
+  {
+    "check": "关闭恢复图节点",
+    "focus": "workflow-artifacts"
+  },
+  {
+    "check": "固定交付文档、图片与主动查看当前原文",
+    "fixedIdentity": "docs/item-workspace-design.md · 版本 0d1a1d0377aca95848e2ca79a48810e1aa8b1c18ce50be1fe87038771e2c5451",
+    "currentUrl": "http://127.0.0.1:8010/lifeweave/personal/knowledge?path=docs/item-workspace-design.md&source=lifeweave-project&returnTo=/lifeweave/personal/items/item-7547b65b4f704829/overview?step=workflow-reading"
+  },
+  {
+    "check": "浏览器错误",
+    "errors": []
+  }
+]

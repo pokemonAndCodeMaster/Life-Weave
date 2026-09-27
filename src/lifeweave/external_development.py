@@ -12,10 +12,12 @@ from pathlib import Path
 from typing import Literal
 
 from fastapi import APIRouter, HTTPException, Request
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 from psycopg.types.json import Jsonb
 
 from .models import WorkspaceKey
+from .work_step_reports import ReportDelivery, StepReportInput, StepReportService
+from .work_binding import WorkBindingInput, WorkBindingService
 
 router = APIRouter(prefix='/api/lifeweave/{workspace}/items/{item_id}/external-development', tags=['external-development'])
 
@@ -28,6 +30,14 @@ class Start(BaseModel):
     methodId: str | None = None
     knowledgeRefs: list[str] = Field(default_factory=list, max_length=10)
     nativeSessionId: str | None = Field(default=None, min_length=8, max_length=128)
+    stepId: str | None = Field(default=None, min_length=1, max_length=128)
+    planVersion: int | None = Field(default=None, ge=1)
+
+    @model_validator(mode='after')
+    def complete_step_binding(self) -> 'Start':
+        if (self.stepId is None) != (self.planVersion is None):
+            raise ValueError('开始步骤须同时提供 stepId 和 planVersion')
+        return self
 
 
 class Report(BaseModel):
@@ -37,6 +47,19 @@ class Report(BaseModel):
     summary: str = Field(min_length=1, max_length=5000)
     checks: list[str] = Field(default_factory=list, max_length=20)
     knowledgeRefs: list[str] = Field(default_factory=list, max_length=10)
+    stepId: str | None = Field(default=None, min_length=1, max_length=128)
+    planVersion: int | None = Field(default=None, ge=1)
+    outcome: Literal['running', 'succeeded', 'failed', 'blocked', 'cancelled'] | None = None
+    deliverables: list[ReportDelivery] = Field(default_factory=list, max_length=80)
+
+    @model_validator(mode='after')
+    def complete_step_binding(self) -> 'Report':
+        supplied = [self.stepId is not None, self.planVersion is not None, self.outcome is not None]
+        if any(supplied) and not all(supplied):
+            raise ValueError('步骤报告须同时提供 stepId、planVersion 和 outcome')
+        if self.deliverables and not all(supplied):
+            raise ValueError('产物必须关联计划步骤和结论')
+        return self
 
 
 class Bind(BaseModel):
@@ -75,8 +98,8 @@ def git_state(raw_path: str) -> dict:
     revision = git('rev-parse', 'HEAD')
     changed = git('diff', '--name-only', 'HEAD').splitlines()
     untracked = git('ls-files', '--others', '--exclude-standard').splitlines()
-    return {'repositoryPath': str(root), 'revision': revision, 'changedPaths': changed[:100],
-            'untrackedPaths': untracked[:100], 'changedCount': len(changed), 'untrackedCount': len(untracked)}
+    return {'repositoryPath': str(root), 'revision': revision, 'changedPaths': changed,
+            'untrackedPaths': untracked, 'changedCount': len(changed), 'untrackedCount': len(untracked)}
 
 
 def inputs(request: Request, workspace: str, method_id: str | None, refs: list[str]) -> list[dict]:
@@ -191,6 +214,11 @@ def start(request: Request, workspace: WorkspaceKey, item_id: str, body: Start):
                 raise ValueError('此请求身份已经用于不同内容')
             return {'sessionId': existing['payload']['sessionId'], 'event': existing}
         state = git_state(body.repositoryPath)
+        if body.stepId is not None:
+            plan = (request.app.state.lifeweave_service.get_item(workspace, item_id).get('payload') or {}).get('workPlan') or {}
+            if plan.get('version') != body.planVersion or not any(
+                    node.get('id') == body.stepId for node in plan.get('nodes', [])):
+                raise ValueError('外部会话绑定的步骤或计划版本已变化，请刷新业务计划')
         choices = request.app.state.development.choices(workspace, item_id)
         method_id = body.methodId or choices['methodId']
         if not method_id:
@@ -199,11 +227,19 @@ def start(request: Request, workspace: WorkspaceKey, item_id: str, body: Start):
                                      state['repositoryPath'] == choices['recommendedRepositoryPath'] else [])
         selected = inputs(request, workspace, method_id, refs)
         session_id = 'external-' + identity.removeprefix('activity-')
-        row = save(request, workspace, item_id, body.requestId, 'external_development_start', body.summary,
-                   {'sessionId': session_id, 'phase': 'started', 'observedGit': state,
-                    'agentId': 'development', 'methodId': method_id,
-                    'declaredInputs': selected, 'nativeSessionId': body.nativeSessionId,
-                    'observation': '外部会话主动登记；Hook 只记录受支持且已绑定的后续事件'}, fingerprint)
+        db = request.app.state.database_manager.postgres()
+        with db.atomic():
+            WorkBindingService(request.app.state.lifeweave_service).resolve(
+                workspace, WorkBindingInput.model_validate({
+                    'requestId': f'external:{body.requestId}', 'decision': 'continue',
+                    'itemId': item_id, 'sessionId': session_id,
+                }), 'local-user')
+            row = save(request, workspace, item_id, body.requestId, 'external_development_start', body.summary,
+                       {'sessionId': session_id, 'phase': 'started', 'observedGit': state,
+                        'agentId': 'development', 'methodId': method_id,
+                        'declaredInputs': selected, 'nativeSessionId': body.nativeSessionId,
+                        'stepId': body.stepId, 'planVersion': body.planVersion,
+                        'observation': '外部会话主动登记；Hook 只记录受支持且已绑定的后续事件'}, fingerprint)
         return {'sessionId': session_id, 'event': normalized(row)}
     except (KeyError, ValueError, OSError, subprocess.TimeoutExpired) as exc:
         raise fail(exc) from exc
@@ -219,17 +255,44 @@ def report(request: Request, workspace: WorkspaceKey, item_id: str, session_id: 
         if existing:
             if existing['payload'].get('requestFingerprint') != fingerprint or existing['payload'].get('sessionId') != session_id:
                 raise ValueError('此请求身份已经用于不同内容')
+            if body.stepId is not None:
+                report_id = StepReportService._identity(workspace, item_id, body.requestId)
+                report_row = request.app.state.database_manager.postgres().fetch_one(
+                    'SELECT * FROM workbench.t_lifeweave_activity WHERE id=%s AND workspace_key=%s AND item_id=%s',
+                    (report_id, workspace, item_id))
+                if not report_row:
+                    raise ValueError('外部阶段记录存在，但步骤报告缺失；请检查并重新上报')
+                return {**existing, 'stepReport': StepReportService._wire(report_row)}
             return existing
         if any(row['kind'] == 'external_development_event' and row['payload'].get('sessionId') == session_id
                and row['payload'].get('phase') == 'finished' for row in activities):
             raise ValueError('外部开发记录已结束')
         state = git_state(start_row['payload']['observedGit']['repositoryPath'])
         selected = inputs(request, workspace, None, body.knowledgeRefs)
-        row = save(request, workspace, item_id, body.requestId, 'external_development_event', body.summary,
-                   {'sessionId': session_id, 'phase': body.phase, 'observedGit': state,
-                    'declaredInputs': selected, 'reportedChecks': body.checks,
-                    'observation': '阶段与检查由外部会话上报；Git 状态由服务读取'}, fingerprint)
-        return normalized(row)
+        db = request.app.state.database_manager.postgres()
+        with db.atomic():
+            row = save(request, workspace, item_id, body.requestId, 'external_development_event', body.summary,
+                       {'sessionId': session_id, 'phase': body.phase, 'observedGit': state,
+                        'declaredInputs': selected, 'reportedChecks': body.checks,
+                        'stepId': body.stepId, 'planVersion': body.planVersion,
+                        'observation': '阶段与检查由外部会话上报；Git 状态由服务读取'}, fingerprint)
+            result = normalized(row)
+            if body.stepId is not None:
+                report_body = StepReportInput.model_validate({
+                    'requestId': body.requestId, 'planVersion': body.planVersion,
+                    'stepId': body.stepId, 'outcome': body.outcome,
+                    'summary': body.summary,
+                    'deliverables': [entry.model_dump(by_alias=True) for entry in body.deliverables],
+                    'checks': [{'label': check, 'result': 'passed', 'evidence': check}
+                               for check in body.checks],
+                    'sessionId': session_id,
+                })
+                reporter = StepReportService(request.app.state.lifeweave_service,
+                                             request.app.state.lifeweave_runtime_service,
+                                             request.app.state.development,
+                                             request.app.state.output_files)
+                result['stepReport'] = reporter.submit(workspace, item_id, report_body, 'local-user')
+        return result
     except (KeyError, ValueError, OSError, subprocess.TimeoutExpired) as exc:
         raise fail(exc) from exc
 

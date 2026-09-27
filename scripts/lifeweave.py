@@ -50,6 +50,15 @@ def main(argv=None):
     p = commands.add_parser('create', help='create work and its initial intent; no execution')
     p.add_argument('title'); p.add_argument('--goal', required=True)
     p.add_argument('--type', choices=['requirement', 'research', 'fix', 'learning', 'review', 'personal', 'hobby', 'game', 'other'], default='other')
+    p.add_argument('--request-id', help='reuse this ID when retrying the exact same creation')
+    p.add_argument('--distinct-goal', action='store_true', help='confirm a same-title goal is independent')
+    p = commands.add_parser('work-bind', help='resolve or create one item for a conversation or execution without starting work')
+    p.add_argument('--decision', choices=['auto', 'continue', 'child', 'new'], default='auto')
+    p.add_argument('--item-id'); p.add_argument('--parent-id'); p.add_argument('--conversation-id'); p.add_argument('--session-id')
+    p.add_argument('--title'); p.add_argument('--goal')
+    p.add_argument('--type', choices=['requirement', 'research', 'fix', 'learning', 'review', 'personal', 'hobby', 'game', 'other'], default='requirement')
+    p.add_argument('--distinct-goal', action='store_true', help='explicitly confirm a same-title target has independent acceptance')
+    p.add_argument('--request-id', help='reuse this ID when retrying the same binding')
     for name in ('discuss', 'feedback'):
         p = commands.add_parser(name, help='save discussion' if name == 'discuss' else 'save correction for automatic inclusion in subsequent runs')
         p.add_argument('item_id'); p.add_argument('body')
@@ -63,16 +72,37 @@ def main(argv=None):
     p.add_argument('item_id'); p.add_argument('--repo', required=True); p.add_argument('--summary', required=True)
     p.add_argument('--method'); p.add_argument('--knowledge', action='append', default=[])
     p.add_argument('--request-id', default=None)
+    p.add_argument('--step-id', help='target step from current work-view')
+    p.add_argument('--plan-version', type=int, help='current plan.version')
     p = commands.add_parser('external-report', help='report an actual phase; this does not claim automatic tool capture')
     p.add_argument('item_id'); p.add_argument('session_id')
     p.add_argument('phase', choices=['context','design','implementation','verification','knowledge','finished','blocked'])
     p.add_argument('summary'); p.add_argument('--check', action='append', default=[])
     p.add_argument('--knowledge', action='append', default=[]); p.add_argument('--request-id', default=None)
+    p.add_argument('--step-id', help='planned step ID from work-view')
+    p.add_argument('--plan-version', type=int, help='plan.version from work-view')
+    p.add_argument('--outcome', choices=['running', 'succeeded', 'failed', 'blocked', 'cancelled'])
+    p.add_argument('--deliverable', action='append', default=[], metavar='EXPECTATION_ID=OUTPUT_ID',
+                   help='bind a fixed result to one expected output; repeat for multiple outputs')
     p = commands.add_parser('external-bind', help='bind an existing external record to this Codex native session for supported hooks')
     p.add_argument('item_id'); p.add_argument('session_id'); p.add_argument('--repo', required=True)
     p.add_argument('--request-id', default=None)
     p = commands.add_parser('external-list', help='read explicitly reported development activity for an item')
     p.add_argument('item_id')
+    p = commands.add_parser('external-delivery', help='capture selected changed files as a fixed external code delivery')
+    p.add_argument('item_id'); p.add_argument('session_id')
+    p.add_argument('--title', required=True); p.add_argument('--summary', required=True)
+    p.add_argument('--path', action='append', required=True, help='changed path owned by this session; repeat for each')
+    p.add_argument('--acknowledge-preexisting-changes', action='store_true',
+                   help='explicitly include selected paths already dirty when the session started')
+    p.add_argument('--request-id', help='reuse this ID when retrying the exact same delivery')
+    p = commands.add_parser('manual-result', help='register a fixed, readable non-code result for one item')
+    p.add_argument('item_id'); p.add_argument('--title', required=True)
+    p.add_argument('--content-file', required=True, help='UTF-8 file containing the actual result')
+    p.add_argument('--verification', required=True, help='actual check or review evidence')
+    p.add_argument('--environment', required=True, help='where the result was checked')
+    p.add_argument('--kind', choices=['plan', 'document', 'validation', 'finding', 'decision', 'operation', 'attachment'],
+                   default='document')
     args = parser.parse_args(argv)
     url = urlsplit(args.url)
     if url.scheme != 'http' or url.hostname not in {'127.0.0.1', 'localhost', '::1'} or url.username or url.password or url.path not in {'', '/'} or url.query or url.fragment:
@@ -132,8 +162,21 @@ def main(argv=None):
                 if not page['items']: raise OSError('读取期间运行列表变化，请重试')
             result = {'items': rows, 'total': len(rows)}
         elif args.command == 'create':
-            result = call('/items', {'itemType': args.type, 'title': args.title,
-                          'initialContext': {'goal': args.goal}, 'payload': {'goal': args.goal}})
+            request_id = args.request_id or str(uuid4())
+            print('create requestId: ' + request_id, file=sys.stderr)
+            binding = call('/work-bindings/resolve', {
+                'requestId': request_id, 'decision': 'new', 'itemType': args.type,
+                'title': args.title, 'goal': args.goal, 'distinctGoal': args.distinct_goal})
+            result = (call('/items/' + quote(binding['itemId'], safe=''))
+                      if binding.get('itemId') else binding)
+        elif args.command == 'work-bind':
+            request_id = args.request_id or str(uuid4())
+            print('work-bind requestId: ' + request_id, file=sys.stderr)
+            result = call('/work-bindings/resolve', {
+                'requestId': request_id, 'decision': args.decision, 'itemId': args.item_id,
+                'parentId': args.parent_id, 'conversationId': args.conversation_id,
+                'sessionId': args.session_id, 'title': args.title, 'goal': args.goal,
+                'itemType': args.type, 'distinctGoal': args.distinct_goal})
         elif args.command == 'discuss':
             result = call(f'/items/{item}/discussions', {'body': args.body})
         elif args.command == 'feedback':
@@ -144,11 +187,14 @@ def main(argv=None):
         elif args.command == 'external-start':
             request_id = args.request_id or str(uuid4())
             print('external-start requestId: ' + request_id, file=sys.stderr)
+            if (args.step_id is None) != (args.plan_version is None):
+                parser.error('外部开发启动须同时指定 --step-id 和 --plan-version')
             native_id = os.environ.get('CODEX_SESSION_ID') or os.environ.get('CODEX_THREAD_ID')
             result = call(f'/items/{item}/external-development/sessions', {
                 'requestId': request_id, 'repositoryPath': args.repo, 'summary': args.summary,
                 'methodId': args.method, 'knowledgeRefs': args.knowledge,
-                'nativeSessionId': native_id})
+                'nativeSessionId': native_id, 'stepId': args.step_id,
+                'planVersion': args.plan_version})
             if native_id:
                 if result['event'].get('payload', {}).get('nativeSessionId') != native_id:
                     session = quote(result['sessionId'], safe='')
@@ -161,11 +207,39 @@ def main(argv=None):
             request_id = args.request_id or str(uuid4())
             print('external-report requestId: ' + request_id, file=sys.stderr)
             session = quote(args.session_id, safe='')
+            deliverables = []
+            for raw in args.deliverable:
+                expectation_id, separator, output_id = raw.partition('=')
+                if not separator or not expectation_id or not output_id:
+                    parser.error('--deliverable 须为 EXPECTATION_ID=OUTPUT_ID')
+                deliverables.append({'expectationId': expectation_id, 'outputId': output_id})
+            if any(value is not None for value in (args.step_id, args.plan_version, args.outcome)) or deliverables:
+                if not all(value is not None for value in (args.step_id, args.plan_version, args.outcome)):
+                    parser.error('步骤报告须同时指定 --step-id、--plan-version 和 --outcome')
             result = call(f'/items/{item}/external-development/sessions/{session}/events', {
                 'requestId': request_id, 'phase': args.phase, 'summary': args.summary,
-                'checks': args.check, 'knowledgeRefs': args.knowledge})
+                'checks': args.check, 'knowledgeRefs': args.knowledge,
+                'stepId': args.step_id, 'planVersion': args.plan_version,
+                'outcome': args.outcome, 'deliverables': deliverables})
         elif args.command == 'external-list':
             result = call(f'/items/{item}/external-development/sessions')
+        elif args.command == 'external-delivery':
+            request_id = args.request_id or str(uuid4())
+            print('external-delivery requestId: ' + request_id, file=sys.stderr)
+            session = quote(args.session_id, safe='')
+            result = call(f'/items/{item}/external-development/sessions/{session}/delivery', {
+                'requestId': request_id, 'title': args.title, 'summary': args.summary,
+                'paths': args.path, 'acknowledgePreexistingChanges': args.acknowledge_preexisting_changes})
+        elif args.command == 'manual-result':
+            try:
+                content = Path(args.content_file).read_text(encoding='utf-8')
+            except (OSError, UnicodeError) as exc:
+                parser.error(f'无法读取成果文件：{exc}')
+            if not content.strip():
+                parser.error('成果正文不能为空')
+            result = call(f'/items/{item}/manual-results', {
+                'title': args.title, 'content': content, 'verification': args.verification,
+                'environment': args.environment, 'resultKind': args.kind})
         elif args.command == 'external-bind':
             native_id = os.environ.get('CODEX_SESSION_ID') or os.environ.get('CODEX_THREAD_ID')
             if not native_id: parser.error('只在运行中的 Codex 会话内绑定原生 Hook')

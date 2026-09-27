@@ -7,6 +7,9 @@ import json
 import os
 from pathlib import Path
 from uuid import uuid4
+from urllib.parse import urlencode
+
+from .document_assets import image_references, asset_relative, read_media
 
 from src.database import PGConnector
 
@@ -77,8 +80,48 @@ class Library:
         if path.stat().st_size > 2_000_000:
             raise ValueError('文件超过 2 MB，请拆分或使用本地编辑器阅读')
         content = path.read_text(encoding='utf-8')
-        refs = self.reference_provider(workspace,source_id,relative,content) if self.reference_provider else None
-        return {'path':relative, 'sourceId':source_id, 'sourceTitle':source['title'], 'writable':source['writable'], 'content':content, 'version':fingerprint(content), 'title':self.title(content,relative), 'references':refs}
+        refs = self.document_references(workspace, source_id, relative, content)
+        return {'path':relative, 'sourceId':source_id, 'sourceTitle':source['title'], 'writable':source['writable'], 'content':content, 'version':fingerprint(content), 'title':self.title(content,relative), 'references':refs, 'kind':'knowledge', 'contentType':'text/markdown'}
+
+    def document_references(self, workspace, source_id, relative, content):
+        provided = self.reference_provider(workspace, source_id, relative, content) if self.reference_provider else None
+        refs = {kind: dict((provided or {}).get(kind, {})) for kind in ('links', 'images')}
+        refs['warnings'] = list((provided or {}).get('warnings', []))
+        for reference in image_references(content):
+            # A preserved research identity takes priority over a coincidental
+            # current file. Ambiguous imported mappings must not become local.
+            if reference in refs['images'] or any(reference in warning for warning in refs['warnings']):
+                continue
+            try:
+                asset_path = asset_relative(relative, reference)
+            except ValueError as exc:
+                if not reference.startswith(('https:', 'http:', 'data:')):
+                    refs['warnings'].append(f'图片 {reference} 未加载：{exc}')
+                continue
+            root = Path(self.source(workspace, source_id)['root']).resolve()
+            target = root / asset_path
+            if any((root / Path(*Path(asset_path).parts[:index+1])).is_symlink() for index in range(len(Path(asset_path).parts))):
+                refs['warnings'].append(f'图片 {reference} 包含符号链接，不能读取。')
+            elif not target.is_file():
+                refs['warnings'].append(f'图片 {reference} 在所选来源中不存在。')
+            refs['images'][reference] = f'/api/lifeweave/{workspace}/library/asset?' + urlencode({
+                'sourceId': source_id, 'documentPath': relative, 'version': fingerprint(content), 'path': reference,
+            })
+        return refs
+
+    def asset(self, workspace, source_id, document_path, version, reference):
+        document = self.document(workspace, source_id, document_path)
+        if version != document['version']:
+            raise ValueError('文档已变化，图片未按旧正文替换。请重新读取当前文档。')
+        if reference not in image_references(document['content']):
+            raise ValueError('图片未被所选文档引用')
+        # Imported run images keep their original run; do not redirect them to
+        # current source files if their original asset becomes unavailable.
+        mapped = document['references']['images'].get(reference, '')
+        if not mapped.startswith(f'/api/lifeweave/{workspace}/library/asset?'):
+            raise ValueError('此图片属于其他已登记来源，请从正文来源链接读取')
+        source = self.source(workspace, source_id)
+        return read_media(Path(source['root']), asset_relative(document_path, reference))
 
     @staticmethod
     def title(content: str, fallback: str):

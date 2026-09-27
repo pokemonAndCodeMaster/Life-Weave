@@ -2,7 +2,7 @@ import { http } from '@/shared/api/http'
 import type { WorkspaceKind } from '../types'
 export interface Source { id: string; title: string; root: string; writable: boolean; includedPaths?: string[]; archiveBaseUrl?: string | null }
 export interface ReferenceMap { links: Record<string,string>; images: Record<string,string>; warnings: string[] }
-export interface Document { path: string; sourceId: string; title: string; content: string; version: string; writable: boolean; sourceTitle: string; references?: ReferenceMap|null }
+export interface Document { contentType?: string; kind?: 'knowledge' | 'artifact'; itemId?: string; outputId?: string; currentSource?: { sourceId: string; path: string } | null; path: string; sourceId: string; title: string; content: string; version: string; writable: boolean; sourceTitle: string; references?: ReferenceMap|null }
 export interface Revision { id: string; source_id: string; path: string; content: string; before_content: string; diff: string; reason: string; status: 'draft'|'accepted'|'rejected'; created_at: string; references?: ReferenceMap|null }
 export interface KnowledgeRelations {
   sourceId: string; path: string; version: string; scannedDocuments: number
@@ -26,3 +26,5 @@ export async function sources(ws: WorkspaceKind) { return (await http.get<Source
 export async function revisions(ws: WorkspaceKind) { return (await http.get<Revision[]>(`${root(ws)}/revisions`)).data }
 export async function propose(ws: WorkspaceKind,body: {sourceId:string;path:string;content:string;baseVersion:string;reason:string}) { return (await http.post<Revision>(`${root(ws)}/revisions`,body)).data }
 export async function decide(ws: WorkspaceKind,id:string,accept:boolean) { return (await http.post<Revision>(`${root(ws)}/revisions/${id}/decision`,{accept})).data }
+
+export async function workOutputDocument(ws: WorkspaceKind,itemId:string,outputId:string,path:string,version:string) { return (await http.get<Document>(`/lifeweave/${ws}/items/${encodeURIComponent(itemId)}/outputs/document`,{params:{outputId,path,version}})).data }

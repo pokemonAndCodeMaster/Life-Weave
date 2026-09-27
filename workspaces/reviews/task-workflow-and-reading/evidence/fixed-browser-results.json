@@ -1,0 +1,50 @@
+[
+  {
+    "name": "step to fixed GSSM document",
+    "status": "pass",
+    "url": "http://127.0.0.1:8010/lifeweave/personal/knowledge?item=item-de7785d0790445d8&output=run:gzrun-20260919-130600-2cabbf3e&path=report.md&version=fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520&returnTo=/lifeweave/personal/items/item-de7785d0790445d8/overview?step=run:gzrun-20260919-130600-2cabbf3e%26output=run:gzrun-20260919-130600-2cabbf3e%26file=report.md",
+    "identity": "report.md · 版本 fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520",
+    "formula_count": 87,
+    "image": {
+      "loaded": true,
+      "width": 848,
+      "src": "http://127.0.0.1:8010/api/lifeweave/personal/items/item-de7785d0790445d8/outputs/asset?outputId=run%3Agzrun-20260919-130600-2cabbf3e&path=files%2Fc51274814ea909e5-shrp2-event-counts-original.png&version=fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520"
+    }
+  },
+  {
+    "name": "fixed image keyboard zoom",
+    "status": "pass"
+  },
+  {
+    "name": "fixed bundle actual contents",
+    "status": "pass",
+    "file_count": 32,
+    "html": [
+      "files/599d52ec0d53c95d-arxiv-abs.html"
+    ],
+    "png_count": 8,
+    "bytes": 2116714
+  },
+  {
+    "name": "return to original step",
+    "status": "pass",
+    "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-de7785d0790445d8/overview?step=run:gzrun-20260919-130600-2cabbf3e&output=run:gzrun-20260919-130600-2cabbf3e&file=report.md",
+    "dialog_title": "step-dialog-title"
+  },
+  {
+    "name": "refresh fixed document link",
+    "status": "pass",
+    "identity": "report.md · 版本 fec353264fb26271deaa183e66ba4645cc934e3c214bf44f7447d7666ed81520"
+  },
+  {
+    "name": "wrong fixed version has explicit error",
+    "status": "pass",
+    "message": "指定成果版本与保存的交付不一致，请返回产物目录选择版本",
+    "body_present": 0
+  },
+  {
+    "name": "console and writes",
+    "errors": [],
+    "writes": []
+  }
+]

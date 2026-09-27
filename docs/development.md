@@ -213,11 +213,29 @@ python scripts/workbench.py start
   "title": "资料与日程并行准备",
   "provider": "个人安排能力",
   "nodes": [
-    {"id": "materials", "title": "整理资料", "description": "核对所需材料", "state": "planned", "summary": "", "dependsOn": [], "outputIds": []},
-    {"id": "schedule", "title": "确认时间", "description": "核对可用时间", "state": "planned", "summary": "", "dependsOn": [], "outputIds": []},
-    {"id": "prepare", "title": "完成准备", "description": "两项条件满足后汇总", "state": "planned", "summary": "", "dependsOn": ["materials", "schedule"], "outputIds": []}
+    {"id": "materials", "title": "整理资料", "description": "核对所需材料", "state": "planned", "dependsOn": [], "outputIds": [], "expectedOutputs": [{"id": "materials", "title": "资料清单与来源", "kind": "document", "required": true}], "acceptance": "清单能打开原始材料，说明适用范围与缺口"},
+    {"id": "schedule", "title": "确认时间", "description": "核对可用时间", "state": "planned", "dependsOn": [], "outputIds": [], "expectedOutputs": [{"id": "schedule", "title": "可用时间与决定", "kind": "decision", "required": true}], "acceptance": "时间安排有用户输入或明确来源"},
+    {"id": "prepare", "title": "完成准备", "description": "两项条件满足后汇总", "state": "planned", "dependsOn": ["materials", "schedule"], "outputIds": [], "expectedOutputs": [{"id": "summary", "title": "准备结果", "kind": "document", "required": true}], "acceptance": "汇总引用已经完成的两项结果"}
   ]
 }
 ```
 
-能力可以绑定同事项的 `runId`、`assignmentId` 和 `work-view.outputs` 中的成果 ID；绑定后显示实际状态。无执行依据的人工记录不冒充自动运行。409 表示已有新版本，应重新读取、比较再决定如何合并，不能自动替换版本重试。第一版不是通用调度器，外部会话阶段仍由 `external-report` 留痕，不会自动变成业务步骤图。流程与验证说明见[事项工作区](item-workspace-design.md)。
+能力可以绑定同事项的 `runId`、`assignmentId` 和成果 ID。编辑计划负责修改工作要求，步骤完成由共同报告规则检查；409 表示已有新版本或具体交付不满足要求，应读取实际错误，不自动替换版本重试。旧图和旧阶段记录仍可读，不能补造当时的步骤证据。
+
+本机接续先 `work-bind --decision continue --item-id item-实际编号 --request-id 本次请求标识`，再 `external-start`。独立交付可用 `work-bind --decision child --parent-id ... --title ... --goal ...` 创建子事项；同名不代表一定是同一目标，歧义返回候选。
+
+代码交付使用 `external-delivery` 显式列出自己负责的 `--path`，取得固定 `outputId`；不会默认归档整个脏工作区。包含会话开始前的改动时必须核实范围，再显式使用 `--acknowledge-preexisting-changes`。固定 ZIP 包含补丁、清单、文件前后快照和文档引用的图片。`manual-result` 可保存方案、调查结论或验证报告等固定正文，使用对应 `resultKind`；具体参数见 CLI `--help`。
+
+完成某步时，上报真实结果，例如：
+
+```bash
+python scripts/lifeweave.py external-report item-实际编号 external-实际会话 \
+  implementation '已完成此步并交付固定文件' \
+  --step-id implementation --plan-version 2 --outcome succeeded \
+  --deliverable code=artifact:实际成果编号 \
+  --check '实际执行的验证及结果' --request-id 本次步骤报告标识
+```
+
+`code` 必须是计划中预期产物的 ID，`plan-version` 来自 `work-view.plan.version`。回执中的 `stepReport.applied` 和 `issues` 才说明是否成功推进；保存了报告不等于完成。网页受管开发也使用这套规则，已有多个可执行步骤时明确选择。本功能不是任意 DAG 的通用调度器，未接入 Agent 仍不会自动产出图。流程见[事项工作区](item-workspace-design.md)。
+
+固定产物读取使用 `/items/{id}/outputs/catalog|file|document|asset|download|bundle`，按 `outputId` 与 `version` 定位。知识页工作产物模式只读，不代替正式知识修订。前端新增 Mermaid，升级需重新安装锁定依赖并构建；服务继续只监听本机 8010，手机访问另行建设。

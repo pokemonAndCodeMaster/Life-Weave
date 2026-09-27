@@ -1,0 +1,6 @@
+dialog geometry {'x': 0, 'y': 0, 'width': 390, 'height': 844} viewport {'width': 390, 'height': 844} bodyOverflow hidden
+internal scroll [721, 1263] root overflow 0
+focus after Tab <button data-v-2b446adf="" type="button">规划与交付要求</button>
+Escape dialog 0 focus workflow-modal
+table count 2 regions [[300, 601], [300, 1099]] root overflow 0
+errors []

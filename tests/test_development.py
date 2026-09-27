@@ -102,6 +102,11 @@ def test_development_plan_review_implementation_and_idempotence(dedicated_client
     assert created.status_code == 202, created.text
     first = created.json()
     assert first['status'] == 'planning' and first['planRunId']
+    initial_view = client.get(f'{path}/items/{item["id"]}/work-view').json()
+    assert initial_view['plan']['source'] == 'declared'
+    assert initial_view['plan']['nodes'][0]['state'] == 'running'
+    assert initial_view['plan']['nodes'][0]['expectedOutputs'][0]['kind'] == 'plan'
+    assert initial_view['plan']['nodes'][0]['attempts'][0]['runId'] == first['planRunId']
     assert client.post(f'{path}/development', json=payload).json()['id'] == first['id']
     changed = client.post(f'{path}/development', json={**payload, 'instruction': 'a different task'})
     assert changed.status_code == 409
@@ -112,16 +117,28 @@ def test_development_plan_review_implementation_and_idempotence(dedicated_client
     reviewing = service.get('personal', first['id'])
     assert reviewing['status'] == 'reviewing' and reviewing['reviewRunId']
     assert reviewing['planSha256']
+    plan_view = client.get(f'{path}/items/{item["id"]}/work-view').json()
+    assert [node['state'] for node in plan_view['plan']['nodes']] == ['succeeded', 'running', 'planned']
+    assert plan_view['plan']['nodes'][0]['outputIds'] == [f'run:{first["planRunId"]}']
+    assert plan_view['plan']['nodes'][0]['attempts'][0]['applied'] is True
     readonly_checkout(client, tmp_path, root, reviewing['reviewRunId'])
     finish(client, reviewing['reviewRunId'], 'Reviewed request and plan.\nREVIEW_DECISION: PASS')
     service.advance(first['id'])
     implementing = service.get('personal', first['id'])
     assert implementing['status'] == 'implementing' and implementing['implementationRunId']
+    review_view = client.get(f'{path}/items/{item["id"]}/work-view').json()
+    assert [node['state'] for node in review_view['plan']['nodes']] == ['succeeded', 'succeeded', 'running']
+    assert review_view['plan']['nodes'][1]['outputIds'] == [f'run:{reviewing["reviewRunId"]}']
     implementation_checkout(client, tmp_path, root, implementing['implementationRunId'])
     finish(client, implementing['implementationRunId'], 'Changed README; test command passed.')
     service.advance(first['id'])
     done = service.get('personal', first['id'])
     assert done['status'] == 'awaiting_acceptance'
+    delivered_view = client.get(f'{path}/items/{item["id"]}/work-view').json()
+    assert [node['state'] for node in delivered_view['plan']['nodes']] == ['succeeded'] * 3
+    assert delivered_view['plan']['nodes'][2]['outputIds'] == [f'delivery:{first["id"]}']
+    assert delivered_view['plan']['nodes'][2]['deliveryStatus'] == 'complete'
+    assert delivered_view['plan']['nodes'][2]['attempts'][0]['runId'] == done['implementationRunId']
     frozen = client.get(f'{path}/development/{done["id"]}/delivery')
     assert frozen.status_code == 200, frozen.text
     delivery = frozen.json()

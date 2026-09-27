@@ -17,8 +17,8 @@ export async function getLifeWeaveConfig() {
 }
 
 export function apiError(error: unknown): ApiErrorShape {
-  if (error && typeof error === 'object' && 'message' in error && 'status' in error) return error as ApiErrorShape
-  const candidate = error as AxiosError<{ detail?: unknown; message?: string }>
+  if (error && typeof error === 'object' && 'message' in error && 'status' in error && !('response' in error)) return error as ApiErrorShape
+  const candidate = (error || {}) as AxiosError<{ detail?: unknown; message?: string }>
   const status = candidate.response?.status ?? 0
   const detail = candidate.response?.data?.detail
   const fallback = status === 409
