@@ -1,0 +1,35 @@
+{
+  "id": "activity-4e3239795465f4ed35237f68b965798b",
+  "itemId": "item-c0f13d85b5c145fd",
+  "kind": "external_development_event",
+  "body": "概述、现有事项整理、公共组织能力与Agent中心已上线本机。设计、三份代码包、流程文档和验证报告已固定可读，Notion两页镜像已回读；保留用户审阅步骤。",
+  "payload": {
+    "phase": "finished",
+    "stepId": null,
+    "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+    "observation": "阶段与检查由外部会话上报；Git 状态由服务读取",
+    "observedGit": {
+      "revision": "fd6ae8dc5090171c1baf9abbedf5eb6dc67aa6b4",
+      "changedCount": 0,
+      "changedPaths": [],
+      "repositoryPath": "/home/yyh/project/lifeweave",
+      "untrackedCount": 0,
+      "untrackedPaths": []
+    },
+    "planVersion": null,
+    "declaredInputs": [
+      {
+        "id": "document-396fe532ce25131f",
+        "title": "Agent 怎样承接、执行和交付一件事",
+        "target": "knowledge",
+        "version": "892b9360a8fab87c60465eb22c50c0359d9a0a4c759167426a6d672d5aee76c8",
+        "sourcePath": "lifeweave-project:docs/agent-workflow.md"
+      }
+    ],
+    "reportedChecks": [
+      "后端173项、前端159项；独立复核及真实受管小仓交付通过。"
+    ],
+    "requestFingerprint": "76eece4716364eb61fa56c54bc85fd77b292ef11438c43d1d68953248e81ee1d"
+  },
+  "createdAt": "2026-09-29T00:07:02.851994+08:00"
+}
