@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "platform",
+      "terms": [
+        "LifeWeave",
+        "事项工作区",
+        "Agent 中心"
+      ],
+      "title": "平台事项关键词",
+      "enabled": true,
+      "topicIds": [
+        "topic-8ce86bbe04c74ff1"
+      ],
+      "domainIds": [
+        "domain-2ec35e994ba5406e"
+      ]
+    },
+    {
+      "id": "research",
+      "terms": [
+        "GSSM",
+        "Qwen-Drive",
+        "自动驾驶论文"
+      ],
+      "title": "已确认论文关键词",
+      "enabled": true,
+      "topicIds": [
+        "topic-9b954036e8db4f24"
+      ],
+      "domainIds": [
+        "domain-a09b58908ea8481f"
+      ]
+    }
+  ]
+}

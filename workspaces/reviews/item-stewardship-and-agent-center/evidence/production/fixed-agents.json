@@ -1,0 +1,24 @@
+{
+  "selectedPaths": [
+    "methods/lifeweave-development/SKILL.md",
+    "migrations/019_agent_center.sql",
+    "scripts/lifeweave.py",
+    "src/api/app.py",
+    "src/lifeweave/development.py",
+    "src/lifeweave/development_router.py",
+    "src/lifeweave/external_development.py",
+    "src/lifeweave_agents/__init__.py",
+    "src/lifeweave_agents/registry.py",
+    "src/lifeweave_agents/router.py",
+    "src/lifeweave_agents/service.py",
+    "src/lifeweave_plugins/core.py",
+    "src/lifeweave_runtime/router.py",
+    "tests/test_agent_center.py",
+    "tests/test_development_retry_binding.py"
+  ],
+  "result": {
+    "artifactId": "output-93f8591c471dc0809a23d22c77ca2ffe",
+    "outputId": "artifact:output-93f8591c471dc0809a23d22c77ca2ffe",
+    "version": "adf43e7dcce0dcc4029c4fbdcd4165d3b4a2026cdfd4c1e20888212262241d0a"
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "id": "delivery-e8f9f45f61889ee6e151d434c9ef3525",
+  "assignmentId": "dev-e8f9f45f61889ee6e151d434c9ef3525",
+  "implementationRunId": "gzrun-20260928-154124-6966a0d4",
+  "baseRevision": "665dcc9a8fda048848a6b53646dc3326cc2424a7",
+  "artifactSha256": "b4b46be7cfb7b6bad3f98a70639072c7998ecf636ea41ed7fd01c4b2b492cac0",
+  "manifest": {
+    "files": [
+      {
+        "path": "README.md",
+        "after": {
+          "oid": "4e4e9dd43f2b70531e25002a067eee96b63199d1",
+          "mode": "100644",
+          "type": "blob",
+          "sha256": "724fb5be5023aa7421681f052667ee8758db868777b242147473deff08a30fb2",
+          "snapshot": "blobs/4e4e9dd43f2b70531e25002a067eee96b63199d1"
+        },
+        "before": {
+          "oid": "3c68a9a6cb4e80199c6011b08e508d7d7b6e22a8",
+          "mode": "100644",
+          "type": "blob",
+          "sha256": "f3f8ee68034b05b658d61f50ef0d4774b7ad2f51b450745ebad7e5b77dad3616",
+          "snapshot": "blobs/3c68a9a6cb4e80199c6011b08e508d7d7b6e22a8"
+        },
+        "status": "modified",
+        "additions": 14,
+        "deletions": 0
+      }
+    ],
+    "itemId": "item-80ad795359af474a",
+    "resources": [],
+    "planSha256": "dcc3f72f8b67f0290f1877c5a1764117cd6265855d2e022ad25ed56ce08b0a03",
+    "patchSha256": "a264e88ec4fb6ed62110e8e80765bf05b59d6d29ab7cc80f2cbd416fed53284b",
+    "reviewRunId": "gzrun-20260928-154037-a5d7f8cc",
+    "assignmentId": "dev-e8f9f45f61889ee6e151d434c9ef3525",
+    "baseRevision": "665dcc9a8fda048848a6b53646dc3326cc2424a7",
+    "inputVersions": [
+      {
+        "id": "method-2e4666e825775e6645bf",
+        "version": "23078d6454aaa5c8e33b8ef886c4274d543d084dc98a9f384c742bf9e065f566",
+        "sourcePath": "/home/yyh/project/lifeweave/methods/lifeweave-development/SKILL.md"
+      }
+    ],
+    "schemaVersion": 2,
+    "serviceChecks": [
+      "git-diff-check",
+      "base-patch-replay-tree-match",
+      "stable-worktree-status-and-content"
+    ],
+    "reviewDecision": "pass",
+    "excludedGenerated": [
+      ".agents/skills/method-2e4666e825775e6645bf/SKILL.md",
+      ".lifeweave/capability-manifest.json"
+    ],
+    "implementationRunId": "gzrun-20260928-154124-6966a0d4",
+    "verificationBoundary": "实施结果是 Agent 报告；补丁与文件清单由服务从 Git 工作树固定。",
+    "implementationResultSha256": "bb08355418753658d6725ca498e0b42e45b5f6bab90ee57f469f375ebff8a6af"
+  },
+  "integrationCommit": null,
+  "integrationCheckedAt": null,
+  "integrationCurrentHead": null,
+  "decision": null,
+  "decisionScope": null,
+  "decisionReason": null,
+  "decisionRequestId": null,
+  "decidedBy": null,
+  "decidedAt": null,
+  "createdAt": "2026-09-28T23:42:19.880690+08:00"
+}

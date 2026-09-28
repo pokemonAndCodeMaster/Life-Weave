@@ -1,0 +1,44 @@
+{
+  "runtime": {
+    "effectiveModel": "gpt-6-astra",
+    "engine": null,
+    "executorVersion": "codex-cli 0.154.0",
+    "source": null,
+    "requestedModel": null
+  },
+  "zipSha256": "b4b46be7cfb7b6bad3f98a70639072c7998ecf636ea41ed7fd01c4b2b492cac0",
+  "zipBytes": 3750,
+  "zipEntries": [
+    "before/README.md",
+    "blobs/3c68a9a6cb4e80199c6011b08e508d7d7b6e22a8",
+    "blobs/4e4e9dd43f2b70531e25002a067eee96b63199d1",
+    "changes.patch",
+    "files/README.md",
+    "implementation-result.md",
+    "manifest.json"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "after": {
+        "oid": "4e4e9dd43f2b70531e25002a067eee96b63199d1",
+        "mode": "100644",
+        "type": "blob",
+        "sha256": "724fb5be5023aa7421681f052667ee8758db868777b242147473deff08a30fb2",
+        "snapshot": "blobs/4e4e9dd43f2b70531e25002a067eee96b63199d1"
+      },
+      "before": {
+        "oid": "3c68a9a6cb4e80199c6011b08e508d7d7b6e22a8",
+        "mode": "100644",
+        "type": "blob",
+        "sha256": "f3f8ee68034b05b658d61f50ef0d4774b7ad2f51b450745ebad7e5b77dad3616",
+        "snapshot": "blobs/3c68a9a6cb4e80199c6011b08e508d7d7b6e22a8"
+      },
+      "status": "modified",
+      "additions": 14,
+      "deletions": 0
+    }
+  ],
+  "status": "awaiting_acceptance",
+  "userAccepted": false
+}

@@ -11,16 +11,16 @@
 
 | 部分 | 章节 | 来源 | 原文 SHA-256 |
 | --- | --- | --- | --- |
-| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `7a6ec17470608964c913b1c7156d5c29271dcb87527a6bd8cd5aa3d0e899a0e8` |
+| 当前说明 | [LifeWeave](#doc-01) | `README.md` | `17653b7445e588ffa8540d119aa9562eb83cacdb9c8a9e5642758e93381855d7` |
 | 当前说明 | [LifeWeave 项目文档](#doc-02) | `docs/README.md` | `659183a746a25858da050fb6b306020c6c606cfc1dcfb38df7ae397cfb75eda1` |
 | 当前说明 | [产品设计：让分散的事情接得上、推得动](#doc-03) | `docs/product.md` | `d20d8ff66a4a688c86d3b7da6fb9730339c793ff0e606687ade0ded33e7ac926` |
 | 当前说明 | [架构与关键实现](#doc-04) | `docs/architecture.md` | `60f54d1cddaa479d08c7185c463e226563a96378278b030453ef1218b9101048` |
 | 当前说明 | [插件目录与开发过程：首个可运行切片](#doc-05) | `docs/plugin-system.md` | `3a9044c60e081703c0c7a2c83e1779fc33c3f8b0a602e2a96fc1ab2c8dc78483` |
 | 当前说明 | [事项工作区：能力定义计划，统一交付与阅读](#doc-06) | `docs/item-workspace-design.md` | `7ff45fb6ed1d12d6cdc88164535af376f128b2c8b0728e2a0d73e87e3d012a55` |
-| 当前说明 | [Agent 怎样承接、执行和交付一件事](#doc-07) | `docs/agent-workflow.md` | `9e3381e6710b1a12d3d442fe31fa59a576e2d546090fde94ee2cd8a05ab5bc2e` |
-| 当前说明 | [当前完成情况](#doc-08) | `docs/status.md` | `4878761ad336dfa0789b7adf257c5096bd2e9cbc0b616d71cfc12bc98ad2e6e5` |
+| 当前说明 | [Agent 怎样承接、执行和交付一件事](#doc-07) | `docs/agent-workflow.md` | `892b9360a8fab87c60465eb22c50c0359d9a0a4c759167426a6d672d5aee76c8` |
+| 当前说明 | [当前完成情况](#doc-08) | `docs/status.md` | `8e1b1103931e266ed104cdffdf30179baafccf62976aaf707fe1fd18a93aef8c` |
 | 当前说明 | [当前建设路线](#doc-09) | `docs/roadmap.md` | `93843a360b834687161282d0e56ba7d247d80a9a7bd9c62798190b1cd2fe75f7` |
-| 当前说明 | [开发与运行维护](#doc-10) | `docs/development.md` | `3b34d7c56d4bf5dfc1e6721110eb38994e2c1326940e872ae6e7e1930167d958` |
+| 当前说明 | [开发与运行维护](#doc-10) | `docs/development.md` | `47bb00c8bdd691f223dbe5ac73084c4f9c269ca84c99fc14859e55893ee1bfec` |
 | 当前说明 | [LifeWeave：名称与适配](#doc-11) | `docs/naming.md` | `c9af16fac248971f1bd99b4a0893a3bf6d44fc9889da2b0aa96630abf0f5117c` |
 | 当前说明 | [研究成果归档、离线阅读与跨文章讨论](#doc-12) | `docs/research-archive.md` | `e3d4980ab611ac1c975ce3122f27f6ceb53c57756716fc7003396e52aa77d3f7` |
 
@@ -52,7 +52,7 @@ LifeWeave 希望把工作、学习、爱好和生活中的想法、计划、行�
 4. [建设路线](#doc-09)：下一阶段按用户结果交付什么。
 5. [开发与运行维护](#doc-10)：本地启动、配置、验证、改名兼容和排障。
 
-[事项工作区设计与实现](#doc-06)说明不同能力如何共用步骤图、节点与成果阅读。
+[事项工作区设计与实现](#doc-06)说明不同能力如何共用步骤图、节点与成果阅读。[Agent 工作流](#doc-07)说明配置、调用关系、两种开发入口和真实运行边界。
 
 [文档导航](#doc-02) 区分当前说明与历史证据；[命名说明](#doc-11) 解释名称与适配边界。
 
@@ -75,7 +75,7 @@ python scripts/workbench.py start
 1. 默认打开“对话”。直接提问、说出研究委托，或选“只记录”保存想法；历史对话可刷新后继续。左侧可保存明确的方向与偏好。
 2. 在“工作事项”按状态、类型、标签、负责人、领域、专题或日期筛选，选择分组、排序和显示列；父项可展开子事项，视图按空间保存。进入事项先看工作步骤图和主要成果，点击节点再展开目标、结论与依据；原始说明、背景与历史按需查看。在“计划”中安排优先级、日期和阶段。
    “我的日常”可点“调整首页”，通过勾选、位置和上下移动配置卡片；个人与团队分别保存。
-3. 点“委托 AI”，写清这次希望得到什么。可选择执行器、项目目录、工作方法与知识。不选项目时使用空白任务目录；选 Git 项目时使用固定提交的独立 worktree，未提交修改不会自动带入。
+3. 从事项的“委托 Agent”或侧栏“Agent 中心”选择同一 Agent 并派任务；中心也能注册配置、查看全部已登记执行。写清这次希望得到什么，可选择执行器、模型、项目目录、工作方法与知识。不选项目时使用空白任务目录；选 Git 项目时使用固定提交的独立 worktree，未提交修改不会自动带入。
 4. 在对话和事项页阅读完整成果，查看公式与本轮图片，选择历史版本、下载纯正文，或点“下载完整包（含图片）”取得可离线阅读的 ZIP。选中段落可保存定位反馈，再让对话继续修订。运行成功不会自动完成事项。
 5. 从成果提出知识候选，或在“知识与材料”写笔记。阅读差异后接受或拒绝；当前原文变化会阻止覆盖。已接受知识可供后续对话和研究读取。
    打开一篇知识后，可在正文下查看它引用的同源 Markdown 和反向引用；断链会提示，不能误当成已有材料。
@@ -777,7 +777,7 @@ GitHub 以分支提交回读确认；Notion 以 Markdown 全文回读、来源�
 
 LifeWeave 的 Agent 是一套可触发的工作配置：它选择已有能力、方法和运行环境。事项保存用户目标；步骤计划说明如何推进；一次执行记录这次实际用了什么、做了什么和交付了什么。把这几层分开，才能让同一事项在网页或本机接续，也能换模型而不丢失目标与成果。
 
-本文以当前工程为依据。新增 Agent 中心与事项整理部分仍随本轮实现验证更新；最终证据在[本轮方案与交付](../workspaces/reviews/item-stewardship-and-agent-center/review.md)。
+本文以当前工程为依据。Agent 中心与事项整理已落地；本轮验证及独立审查证据在[本轮方案与交付](../workspaces/reviews/item-stewardship-and-agent-center/review.md)。
 
 <a id="doc-07-line-7"></a>
 
@@ -787,7 +787,7 @@ LifeWeave 的 Agent 是一套可触发的工作配置：它选择已有能力、
 
 这些记录关联了 `development` 身份和 `lifeweave-development` 方法版本，但关联标签与已加载方法不是“平台开发 Agent 全程调度”的证明。它们能证明具体报告、Git 观察和固定产物，不能重建未采集的全部操作。之前“开发 Agent 双入口与 Notion 知识联动”另有真实受管开发委托；不能把那个事项的验证套在这次工作区改造上。
 
-本轮同样由主 Agent 负责设计、集成与交付，GPT-6 Sol 极高思考负责三个明确的实现包。它是一条实际登记到平台的外部开发流程。新增中心将受管任务和外部工作放到同一个查询入口，保留各自来源和控制边界。
+本轮同样由主 Agent 负责设计、集成与交付，GPT-6 Sol 极高思考负责三个明确的实现包。它是一条实际登记到平台的外部开发流程。另有独立的真实平台验证：从 Agent 中心发起小仓 README 修改，经过方案、独立审阅、隔离实施和固定 ZIP，处于待用户审阅；这项验证不能倒推本轮整个平台代码都由受管 Agent 执行。新增中心将受管任务和外部工作放到同一个查询入口，保留各自来源和控制边界。
 
 <a id="doc-07-line-15"></a>
 
@@ -884,7 +884,7 @@ sequenceDiagram
 
 ### 从哪里选择 Agent、运行时和模型
 
-本轮目标入口是 **Agent 中心 → Agents**：查看内置与注册配置、默认方法、运行时和模型，修改后持久保存。派发时先选已有事项，再选择 Agent，可对本次执行覆盖参数。事项里的委托入口调用同一个触发组件与服务；开发配置保留专项方案、审查、目标仓和交付控制。
+当前入口是 **Agent 中心 → Agents**：查看内置与注册配置、默认方法、运行时和模型，修改后持久保存。派发时先选已有事项，再选择 Agent，可对本次执行覆盖参数。事项里的委托入口调用同一个触发组件与服务；开发配置保留专项方案、审查、目标仓和交付控制。
 
 **Agent 中心 → 执行记录** 汇总开发组合、独立 Run、外部会话和事项整理操作。开发的方案/审查/实施 Run 嵌在同一组合里，避免在列表重复出现三项。详情显示固定配置、输入、事件、成果和错误，进行中的状态自动刷新；历史默认值改变不会改写旧执行。
 
@@ -915,6 +915,18 @@ Agent 可以读取现有事项/分类，结合目标提交带理由的建议。�
 | 不同Agent选型不清 | 配置与每次覆盖分离，运行环境就绪提示 | 第二条受管开发执行路径仍受OpenCode边界限制 |
 
 本轮建设不等于平台已经成为无需监督的全能开发者。它把现有能执行的能力变得可选择、可看见、可接续，也把尚未实现或无法观测的部分放到准确位置。
+
+<a id="doc-07-line-130"></a>
+
+### 本轮真实开发验证与模型配置边界
+
+新中心在正式本机服务创建了“Agent 中心真实开发链验证”，继承本轮父事项的专题与领域。首次在派发中指定 `gpt-6-sol`，本机 Codex CLI 的 ChatGPT 账号返回“不支持该模型”并停止方案阶段；失败保留可查。再次留空模型，使用本机配置，完成三个真实阶段和固定交付：只修改小仓 README 的运行说明，主 Agent 另行运行 `python hello.py` 核对输出，ZIP 哈希与服务记录一致。原仓和 `hello.py` 均未修改，没有替用户点击接受。
+
+此处运行环境记录的 effectiveModel 为 `gpt-6-astra`、CLI 为 `codex-cli 0.154.0`；这是传给执行器的配置证据，不是上游返回的模型身份认证。主会话调用的 Sol 子 Agent 与产品中的本机 CLI 使用不同调用入口，不能从前者可用推断后者账号必然支持同名模型。[官方 Codex 模型说明](https://developers.openai.com/codex/models/)可用于配置参考；本轮账号可用范围以保留的真实运行结果为准。
+
+这次真实重试还发现自动三阶段计划会把新方案和审阅误挂到实施节点。现已用真实成功 Run 的固定产物，通过正式步骤报告接口补正显示，旧失败和旧报告保留；自动绑定已修复并经过失败重试与用户自定义步骤的独立数据库回归。
+
+验证只覆盖有界小仓任务，不证明任意复杂工程都能自主完成。任务入口、固定输入、阶段结果、差异包和失败均可在 Agent 中心及所属事项读取；详情长输入和原始事件按需展开，历史未采集内容不能补造。
 <!-- source-end: docs/agent-workflow.md -->
 
 ---
@@ -925,11 +937,13 @@ Agent 可以读取现有事项/分类，结合目标提交带理由的建议。�
 
 ## 当前完成情况
 
-核对日期：2026-09-27。本页描述当前可用范围。历史阶段的测试数量、失败与修复记录保留在[历史状态](history/status-through-20260926.md)和[证据目录](evidence/README.md)，不作为当前能力的累计完成率。
+核对日期：2026-09-28。本页描述当前可用范围。历史阶段的测试数量、失败与修复记录保留在[历史状态](history/status-through-20260926.md)和[证据目录](evidence/README.md)，不作为当前能力的累计完成率。
 
 LifeWeave 是一套本机单用户工作台。个人和团队是隔离的内容空间，不是多人账号。已有真实研究、持续事项、人工主导的能力试验；开发自用、自动进化和远程团队使用尚未形成完整体验。
 
 2026-09-27 的[事项工作区](#doc-06)已进一步改为步骤弹窗、分类文件树、单文件差异和内部固定版本阅读。计划声明每步预期交付与验收；网页受管开发与本机报告共用事项绑定和步骤报告，缺少固定产物或有效检查不能标为完成。旧运行记录保留，旧空步骤不会补造证据。真实 GSSM 报告、项目 Mermaid 和步骤返回交互已有浏览器核查，整体交付与限制见[本轮说明](../workspaces/reviews/task-workflow-and-reading/review.md)。任意 Agent 自动生成、执行整张图仍未实现；手机网络访问本轮后置。
+
+2026-09-28 新增[Agent 中心与事项整理](../workspaces/reviews/item-stewardship-and-agent-center/review.md)：概述首卡集中背景、目标、预期结果、真实进展和固定产出；个人原有 15 项及团队原有 1 项已实际分组，保留原编号、状态、背景与成果，另建两个聚合父项。本轮工作和真实验证作为现有开发目标的子项。创建继承与明确规则、公用整理建议/应用/撤销、Agent 注册和共同派发均已实现。Agent 中心汇总受管开发、单次 Run、外部会话和整理操作，页面注明轨迹采集范围。准确工作流和使用入口见[开发 Agent 全流程](#doc-07)。 2026-09-29 集成验证为后端 173 项、前端 159 项通过；真实网页开发委托完成方案、独立审阅和隔离实施，固定交付待用户审阅。独立复核未发现本轮范围内剩余阻断；原失败和修复记录保留。
 
 | 用户现在能做什么 | 证据与适用范围 | 仍不能依赖什么 |
 | --- | --- | --- |
@@ -1279,6 +1293,34 @@ python scripts/lifeweave.py external-report item-实际编号 external-实际会
 `code` 必须是计划中预期产物的 ID，`plan-version` 来自 `work-view.plan.version`。回执中的 `stepReport.applied` 和 `issues` 才说明是否成功推进；保存了报告不等于完成。网页受管开发也使用这套规则，已有多个可执行步骤时明确选择。本功能不是任意 DAG 的通用调度器，未接入 Agent 仍不会自动产出图。流程见[事项工作区](#doc-06)。
 
 固定产物读取使用 `/items/{id}/outputs/catalog|file|document|asset|download|bundle`，按 `outputId` 与 `version` 定位。知识页工作产物模式只读，不代替正式知识修订。前端新增 Mermaid，升级需重新安装锁定依赖并构建；服务继续只监听本机 8010，手机访问另行建设。
+
+<a id="doc-10-line-243"></a>
+
+### Agent 中心与事项整理
+
+进入 `/lifeweave/personal/agents`，在 Agents 中查看或注册配置，选择已有事项后“派任务”。能力绑定已有开发、研究、通用工作或事项整理插件；默认执行器、模型、方法可保存，每次任务可覆盖。事项右上“委托 Agent”使用同一组件和接口。选择开发能力后填写目标 Git 仓，选择仅方案/允许实施、独立审阅/自检；选择普通任务可以配置目标目录、权限和容器。
+
+执行记录页汇总全部已登记来源，支持 Agent ID、事项 ID 和状态筛选；点开查看固定输入、阶段运行、成果与已采集轨迹。外部会话只能展示实际主动报告和受支持 Hook 元事件，不能控制或补造未接入的操作。开发隔离结果不会自动合入目标仓。执行器账号仍用本机 Codex/OpenCode CLI 登录；网页没有通用 API Key 保险库，切勿把密钥填到 Agent 描述或任务正文。
+
+事项列表默认按专题分组；“整理事项”支持按明确规则建议、指定分类/父级、选取已有事项聚合、预览、应用与撤销。分类规则可维护关键词；多个不同归属命中时保留待判断，不随机选择。子事项创建在同一事务中继承父项分类。整理不会把业务状态或历史成果改成完成。
+
+本机 Agent 可调用同一入口：
+
+```bash
+python scripts/lifeweave.py agents
+python scripts/lifeweave.py agent-choices ITEM_ID
+python scripts/lifeweave.py agent-register --file agent.json
+python scripts/lifeweave.py agent-update AGENT_ID --file patch.json
+python scripts/lifeweave.py agent-dispatch ITEM_ID --file dispatch.json --request-id STABLE_REQUEST_ID
+python scripts/lifeweave.py agent-executions --item-id ITEM_ID
+python scripts/lifeweave.py agent-execution managed_development EXECUTION_ID
+python scripts/lifeweave_organization.py catalog
+python scripts/lifeweave_organization.py propose --file organization.json
+python scripts/lifeweave_organization.py apply PROPOSAL_ID
+python scripts/lifeweave_organization.py undo PROPOSAL_ID
+```
+
+两个客户端默认个人空间和本机 8010；全局 `--workspace team` 切换团队空间，`--url` 只允许本机 HTTP。具体 JSON 字段可查 `/docs` 和[本轮接口说明](../workspaces/reviews/item-stewardship-and-agent-center/contracts.md)。创建/派发超时重试要复用相同 requestId；修改已保存配置、概述或规则携带当前版本，避免覆盖别人刚做的修改。
 <!-- source-end: docs/development.md -->
 
 ---

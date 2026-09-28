@@ -51,3 +51,11 @@ Proposal 至少 `{id,status:'proposed'|'applied'|'undone',reason,changes:[{itemI
 - Sol Agent：`src/lifeweave_agents/*`, `src/api/app.py`, 原development/runtime/external routers必要适配，`src/lifeweave_plugins/*`必要登记，`scripts/lifeweave.py`，对应后端测试。不要修改事项owner文件。
 - Sol UI：`web/src/**`，对应前端测试。需要类型契约时与两个后端owner直接沟通。
 - Root：方案/流程文档、真实数据整理批次、集成与浏览器验证、交付证据、Notion镜像。代码只做必要最终集成，先通知owner。
+
+## 实施中明确的字段与边界
+
+Agent 配置包含 `runtime`（native/docker）和 `permission`（read-only/workspace-write）。能力决定 pluginId，注册请求不接受独立 pluginId；已有配置修改不允许换能力。派发支持 directory/runtime/permission/image/branch/machineId/capabilityCandidateId 等本次运行参数，开发组合仍使用自身阶段权限与隔离工作树。省略 knowledgeRefs 与明确传空数组含义不同：前者允许能力默认知识，后者明确不携带。
+
+执行引用包含 `agentIds`、`itemIds`，组织建议由多个 Agent 先后操作时按参与身份/事项均可筛选。详情 `launches[]` 保存每次提出/应用操作的当时配置、输入和结果，不因后续配置改变而重写。events 保留脱敏 payload 以及 native/platform/reported 来源；coverage 说明缺口。
+
+公开 `/relations` 不再直接改写专题/领域归属或父级；普通资源引用保留。旧网页关系编辑和新建后关联分类也走组织 proposal/apply。创建时继承、批次应用/撤销保留内部事务路径，旧领域 references 关系可读取与原样撤销。

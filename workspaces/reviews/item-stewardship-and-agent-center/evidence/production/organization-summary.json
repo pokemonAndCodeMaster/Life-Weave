@@ -1,0 +1,41 @@
+{
+  "personal": {
+    "items": 19,
+    "roots": 6,
+    "children": 13,
+    "unorganized": 0,
+    "topics": [
+      {
+        "title": "平台历史与阶段交付",
+        "items": 2
+      },
+      {
+        "title": "自动驾驶论文研究",
+        "items": 3
+      },
+      {
+        "title": "LifeWeave 平台建设",
+        "items": 14
+      }
+    ],
+    "domains": [
+      "研究与学习",
+      "平台开发"
+    ]
+  },
+  "team": {
+    "items": 1,
+    "roots": 1,
+    "children": 0,
+    "unorganized": 0,
+    "topics": [
+      {
+        "title": "团队工作台验证",
+        "items": 1
+      }
+    ],
+    "domains": [
+      "团队协作"
+    ]
+  }
+}

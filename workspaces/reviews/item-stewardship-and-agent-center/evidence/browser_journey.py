@@ -72,7 +72,7 @@ with sync_playwright() as play:
     page.get_by_label('给事项派任务').select_option(item_id)
     page.get_by_role('button',name='派任务',exact=True).click()
     launch=page.get_by_role('region',name='委托 Agent')
-    launch.get_by_label('Agent',exact=True).select_option('general')
+    launch.get_by_role('combobox',name=re.compile('^Agent')).select_option('general')
     launch.get_by_label('本次任务').fill('仅验证已登记任务能入队；隔离服务不启动模型。')
     with page.expect_response(lambda response: response.request.method=='POST' and response.url.endswith('/agent-dispatch')) as dispatched:
         launch.get_by_role('button',name='开始委托',exact=True).click()

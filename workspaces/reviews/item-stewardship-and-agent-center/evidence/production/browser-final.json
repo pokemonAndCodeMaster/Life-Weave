@@ -1,0 +1,39 @@
+{
+  "checks": [
+    {
+      "kind": "external_session",
+      "executionId": "external-ee630a9a0ff794aa5f3d8f8ef4429298",
+      "outputId": "artifact:output-807d5e59db6580578aebf0e63e064788",
+      "title": "事项归属、版本计划与两入口步骤报告",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-7547b65b4f704829/outputs?output=artifact:output-807d5e59db6580578aebf0e63e064788"
+    },
+    {
+      "kind": "managed_development",
+      "executionId": "dev-e8f9f45f61889ee6e151d434c9ef3525",
+      "outputId": "delivery:dev-e8f9f45f61889ee6e151d434c9ef3525",
+      "title": "代码交付包",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-80ad795359af474a/outputs?output=delivery:dev-e8f9f45f61889ee6e151d434c9ef3525"
+    },
+    {
+      "kind": "managed_run",
+      "executionId": "gzrun-20260919-130600-2cabbf3e",
+      "outputId": "run:gzrun-20260919-130600-2cabbf3e",
+      "title": "研究成果",
+      "url": "http://127.0.0.1:8010/lifeweave/personal/items/item-de7785d0790445d8/outputs?output=run:gzrun-20260919-130600-2cabbf3e"
+    }
+  ],
+  "listingTimings": [
+    {
+      "seconds": 0.049,
+      "rows": 8,
+      "total": 33
+    },
+    {
+      "seconds": 0.039,
+      "rows": 8,
+      "total": 33
+    }
+  ],
+  "firstOutputY": 609.84375,
+  "pageErrors": []
+}

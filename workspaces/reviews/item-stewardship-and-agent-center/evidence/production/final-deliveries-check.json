@@ -1,0 +1,67 @@
+{
+  "codeVersion": "49f3fec",
+  "steps": [
+    {
+      "id": "design",
+      "state": "succeeded",
+      "outputIds": [
+        "artifact:result-88fbac408888807dc35a1c3c"
+      ]
+    },
+    {
+      "id": "organization",
+      "state": "succeeded",
+      "outputIds": [
+        "artifact:output-139a5c20ab1929288c701d999199fede"
+      ]
+    },
+    {
+      "id": "agents",
+      "state": "succeeded",
+      "outputIds": [
+        "artifact:output-93f8591c471dc0809a23d22c77ca2ffe"
+      ]
+    },
+    {
+      "id": "interface",
+      "state": "succeeded",
+      "outputIds": [
+        "artifact:output-2515612f90c595a4bdcd762e4bc15af6"
+      ]
+    },
+    {
+      "id": "verification",
+      "state": "succeeded",
+      "outputIds": [
+        "artifact:result-dbea0d41bfe96510d6d296ce"
+      ]
+    },
+    {
+      "id": "acceptance",
+      "state": "planned",
+      "outputIds": []
+    }
+  ],
+  "bundles": [
+    {
+      "step": "organization",
+      "catalogFilesIncludingReport": 15,
+      "sha256Verified": true,
+      "zipEntries": 39
+    },
+    {
+      "step": "agents",
+      "catalogFilesIncludingReport": 16,
+      "sha256Verified": true,
+      "zipEntries": 49
+    },
+    {
+      "step": "interface",
+      "catalogFilesIncludingReport": 36,
+      "sha256Verified": true,
+      "zipEntries": 101
+    }
+  ],
+  "pageErrors": [],
+  "initialProbeCorrection": "First probe looked for folders before expanding code category. Actual categories are collapsed by design. Retried by clicking code category, then folders; no product change."
+}

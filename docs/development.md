@@ -239,3 +239,29 @@ python scripts/lifeweave.py external-report item-实际编号 external-实际会
 `code` 必须是计划中预期产物的 ID，`plan-version` 来自 `work-view.plan.version`。回执中的 `stepReport.applied` 和 `issues` 才说明是否成功推进；保存了报告不等于完成。网页受管开发也使用这套规则，已有多个可执行步骤时明确选择。本功能不是任意 DAG 的通用调度器，未接入 Agent 仍不会自动产出图。流程见[事项工作区](item-workspace-design.md)。
 
 固定产物读取使用 `/items/{id}/outputs/catalog|file|document|asset|download|bundle`，按 `outputId` 与 `version` 定位。知识页工作产物模式只读，不代替正式知识修订。前端新增 Mermaid，升级需重新安装锁定依赖并构建；服务继续只监听本机 8010，手机访问另行建设。
+
+## Agent 中心与事项整理
+
+进入 `/lifeweave/personal/agents`，在 Agents 中查看或注册配置，选择已有事项后“派任务”。能力绑定已有开发、研究、通用工作或事项整理插件；默认执行器、模型、方法可保存，每次任务可覆盖。事项右上“委托 Agent”使用同一组件和接口。选择开发能力后填写目标 Git 仓，选择仅方案/允许实施、独立审阅/自检；选择普通任务可以配置目标目录、权限和容器。
+
+执行记录页汇总全部已登记来源，支持 Agent ID、事项 ID 和状态筛选；点开查看固定输入、阶段运行、成果与已采集轨迹。外部会话只能展示实际主动报告和受支持 Hook 元事件，不能控制或补造未接入的操作。开发隔离结果不会自动合入目标仓。执行器账号仍用本机 Codex/OpenCode CLI 登录；网页没有通用 API Key 保险库，切勿把密钥填到 Agent 描述或任务正文。
+
+事项列表默认按专题分组；“整理事项”支持按明确规则建议、指定分类/父级、选取已有事项聚合、预览、应用与撤销。分类规则可维护关键词；多个不同归属命中时保留待判断，不随机选择。子事项创建在同一事务中继承父项分类。整理不会把业务状态或历史成果改成完成。
+
+本机 Agent 可调用同一入口：
+
+```bash
+python scripts/lifeweave.py agents
+python scripts/lifeweave.py agent-choices ITEM_ID
+python scripts/lifeweave.py agent-register --file agent.json
+python scripts/lifeweave.py agent-update AGENT_ID --file patch.json
+python scripts/lifeweave.py agent-dispatch ITEM_ID --file dispatch.json --request-id STABLE_REQUEST_ID
+python scripts/lifeweave.py agent-executions --item-id ITEM_ID
+python scripts/lifeweave.py agent-execution managed_development EXECUTION_ID
+python scripts/lifeweave_organization.py catalog
+python scripts/lifeweave_organization.py propose --file organization.json
+python scripts/lifeweave_organization.py apply PROPOSAL_ID
+python scripts/lifeweave_organization.py undo PROPOSAL_ID
+```
+
+两个客户端默认个人空间和本机 8010；全局 `--workspace team` 切换团队空间，`--url` 只允许本机 HTTP。具体 JSON 字段可查 `/docs` 和[本轮接口说明](../workspaces/reviews/item-stewardship-and-agent-center/contracts.md)。创建/派发超时重试要复用相同 requestId；修改已保存配置、概述或规则携带当前版本，避免覆盖别人刚做的修改。

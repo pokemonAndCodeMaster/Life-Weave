@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "team",
+      "terms": [
+        "团队工作台"
+      ],
+      "title": "团队工作台验证",
+      "enabled": true,
+      "topicIds": [
+        "topic-d894e5857ed541b2"
+      ],
+      "domainIds": [
+        "domain-66bd79fe88bf4188"
+      ]
+    }
+  ]
+}

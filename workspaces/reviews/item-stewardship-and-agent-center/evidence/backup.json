@@ -2,5 +2,10 @@
   "database": ".runtime/backups/lifeweave-20260928-230035.dump",
   "knowledge": ".runtime/backups/knowledge-20260928-230035.tar.gz",
   "mode": "pg_dump consistent snapshot; no active managed runs in either workspace; knowledge idle",
-  "activeRuns": 0
+  "activeRuns": 0,
+  "deploymentBackup": {
+    "database": ".runtime/backups/lifeweave-20260928-233255.dump",
+    "knowledge": ".runtime/backups/knowledge-20260928-233256.tar.gz",
+    "mode": "owned service stopped after both workspace active runs verified empty; workbench backup"
+  }
 }

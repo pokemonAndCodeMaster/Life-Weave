@@ -1,0 +1,513 @@
+{
+  "itemId": "item-c0f13d85b5c145fd",
+  "itemVersion": 13,
+  "current": {
+    "state": "open",
+    "label": "用户审阅",
+    "summary": "业务计划含 6 个步骤，版本 1；事项正式状态为待处理。",
+    "updatedAt": "2026-09-29T00:04:20.060317+08:00"
+  },
+  "plan": {
+    "id": "plan:item-c0f13d85b5c145fd",
+    "title": "事项管理与 Agent 中心",
+    "provider": "development",
+    "source": "declared",
+    "version": 1,
+    "editable": true,
+    "revisionReason": "",
+    "nodes": [
+      {
+        "id": "design",
+        "runId": null,
+        "state": "succeeded",
+        "title": "方案与流程核对",
+        "summary": "六项要求形成完整设计与接口契约，已核对真实事项与受管/外部流程，Sol 分工进入实施。",
+        "dependsOn": [],
+        "outputIds": [
+          "artifact:result-88fbac408888807dc35a1c3c"
+        ],
+        "acceptance": "六项诉求均有用户旅程、责任与验证。",
+        "provenance": "declared",
+        "contextRefs": [],
+        "description": "六项诉求均有用户旅程、责任与验证。",
+        "assignmentId": null,
+        "expectedOutputs": [
+          {
+            "id": "main",
+            "kind": "plan",
+            "title": "完整方案与接口契约",
+            "required": true
+          }
+        ],
+        "attempts": [
+          {
+            "id": "step-report-8d150f385fbe44e55bf54d84cc2116dc",
+            "planVersion": 1,
+            "outcome": "succeeded",
+            "applied": true,
+            "summary": "六项要求形成完整设计与接口契约，已核对真实事项与受管/外部流程，Sol 分工进入实施。",
+            "createdAt": "2026-09-28T23:00:51.106103+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [
+              "artifact:result-88fbac408888807dc35a1c3c"
+            ],
+            "issues": [],
+            "checks": [
+              {
+                "label": "逐项核对个人15项和团队1项、当前源码与Notion插件架构；接口文件和固定设计产物可读。",
+                "result": "passed",
+                "evidence": "逐项核对个人15项和团队1项、当前源码与Notion插件架构；接口文件和固定设计产物可读。"
+              }
+            ],
+            "fixedDeliveries": [
+              {
+                "version": "b7a1d32990be8d326ddb35b23de4d5ea56092cae272e505da01ce4c905ecaf18",
+                "outputId": "artifact:result-88fbac408888807dc35a1c3c",
+                "expectationId": "main"
+              }
+            ]
+          }
+        ],
+        "deliveryStatus": "complete",
+        "missingRequirements": []
+      },
+      {
+        "id": "organization",
+        "runId": null,
+        "state": "succeeded",
+        "title": "事项概述与公共整理",
+        "summary": "事项概述、创建继承与公共整理已完成；现有个人与团队事项已按审核批次归组并保留原记录。",
+        "dependsOn": [
+          "design"
+        ],
+        "outputIds": [
+          "artifact:output-139a5c20ab1929288c701d999199fede"
+        ],
+        "acceptance": "创建继承、批次整理与撤销均可验证。",
+        "provenance": "declared",
+        "contextRefs": [],
+        "description": "创建继承、批次整理与撤销均可验证。",
+        "assignmentId": null,
+        "expectedOutputs": [
+          {
+            "id": "main",
+            "kind": "code",
+            "title": "概述和组织治理实现",
+            "required": true
+          }
+        ],
+        "attempts": [
+          {
+            "id": "step-report-f2c262ea1eba8898a316efc937453224",
+            "planVersion": 1,
+            "outcome": "succeeded",
+            "applied": true,
+            "summary": "事项概述、创建继承与公共整理已完成；现有个人与团队事项已按审核批次归组并保留原记录。",
+            "createdAt": "2026-09-29T00:02:29.465380+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [
+              "artifact:output-139a5c20ab1929288c701d999199fede"
+            ],
+            "issues": [],
+            "checks": [
+              {
+                "label": "后端 173 项、前端 159 项通过；正式浏览器和独立反例核查。",
+                "result": "passed",
+                "evidence": "后端 173 项、前端 159 项通过；正式浏览器和独立反例核查。"
+              }
+            ],
+            "fixedDeliveries": [
+              {
+                "version": "02dbebfee5ca3e8d13e460b333718bf8aca5407f0e7217bf8314cd3544640f7c",
+                "outputId": "artifact:output-139a5c20ab1929288c701d999199fede",
+                "expectationId": "main"
+              }
+            ]
+          },
+          {
+            "id": "step-report-bdf53741656fe3fe631f31d14500cbf3",
+            "planVersion": 1,
+            "outcome": "running",
+            "applied": true,
+            "summary": "Sol 正在实现事项概述、通用组织服务与建项继承。",
+            "createdAt": "2026-09-28T23:00:51.308273+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [],
+            "issues": [],
+            "checks": [],
+            "fixedDeliveries": []
+          }
+        ],
+        "deliveryStatus": "complete",
+        "missingRequirements": []
+      },
+      {
+        "id": "agents",
+        "runId": null,
+        "state": "succeeded",
+        "title": "Agent 配置与执行归一",
+        "summary": "Agent 注册、共同触发、执行目录及已采集轨迹已完成；真实受管三阶段验证通过，失败重试映射已修复。",
+        "dependsOn": [
+          "design"
+        ],
+        "outputIds": [
+          "artifact:output-93f8591c471dc0809a23d22c77ca2ffe"
+        ],
+        "acceptance": "受管、外部与整理操作同一处可追踪。",
+        "provenance": "declared",
+        "contextRefs": [],
+        "description": "受管、外部与整理操作同一处可追踪。",
+        "assignmentId": null,
+        "expectedOutputs": [
+          {
+            "id": "main",
+            "kind": "code",
+            "title": "Agent目录、共同触发与执行轨迹",
+            "required": true
+          }
+        ],
+        "attempts": [
+          {
+            "id": "step-report-16a6e5dc9efccc91a261d054aae9274b",
+            "planVersion": 1,
+            "outcome": "succeeded",
+            "applied": true,
+            "summary": "Agent 注册、共同触发、执行目录及已采集轨迹已完成；真实受管三阶段验证通过，失败重试映射已修复。",
+            "createdAt": "2026-09-29T00:02:29.589709+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [
+              "artifact:output-93f8591c471dc0809a23d22c77ca2ffe"
+            ],
+            "issues": [],
+            "checks": [
+              {
+                "label": "后端 173 项、前端 159 项通过；正式浏览器和独立反例核查。",
+                "result": "passed",
+                "evidence": "后端 173 项、前端 159 项通过；正式浏览器和独立反例核查。"
+              }
+            ],
+            "fixedDeliveries": [
+              {
+                "version": "adf43e7dcce0dcc4029c4fbdcd4165d3b4a2026cdfd4c1e20888212262241d0a",
+                "outputId": "artifact:output-93f8591c471dc0809a23d22c77ca2ffe",
+                "expectationId": "main"
+              }
+            ]
+          },
+          {
+            "id": "step-report-9df2498c2119f8384584e363a99e88c0",
+            "planVersion": 1,
+            "outcome": "running",
+            "applied": true,
+            "summary": "Sol 正在实现Agent目录、共同触发与执行轨迹归总。",
+            "createdAt": "2026-09-28T23:00:51.422215+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [],
+            "issues": [],
+            "checks": [],
+            "fixedDeliveries": []
+          }
+        ],
+        "deliveryStatus": "complete",
+        "missingRequirements": []
+      },
+      {
+        "id": "interface",
+        "runId": null,
+        "state": "succeeded",
+        "title": "共同前端交互",
+        "summary": "概述首卡、层级列表、Agent 中心和共同派发/详情已完成，浏览器成果跳转与实时状态核验通过。",
+        "dependsOn": [
+          "organization",
+          "agents"
+        ],
+        "outputIds": [
+          "artifact:output-2515612f90c595a4bdcd762e4bc15af6"
+        ],
+        "acceptance": "网页可注册、派发、查看实时过程和固定成果。",
+        "provenance": "declared",
+        "contextRefs": [],
+        "description": "网页可注册、派发、查看实时过程和固定成果。",
+        "assignmentId": null,
+        "expectedOutputs": [
+          {
+            "id": "main",
+            "kind": "code",
+            "title": "概览、Agent中心与共同详情",
+            "required": true
+          }
+        ],
+        "attempts": [
+          {
+            "id": "step-report-38d57b1d175276a221cf56eb351e85cf",
+            "planVersion": 1,
+            "outcome": "succeeded",
+            "applied": true,
+            "summary": "概述首卡、层级列表、Agent 中心和共同派发/详情已完成，浏览器成果跳转与实时状态核验通过。",
+            "createdAt": "2026-09-29T00:02:29.720185+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [
+              "artifact:output-2515612f90c595a4bdcd762e4bc15af6"
+            ],
+            "issues": [],
+            "checks": [
+              {
+                "label": "后端 173 项、前端 159 项通过；正式浏览器和独立反例核查。",
+                "result": "passed",
+                "evidence": "后端 173 项、前端 159 项通过；正式浏览器和独立反例核查。"
+              }
+            ],
+            "fixedDeliveries": [
+              {
+                "version": "91c43860cfc768fa1cf09604375a61195f864fd95851c9f51461eb0ab879e7a4",
+                "outputId": "artifact:output-2515612f90c595a4bdcd762e4bc15af6",
+                "expectationId": "main"
+              }
+            ]
+          },
+          {
+            "id": "step-report-f2d15f59f9d25f04a9e976057647f950",
+            "planVersion": 1,
+            "outcome": "running",
+            "applied": true,
+            "summary": "Sol 正在实现Agent中心、共同执行详情和事项概述交互。",
+            "createdAt": "2026-09-28T23:00:51.535465+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [],
+            "issues": [],
+            "checks": [],
+            "fixedDeliveries": []
+          }
+        ],
+        "deliveryStatus": "complete",
+        "missingRequirements": []
+      },
+      {
+        "id": "verification",
+        "runId": null,
+        "state": "succeeded",
+        "title": "数据整理与真实验收",
+        "summary": "正式事项已归组；三类成果正确阅读，真实开发三阶段、固定差异及独立复核通过。后端173项、前端159项通过，待用户使用审阅。",
+        "dependsOn": [
+          "interface"
+        ],
+        "outputIds": [
+          "artifact:result-dbea0d41bfe96510d6d296ce"
+        ],
+        "acceptance": "保留全部原事项，实际操作和独立审查通过。",
+        "provenance": "declared",
+        "contextRefs": [],
+        "description": "保留全部原事项，实际操作和独立审查通过。",
+        "assignmentId": null,
+        "expectedOutputs": [
+          {
+            "id": "main",
+            "kind": "validation",
+            "title": "整理对账、运行证据和独立审查",
+            "required": true
+          }
+        ],
+        "attempts": [
+          {
+            "id": "step-report-2dff8e8c103864b7c42764d0702d3005",
+            "planVersion": 1,
+            "outcome": "succeeded",
+            "applied": true,
+            "summary": "正式事项已归组；三类成果正确阅读，真实开发三阶段、固定差异及独立复核通过。后端173项、前端159项通过，待用户使用审阅。",
+            "createdAt": "2026-09-29T00:04:20.060317+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [
+              "artifact:result-dbea0d41bfe96510d6d296ce"
+            ],
+            "issues": [],
+            "checks": [
+              {
+                "label": "独立报告覆盖49f3fec；正式浏览器无页面错误；失败历史保留。",
+                "result": "passed",
+                "evidence": "独立报告覆盖49f3fec；正式浏览器无页面错误；失败历史保留。"
+              }
+            ],
+            "fixedDeliveries": [
+              {
+                "version": "9b213d1379b4308c1af8011d83fcce4400760eefc8178319d901ac77ff4e91f8",
+                "outputId": "artifact:result-dbea0d41bfe96510d6d296ce",
+                "expectationId": "main"
+              }
+            ]
+          },
+          {
+            "id": "step-report-451a4b77cc89254f725f13e7ca85f399",
+            "planVersion": 1,
+            "outcome": "running",
+            "applied": true,
+            "summary": "正式空间已完成存量分类与聚合，原事项/状态/上下文/成果逐一保留；新Agent中心已实际注册、派发并读取过程。正在完成真实开发链和独立审查发现的成果跳转、关系治理修复。",
+            "createdAt": "2026-09-28T23:40:40.963589+08:00",
+            "runId": null,
+            "assignmentId": null,
+            "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+            "outputIds": [],
+            "issues": [],
+            "checks": [
+              {
+                "label": "正式个人15项及团队1项对账通过；本轮与两个聚合父项保留",
+                "result": "passed",
+                "evidence": "正式个人15项及团队1项对账通过；本轮与两个聚合父项保留"
+              }
+            ],
+            "fixedDeliveries": []
+          }
+        ],
+        "deliveryStatus": "complete",
+        "missingRequirements": []
+      },
+      {
+        "id": "acceptance",
+        "runId": null,
+        "state": "planned",
+        "title": "用户审阅",
+        "summary": "",
+        "dependsOn": [
+          "verification"
+        ],
+        "outputIds": [],
+        "acceptance": "用户查看交付后决定，Agent不代替接受。",
+        "provenance": "declared",
+        "contextRefs": [],
+        "description": "用户查看交付后决定，Agent不代替接受。",
+        "assignmentId": null,
+        "expectedOutputs": [
+          {
+            "id": "main",
+            "kind": "decision",
+            "title": "用户接受或反馈",
+            "required": true
+          }
+        ],
+        "attempts": [],
+        "deliveryStatus": "pending",
+        "missingRequirements": []
+      }
+    ]
+  },
+  "outputs": [
+    {
+      "id": "artifact:result-de0d75dc22d0e22500625bb4",
+      "title": "Agent 开发流程、调用关系与顺序图",
+      "kind": "document",
+      "summary": "# Agent 怎样承接、执行和交付一件事 LifeWeave 的 Agent 是一套可触发的工作配置：它选择已有能力、方法和运行环境。事项保存用户目标；步骤计划说明如何推进；一次执行记录这次实际用了什么、做了什么和交付了什么。把这几层分开，才能让同一事项在网页或本机接续，也能换模型而不丢失目标与成果。 本文以当前工程为依据。Agent 中心与事项整理已落地；本轮验证及独立审查证据在[本轮方案与交付](../workspaces/reviews/item-stewardshi",
+      "state": "manual",
+      "createdAt": "2026-09-29T00:04:19.943620+08:00",
+      "version": "189ec31a6c59c9079c0fb7f1bed4295aae6f4f7cb2573f6b84c9c489908b89ca",
+      "runId": null,
+      "assignmentId": null,
+      "artifactId": "result-de0d75dc22d0e22500625bb4",
+      "uri": "/api/lifeweave/personal/items/item-c0f13d85b5c145fd/research-output"
+    },
+    {
+      "id": "artifact:result-dbea0d41bfe96510d6d296ce",
+      "title": "事项整理与 Agent 中心：交付验证",
+      "kind": "validation",
+      "summary": "# 事项管理与 Agent 中心：方案与实施计划 本轮解决两个日常困难：打开事项看不懂为什么做、做到哪里；不同入口叫来的 Agent 没有共同目录与执行视图。用户应能先在整理好的事项树中找到工作，在概览读懂背景和结果，再从事项或 Agent 中心选择同一能力执行，并在同一详情里跟踪实际输入、步骤、工具事件、输出和失败。 来源：2026-09-28 用户六项要求及“你来规划设计，sol 来实施”的直接授权。目标仓为 LifeWeave；基线 `ccd4c1b`。本轮事项 `it",
+      "state": "manual",
+      "createdAt": "2026-09-29T00:03:51.359734+08:00",
+      "version": "9b213d1379b4308c1af8011d83fcce4400760eefc8178319d901ac77ff4e91f8",
+      "runId": null,
+      "assignmentId": null,
+      "artifactId": "result-dbea0d41bfe96510d6d296ce",
+      "uri": "/api/lifeweave/personal/items/item-c0f13d85b5c145fd/research-output"
+    },
+    {
+      "id": "artifact:output-2515612f90c595a4bdcd762e4bc15af6",
+      "title": "概述、事项组织与 Agent 中心页面",
+      "kind": "code",
+      "summary": "实现共用派发、执行详情、实时状态和站内成果阅读；概述短摘要、可展开组织层级及有界事件阅读。",
+      "state": "manual",
+      "createdAt": "2026-09-29T00:02:08.823875+08:00",
+      "version": "91c43860cfc768fa1cf09604375a61195f864fd95851c9f51461eb0ab879e7a4",
+      "runId": null,
+      "assignmentId": null,
+      "artifactId": "output-2515612f90c595a4bdcd762e4bc15af6",
+      "uri": "/api/lifeweave/personal/items/item-c0f13d85b5c145fd/research-output"
+    },
+    {
+      "id": "artifact:output-93f8591c471dc0809a23d22c77ca2ffe",
+      "title": "Agent 配置、共同触发与执行轨迹",
+      "kind": "code",
+      "summary": "实现注册配置、统一派发与执行目录，固定配置与实际已采集事件；修复成果引用、列表分页和受管开发失败重试步骤绑定。",
+      "state": "manual",
+      "createdAt": "2026-09-29T00:02:08.553880+08:00",
+      "version": "adf43e7dcce0dcc4029c4fbdcd4165d3b4a2026cdfd4c1e20888212262241d0a",
+      "runId": null,
+      "assignmentId": null,
+      "artifactId": "output-93f8591c471dc0809a23d22c77ca2ffe",
+      "uri": "/api/lifeweave/personal/items/item-c0f13d85b5c145fd/research-output"
+    },
+    {
+      "id": "artifact:output-139a5c20ab1929288c701d999199fede",
+      "title": "事项概述与公共整理实现",
+      "kind": "code",
+      "summary": "实现可维护概述、创建继承、规则分类和可撤销整理批次，包含公开关系绕过修复及数据库回归。",
+      "state": "manual",
+      "createdAt": "2026-09-29T00:02:08.296170+08:00",
+      "version": "02dbebfee5ca3e8d13e460b333718bf8aca5407f0e7217bf8314cd3544640f7c",
+      "runId": null,
+      "assignmentId": null,
+      "artifactId": "output-139a5c20ab1929288c701d999199fede",
+      "uri": "/api/lifeweave/personal/items/item-c0f13d85b5c145fd/research-output"
+    },
+    {
+      "id": "artifact:result-88fbac408888807dc35a1c3c",
+      "title": "事项管理与 Agent 中心：方案和实施计划",
+      "kind": "plan",
+      "summary": "# 事项管理与 Agent 中心：方案与实施计划 本轮解决两个日常困难：打开事项看不懂为什么做、做到哪里；不同入口叫来的 Agent 没有共同目录与执行视图。用户应能先在整理好的事项树中找到工作，在概览读懂背景和结果，再从事项或 Agent 中心选择同一能力执行，并在同一详情里跟踪实际输入、步骤、工具事件、输出和失败。 来源：2026-09-28 用户六项要求及“你来规划设计，sol 来实施”的直接授权。目标仓为 LifeWeave；基线 `ccd4c1b`。本轮事项 `it",
+      "state": "manual",
+      "createdAt": "2026-09-28T23:00:35.870297+08:00",
+      "version": "b7a1d32990be8d326ddb35b23de4d5ea56092cae272e505da01ce4c905ecaf18",
+      "runId": null,
+      "assignmentId": null,
+      "artifactId": "result-88fbac408888807dc35a1c3c",
+      "uri": "/api/lifeweave/personal/items/item-c0f13d85b5c145fd/research-output"
+    }
+  ],
+  "warnings": [],
+  "overview": {
+    "background": "事项的介绍、分类和 Agent 执行入口分散，已有事项没有真正归组；看不清谁做了什么，也难以找到 Agent 和执行环境设置。",
+    "intent": "改进事项概述，整理现有事项，提供所有 Agent 可调用的事项管理能力，并建立共用触发和过程阅读的 Agent 中心。",
+    "expectedResult": "进入事项能读懂目标、进展和产物；列表按专题和父子目标收拢；从事项或 Agent 中心可选择能力并看到真实执行轨迹。",
+    "progress": {
+      "summary": "数据整理与真实验收：正式事项已归组；三类成果正确阅读，真实开发三阶段、固定差异及独立复核通过。后端173项、前端159项通过，待用户使用审阅。；下一步：用户审阅",
+      "state": "planned",
+      "completedSteps": 5,
+      "totalSteps": 6
+    },
+    "outputIds": [
+      "artifact:result-88fbac408888807dc35a1c3c",
+      "artifact:output-139a5c20ab1929288c701d999199fede",
+      "artifact:output-93f8591c471dc0809a23d22c77ca2ffe",
+      "artifact:output-2515612f90c595a4bdcd762e4bc15af6",
+      "artifact:result-dbea0d41bfe96510d6d296ce"
+    ],
+    "sources": {
+      "background": "item.overview",
+      "intent": "item.overview",
+      "expectedResult": "item.overview",
+      "progress": "step_report"
+    }
+  }
+}

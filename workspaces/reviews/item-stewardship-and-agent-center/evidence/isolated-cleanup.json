@@ -1,0 +1,8 @@
+{
+  "removedServerPid": 810716,
+  "removedPort": 8012,
+  "removedDatabase": "test_lifeweave_agent_center_20260928",
+  "removedKnowledgeRoot": "/home/yyh/project/lifeweave/.runtime/agent-center-browser",
+  "production8010Preserved": true,
+  "realManagedFixtureAndDeliveriesPreserved": true
+}

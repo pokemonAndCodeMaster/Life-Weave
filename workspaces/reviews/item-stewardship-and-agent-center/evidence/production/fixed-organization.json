@@ -1,0 +1,23 @@
+{
+  "selectedPaths": [
+    "migrations/018_item_organization.sql",
+    "scripts/lifeweave_organization.py",
+    "src/lifeweave/item_organization.py",
+    "src/lifeweave/item_organization_models.py",
+    "src/lifeweave/item_organization_router.py",
+    "src/lifeweave/item_overview.py",
+    "src/lifeweave/item_overview_models.py",
+    "src/lifeweave/item_overview_router.py",
+    "src/lifeweave/router.py",
+    "src/lifeweave/service.py",
+    "src/lifeweave/work_binding.py",
+    "src/lifeweave/work_view.py",
+    "tests/test_item_organization.py",
+    "tests/test_item_overview.py"
+  ],
+  "result": {
+    "artifactId": "output-139a5c20ab1929288c701d999199fede",
+    "outputId": "artifact:output-139a5c20ab1929288c701d999199fede",
+    "version": "02dbebfee5ca3e8d13e460b333718bf8aca5407f0e7217bf8314cd3544640f7c"
+  }
+}

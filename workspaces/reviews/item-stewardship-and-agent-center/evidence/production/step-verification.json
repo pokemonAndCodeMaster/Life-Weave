@@ -1,0 +1,130 @@
+{
+  "id": "activity-2dff8e8c103864b7c42764d0702d3005",
+  "itemId": "item-c0f13d85b5c145fd",
+  "kind": "external_development_event",
+  "body": "正式事项已归组；三类成果正确阅读，真实开发三阶段、固定差异及独立复核通过。后端173项、前端159项通过，待用户使用审阅。",
+  "payload": {
+    "phase": "verification",
+    "stepId": "verification",
+    "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+    "observation": "阶段与检查由外部会话上报；Git 状态由服务读取",
+    "observedGit": {
+      "revision": "49f3feca88a6667fe7a37fdfcf53226d901dec49",
+      "changedCount": 13,
+      "changedPaths": [
+        "README.md",
+        "docs/agent-workflow.md",
+        "docs/complete-guide.md",
+        "docs/development.md",
+        "docs/status.md",
+        "workspaces/reviews/item-stewardship-and-agent-center/contracts.md",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/backend-tests-verified.txt",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/backup.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/browser-journey.txt",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/browser_journey.py",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/organized-items-final.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/ui-verification.md",
+        "workspaces/reviews/item-stewardship-and-agent-center/review.md"
+      ],
+      "repositoryPath": "/home/yyh/project/lifeweave",
+      "untrackedCount": 52,
+      "untrackedPaths": [
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/backend-tests-release.txt",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/browser-journey.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/execution-narrow-final.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/frontend-tests-release.txt",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/independent-final-review.md",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/independent-review.md",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/knowledge-workflow-final.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/live_development.py",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/agent-center-narrow.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/agent-executions-final.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/browser-final.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/browser-final.txt",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/fixed-agents.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/fixed-interface.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/fixed-organization.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/items-final.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-default-assignment.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-default-code-verification.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-default-completed.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-default-delivery.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-default-runtime-and-zip.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-default-step-reconciliation.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-default-work-view.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-development-default-observed.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-development-default-start.txt",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-development-default.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-development-observed.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-development-start-default.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-development-start.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-development-start.txt",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-development.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-execution-completed.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-fixed-delivery.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/live-step-graph.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/organization-receipts.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/organization-summary.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/overviews.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/personal-organization-after.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/personal-organization-proposal.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/personal-rules.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/step-agents.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/step-interface.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/step-organization.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/step-verification.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/team-organization-after.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/team-organization-proposal.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/team-rules.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/validation-result.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production/workflow-result.json",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/production_browser.py",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/queued-execution-final.png",
+        "workspaces/reviews/item-stewardship-and-agent-center/evidence/verification-progress.json"
+      ]
+    },
+    "planVersion": 1,
+    "declaredInputs": [],
+    "reportedChecks": [
+      "独立报告覆盖49f3fec；正式浏览器无页面错误；失败历史保留。"
+    ],
+    "requestFingerprint": "4ba2b139e9d1b697b1bea3d0ef7f32821d8615bd7183618979c4964aabf45b1a"
+  },
+  "createdAt": "2026-09-29T00:04:20.060317+08:00",
+  "stepReport": {
+    "id": "step-report-2dff8e8c103864b7c42764d0702d3005",
+    "itemId": "item-c0f13d85b5c145fd",
+    "createdAt": "2026-09-29T00:04:20.060317+08:00",
+    "requestId": "agent-center-verification-complete-49f3fec",
+    "planVersion": 1,
+    "stepId": "verification",
+    "outcome": "succeeded",
+    "summary": "正式事项已归组；三类成果正确阅读，真实开发三阶段、固定差异及独立复核通过。后端173项、前端159项通过，待用户使用审阅。",
+    "deliverables": [
+      {
+        "expectationId": "main",
+        "outputId": "artifact:result-dbea0d41bfe96510d6d296ce"
+      }
+    ],
+    "checks": [
+      {
+        "label": "独立报告覆盖49f3fec；正式浏览器无页面错误；失败历史保留。",
+        "result": "passed",
+        "evidence": "独立报告覆盖49f3fec；正式浏览器无页面错误；失败历史保留。"
+      }
+    ],
+    "sessionId": "external-be6dc063dc1ff28bfb26eaba0f4a1460",
+    "applied": true,
+    "issues": [],
+    "outputIds": [
+      "artifact:result-dbea0d41bfe96510d6d296ce"
+    ],
+    "fixedDeliveries": [
+      {
+        "expectationId": "main",
+        "outputId": "artifact:result-dbea0d41bfe96510d6d296ce",
+        "version": "9b213d1379b4308c1af8011d83fcce4400760eefc8178319d901ac77ff4e91f8"
+      }
+    ]
+  }
+}
