@@ -11,6 +11,7 @@
 - [(内部验证) 指定方法与知识的真实评测](research/personal/item-724331a2968c4420/gzrun-20260926-055416-2343fb31/report.md) · `gzrun-20260926-055416-2343fb31`
 - [Agent 中心真实开发链验证](research/personal/item-80ad795359af474a/gzrun-20260928-153931-bb453740/report.md) · `gzrun-20260928-153931-bb453740`
 - [Agent 中心真实开发链验证](research/personal/item-80ad795359af474a/gzrun-20260928-154037-a5d7f8cc/report.md) · `gzrun-20260928-154037-a5d7f8cc`
+- [Agent 中心真实开发链验证](research/personal/item-80ad795359af474a/gzrun-20260928-154124-6966a0d4/report.md) · `gzrun-20260928-154124-6966a0d4`
 - [Qwen-Drive-1.0 原文核验与持续论文研究](research/personal/item-810217743bbb4be2/gzrun-20260919-095844-49f47906/report.md) · `gzrun-20260919-095844-49f47906`
 - [回归验证只读阶段守卫后 Codex 仍可完成开发](research/personal/item-8891f7cb4f634c8f/gzrun-20260926-152934-e3603670/report.md) · `gzrun-20260926-152934-e3603670`
 - [回归验证只读阶段守卫后 Codex 仍可完成开发](research/personal/item-8891f7cb4f634c8f/gzrun-20260926-153025-90502cb1/report.md) · `gzrun-20260926-153025-90502cb1`

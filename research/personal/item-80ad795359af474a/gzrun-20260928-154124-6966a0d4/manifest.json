@@ -1,0 +1,12 @@
+{
+  "workspace": "personal",
+  "itemId": "item-80ad795359af474a",
+  "runId": "gzrun-20260928-154124-6966a0d4",
+  "title": "Agent 中心真实开发链验证",
+  "version": "bb08355418753658d6725ca498e0b42e45b5f6bab90ee57f469f375ebff8a6af",
+  "files": [],
+  "warnings": [
+    "未打包本机绝对或网页路径：/home/yyh/project/lifeweave/.runtime/executions/personal/gzrun-20260928-154124-6966a0d4/repo/README.md"
+  ],
+  "boundary": "研究成果归档，不代表已接受的正式知识。外部网址仍需联网。"
+}
