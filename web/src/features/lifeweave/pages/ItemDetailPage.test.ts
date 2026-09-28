@@ -33,6 +33,9 @@ async function openPage(id = 'child-1', parentEstablished = true) {
   const child = fixture('child-1', 'parent-1')
   const items = [parent, child]
   get.mockImplementation(async (url: string) => {
+    if (url.endsWith('/agent-choices')) return { data: { itemId: id, recommendedAgentId: 'general', items: [{ id:'general', name:'通用 Agent', description:'处理事项', version:1, capability:'general', pluginId:'lifeweave.general', engine:'codex', enabled:true, available:true, modes:['managed_run'] }], engines:[{id:'codex',label:'Codex',available:true}], environment:{} } }
+    if (url.endsWith('/input-recommendations')) return { data: { methods:[], documents:[], suggested:{methodId:null,knowledgeRefs:[]}, unavailable:[], boundary:'' } }
+    if (url.endsWith('/capabilities')) return { data: { items:[] } }
     if (url.endsWith('/research-output')) return { data: { current: null, versions: [] } }
     if (url.endsWith('/work-view')) {
       const workItemId = url.split('/').at(-2)
@@ -49,12 +52,12 @@ async function openPage(id = 'child-1', parentEstablished = true) {
     if (url.endsWith('/runs') || url.endsWith('/machines')) return { data: { items: [] } }
     return { data: items.find((entry) => url.endsWith('/items/' + entry.id)) }
   })
-  post.mockResolvedValue({ data: { id: 'run-1' } })
+  post.mockResolvedValue({ data: { kind:'managed_run', id:'run-1', itemId:id, agentId:'general', status:'queued' } })
   const workspace = useLifeWeaveWorkspace()
   await workspace.load('personal')
   const router = createRouter({
     history: createMemoryHistory(),
-    routes: [{ path: '/lifeweave/:workspace/items/:itemId/:tab', component: Harness }, { path: '/lifeweave/:workspace/conversation', component: { template: '<div />' } }],
+    routes: [{ path: '/lifeweave/:workspace/items/:itemId/:tab', component: Harness }, { path: '/lifeweave/:workspace/conversation', component: { template: '<div />' } }, { path: '/lifeweave/:workspace/agent-executions/:kind/:executionId', component: { template: '<div />' } }],
   })
   await router.push('/lifeweave/personal/items/' + id + '/overview')
   await router.isReady()
@@ -126,30 +129,27 @@ describe('事项页委托', () => {
     await flushPromises()
     await waitFor(() => expect((screen.getAllByRole('textbox', { name: '这一步要做什么' })[0]! as HTMLTextAreaElement).value).toBe('本次未保存的改动'))
   })
-  it('子事项委托提交子标识，同时清楚展示子目标和父共同背景', async () => {
+  it('子事项的共同触发保留子标识、目标和父背景', async () => {
     await openPage()
-    await waitFor(() => expect(screen.getByRole('button', { name: '委托 AI' })).toBeTruthy())
-    await fireEvent.click(screen.getByRole('button', { name: '委托 AI' }))
-    const dialog = within(screen.getByRole('dialog', { name: '委托一次工作' }))
-    expect(dialog.getByText('本次事项：child-1 · 解释分配缺口')).toBeTruthy()
-    expect(dialog.getByText(/目标：说明每个未分配原因/)).toBeTruthy()
-    expect(dialog.getByText(/共同背景：parent-1 · v7/)).toBeTruthy()
-    await fireEvent.update(dialog.getByRole('textbox', { name: '这次具体做什么' }), '检查缺口解释是否完整')
-    await fireEvent.click(dialog.getByRole('button', { name: '开始委托' }))
-    await waitFor(() => expect(post).toHaveBeenCalledWith('/lifeweave/personal/runs', expect.objectContaining({
-      itemId: 'child-1', instruction: '检查缺口解释是否完整', engine: 'codex',
-    })))
+    await waitFor(() => expect(screen.getByRole('button', { name: '委托 Agent' })).toBeTruthy())
+    await fireEvent.click(screen.getByRole('button', { name: '委托 Agent' }))
+    expect(screen.getByText(/本次事项：child-1 · 解释分配缺口/)).toBeTruthy()
+    expect(screen.getByText(/共同背景来自 parent-1 · v7/)).toBeTruthy()
+    await waitFor(() => expect(screen.getByRole('textbox', { name: '本次任务' })).toBeTruthy())
+    await fireEvent.update(screen.getByRole('textbox', { name: '本次任务' }), '检查缺口解释是否完整')
+    await fireEvent.click(screen.getByRole('button', { name: '开始委托' }))
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/lifeweave/personal/items/child-1/agent-dispatch', expect.objectContaining({ agentId:'general', mode:'managed_run', instruction:'检查缺口解释是否完整' })))
   })
 
-  it('主事项仍委托自己并显示自己的共同背景版本', async () => {
+  it('主事项的共同触发仍绑定自己', async () => {
     await openPage('parent-1')
-    await waitFor(() => expect(screen.getByRole('button', { name: '委托 AI' })).toBeTruthy())
-    await fireEvent.click(screen.getByRole('button', { name: '委托 AI' }))
-    const dialog = within(screen.getByRole('dialog'))
-    expect(dialog.getByText('本次事项：parent-1 · 改善验收体验')).toBeTruthy()
-    expect(dialog.getByText(/使用共享上下文 v7/)).toBeTruthy()
-    await fireEvent.click(dialog.getByRole('button', { name: '开始委托' }))
-    await waitFor(() => expect(post).toHaveBeenCalledWith('/lifeweave/personal/runs', expect.objectContaining({ itemId: 'parent-1' })))
+    await waitFor(() => expect(screen.getByRole('button', { name: '委托 Agent' })).toBeTruthy())
+    await fireEvent.click(screen.getByRole('button', { name: '委托 Agent' }))
+    expect(screen.getByText(/本次事项：parent-1 · 改善验收体验/)).toBeTruthy()
+    expect(screen.getByText(/共同背景 v7/)).toBeTruthy()
+    await waitFor(() => expect(screen.getByRole('button', { name: '开始委托' })).toBeTruthy())
+    await fireEvent.click(screen.getByRole('button', { name: '开始委托' }))
+    await waitFor(() => expect(post).toHaveBeenCalledWith('/lifeweave/personal/items/parent-1/agent-dispatch', expect.objectContaining({ agentId:'general' })))
   })
 
   it('父共同背景缺失时，仍在父事项建立背景，不误发子事项运行', async () => {

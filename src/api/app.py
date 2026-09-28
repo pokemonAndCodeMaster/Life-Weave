@@ -54,6 +54,11 @@ from src.lifeweave_runtime.local_workers import LocalWorkers
 from src.lifeweave_plugins import PluginHost, builtin_registry
 from src.lifeweave_plugins.service import PluginService
 from src.lifeweave_plugins.router import router as plugin_router
+from src.lifeweave_agents import AgentRegistry, AgentService
+from src.lifeweave_agents.router import router as agent_router
+from src.lifeweave.item_organization import ItemOrganizationService
+from src.lifeweave.item_organization_router import router as item_organization_router
+from src.lifeweave.item_overview_router import router as item_overview_router
 
 ROOT = Path(__file__).resolve().parents[2]
 
@@ -150,6 +155,12 @@ def create_app() -> FastAPI:
     app.state.output_files.research = app.state.research_outputs
     app.state.output_files.library = app.state.library
     app.state.development.output_files = app.state.output_files
+    app.state.item_organization = ItemOrganizationService(work)
+    app.state.agent_registry = AgentRegistry(manager.postgres(), app.state.plugins,
+                                             app.state.task_sources, runtime, local_workers)
+    app.state.agent_service = AgentService(manager.postgres(), app.state.agent_registry,
+                                           runtime, app.state.development, work,
+                                           app.state.plugin_host, app.state.item_organization)
     app.state.research_archive = ResearchArchive(ROOT, app.state.research_outputs, app.state.linear.connection, app.state.notion_mirror)
     app.state.lifeweave_evaluations = Evaluations(EvaluationRepository(manager.postgres()), work, runtime, knowledge)
     app.state.lifeweave_evaluations.plugins = app.state.plugins
@@ -187,6 +198,9 @@ def create_app() -> FastAPI:
     app.include_router(output_files_router)
     app.include_router(external_delivery_router)
     app.include_router(plugin_router)
+    app.include_router(agent_router)
+    app.include_router(item_organization_router)
+    app.include_router(item_overview_router)
     app.include_router(integrations_router)
     app.include_router(notion_mirror_router)
     app.include_router(library_router)

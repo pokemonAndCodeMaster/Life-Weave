@@ -1,0 +1,24 @@
+register 201
+edit 200
+行、人工接受证据与最终判断；给出至少一个无法判断的情形；不虚构已经通过的业务效果。 请保留过程、来源与不足，供人审阅。
+受管运行 · succeeded · 2026/9/26 13:23:39
+事项 item-36e70781e4c6449b · managed_events
+为用户开启独立的持续论文研究，本轮仅开展资料读取、研究及本轮隔离成果写入。论文身份已由用户明确确认：GSSM — Learning collision risk proactively from naturalistic driving data at scale，作者 Yiru Jiao、Simeon C. Calv
+受管运行 · succeeded · 2026/9/19 21:05:59
+事项 item-de7785d0790445d8 · managed_events
+开展新的持续论文研究，不关联现有两个不同主题的候选事项。候选入口：https://arxiv.org/abs/2609.00111；待核验标题：Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomou
+受管运行 · succeeded · 2026/9/19 17:58:44
+事项 item-810217743bbb4be2 · managed_events
+开展新的持续论文研究，不关联现有两个不同主题的候选事项。候选入口：https://arxiv.org/abs/2609.00111；待核验标题：Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomou
+受管运行 · failed · 2026/9/19 17:40:44
+事项 item-810217743bbb4be2 · managed_events
+根据这条从 Linear 引入的事项背景，为用户写三条下次接续工作时的操作步骤，总共不超过 150 字。明确当前工作台只在本机单用户运行。不要联网、不要执行命令、不要写文件、不要启动其他 Agent，不修改 Linear。
+受管运行 · failed · 2026/9/19 00:31:06
+事项 linear-b2ff980d35c647861055 · managed_events
+根据这条从 Linear 引入的事项背景，为用户写三条下次接续工作时的操作步骤，总共不超过 150 字。明确当前工作台只在本机单用户运行。不要联网、不要执行命令、不要写文件、不要启动其他 Agent，不修改 Linear。
+受管运行 · failed · 2026/9/19 00:29:49
+事项 linear-b2ff980d35c647861055 · managed_events
+请只读检查本项目 README.md、src/api/app.py、src/gongzuo/manual_results.py 和 web/src/features/gongzuo/pages/KnowledgePage.vue，给出本机使用者能理解的首次使用说明，并指出最多三项会阻碍日常使用的具体风险。引用实际文件作
+受管运行 · succeeded · 2026/9/19 00:05:26
+事项 item-85b6472a17f64292 · managed_events
+31 / 31 条

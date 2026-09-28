@@ -1,0 +1,15 @@
+{
+  "path": "docs/agent-workflow.md",
+  "sourceId": "lifeweave-project",
+  "sourceTitle": "LifeWeave 项目",
+  "writable": false,
+  "version": "9e3381e6710b1a12d3d442fe31fa59a576e2d546090fde94ee2cd8a05ab5bc2e",
+  "title": "Agent 怎样承接、执行和交付一件事",
+  "references": {
+    "links": {},
+    "images": {},
+    "warnings": []
+  },
+  "kind": "knowledge",
+  "contentType": "text/markdown"
+}

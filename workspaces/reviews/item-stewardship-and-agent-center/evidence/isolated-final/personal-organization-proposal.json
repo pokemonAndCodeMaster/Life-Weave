@@ -1,0 +1,407 @@
+{
+  "id": "orgp-7c00ac88718e45ac88a5847e",
+  "status": "proposed",
+  "reason": "用户要求实际规整现有事项；按原目标核对并保留全部事项、状态、讨论和成果。",
+  "changes": [
+    {
+      "after": {
+        "parentId": "item-7547b65b4f704829",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "工作流与阅读：集成验证",
+      "before": {
+        "parentId": "item-7547b65b4f704829",
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-2a56f97ea1074d71",
+      "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。",
+      "itemVersion": 5,
+      "beforeRelations": [
+        {
+          "id": "rel-31ff8e22dcbf4521",
+          "toId": "item-7547b65b4f704829",
+          "fromId": "item-2a56f97ea1074d71",
+          "toKind": "item",
+          "fromKind": "item",
+          "createdAt": "2026-09-27T21:25:50.180653+08:00",
+          "createdBy": "local-user",
+          "relationType": "part_of"
+        }
+      ]
+    },
+    {
+      "after": {
+        "parentId": null,
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "事项工作区：统一步骤图与成果阅读",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-7547b65b4f704829",
+      "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。",
+      "itemVersion": 25,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "item-92989f3f9ca34660",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "阶段 2 自用：交付页提供完整版本复制入口",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-62fe9c309d994457",
+      "reason": "该工作提供双入口开发所需的项目知识或开发交付阅读能力，可作为原目标下的独立可审成果。",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "item-92989f3f9ca34660",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "补齐开发任务使用当前项目知识的操作说明",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-e044cf4e1af64b0c",
+      "reason": "该工作提供双入口开发所需的项目知识或开发交付阅读能力，可作为原目标下的独立可审成果。",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "group:execution-validation",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "回归验证只读阶段守卫后 Codex 仍可完成开发",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-8891f7cb4f634c8f",
+      "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。；显式聚合到一级事项",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "group:execution-validation",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "验证网页选择 OpenCode 修改 README",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-4891c4eedb674483",
+      "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。；显式聚合到一级事项",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "group:execution-validation",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "验证 OpenCode 开发链：空白字符串词数",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-c52809b4b3294166",
+      "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。；显式聚合到一级事项",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": null,
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "开发 Agent 双入口与 Notion 知识联动",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-92989f3f9ca34660",
+      "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "item-92989f3f9ca34660",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "LifeWeave 项目知识与开发接续",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-58363ef3851142d8",
+      "reason": "该工作提供双入口开发所需的项目知识或开发交付阅读能力，可作为原目标下的独立可审成果。",
+      "itemVersion": 4,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "group:execution-validation",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "[内部验证] 指定方法与知识的真实评测",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-724331a2968c4420",
+      "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。；显式聚合到一级事项",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "group:execution-validation",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "LifeWeave 评测入口真实运行检查（2026-09-26）",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-36e70781e4c6449b",
+      "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。；显式聚合到一级事项",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "group:driving-research",
+        "topicIds": [
+          "topic-7f9d4bf11db44981"
+        ],
+        "domainIds": [
+          "domain-2c39bf75643540b1"
+        ]
+      },
+      "title": "GSSM v5 原文与代码核验及持续论文研究",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-de7785d0790445d8",
+      "reason": "原事项明确是自动驾驶论文研究，保留独立研究成果和反馈。；显式聚合到一级事项",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "group:driving-research",
+        "topicIds": [
+          "topic-7f9d4bf11db44981"
+        ],
+        "domainIds": [
+          "domain-2c39bf75643540b1"
+        ]
+      },
+      "title": "Qwen-Drive-1.0 原文核验与持续论文研究",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-810217743bbb4be2",
+      "reason": "原事项明确是自动驾驶论文研究，保留独立研究成果和反馈。；显式聚合到一级事项",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": null,
+        "topicIds": [
+          "topic-ba8cbdce79424305"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "让新 Codex 会话接续 Linear 事项",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "linear-b2ff980d35c647861055",
+      "reason": "保留旧 Linear 接续或首次阶段交付的历史目标与状态，不混入新的待开发范围。",
+      "itemVersion": 1,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": null,
+        "topicIds": [
+          "topic-ba8cbdce79424305"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "共作首次交付检查",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-85b6472a17f64292",
+      "reason": "保留旧 Linear 接续或首次阶段交付的历史目标与状态，不混入新的待开发范围。",
+      "itemVersion": 3,
+      "beforeRelations": []
+    },
+    {
+      "after": {
+        "parentId": "item-92989f3f9ca34660",
+        "topicIds": [
+          "topic-e8fbc18f343f42af"
+        ],
+        "domainIds": [
+          "domain-4b03b61f65f446f8"
+        ]
+      },
+      "title": "事项管理与 Agent 中心",
+      "before": {
+        "parentId": "item-92989f3f9ca34660",
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-c0f13d85b5c145fd",
+      "reason": "本轮 Agent 中心与事项公共管理接续双入口开发目标，已有父级保持。",
+      "itemVersion": 2,
+      "beforeRelations": [
+        {
+          "id": "rel-495b0e98f0924430",
+          "toId": "item-92989f3f9ca34660",
+          "fromId": "item-c0f13d85b5c145fd",
+          "toKind": "item",
+          "fromKind": "item",
+          "createdAt": "2026-09-28T22:54:08.458344+08:00",
+          "createdBy": "local-user",
+          "relationType": "part_of"
+        }
+      ]
+    }
+  ],
+  "groups": [
+    {
+      "key": "execution-validation",
+      "goal": "汇总 Codex、OpenCode 与方法评测的真实验证事项和证据，持续跟踪已暴露的运行边界。",
+      "owner": null,
+      "title": "LifeWeave 执行器与评测验证",
+      "itemIds": [
+        "item-8891f7cb4f634c8f",
+        "item-4891c4eedb674483",
+        "item-c52809b4b3294166",
+        "item-724331a2968c4420",
+        "item-36e70781e4c6449b"
+      ],
+      "topicIds": [
+        "topic-e8fbc18f343f42af"
+      ],
+      "domainIds": [
+        "domain-4b03b61f65f446f8"
+      ]
+    },
+    {
+      "key": "driving-research",
+      "goal": "把两篇论文作为独立子事项持续推进，在共同专题中比较方法、数据、实验与对实际工作的启发。",
+      "owner": null,
+      "title": "自动驾驶论文持续研读",
+      "itemIds": [
+        "item-de7785d0790445d8",
+        "item-810217743bbb4be2"
+      ],
+      "topicIds": [
+        "topic-7f9d4bf11db44981"
+      ],
+      "domainIds": [
+        "domain-2c39bf75643540b1"
+      ]
+    }
+  ],
+  "warnings": [],
+  "createdAt": "2026-09-28T23:25:40.954605+08:00",
+  "appliedAt": null,
+  "undoneAt": null,
+  "createdBy": "local-user"
+}

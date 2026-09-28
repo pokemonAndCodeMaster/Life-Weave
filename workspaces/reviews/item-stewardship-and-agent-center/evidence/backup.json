@@ -1,0 +1,6 @@
+{
+  "database": ".runtime/backups/lifeweave-20260928-230035.dump",
+  "knowledge": ".runtime/backups/knowledge-20260928-230035.tar.gz",
+  "mode": "pg_dump consistent snapshot; no active managed runs in either workspace; knowledge idle",
+  "activeRuns": 0
+}

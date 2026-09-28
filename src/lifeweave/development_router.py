@@ -68,14 +68,7 @@ def list_assignments(request: Request, workspace: WorkspaceKey, item_id: str):
 @router.post("/development", status_code=202)
 def create(request: Request, workspace: WorkspaceKey, body: DevelopmentCreate):
     try:
-        return request.app.state.development.create(
-            workspace, item_id=body.itemId, request_id=body.requestId,
-            instruction=body.instruction, repository_path=body.repositoryPath,
-            engine=body.engine, model=body.model, method_id=body.methodId,
-            knowledge_refs=body.knowledgeRefs, review_mode=body.reviewMode,
-            execution_scope=body.executionScope,
-            acknowledge_excluded_changes=body.acknowledgeExcludedChanges,
-            step_id=body.stepId, plan_version=body.planVersion)
+        return request.app.state.agent_service.legacy_development(workspace, body)
     except (ValueError, KeyError, OSError) as exc:
         raise error(exc) from exc
 

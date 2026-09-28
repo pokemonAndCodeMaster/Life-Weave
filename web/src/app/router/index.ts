@@ -22,7 +22,9 @@ const router = createRouter({
     { path: '/lifeweave/:workspace(personal|team)/plan', name: 'plan', component: () => import('@/features/lifeweave/pages/PlanPage.vue') },
     { path: '/lifeweave/:workspace(personal|team)/settings', name: 'settings', component: () => import('@/features/lifeweave/pages/SettingsPage.vue') },
     { path: '/lifeweave/:workspace(personal|team)/connections', name: 'connections', component: () => import('@/features/lifeweave/pages/ConnectionsPage.vue') },
-    { path: '/lifeweave/:workspace(personal|team)/runs', name: 'runs', component: () => import('@/features/lifeweave/pages/RunsPage.vue') },
+    { path: '/lifeweave/:workspace(personal|team)/agents', name: 'agents', component: () => import('@/features/lifeweave/pages/AgentCenterPage.vue'), meta: { lifeweave: true, title: 'Agent 中心' } },
+    { path: '/lifeweave/:workspace(personal|team)/agent-executions/:kind(managed_development|managed_run|external_session|organization)/:executionId', name: 'agent-execution', component: () => import('@/features/lifeweave/pages/ExecutionDetailPage.vue'), meta: { lifeweave: true, title: '执行详情' } },
+    { path: '/lifeweave/:workspace(personal|team)/runs', name: 'runs', redirect: (to) => typeof to.query.runId === 'string' ? { name: 'agent-execution', params: { workspace: to.params.workspace, kind: 'managed_run', executionId: to.query.runId } } : { name: 'agents', params: { workspace: to.params.workspace }, query: { tab: 'executions' } } },
     { path: '/:pathMatch(.*)*', redirect: '/lifeweave/personal/conversation' },
   ],
 })

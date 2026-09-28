@@ -56,7 +56,7 @@ export function itemTags(item: WorkItem): string[] {
 }
 
 export function defaultItemView(): ItemView {
-  return { focus: 'active', query: '', status: '', priority: '', type: '', tag: '', domain: '', topic: '', owner: '', dateField: 'updated', dateFrom: '', dateTo: '', group: 'none', sort: 'updated', columns: [...defaultColumns] }
+  return { focus: 'active', query: '', status: '', priority: '', type: '', tag: '', domain: '', topic: '', owner: '', dateField: 'updated', dateFrom: '', dateTo: '', group: 'topic', sort: 'updated', columns: [...defaultColumns] }
 }
 
 export function restoreItemView(saved: unknown): ItemView {

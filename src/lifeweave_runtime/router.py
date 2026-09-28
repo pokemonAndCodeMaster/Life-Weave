@@ -79,9 +79,9 @@ def list_runs(
 
 
 @router.post("/runs", response_model=RunOut, status_code=status.HTTP_202_ACCEPTED)
-def create_run(workspace: Workspace, payload: RunCreate, service: Service) -> dict:
+def create_run(request: Request, workspace: Workspace, payload: RunCreate, service: Service) -> dict:
     try:
-        return service.create_run(workspace, actor_id="admin", **payload.model_dump())
+        return request.app.state.agent_service.legacy_run(workspace, payload)
     except Exception as exc:
         raise _http_error(exc) from exc
 

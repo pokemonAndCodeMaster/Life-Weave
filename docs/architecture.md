@@ -103,6 +103,10 @@ PostgreSQL 的 `workbench` schema 保存以下对象。完整字段以 [migratio
 
 列表以规范关系中的 `part_of` / `contributes_to` 为父子依据，兼容旧 payload 父项；范围、筛选、分组、排序和列配置只保存为当前空间的呈现偏好。完成日期由真实完成动作保存，旧事项缺失时不从更新时间倒推。
 
+## Agent 与执行入口
+
+开发能力、方法、运行时和一次执行的职责不同。网页受管开发的阶段编排与本机外部会话的主动接入都沿同一事项、步骤和固定产物协议工作，实际运行来源必须保留。完整流程、调用关系、顺序图与目前限制见 [Agent 工作流](agent-workflow.md)。本轮 Agent 中心和事项整理的设计及运行验收见[实施记录](../workspaces/reviews/item-stewardship-and-agent-center/review.md)。
+
 ## 一次 AI 委托怎样完成
 
 ```mermaid

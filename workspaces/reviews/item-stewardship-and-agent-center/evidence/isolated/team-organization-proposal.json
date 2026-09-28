@@ -1,0 +1,34 @@
+{
+  "id": "orgp-61de0006296b423aad3e6f4f",
+  "status": "proposed",
+  "reason": "用户要求实际规整现有事项；按原目标核对并保留全部事项、状态、讨论和成果。",
+  "changes": [
+    {
+      "after": {
+        "parentId": null,
+        "topicIds": [
+          "topic-d5a5dc112afd4859"
+        ],
+        "domainIds": [
+          "domain-cd4d7695a4a641f7"
+        ]
+      },
+      "title": "团队空间本机执行检查",
+      "before": {
+        "parentId": null,
+        "topicIds": [],
+        "domainIds": []
+      },
+      "itemId": "item-2cab593824114b90",
+      "reason": "原事项明确验证团队空间独立事项和执行。",
+      "itemVersion": 1,
+      "beforeRelations": []
+    }
+  ],
+  "groups": [],
+  "warnings": [],
+  "createdAt": "2026-09-28T23:13:25.618032+08:00",
+  "appliedAt": null,
+  "undoneAt": null,
+  "createdBy": "local-user"
+}

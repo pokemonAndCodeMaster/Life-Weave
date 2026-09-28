@@ -11,6 +11,10 @@ function item(id: string, overrides: Partial<WorkItem> = {}): WorkItem {
 }
 
 describe('事项列表视图', () => {
+  it('新视图默认按专题分组；已有保存分组保持原选择', () => {
+    expect(defaultItemView().group).toBe('topic')
+    expect(restoreItemView({group:'none'}).group).toBe('none')
+  })
   it('默认关注进行中；状态、类型、领域、专题、负责人独立生效', () => {
     const rows = [
       item('target', { kind: '修复', domains: ['平台'], topics: ['秋季'], owner: '甲', state: '待验收' }),

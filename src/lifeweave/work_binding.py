@@ -127,10 +127,6 @@ class WorkBindingService:
                                              actor_id=actor_id, initial_context=body.initial_context,
                                              provenance=body.provenance)
                 resolved_id = item['id']
-                if parent:
-                    self.work.create_relation(workspace, actor_id=actor_id,
-                                              from_kind='item', from_id=resolved_id,
-                                              to_kind='item', to_id=parent, relation_type='part_of')
                 action = 'created_child' if parent else 'created'
             if not resolved_id:
                 raise ValueError('尚未确定事项归属')

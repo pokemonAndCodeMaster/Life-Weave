@@ -201,8 +201,7 @@ def current_git_diff(start_state: dict) -> dict:
             'scope': '当前仓库相对起始提交的全部差异，可能包含其他会话修改'}
 
 
-@router.post('/sessions', status_code=201)
-def start(request: Request, workspace: WorkspaceKey, item_id: str, body: Start):
+def start_core(request: Request, workspace: WorkspaceKey, item_id: str, body: Start):
     try:
         fingerprint = hashlib.sha256(json.dumps(body.model_dump(), sort_keys=True).encode()).hexdigest()
         identity = receipt_id(workspace, item_id, body.requestId)
@@ -242,6 +241,14 @@ def start(request: Request, workspace: WorkspaceKey, item_id: str, body: Start):
                         'observation': '外部会话主动登记；Hook 只记录受支持且已绑定的后续事件'}, fingerprint)
         return {'sessionId': session_id, 'event': normalized(row)}
     except (KeyError, ValueError, OSError, subprocess.TimeoutExpired) as exc:
+        raise fail(exc) from exc
+
+
+@router.post('/sessions', status_code=201)
+def start(request: Request, workspace: WorkspaceKey, item_id: str, body: Start):
+    try:
+        return request.app.state.agent_service.external_start(request, workspace, item_id, body)
+    except (KeyError, ValueError, OSError) as exc:
         raise fail(exc) from exc
 
 

@@ -1,0 +1,1226 @@
+{
+  "personal": {
+    "workspace": "personal",
+    "items": [
+      {
+        "id": "item-2a56f97ea1074d71",
+        "workspace": "personal",
+        "itemType": "review",
+        "title": "工作流与阅读：集成验证",
+        "status": "awaiting_acceptance",
+        "payload": {
+          "goal": "验证本轮工作流、步骤产物和阅读体验，交付实际操作证据与独立审查；接续原工作区目标。",
+          "owner": "我",
+          "scope": "继承 item-7547b65b4f704829 共享上下文 v1",
+          "update": "已分派，尚未回传结果",
+          "parentId": "item-7547b65b4f704829",
+          "workPlan": {
+            "id": "plan:item-2a56f97ea1074d71",
+            "nodes": [
+              {
+                "id": "integration",
+                "runId": null,
+                "state": "succeeded",
+                "title": "真实交叉接续与独立审查",
+                "summary": "工作流与阅读交付已完成技术验证，首轮独立发现已修复，新的独立复查通过；等待用户实际使用反馈。",
+                "dependsOn": [],
+                "outputIds": [
+                  "artifact:result-065895e443e5e0c21c7a855c"
+                ],
+                "acceptance": "同一子事项和父关系保持；固定代码与文档能读；关键反例有可复查结果；独立审查发现的问题已处理。",
+                "provenance": null,
+                "contextRefs": [],
+                "description": "从网页创建并由CLI接续，验证步骤产物、阅读返回、隔离回归和独立审查。",
+                "assignmentId": null,
+                "expectedOutputs": [
+                  {
+                    "id": "evidence",
+                    "kind": "validation",
+                    "title": "实际验证记录与独立审查结论",
+                    "required": true
+                  }
+                ]
+              }
+            ],
+            "title": "工作流与阅读集成验证",
+            "version": 1,
+            "provider": "external:codex",
+            "revisionReason": ""
+          },
+          "contextRef": {
+            "itemId": "item-7547b65b4f704829",
+            "version": 1
+          },
+          "participants": [
+            "我"
+          ]
+        },
+        "version": 5,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:25:50.180653+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-27T21:50:19.103879+08:00",
+        "context": {
+          "id": "context-cc23ec1746d84067",
+          "workspace": "personal",
+          "itemId": "item-2a56f97ea1074d71",
+          "currentVersionId": "ctxv-ccc85e131ecf4260",
+          "version": 1,
+          "createdAt": "2026-09-27T21:25:50.180653+08:00",
+          "updatedAt": "2026-09-27T21:25:50.180653+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "验证本轮工作流、步骤产物和阅读体验，交付实际操作证据与独立审查；接续原工作区目标。",
+            "scope": "继承 item-7547b65b4f704829 共享上下文 v1"
+          },
+          "provenance": [
+            {
+              "source": "用户创建事项"
+            }
+          ]
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-7547b65b4f704829",
+        "workspace": "personal",
+        "itemType": "requirement",
+        "title": "事项工作区：统一步骤图与成果阅读",
+        "status": "awaiting_acceptance",
+        "payload": {
+          "goal": "落实用户已确认的能力定义流程、公共底座统一呈现；重整事项列表、详情首页、节点阅读和成果入口，使研究、开发及人工事项均可清楚理解与继续。",
+          "workPlan": {
+            "id": "plan:item-7547b65b4f704829",
+            "nodes": [
+              {
+                "id": "workflow-plan",
+                "runId": null,
+                "state": "succeeded",
+                "title": "规划与交付要求",
+                "summary": "已批准的方案和逐步交付要求已登记。",
+                "dependsOn": [],
+                "outputIds": [
+                  "artifact:result-4d57418eb05252744e9c2cd6"
+                ],
+                "acceptance": "交付已批准的完整方案：步骤、预期产物、验收办法、手机后置边界。",
+                "provenance": "declared",
+                "contextRefs": [],
+                "description": "交付已批准的完整方案：步骤、预期产物、验收办法、手机后置边界。",
+                "assignmentId": null,
+                "expectedOutputs": [
+                  {
+                    "id": "main",
+                    "kind": "plan",
+                    "title": "已批准完整方案",
+                    "required": true
+                  }
+                ]
+              },
+              {
+                "id": "workflow-protocol",
+                "runId": null,
+                "state": "succeeded",
+                "title": "两入口与步骤交付",
+                "summary": "事项归属与步骤交付（含最新有效成果选择）；已保存固定版本，独立复查在验证步骤继续。",
+                "dependsOn": [
+                  "workflow-plan"
+                ],
+                "outputIds": [
+                  "artifact:output-807d5e59db6580578aebf0e63e064788",
+                  "artifact:output-8ecebcf3e39c7f090962ac15a44ec628",
+                  "artifact:output-094b172d09b65c49efd2a34cb94074a8"
+                ],
+                "acceptance": "交付事项归属、版本化计划、逐步报告与缺交付检查的代码和验证结果。",
+                "provenance": "declared",
+                "contextRefs": [],
+                "description": "交付事项归属、版本化计划、逐步报告与缺交付检查的代码和验证结果。",
+                "assignmentId": null,
+                "expectedOutputs": [
+                  {
+                    "id": "main",
+                    "kind": "code",
+                    "title": "固定代码、文档及交付说明",
+                    "required": true
+                  }
+                ]
+              },
+              {
+                "id": "workflow-artifacts",
+                "runId": null,
+                "state": "succeeded",
+                "title": "固定产物与完整目录",
+                "summary": "已实现并固定本步骤代码交付；集成验收与独立审查仍在单独步骤继续。",
+                "dependsOn": [
+                  "workflow-plan"
+                ],
+                "outputIds": [
+                  "artifact:output-49ae40cec72d0f1fc4391a1584867802"
+                ],
+                "acceptance": "交付固定文件、分类目录、文件diff、指定版本文档与受控媒体接口。",
+                "provenance": "declared",
+                "contextRefs": [],
+                "description": "交付固定文件、分类目录、文件diff、指定版本文档与受控媒体接口。",
+                "assignmentId": null,
+                "expectedOutputs": [
+                  {
+                    "id": "main",
+                    "kind": "code",
+                    "title": "固定代码、文档及交付说明",
+                    "required": true
+                  }
+                ]
+              },
+              {
+                "id": "workflow-modal",
+                "runId": null,
+                "state": "succeeded",
+                "title": "步骤弹窗与产物树",
+                "summary": "步骤弹窗与固定选择代码已保存，实际测试和独立审查详见验证步骤。",
+                "dependsOn": [
+                  "workflow-plan"
+                ],
+                "outputIds": [
+                  "artifact:output-ce53de7a6fcc8301a25b37856e32e690",
+                  "artifact:output-23359112421184d8c9c80faa26b7ef0c",
+                  "artifact:output-ac40015fca565f4cb7e7387403ee9661"
+                ],
+                "acceptance": "交付有界弹窗、分类目录、文件diff和键盘/返回定位的浏览器证据。",
+                "provenance": "declared",
+                "contextRefs": [],
+                "description": "交付有界弹窗、分类目录、文件diff和键盘/返回定位的浏览器证据。",
+                "assignmentId": null,
+                "expectedOutputs": [
+                  {
+                    "id": "main",
+                    "kind": "code",
+                    "title": "固定代码、文档及交付说明",
+                    "required": true
+                  }
+                ]
+              },
+              {
+                "id": "workflow-reading",
+                "runId": null,
+                "state": "succeeded",
+                "title": "内部成果阅读",
+                "summary": "已实现并固定本步骤代码交付；集成验收与独立审查仍在单独步骤继续。",
+                "dependsOn": [
+                  "workflow-plan"
+                ],
+                "outputIds": [
+                  "artifact:output-fbe22228380fe98c2f0ffc5891f6ca26"
+                ],
+                "acceptance": "交付公式、相对图片、Mermaid、表格与指定版本文档阅读及验证。",
+                "provenance": "declared",
+                "contextRefs": [],
+                "description": "交付公式、相对图片、Mermaid、表格与指定版本文档阅读及验证。",
+                "assignmentId": null,
+                "expectedOutputs": [
+                  {
+                    "id": "main",
+                    "kind": "code",
+                    "title": "固定代码、文档及交付说明",
+                    "required": true
+                  }
+                ]
+              },
+              {
+                "id": "workflow-validation",
+                "runId": null,
+                "state": "succeeded",
+                "title": "真实接续与交付验证",
+                "summary": "工作流与阅读交付已完成技术验证，首轮独立发现已修复，新的独立复查通过；等待用户实际使用反馈。",
+                "dependsOn": [
+                  "workflow-protocol",
+                  "workflow-artifacts",
+                  "workflow-modal",
+                  "workflow-reading"
+                ],
+                "outputIds": [
+                  "artifact:result-44ea28d801bc1c40e3f42ab2",
+                  "artifact:result-81d0aa65983bd9b6534e9c43"
+                ],
+                "acceptance": "交付网页与本机接续、研究与开发阅读、失败边界和独立审查的真实证据。",
+                "provenance": "declared",
+                "contextRefs": [],
+                "description": "交付网页与本机接续、研究与开发阅读、失败边界和独立审查的真实证据。",
+                "assignmentId": null,
+                "expectedOutputs": [
+                  {
+                    "id": "main",
+                    "kind": "validation",
+                    "title": "真实使用与独立审查证据",
+                    "required": true
+                  }
+                ]
+              },
+              {
+                "id": "workflow-acceptance",
+                "runId": null,
+                "state": "planned",
+                "title": "审阅本轮交付",
+                "summary": "",
+                "dependsOn": [
+                  "workflow-validation"
+                ],
+                "outputIds": [],
+                "acceptance": "用户查看本轮变化与证据，接受或反馈；不由Agent代替接受。",
+                "provenance": "declared",
+                "contextRefs": [],
+                "description": "用户查看本轮变化与证据，接受或反馈；不由Agent代替接受。",
+                "assignmentId": null,
+                "expectedOutputs": [
+                  {
+                    "id": "main",
+                    "kind": "decision",
+                    "title": "用户审阅决定",
+                    "required": true
+                  }
+                ]
+              }
+            ],
+            "title": "事项工作流、步骤交付与阅读",
+            "version": 5,
+            "provider": "development",
+            "revisionReason": "启用共同步骤协议：明确每步交付类型与验收要求，实际进展由步骤报告登记。"
+          }
+        },
+        "version": 25,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T11:07:29.192160+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-27T21:50:18.749662+08:00",
+        "context": {
+          "id": "context-7305237c95a94e8d",
+          "workspace": "personal",
+          "itemId": "item-7547b65b4f704829",
+          "currentVersionId": "ctxv-2b7687635f514eb3",
+          "version": 1,
+          "createdAt": "2026-09-27T11:07:29.192160+08:00",
+          "updatedAt": "2026-09-27T11:07:29.192160+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "落实用户已确认的能力定义流程、公共底座统一呈现；重整事项列表、详情首页、节点阅读和成果入口，使研究、开发及人工事项均可清楚理解与继续。"
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-62fe9c309d994457",
+        "workspace": "personal",
+        "itemType": "requirement",
+        "title": "阶段 2 自用：交付页提供完整版本复制入口",
+        "status": "open",
+        "payload": {},
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T01:57:14.555749+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-27T01:57:14.555749+08:00",
+        "context": {
+          "id": "context-5f71583cd02a4bee",
+          "workspace": "personal",
+          "itemId": "item-62fe9c309d994457",
+          "currentVersionId": "ctxv-5cd86775eb0f4ac7",
+          "version": 1,
+          "createdAt": "2026-09-27T01:57:14.555749+08:00",
+          "updatedAt": "2026-09-27T01:57:14.555749+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "在网页交付区直接取得完整代码基线和交付包版本，便于审阅者核对同一份结果；先验证仅方案门禁，再完成有界实现。"
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-e044cf4e1af64b0c",
+        "workspace": "personal",
+        "itemType": "requirement",
+        "title": "补齐开发任务使用当前项目知识的操作说明",
+        "status": "open",
+        "payload": {
+          "goal": "让下一位开发者能按步骤在工作台选入当前项目知识、确认固定版本，并看见同一事项中的实际调用与 Notion 镜像状态。"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T01:23:10.435785+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-27T01:23:10.435785+08:00",
+        "context": {
+          "id": "context-84731ee4aa33427e",
+          "workspace": "personal",
+          "itemId": "item-e044cf4e1af64b0c",
+          "currentVersionId": "ctxv-5b6fa059cabc4954",
+          "version": 1,
+          "createdAt": "2026-09-27T01:23:10.435785+08:00",
+          "updatedAt": "2026-09-27T01:23:10.435785+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "让下一位开发者能按步骤在工作台选入当前项目知识、确认固定版本，并看见同一事项中的实际调用与 Notion 镜像状态。"
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-8891f7cb4f634c8f",
+        "workspace": "personal",
+        "itemType": "fix",
+        "title": "回归验证只读阶段守卫后 Codex 仍可完成开发",
+        "status": "open",
+        "payload": {
+          "goal": "在隔离测试仓 README 末尾新增 Smoke: codex-guard，并验证"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-26T23:29:26.782138+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-26T23:29:26.782138+08:00",
+        "context": {
+          "id": "context-183d70277c8e4895",
+          "workspace": "personal",
+          "itemId": "item-8891f7cb4f634c8f",
+          "currentVersionId": "ctxv-11f7608d75dc434c",
+          "version": 1,
+          "createdAt": "2026-09-26T23:29:26.782138+08:00",
+          "updatedAt": "2026-09-26T23:29:26.782138+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "在隔离测试仓 README 末尾新增 Smoke: codex-guard，并验证",
+            "scope": ""
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-4891c4eedb674483",
+        "workspace": "personal",
+        "itemType": "fix",
+        "title": "验证网页选择 OpenCode 修改 README",
+        "status": "open",
+        "payload": {
+          "goal": "在隔离测试仓 README 末尾新增一行 Smoke: browser-opencode，并验证该行存在"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-26T23:11:23.004273+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-26T23:11:23.004273+08:00",
+        "context": {
+          "id": "context-3fd7b0bd1ac24645",
+          "workspace": "personal",
+          "itemId": "item-4891c4eedb674483",
+          "currentVersionId": "ctxv-0b85d2734f604560",
+          "version": 1,
+          "createdAt": "2026-09-26T23:11:23.004273+08:00",
+          "updatedAt": "2026-09-26T23:11:23.004273+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "在隔离测试仓 README 末尾新增一行 Smoke: browser-opencode，并验证该行存在",
+            "scope": ""
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-c52809b4b3294166",
+        "workspace": "personal",
+        "itemType": "fix",
+        "title": "验证 OpenCode 开发链：空白字符串词数",
+        "status": "open",
+        "payload": {
+          "goal": "让词数函数对空白字符串返回 0，并留下可运行的验证"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-26T22:53:59.301261+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-26T22:53:59.301261+08:00",
+        "context": {
+          "id": "context-994014d1e6c143b0",
+          "workspace": "personal",
+          "itemId": "item-c52809b4b3294166",
+          "currentVersionId": "ctxv-f7c1b5e1207a47c8",
+          "version": 1,
+          "createdAt": "2026-09-26T22:53:59.301261+08:00",
+          "updatedAt": "2026-09-26T22:53:59.301261+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "让词数函数对空白字符串返回 0，并留下可运行的验证",
+            "scope": ""
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-92989f3f9ca34660",
+        "workspace": "personal",
+        "itemType": "requirement",
+        "title": "开发 Agent 双入口与 Notion 知识联动",
+        "status": "open",
+        "payload": {
+          "goal": "从网页或本机 Codex 承接同一开发事项，读取项目知识，留下与规模相称的方案和审查，真实执行、验证和交付过程在 LifeWeave 可见；Notion 作原文镜像、Linear 历史只读。首版先用 Codex 跑通。"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-26T21:13:07.951613+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-26T21:13:07.951613+08:00",
+        "context": {
+          "id": "context-1becbaebe79344c9",
+          "workspace": "personal",
+          "itemId": "item-92989f3f9ca34660",
+          "currentVersionId": "ctxv-452e37dd1caf4df9",
+          "version": 1,
+          "createdAt": "2026-09-26T21:13:07.951613+08:00",
+          "updatedAt": "2026-09-26T21:13:07.951613+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "从网页或本机 Codex 承接同一开发事项，读取项目知识，留下与规模相称的方案和审查，真实执行、验证和交付过程在 LifeWeave 可见；Notion 作原文镜像、Linear 历史只读。首版先用 Codex 跑通。"
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-58363ef3851142d8",
+        "workspace": "personal",
+        "itemType": "fix",
+        "title": "LifeWeave 项目知识与开发接续",
+        "status": "awaiting_acceptance",
+        "payload": {
+          "goal": "把当前项目规范接入知识页与正式 CLI，整理不拼接历史的当前说明，并让已有 Codex 开发会话在同一事项上可接续地记录真实改动、验证和知识更新。",
+          "update": "当前九篇项目规范可读；历史引用可打开 GitHub 档案；外部开发记录可从同一事项接续。",
+          "nextStep": "请用户在日常服务实际试用项目知识与同一事项接续；随后继续验证从需求开始即登记、自动采集实际代码/工具过程，并将多端同源访问单独推进。",
+          "scopeBoundary": "本次外部会话在候选改动完成后才登记；此前命令无平台 trace。日常服务仍为本机单用户。",
+          "deliveredEvidence": "docs/evidence/project-development/README.md",
+          "deliveredRevision": "dcf36473f6e7b41bec0ebc2521135a3f83a258cf"
+        },
+        "version": 4,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-26T18:27:08.010745+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-26T18:39:44.403683+08:00",
+        "context": {
+          "id": "context-8f62102f40f346d9",
+          "workspace": "personal",
+          "itemId": "item-58363ef3851142d8",
+          "currentVersionId": "ctxv-ff34c616400f4c26",
+          "version": 1,
+          "createdAt": "2026-09-26T18:27:08.010745+08:00",
+          "updatedAt": "2026-09-26T18:27:08.010745+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "把当前项目规范接入知识页与正式 CLI，整理不拼接历史的当前说明，并让已有 Codex 开发会话在同一事项上可接续地记录真实改动、验证和知识更新。"
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-724331a2968c4420",
+        "workspace": "personal",
+        "itemType": "research",
+        "title": "[内部验证] 指定方法与知识的真实评测",
+        "status": "open",
+        "payload": {
+          "goal": "验证显式选择的方法、知识和候选能力进入同一次真实运行，并核对回答来源"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-26T13:54:16.837933+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-26T13:54:16.837933+08:00",
+        "context": {
+          "id": "context-ede557e8e9dd4f62",
+          "workspace": "personal",
+          "itemId": "item-724331a2968c4420",
+          "currentVersionId": "ctxv-1d44c549244d4035",
+          "version": 1,
+          "createdAt": "2026-09-26T13:54:16.837933+08:00",
+          "updatedAt": "2026-09-26T13:54:16.837933+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "验证显式选择的方法、知识和候选能力进入同一次真实运行，并核对回答来源",
+            "scope": ""
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-36e70781e4c6449b",
+        "workspace": "personal",
+        "itemType": "review",
+        "title": "LifeWeave 评测入口真实运行检查（2026-09-26）",
+        "status": "open",
+        "payload": {},
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-26T13:23:26.560848+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-26T13:23:26.560848+08:00",
+        "context": {
+          "id": "context-1b3f504297fc4cac",
+          "workspace": "personal",
+          "itemId": "item-36e70781e4c6449b",
+          "currentVersionId": "ctxv-56276f56d1044ba1",
+          "version": 1,
+          "createdAt": "2026-09-26T13:23:26.560848+08:00",
+          "updatedAt": "2026-09-26T13:23:26.560848+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "检查评测任务能否由网页入口关联实际运行、保存过程与结果；这是一条内部受控样例。"
+          },
+          "provenance": []
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-de7785d0790445d8",
+        "workspace": "personal",
+        "itemType": "research",
+        "title": "GSSM v5 原文与代码核验及持续论文研究",
+        "status": "open",
+        "payload": {
+          "conversationId": "conversation-728226ce84e789f1605a149ce33f7931",
+          "originalRequest": "请创建并开始一项持续论文研究：GSSM — Learning collision risk proactively from naturalistic driving data at scale，Yiru Jiao、Simeon C. Calvert、Sander van Cranenburgh、Hans van Lint。用户已明确确认就是这篇。官方入口：https://arxiv.org/abs/2505.13556 ，优先读取修正后的 v5 全文 https://arxiv.org/html/2505.13556v5 ，期刊 DOI https://doi.org/10.1038/s42256-026-01189-w ，作者代码 https://github.com/Yiru-Jiao/GSSM 。先核对身份、版本、官方来源与代码提交，特别留意作者指出的旧版式(15)错误，不能沿用旧公式。\n请复用工作台已有论文研究方法，从全文和必要源码交付一份连贯、适合学习且可继续反馈修订的中文报告。重点解释：研究为什么需要它；GSSM到底学习什么条件分布；多方向间距、上下文、尾部概率怎样转成风险；它和一般数据稀缺度、异常检测、真实碰撞概率有什么联系和区别，不预设用户原先的“分布/稀缺性”理解全错。关键公式定义变量、说明假设、给一个可算的直观例子；核对v5公式与官方实现，区分数学推导、作者定义和实验证据。\n讲清训练数据来源、输入标签/训练目标、模型与训练/验证/测试划分，为什么训练不需要碰撞标签而评测仍需要；解释评估对象、PR/ROC及提前预警口径，尤其核对2591等样本数及选择过程，主要实验、消融、局限、外推风险和对自动驾驶研究的启发。不要把作者报告值冒充本轮复现。可用本地CPU小例子核对公式，但不训练完整模型、不下载大规模数据/权重、不申请账号或写外部系统。\n保存可追溯的一手资料与来源清单，必要原图实际取得并检查后放在本轮research目录，附能在网页打开的引用。最终回复提供完整可读正文，不能只给文件路径或完成摘要；包括实际阅读范围、版本、尚未解决的问题及下一步。用户是否学会与论文结论是否被接受，仍待用户反馈；不要自动接受知识或改动正式知识。"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-19T21:05:59.955285+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-19T21:05:59.955285+08:00",
+        "context": {
+          "id": "context-1eae8570bcca4877",
+          "workspace": "personal",
+          "itemId": "item-de7785d0790445d8",
+          "currentVersionId": "ctxv-e8aa799cd8c540fe",
+          "version": 1,
+          "createdAt": "2026-09-19T21:05:59.955285+08:00",
+          "updatedAt": "2026-09-19T21:05:59.955285+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "请创建并开始一项持续论文研究：GSSM — Learning collision risk proactively from naturalistic driving data at scale，Yiru Jiao、Simeon C. Calvert、Sander van Cranenburgh、Hans van Lint。用户已明确确认就是这篇。官方入口：https://arxiv.org/abs/2505.13556 ，优先读取修正后的 v5 全文 https://arxiv.org/html/2505.13556v5 ，期刊 DOI https://doi.org/10.1038/s42256-026-01189-w ，作者代码 https://github.com/Yiru-Jiao/GSSM 。先核对身份、版本、官方来源与代码提交，特别留意作者指出的旧版式(15)错误，不能沿用旧公式。\n请复用工作台已有论文研究方法，从全文和必要源码交付一份连贯、适合学习且可继续反馈修订的中文报告。重点解释：研究为什么需要它；GSSM到底学习什么条件分布；多方向间距、上下文、尾部概率怎样转成风险；它和一般数据稀缺度、异常检测、真实碰撞概率有什么联系和区别，不预设用户原先的“分布/稀缺性”理解全错。关键公式定义变量、说明假设、给一个可算的直观例子；核对v5公式与官方实现，区分数学推导、作者定义和实验证据。\n讲清训练数据来源、输入标签/训练目标、模型与训练/验证/测试划分，为什么训练不需要碰撞标签而评测仍需要；解释评估对象、PR/ROC及提前预警口径，尤其核对2591等样本数及选择过程，主要实验、消融、局限、外推风险和对自动驾驶研究的启发。不要把作者报告值冒充本轮复现。可用本地CPU小例子核对公式，但不训练完整模型、不下载大规模数据/权重、不申请账号或写外部系统。\n保存可追溯的一手资料与来源清单，必要原图实际取得并检查后放在本轮research目录，附能在网页打开的引用。最终回复提供完整可读正文，不能只给文件路径或完成摘要；包括实际阅读范围、版本、尚未解决的问题及下一步。用户是否学会与论文结论是否被接受，仍待用户反馈；不要自动接受知识或改动正式知识。"
+          },
+          "provenance": [
+            {
+              "turnId": "turn-6106b31a8fc0e9b682b470109097b2ad",
+              "conversationId": "conversation-728226ce84e789f1605a149ce33f7931"
+            }
+          ]
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-810217743bbb4be2",
+        "workspace": "personal",
+        "itemType": "research",
+        "title": "Qwen-Drive-1.0 原文核验与持续论文研究",
+        "status": "open",
+        "payload": {
+          "conversationId": "conversation-6851a0d06ad9a9feb6bc7cd5fb90fbca",
+          "originalRequest": "请开始 Qwen-Drive-1.0 的真实论文研究，作为在 LifeWeave 中持续推进的事项。候选原文入口为 https://arxiv.org/abs/2609.00111 ，此前提供的标题为 Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomous Driving。先核对标题、作者、论文版本与官方入口是否相符；若候选链接对象不符或拿不到全文，请给出真实查证结果、缺口和下一步，不根据旧摘要虚构论文内容。若能取得正确全文，围绕问题与动机、方法及必要公式、训练数据与训练阶段、实验、局限，以及对自动驾驶相关工作的启发，交付一份连贯、能继续反馈修订的中文研究报告；明确实际阅读范围，区分作者主张、证据与推断，附可核对的原文及代码出处。相关图必须来自真实取得的论文或官方资料，保存在本轮目录后实际核对。遵循可复用研究方法，正文完整留在网页，不只给文件路径。不要自动接受知识或宣布我已经学会；不要发送外部消息或改动外部系统。"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-19T17:40:44.638648+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-19T17:40:44.638648+08:00",
+        "context": {
+          "id": "context-ab46a89c2faa42a6",
+          "workspace": "personal",
+          "itemId": "item-810217743bbb4be2",
+          "currentVersionId": "ctxv-2850e382f5c44005",
+          "version": 1,
+          "createdAt": "2026-09-19T17:40:44.638648+08:00",
+          "updatedAt": "2026-09-19T17:40:44.638648+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "请开始 Qwen-Drive-1.0 的真实论文研究，作为在 LifeWeave 中持续推进的事项。候选原文入口为 https://arxiv.org/abs/2609.00111 ，此前提供的标题为 Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomous Driving。先核对标题、作者、论文版本与官方入口是否相符；若候选链接对象不符或拿不到全文，请给出真实查证结果、缺口和下一步，不根据旧摘要虚构论文内容。若能取得正确全文，围绕问题与动机、方法及必要公式、训练数据与训练阶段、实验、局限，以及对自动驾驶相关工作的启发，交付一份连贯、能继续反馈修订的中文研究报告；明确实际阅读范围，区分作者主张、证据与推断，附可核对的原文及代码出处。相关图必须来自真实取得的论文或官方资料，保存在本轮目录后实际核对。遵循可复用研究方法，正文完整留在网页，不只给文件路径。不要自动接受知识或宣布我已经学会；不要发送外部消息或改动外部系统。"
+          },
+          "provenance": [
+            {
+              "turnId": "turn-c51afff417b33342115aead90f523aee",
+              "conversationId": "conversation-6851a0d06ad9a9feb6bc7cd5fb90fbca"
+            }
+          ]
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "linear-b2ff980d35c647861055",
+        "workspace": "personal",
+        "itemType": "other",
+        "title": "让新 Codex 会话接续 Linear 事项",
+        "status": "open",
+        "payload": {
+          "due": null,
+          "goal": "你要的是：在本地项目里说“继续个人工作台的视图设计”，Codex 能找到原事项、读懂当前背景、推进并写回；范围只包含 Codex。\n\n已安装用户级入口和 personal-workbench 技能，复用已授权 Linear MCP。在另一独立 Git 项目的全新 Codex 会话中，不给编号或技能名也找到了 [YYH-12](https://linear.app/yyhpokemonmaster/issue/YYH-12/设计个人工作台的日常视图)，读到事项与设计全文并说明下一步。普通 Python 问题的新会话没有触发工作台。此前本地写入和回读也有实际记录。\n\n看[Codex 接入与接续验证](<https://linear.app/yyhpokemonmaster/document/ef932315a0be>)，从开头的自然语言例子开始；安装与恢复见[本地说明](<https://linear.app/yyhpokemonmaster/document/e65cc831468f>)，写入证据见[接续验证记录](<https://linear.app/yyhpokemonmaster/document/fa3d0673f664>)。\n\n新一轮非交互 Codex 已读到前一会话的新成果，并准备了精确回写；但工具要求审批，而该次 codex exec 的策略为 never，保存被拒绝，回读确认未写入。此项保持 In Progress，剩余的是在允许工具审批的正常会话中验证写回；不会把只读成功或本会话能写入当成该测试成功。当前机器之外的 Codex 要在当地安装并连接；长会话不保证热更新，可显式重新读取技能。ChatGPT 用户已加自定义指令，但本项测试不代表云端已全部连通。",
+          "owner": "我",
+          "scope": "从 Linear 引入，在共作中推进；本地状态与原事项分别维护。",
+          "priority": 0,
+          "linearUrl": "https://linear.app/yyhpokemonmaster/issue/YYH-11/让新-codex-会话接续-linear-事项",
+          "linearIdentifier": "YYH-11"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-19T00:29:47.919180+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-19T00:29:47.919180+08:00",
+        "context": {
+          "id": "ctx-linear-b2ff980d35c647861055",
+          "workspace": "personal",
+          "itemId": "linear-b2ff980d35c647861055",
+          "currentVersionId": "v1-linear-b2ff980d35c647861055",
+          "version": 1,
+          "createdAt": "2026-09-19T00:29:47.919180+08:00",
+          "updatedAt": "2026-09-19T00:29:47.919180+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "你要的是：在本地项目里说“继续个人工作台的视图设计”，Codex 能找到原事项、读懂当前背景、推进并写回；范围只包含 Codex。\n\n已安装用户级入口和 personal-workbench 技能，复用已授权 Linear MCP。在另一独立 Git 项目的全新 Codex 会话中，不给编号或技能名也找到了 [YYH-12](https://linear.app/yyhpokemonmaster/issue/YYH-12/设计个人工作台的日常视图)，读到事项与设计全文并说明下一步。普通 Python 问题的新会话没有触发工作台。此前本地写入和回读也有实际记录。\n\n看[Codex 接入与接续验证](<https://linear.app/yyhpokemonmaster/document/ef932315a0be>)，从开头的自然语言例子开始；安装与恢复见[本地说明](<https://linear.app/yyhpokemonmaster/document/e65cc831468f>)，写入证据见[接续验证记录](<https://linear.app/yyhpokemonmaster/document/fa3d0673f664>)。\n\n新一轮非交互 Codex 已读到前一会话的新成果，并准备了精确回写；但工具要求审批，而该次 codex exec 的策略为 never，保存被拒绝，回读确认未写入。此项保持 In Progress，剩余的是在允许工具审批的正常会话中验证写回；不会把只读成功或本会话能写入当成该测试成功。当前机器之外的 Codex 要在当地安装并连接；长会话不保证热更新，可显式重新读取技能。ChatGPT 用户已加自定义指令，但本项测试不代表云端已全部连通。",
+            "scope": "从 Linear 引入，在共作中推进；本地状态与原事项分别维护。"
+          },
+          "provenance": [
+            {
+              "source": "https://linear.app/yyhpokemonmaster/issue/YYH-11/让新-codex-会话接续-linear-事项",
+              "updatedAt": "2026-09-13T04:41:29.827Z"
+            }
+          ]
+        },
+        "contextProposals": []
+      },
+      {
+        "id": "item-85b6472a17f64292",
+        "workspace": "personal",
+        "itemType": "research",
+        "title": "共作首次交付检查",
+        "status": "completed",
+        "payload": {
+          "due": "2026-09-19",
+          "goal": "确认独立工作台能够保存计划、阅读知识、发起 AI 委托和审阅成果；找出影响实际使用的问题。",
+          "owner": "我",
+          "scope": "范围待继续澄清。",
+          "update": "已建立独立应用，正在检查真实工作链。",
+          "domains": [],
+          "priority": 2,
+          "participants": [
+            "我"
+          ]
+        },
+        "version": 3,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-19T00:02:31.950474+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-19T00:10:51.548679+08:00",
+        "context": {
+          "id": "context-98877cc1e5314285",
+          "workspace": "personal",
+          "itemId": "item-85b6472a17f64292",
+          "currentVersionId": "ctxv-b9b0972c83484198",
+          "version": 1,
+          "createdAt": "2026-09-19T00:02:31.950474+08:00",
+          "updatedAt": "2026-09-19T00:02:31.950474+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "确认独立工作台能够保存计划、阅读知识、发起 AI 委托和审阅成果；找出影响实际使用的问题。",
+            "scope": "范围待继续澄清。"
+          },
+          "provenance": [
+            {
+              "source": "用户创建事项"
+            }
+          ]
+        },
+        "contextProposals": []
+      }
+    ],
+    "ideas": [],
+    "topics": [],
+    "domains": [],
+    "resources": [],
+    "artifacts": [
+      {
+        "id": "result-065895e443e5e0c21c7a855c",
+        "title": "工作流与阅读：实际交付及独立验证",
+        "version": 1,
+        "payloadSha256": "78917d506687e8c7811190b03a2ab625cac047f285fba8339a52cecc2884085c"
+      },
+      {
+        "id": "result-81d0aa65983bd9b6534e9c43",
+        "title": "工作流与阅读：实际交付及独立验证",
+        "version": 1,
+        "payloadSha256": "78917d506687e8c7811190b03a2ab625cac047f285fba8339a52cecc2884085c"
+      },
+      {
+        "id": "output-ac40015fca565f4cb7e7387403ee9661",
+        "title": "步骤弹窗、产物目录与固定选择",
+        "version": 1,
+        "payloadSha256": "48062106bd28f53787b0cdeafd735317c12dfd2e32e1324753c070324ca62e19"
+      },
+      {
+        "id": "output-23359112421184d8c9c80faa26b7ef0c",
+        "title": "步骤弹窗与产物目录（含差异定位）",
+        "version": 1,
+        "payloadSha256": "dd6ea15776b62b532b4a14d7100551caeab5b1f6be419c227eb8387e8653d54d"
+      },
+      {
+        "id": "output-094b172d09b65c49efd2a34cb94074a8",
+        "title": "事项归属与步骤交付（含最新有效成果选择）",
+        "version": 1,
+        "payloadSha256": "21c9ff429facc8af2047c995eeb81b459b8aa6ed36d9777329ff64d0ff1c2239"
+      },
+      {
+        "id": "result-44ea28d801bc1c40e3f42ab2",
+        "title": "独立审查第一轮：发现默认读取旧版本",
+        "version": 1,
+        "payloadSha256": "33bbf2019cf292eb80922c4b681b951b6e5de9526f6ba8237a04f8797d5ebf7f"
+      },
+      {
+        "id": "output-8ecebcf3e39c7f090962ac15a44ec628",
+        "title": "事项归属、版本计划与两入口步骤报告（含开发方法）",
+        "version": 1,
+        "payloadSha256": "fe836e74a2cd9b31557d2e8af28fc1c0a9040f465784a55dd9f580d03b2c977e"
+      },
+      {
+        "id": "output-fb94bb45d3bef28f4faf0706fd1d7e8b",
+        "title": "工作流与阅读设计、架构和使用说明",
+        "version": 1,
+        "payloadSha256": "a8f0e4a5e5772f9617439ee4f954053fac5c488e13448ad8f2334a6750cf8338"
+      },
+      {
+        "id": "output-fbe22228380fe98c2f0ffc5891f6ca26",
+        "title": "公式图片框图表格及内部固定版本阅读",
+        "version": 1,
+        "payloadSha256": "513fc8ef3b65e8e208e4b8914583380482743dee1fdc8b6d2f15aa09a3681225"
+      },
+      {
+        "id": "output-ce53de7a6fcc8301a25b37856e32e690",
+        "title": "步骤弹窗、产物分类树与文件差异",
+        "version": 1,
+        "payloadSha256": "d2e3c814145908dcf83233ff1a540d303172ebbd9c984ee6ad81b8a6efc39b8a"
+      },
+      {
+        "id": "output-49ae40cec72d0f1fc4391a1584867802",
+        "title": "固定交付、完整目录与受控文件读取",
+        "version": 1,
+        "payloadSha256": "fff20ac84bc8a70d02a60bf4ff7deba5c75e4fc7600c1aab8e4af81edd1a4ad3"
+      },
+      {
+        "id": "output-807d5e59db6580578aebf0e63e064788",
+        "title": "事项归属、版本计划与两入口步骤报告",
+        "version": 1,
+        "payloadSha256": "90e17256dadd220614b25383bf195371be517e052188cad863631d388622c79b"
+      },
+      {
+        "id": "result-4d57418eb05252744e9c2cd6",
+        "title": "工作流与阅读：已批准的步骤计划",
+        "version": 1,
+        "payloadSha256": "bf1ba788d9fe6415022a17a2b32b19ff1f25642166e1f066e398e479f124a0ff"
+      },
+      {
+        "id": "result-b5f4c12970fd2390284621a1",
+        "title": "事项工作流与阅读：已批准实施方案",
+        "version": 1,
+        "payloadSha256": "33d3d8d71cd885dcda64fdde03f2de0ff5f6db9f543824125a924e45cfd4043b"
+      },
+      {
+        "id": "result-8b5ca755f8c41a5f1666851f",
+        "title": "概览与步骤展开：改动、使用方式与验证",
+        "version": 1,
+        "payloadSha256": "bd5ebc35095d6f4fb78341fb04d1a280b792810ab76e70e0d0952f47c82fec8d"
+      },
+      {
+        "id": "result-d8b1d4ac9a4abb2a161ac44a",
+        "title": "事项工作区：概览与步骤展开方案（2026-09-27 修订）",
+        "version": 1,
+        "payloadSha256": "552cc9e852a1d098c8756aff71ce6690815ba9bfec3b9f3ed2db28c0b7370b26"
+      },
+      {
+        "id": "result-14a723fc0549ea2fc3c543b4",
+        "title": "事项工作区第一版：使用说明与交付边界",
+        "version": 1,
+        "payloadSha256": "e61be7810474a1f12ee4fd48e287640167a89cb1d699ed012c64dddeaf9dea61"
+      },
+      {
+        "id": "result-e8feb4e75f693eecb7054d0a",
+        "title": "首轮实际操作验证记录",
+        "version": 1,
+        "payloadSha256": "89aac39b72bac16ea0609923e31ed879d18fe62bf4ec728f700729ec0fc5e920"
+      }
+    ],
+    "improvements": [
+      {
+        "id": "improvement-bbe266a293614f3c",
+        "title": "改进：真实委托和运行轨迹可读性",
+        "version": 1,
+        "payloadSha256": "a1b22cc13b95f0cf374d8018878ffe4830c661b92a98e4c2672c8be262f472d0"
+      }
+    ],
+    "relations": [
+      {
+        "id": "rel-31ff8e22dcbf4521",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-2a56f97ea1074d71",
+        "toKind": "item",
+        "toId": "item-7547b65b4f704829",
+        "relationType": "part_of",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:25:50.180653+08:00"
+      },
+      {
+        "id": "relation-065895e443e5e0c21c7a855c",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-2a56f97ea1074d71",
+        "toKind": "entity",
+        "toId": "result-065895e443e5e0c21c7a855c",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:50:18.939569+08:00"
+      },
+      {
+        "id": "rel-796a6c40ca624226",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-36e70781e4c6449b",
+        "toKind": "entity",
+        "toId": "improvement-bbe266a293614f3c",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-26T13:28:27.771935+08:00"
+      },
+      {
+        "id": "relation-14a723fc0549ea2fc3c543b4",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "result-14a723fc0549ea2fc3c543b4",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T11:44:35.580583+08:00"
+      },
+      {
+        "id": "relation-d8b1d4ac9a4abb2a161ac44a",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "result-d8b1d4ac9a4abb2a161ac44a",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T19:28:19.660589+08:00"
+      },
+      {
+        "id": "relation-8b5ca755f8c41a5f1666851f",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "result-8b5ca755f8c41a5f1666851f",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T19:28:19.677907+08:00"
+      },
+      {
+        "id": "relation-b5f4c12970fd2390284621a1",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "result-b5f4c12970fd2390284621a1",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T20:51:35.387693+08:00"
+      },
+      {
+        "id": "relation-4d57418eb05252744e9c2cd6",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "result-4d57418eb05252744e9c2cd6",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:08:04.281555+08:00"
+      },
+      {
+        "id": "relation-807d5e59db6580578aebf0e63e064788",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-807d5e59db6580578aebf0e63e064788",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:25:29.994398+08:00"
+      },
+      {
+        "id": "relation-49ae40cec72d0f1fc4391a1584867802",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-49ae40cec72d0f1fc4391a1584867802",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:25:30.295040+08:00"
+      },
+      {
+        "id": "relation-ce53de7a6fcc8301a25b37856e32e690",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-ce53de7a6fcc8301a25b37856e32e690",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:25:31.421916+08:00"
+      },
+      {
+        "id": "relation-fbe22228380fe98c2f0ffc5891f6ca26",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-fbe22228380fe98c2f0ffc5891f6ca26",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:25:31.766833+08:00"
+      },
+      {
+        "id": "relation-fb94bb45d3bef28f4faf0706fd1d7e8b",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-fb94bb45d3bef28f4faf0706fd1d7e8b",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:27:47.935024+08:00"
+      },
+      {
+        "id": "relation-8ecebcf3e39c7f090962ac15a44ec628",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-8ecebcf3e39c7f090962ac15a44ec628",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:34:48.498125+08:00"
+      },
+      {
+        "id": "relation-44ea28d801bc1c40e3f42ab2",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "result-44ea28d801bc1c40e3f42ab2",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:38:30.966996+08:00"
+      },
+      {
+        "id": "relation-094b172d09b65c49efd2a34cb94074a8",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-094b172d09b65c49efd2a34cb94074a8",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:38:57.266975+08:00"
+      },
+      {
+        "id": "relation-23359112421184d8c9c80faa26b7ef0c",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-23359112421184d8c9c80faa26b7ef0c",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:38:57.676470+08:00"
+      },
+      {
+        "id": "relation-ac40015fca565f4cb7e7387403ee9661",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "output-ac40015fca565f4cb7e7387403ee9661",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:44:46.406316+08:00"
+      },
+      {
+        "id": "relation-81d0aa65983bd9b6534e9c43",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-7547b65b4f704829",
+        "toKind": "entity",
+        "toId": "result-81d0aa65983bd9b6534e9c43",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-27T21:50:18.592849+08:00"
+      },
+      {
+        "id": "relation-e8feb4e75f693eecb7054d0a",
+        "workspace": "personal",
+        "fromKind": "item",
+        "fromId": "item-85b6472a17f64292",
+        "toKind": "entity",
+        "toId": "result-e8feb4e75f693eecb7054d0a",
+        "relationType": "produces",
+        "createdBy": "local-user",
+        "createdAt": "2026-09-19T00:07:01.073298+08:00"
+      }
+    ],
+    "meeting": {
+      "id": "meeting-default-personal",
+      "workspace": "personal",
+      "config": {
+        "title": "我的周回顾",
+        "sections": [
+          {
+            "key": "decisions",
+            "title": "需要决定的事",
+            "enabled": true
+          },
+          {
+            "key": "topics",
+            "title": "专题目标与缺口",
+            "enabled": true
+          },
+          {
+            "key": "deliveries",
+            "title": "近期交付与变化",
+            "enabled": true,
+            "filters": {
+              "recentDays": 14
+            }
+          }
+        ]
+      },
+      "version": 1,
+      "updatedBy": "migration-008",
+      "updatedAt": "2026-09-18T23:31:07.003122+08:00"
+    },
+    "meetingNotes": [],
+    "preferences": [],
+    "contextSignatures": {
+      "item-2a56f97ea1074d71": "6647558ad68600a0935dd94428e8b4eb087c386b47ceedec39e027da27692541",
+      "item-7547b65b4f704829": "3428c88c6ebe8f41ce13e8f42e9b45587f0f82656675da815f4c7b6c0c5a76f5",
+      "item-62fe9c309d994457": "5c7ec682e9064745d7bc34f7705e7374a51f2cd420763a801cfc5a06d18cb321",
+      "item-e044cf4e1af64b0c": "82ec0b5156c9bf37fd57d4c38caeb3a4f37bd42502880411107f82e61a4ce3c3",
+      "item-8891f7cb4f634c8f": "64447c7faceae3a42fde93b4425311dffb86dcfa7ae89ace9e67877ec07b99fb",
+      "item-4891c4eedb674483": "2bdbd905bb5a136a09df0c7376d4bd5b86739b1325644b87e42182bd8be6f81b",
+      "item-c52809b4b3294166": "3fca37cf7f95d93b3271bfeca56f95b414e71993aec74c5aa1d36315f153c8e7",
+      "item-92989f3f9ca34660": "99d1c6c93420955a9c742b10ef6aaad630e48cd054ce9c4aedb7b25b3159ca1e",
+      "item-58363ef3851142d8": "0b42b71e1917b7a23aa27cf6738b68474f9c15306cb8428e7bca1b53075bc694",
+      "item-724331a2968c4420": "2ec79292f9778deee8845983182eea30f3f411cd633e53cac9f3f26fef23a873",
+      "item-36e70781e4c6449b": "d821f1f72c0ab9fb4f4aa2f21d341c017f599633c0df2c4cacddd82f3cd188bf",
+      "item-de7785d0790445d8": "37043704a9a7d785a14f92fedc5e2e0212e16789e365f7770e8ebebd70075f54",
+      "item-810217743bbb4be2": "bdfe53b97f51319143a38d11f4fbe23c5b8341ad2596b3dc3c7cc731d3fc0ff0",
+      "linear-b2ff980d35c647861055": "df541a2911e5c13dc85cc0366cfb288f8b2b401183b15267e8d7adcbc12e5c54",
+      "item-85b6472a17f64292": "f51a4b919063b8a4e77a99f0e215c6444fd2fa540bba9504e713d8339d3bae59"
+    }
+  },
+  "team": {
+    "workspace": "team",
+    "items": [
+      {
+        "id": "item-2cab593824114b90",
+        "workspace": "team",
+        "itemType": "requirement",
+        "title": "团队空间本机执行检查",
+        "status": "open",
+        "payload": {
+          "goal": "验证团队空间能够单独保存事项和执行结果，明确首次团队回顾应该讨论什么。",
+          "owner": "我",
+          "scope": "范围待继续澄清。",
+          "update": "已形成目标，尚未承诺排期",
+          "domains": [],
+          "participants": [
+            "我"
+          ]
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-19T00:18:32.708628+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-19T00:18:32.708628+08:00",
+        "context": {
+          "id": "context-8198b26b458b4268",
+          "workspace": "team",
+          "itemId": "item-2cab593824114b90",
+          "currentVersionId": "ctxv-ec7333a46b284fbc",
+          "version": 1,
+          "createdAt": "2026-09-19T00:18:32.708628+08:00",
+          "updatedAt": "2026-09-19T00:18:32.708628+08:00",
+          "revisionNo": 1,
+          "content": {
+            "goal": "验证团队空间能够单独保存事项和执行结果，明确首次团队回顾应该讨论什么。",
+            "scope": "范围待继续澄清。"
+          },
+          "provenance": [
+            {
+              "source": "用户创建事项"
+            }
+          ]
+        },
+        "contextProposals": []
+      }
+    ],
+    "ideas": [],
+    "topics": [],
+    "domains": [],
+    "resources": [],
+    "artifacts": [],
+    "improvements": [],
+    "relations": [],
+    "meeting": {
+      "id": "meeting-default-team",
+      "workspace": "team",
+      "config": {
+        "title": "周度组会",
+        "sections": [
+          {
+            "key": "decisions",
+            "title": "需要决定的事",
+            "enabled": true
+          },
+          {
+            "key": "topics",
+            "title": "专题目标与缺口",
+            "enabled": true
+          },
+          {
+            "key": "deliveries",
+            "title": "近期交付与变化",
+            "enabled": true,
+            "filters": {
+              "recentDays": 14
+            }
+          }
+        ]
+      },
+      "version": 1,
+      "updatedBy": "migration-008",
+      "updatedAt": "2026-09-18T23:31:07.003122+08:00"
+    },
+    "meetingNotes": [],
+    "preferences": [],
+    "contextSignatures": {
+      "item-2cab593824114b90": "cebadba7c05364544bbf210bda0fc30106a748da21e8146052d111d2c0aebd67"
+    }
+  }
+}

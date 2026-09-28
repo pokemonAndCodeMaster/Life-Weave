@@ -96,7 +96,7 @@ function normalizeWorkspace(raw: WorkspaceState, workspace: WorkspaceKind): Work
       state: displayStatus[rawItem.status] ?? rawItem.status ?? '待确认',
       domains: [...new Set([...(payload.domains ?? []), ...relatedEntities('domain').map((entity: any) => entity.title)])],
       topics: [...new Set([...(payload.topics ?? []), ...relatedEntities('topic').map((entity: any) => entity.title)])],
-      owner: payload.owner ?? rawItem.createdBy ?? '我',
+      owner: payload.owner || '未分派',
       due: payload.due ?? null,
       update: payload.update ?? '尚无进展说明',
       goal: (rawItem.context ? content.goal : undefined) ?? payload.goal ?? rawItem.title,

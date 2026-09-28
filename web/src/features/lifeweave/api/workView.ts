@@ -54,6 +54,14 @@ export interface WorkStep {
 export interface ItemWorkView {
   itemId: string
   itemVersion: number
+  overview?: {
+    background: string
+    intent: string
+    expectedResult: string
+    progress: { summary: string; state: string; completedSteps: number; totalSteps: number }
+    outputIds: string[]
+    sources: Record<string, string>
+  }
   current: { state: string; label: string; summary: string; updatedAt?: string | null }
   plan: {
     id: string
@@ -80,4 +88,7 @@ export async function getWorkView(workspace: WorkspaceKind, itemId: string) {
 }
 export async function saveWorkPlan(workspace: WorkspaceKind, itemId: string, input: WorkPlanInput) {
   return (await http.put<ItemWorkView>(`${root(workspace, itemId)}/work-plan`, input)).data
+}
+export async function saveItemOverview(workspace: WorkspaceKind, itemId: string, input: {version: number; background: string; intent: string; expectedResult: string}) {
+  return (await http.put<ItemWorkView>(`${root(workspace, itemId)}/overview`, input)).data
 }

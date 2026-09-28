@@ -1,0 +1,123 @@
+{
+  "execution": {
+    "kind": "organization",
+    "id": "orgp-b59dc011f6f0459499c76de0",
+    "itemId": "item-2cab593824114b90",
+    "itemIds": [
+      "item-2cab593824114b90"
+    ],
+    "agentId": "item-steward",
+    "agentName": "事项整理 Agent",
+    "agentIds": [
+      "item-steward"
+    ],
+    "agentIdentity": "registered",
+    "status": "applied",
+    "createdAt": "2026-09-28T23:25:42.040821+08:00",
+    "updatedAt": "2026-09-28T23:25:42.040821+08:00",
+    "engine": "builtin",
+    "model": null,
+    "runIds": [],
+    "traceCoverage": "platform_action",
+    "title": "用户要求实际规整现有事项；按原目标核对并保留全部事项、状态、讨论和成果。",
+    "error": null,
+    "parentExecution": null
+  },
+  "proposalId": "orgp-b59dc011f6f0459499c76de0",
+  "originalItemsVerified": [
+    "item-2cab593824114b90"
+  ],
+  "originalArtifactCount": 0,
+  "afterItemCount": 1,
+  "catalog": {
+    "workspace": "team",
+    "topics": [
+      {
+        "id": "topic-10262e0cb54e449e",
+        "workspace": "team",
+        "entityType": "topic",
+        "title": "团队工作台验证",
+        "payload": {
+          "goal": "验证团队空间的事项隔离、运行与回顾入口。"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-28T23:25:42.011164+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-28T23:25:42.011164+08:00"
+      }
+    ],
+    "domains": [
+      {
+        "id": "domain-e0c6381035f84ccd",
+        "workspace": "team",
+        "entityType": "domain",
+        "title": "团队协作",
+        "payload": {
+          "description": "团队事项、执行与回顾。"
+        },
+        "version": 1,
+        "createdBy": "local-user",
+        "createdAt": "2026-09-28T23:25:41.999014+08:00",
+        "updatedBy": "local-user",
+        "updatedAt": "2026-09-28T23:25:41.999014+08:00"
+      }
+    ],
+    "items": [
+      {
+        "id": "item-2cab593824114b90",
+        "title": "团队空间本机执行检查",
+        "status": "open",
+        "version": 2,
+        "itemType": "requirement",
+        "topicIds": [
+          "topic-10262e0cb54e449e"
+        ],
+        "domainIds": [
+          "domain-e0c6381035f84ccd"
+        ],
+        "parentId": null,
+        "organizationStatus": null
+      }
+    ],
+    "unorganizedItems": [],
+    "rules": [],
+    "rulesVersion": null,
+    "proposals": [
+      {
+        "id": "orgp-b59dc011f6f0459499c76de0",
+        "status": "applied",
+        "reason": "用户要求实际规整现有事项；按原目标核对并保留全部事项、状态、讨论和成果。",
+        "changes": [
+          {
+            "after": {
+              "parentId": null,
+              "topicIds": [
+                "topic-10262e0cb54e449e"
+              ],
+              "domainIds": [
+                "domain-e0c6381035f84ccd"
+              ]
+            },
+            "title": "团队空间本机执行检查",
+            "before": {
+              "parentId": null,
+              "topicIds": [],
+              "domainIds": []
+            },
+            "itemId": "item-2cab593824114b90",
+            "reason": "原事项明确验证团队空间独立事项和执行。",
+            "itemVersion": 1,
+            "beforeRelations": []
+          }
+        ],
+        "groups": [],
+        "warnings": [],
+        "createdAt": "2026-09-28T23:25:42.022713+08:00",
+        "appliedAt": "2026-09-28T23:25:42.040821+08:00",
+        "undoneAt": null,
+        "createdBy": "local-user"
+      }
+    ]
+  }
+}

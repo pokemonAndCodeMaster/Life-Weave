@@ -103,6 +103,13 @@ class DevelopmentService:
                  "sourcePath": entry["sourcePath"]}
                 for entry in self.sources.snapshot(workspace, method_id, refs)]
 
+    @staticmethod
+    def _effective_context_sha256(context: dict[str, Any]) -> str:
+        """Fingerprint accepted context and local working intent, not item status or steps."""
+        value = {key: context.get(key) for key in ('versionId', 'content', 'focus', 'contextRefs')}
+        value['localIntentGoal'] = (context.get('localIntent') or {}).get('goal')
+        return hashlib.sha256(json.dumps(value, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+
     def _bind_business_plan(self, workspace: str, item_id: str, assignment_id: str,
                             execution_scope: str, review_mode: str,
                             step_id: str | None, plan_version: int | None) -> dict[str, Any]:
@@ -257,13 +264,13 @@ class DevelopmentService:
         if len(refs) > 10:
             raise ValueError("一次开发最多选择 10 篇知识")
         versions = self._input_versions(workspace, method_id, refs)
-        context = self.work.current_context_snapshot(workspace, item_id)
         identity = "dev-" + hashlib.sha256(f"{workspace}:{item_id}:{request_id}".encode()).hexdigest()[:32]
         with self.db.atomic() as conn:
             # Serialize different request IDs for the same item before checking the
             # active assignment; an empty SELECT ... FOR UPDATE cannot lock a row.
             conn.execute("SELECT id FROM workbench.t_lifeweave_item "
                          "WHERE workspace_key=%s AND id=%s FOR UPDATE", (workspace, item_id)).fetchone()
+            context = self.work.current_context_snapshot(workspace, item_id)
             existing = conn.execute("SELECT * FROM workbench.lifeweave_development_assignment "
                                     "WHERE workspace=%s AND item_id=%s AND request_id=%s FOR UPDATE",
                                     (workspace, item_id, request_id)).fetchone()
@@ -300,7 +307,9 @@ class DevelopmentService:
             self.work.append_activity(workspace, item_id, kind='work_assignment_binding',
                                       body='受管开发已绑定业务计划步骤',
                                       payload={**binding, 'assignmentId': identity,
-                                               'planRunId': run['id']},
+                                               'planRunId': run['id'],
+                                               'effectiveContextSha256': self._effective_context_sha256(
+                                                   self.work.current_context_snapshot(workspace, item_id))},
                                       actor_id='development-agent')
             self._report_business_stage(row, 'plan', run['id'], 'running', '受管开发已启动方案阶段')
         return self._wire(row)
@@ -354,6 +363,9 @@ class DevelopmentService:
         context = self.work.current_context_snapshot(row["workspace"], row["item_id"])
         if context["versionId"] != row["context_version_id"]:
             raise ValueError("事项背景已更新；请按新共识重新形成方案")
+        binding = self._business_binding(row)
+        if binding and binding.get('effectiveContextSha256') and self._effective_context_sha256(context) != binding['effectiveContextSha256']:
+            raise ValueError("事项工作目标或背景已更新；旧方案不能直接继续，请重新委托")
         if self._input_versions(row["workspace"], row["method_id"], row["knowledge_refs"]) != row["input_versions"]:
             raise ValueError("所选方法或知识版本已变化；请重新形成方案")
 

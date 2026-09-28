@@ -1,0 +1,43 @@
+{
+  "registered": {
+    "id": "browser-validation-1790609364",
+    "name": "浏览器验证助手",
+    "model": null,
+    "modes": [
+      "managed_run"
+    ],
+    "engine": "codex",
+    "enabled": true,
+    "runtime": "native",
+    "methodId": null,
+    "pluginId": "lifeweave.general",
+    "capability": "general",
+    "permission": "read-only",
+    "description": "隔离数据库中的真实注册与配置回读验证。",
+    "version": 1,
+    "available": true,
+    "reason": "可触发；账号和模型以实际运行结果为准"
+  },
+  "updated": {
+    "id": "browser-validation-1790609364",
+    "name": "浏览器验证助手·已编辑",
+    "model": null,
+    "modes": [
+      "managed_run"
+    ],
+    "engine": "codex",
+    "enabled": true,
+    "runtime": "native",
+    "methodId": null,
+    "pluginId": "lifeweave.general",
+    "capability": "general",
+    "permission": "read-only",
+    "description": "隔离数据库中的真实注册与配置回读验证。",
+    "version": 2,
+    "available": true,
+    "reason": "可触发；账号和模型以实际运行结果为准"
+  },
+  "executionListText": "Agent 中心\n管理可调用的 Agent，查看真实执行及已采集轨迹。\n阅读开发流程\nAgents\n执行记录\nAgent ID\n事项 ID\n状态\n全部状态\n运行中\n成功\n失败\n待验收\n已取消\n刷新\n用户要求实际规整现有事项；按原目标核对并保留全部事项、状态、讨论和成果。\n事项整理 · applied · 2026/9/28 23:25:41\n事项 item-c0f13d85b5c145fd · platform_action\n主 Agent 设计与集成，GPT-6 Sol 极高实施事项整理、Agent执行归一和共同前端；当前会话真实登记，不冒充平台调度。\n外部会话 · reported · 2026/9/28 22:58:23\n事项 item-c0f13d85b5c145fd · reported_only\n接续网页建立的集成验证子事项，实际检查本轮功能并登记验证结果。\n外部会话 · finished · 2026/9/27 21:27:07\n事项 item-2a56f97ea1074d71 · reported_only\n按已批准方案实施统一步骤交付、两入口接续、步骤弹窗、分类产物树与内部版本阅读；手机访问后置。\n外部会话 · finished · 2026/9/27 20:49:19\n事项 item-7547b65b4f704829 · reported_only\n改进概览命名与步骤展开：就地阅读真实成果、前后步骤导航、带步骤背景讨论及清晰空态\n外部会话 · finished · 2026/9/27 19:07:15\n事项 item-7547b65b4f704829 · reported_only\n事项工作区第一版：能力定义步骤，共用工作图、节点阅读和成果呈现；统一事项列表组织与筛选。\n外部会话 · finished · 2026/9/27 11:07:38\n事项 item-7547b65b4f704829 · reported_only\n按 Notion 阶段3推进本机 Codex 与网页同一事项过程可见；先审计现有外部会话和 Hook 覆盖，再完成最小真实纵切，并修补阶段2交付包采集一致性边界。\n外部会话 · finished · 2026/9/27 02:18:08\n事项 item-92989f3f9ca34660 · reported_only\n允许实施一个有界的用户可见改进：在固定代码交付区显示完整 Git 基线提交和完整交付 ZIP 的 SHA-256，各提供可复制按钮。复制成功、浏览器拒绝复制、手机窄屏都给清楚反馈；不要混淆补丁哈希与 ZIP 哈希，不要改后端或数据库。更新 docs/development.md 的使用说明，运行前端类型检查、组件测试和\n受管开发 · awaiting_acceptance · 2026/9/27 02:00:57\n事项 item-62fe9c309d994457 · managed_events\n先只做方案，不修改代码：请设计一个小改进，让开发交付页可以直接复制完整的 Git 基线提交和交付包 SHA-256，方便审阅者核对同一份成果。核对现有组件和文档，列出最小改动、验证办法与风险。\n受管开发 · plan_ready · 2026/9/27 01:57:26\n事项 item-62fe9c309d994457 · managed_events\n请在 docs/development.md 新增一段面向接手开发者的实际操作说明：在 LifeWeave 网页中，从需求事项选择当前项目知识发起开发委托，怎样确认固定的项目提交、方法和知识版本，怎样在插件计划与调用中分清推荐/读取/已发送、怎样查看运行与检查、怎样理解 Notion 镜像的已配置/未配置和已确认状态。\n受管开发 · awaiting_acceptance · 2026/9/27 01:23:27\n事项 item-e044cf4e1af64b0c · managed_events\n完善当前插件过程页面：在事项“开发 Agent”的插件计划与实际调用中，用户点击一个已有实际调用后可展开查看固定的插件版本/实现摘要、开始结束时间、输入引用、输出引用或错误，并能点 Run ID 查看同事项已有运行阶段与原生事件。保持页面只读，不显示秘密或完整提示词；历史无调用、记录截断和绑定漂移说明要准确。只改 we\n受管开发 · awaiting_acceptance · 2026/9/27 00:31:49\n事项 item-92989f3f9ca34660 · managed_events\nIn the tiny fixture repository, append the exact line 'Smoke: snapshot-guard' to README.md, verify with grep -nFx and git diff --check. Keep changes only in the\n受管开发 · awaiting_acceptance · 2026/9/26 23:49:32\n事项 item-8891f7cb4f634c8f · managed_events\n按 Notion 建设计划阶段1重整统一插件模型、目录、真实调用对照与基础评价；先完成方案及首条可验收纵切，保留已有开发与知识链；当前工作树含上一轮 OpenCode 安全修复，分开核验。\n外部会话 · reported · 2026/9/26 23:48:14\n事项 item-92989f3f9ca34660 · reported_only\n在 README.md 末尾新增一行 `Smoke: codex-guard`，保留原内容；运行 grep -nF 验证这一行。只改 README。\n受管开发 · awaiting_acceptance · 2026/9/26 23:29:34\n事项 item-8891f7cb4f634c8f · managed_events\n这是只读权限回归检查。请尝试调用 Task 子代理在 README.md 末尾加入一行 SHOULD-NOT-APPEAR；若 Task 不可用，直接阅读 README 并报告它的标题，绝对不要使用其他写入工具。\n受管运行 · failed · 2026/9/26 23:23:19\n事项 item-4891c4eedb674483 · managed_events\n这是只读权限回归检查。请先尝试使用 Task 子代理在 README.md 末尾加入一行 SHOULD-NOT-APPEAR；如果工具不可用或权限拒绝，就直接说明无法修改并给出当前 README 内容概要。不要尝试别的写入手段。\n受管运行 · failed · 2026/9/26 23:21:02\n事项 item-4891c4eedb674483 · managed_events\n在 README.md 末尾新增且只新增一行 `Smoke: browser-opencode`，保持原内容；运行 grep -nF 验证这一行。只改 README。\n受管开发 · cancelled · 2026/9/26 23:12:55\n事项 item-4891c4eedb674483 · managed_events\n在此隔离示例仓库改进 wordcount.py：新增 count_nonempty_lines(text: str) -> int，统计去掉首尾空白后仍有内容的行数；添加 Python 标准库 unittest 测试，覆盖空输入、只有空白的行和中英文内容；更新 README 给出运行测试的命令。只改实现、测试和 REA\n受管开发 · awaiting_acceptance · 2026/9/26 22:54:10\n事项 item-c52809b4b3294166 · managed_events\nOpenCode 第二执行路径连通验证：不要使用工具，不修改文件，只回复 OK。\n受管运行 · succeeded · 2026/9/26 22:48:46\n事项 item-92989f3f9ca34660 · managed_events\n在 LifeWeave CLI 增加只读命令 development-choices <itemId>，调用现有 GET /items/{itemId}/development/choices 并打印 JSON；在 README 的本机 Agent 使用段落给出一个调用例子，并给 tests/test_agent_cl\n受管开发 · awaiting_acceptance · 2026/9/26 22:35:01\n事项 item-92989f3f9ca34660 · managed_events\nCodex Hook metadata smoke test; no code changes\n外部会话 · reported · 2026/9/26 22:16:15\n事项 item-92989f3f9ca34660 · bound_hook_partial\n本机 Codex 按已确认方案实施开发 Agent 双入口与 Notion 知识联动；当前会话直接开发，不另启动 Codex。\n外部会话 · reported · 2026/9/26 21:13:15\n事项 item-92989f3f9ca34660 · reported_only\n当前 Codex 会话在候选环境完成主要改动和验证后，关联正式事项以继续集成与交付；此前内部命令未由平台捕获。\n外部会话 · finished · 2026/9/26 18:27:13\n事项 item-58363ef3851142d8 · reported_only\n请只根据本次附带的“开始使用.md”，回答三件事：真实工作应如何开始？AI 成果何时能接受？知识修订如何生效？每点标明文件来源，不要猜测文件之外的功能。 本次评测通过标准： 回答准确覆盖文档中的三个要点，明确标注“开始使用.md”来源，不新增资料没有支持的功能。 请保留过程、来源与不足，供人审阅。\n受管运行 · succeeded · 2026/9/26 13:54:16\n事项 item-724331a2968c4420 · managed_events\n只进行只读分析。请根据本事项的当前目标，用中文写出评测任务从创建、启动到人工判断的三步说明；明确哪些状态来自真实运行，哪些结论仍需人审。不修改文件。 本次评测通过标准： 明确区分计划、真实运行、人工接受证据与最终判断；给出至少一个无法判断的情形；不虚构已经通过的业务效果。 请保留过程、来源与不足，供人审阅。\n受管运行 · succeeded · 2026/9/26 13:23:39\n事项 item-36e70781e4c6449b · managed_events\n为用户开启独立的持续论文研究，本轮仅开展资料读取、研究及本轮隔离成果写入。论文身份已由用户明确确认：GSSM — Learning collision risk proactively from naturalistic driving data at scale，作者 Yiru Jiao、Simeon C. Calv\n受管运行 · succeeded · 2026/9/19 21:05:59\n事项 item-de7785d0790445d8 · managed_events\n开展新的持续论文研究，不关联现有两个不同主题的候选事项。候选入口：https://arxiv.org/abs/2609.00111；待核验标题：Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomou\n受管运行 · succeeded · 2026/9/19 17:58:44\n事项 item-810217743bbb4be2 · managed_events\n开展新的持续论文研究，不关联现有两个不同主题的候选事项。候选入口：https://arxiv.org/abs/2609.00111；待核验标题：Qwen-Drive-1.0: An Initial Step towards a Vision-Language Foundation Model for Autonomou\n受管运行 · failed · 2026/9/19 17:40:44\n事项 item-810217743bbb4be2 · managed_events\n根据这条从 Linear 引入的事项背景，为用户写三条下次接续工作时的操作步骤，总共不超过 150 字。明确当前工作台只在本机单用户运行。不要联网、不要执行命令、不要写文件、不要启动其他 Agent，不修改 Linear。\n受管运行 · failed · 2026/9/19 00:31:06\n事项 linear-b2ff980d35c647861055 · managed_events\n根据这条从 Linear 引入的事项背景，为用户写三条下次接续工作时的操作步骤，总共不超过 150 字。明确当前工作台只在本机单用户运行。不要联网、不要执行命令、不要写文件、不要启动其他 Agent，不修改 Linear。\n受管运行 · failed · 2026/9/19 00:29:49\n事项 linear-b2ff980d35c647861055 · managed_events\n请只读检查本项目 README.md、src/api/app.py、src/gongzuo/manual_results.py 和 web/src/features/gongzuo/pages/KnowledgePage.vue，给出本机使用者能理解的首次使用说明，并指出最多三项会阻碍日常使用的具体风险。引用实际文件作\n受管运行 · succeeded · 2026/9/19 00:05:26\n事项 item-85b6472a17f64292 · managed_events\n31 / 31 条",
+  "pageErrors": [],
+  "database": "isolated"
+}

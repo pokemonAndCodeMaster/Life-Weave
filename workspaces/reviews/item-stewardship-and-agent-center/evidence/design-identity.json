@@ -1,0 +1,14 @@
+{
+  "baseline": "ccd4c1b17c3ed361ea38be411d0b6387d533f619",
+  "authorization": "2026-09-28 用户六项诉求及直接规划实施授权",
+  "plan": {
+    "approved-plan.md": {
+      "blob": "838b8771b1847a6bdd93b02ff54173decb166871",
+      "sha256": "3f3f0eb4f4583a8943f42c265cfdf7c429c253f318a8462756927a95f5de5e97"
+    },
+    "approved-contracts.md": {
+      "blob": "9e5e47a98abe6800e98a95ac6a48eebb89619817",
+      "sha256": "8eec0762dff42c47d6ac2574124e939c39debfa9ba5b10892a77e897331ef698"
+    }
+  }
+}

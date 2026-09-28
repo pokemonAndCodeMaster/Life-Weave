@@ -1,0 +1,1690 @@
+........................................................................ [ 44%]
+................F.......F....FFFFF.........F.FFFFFF....FFFFFFF.......... [ 88%]
+.............FFF.F                                                       [100%]
+=================================== FAILURES ===================================
+_____ test_evaluation_tasks_use_frozen_candidate_and_accepted_run_evidence _____
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b92fdbd0>
+
+    def test_evaluation_tasks_use_frozen_candidate_and_accepted_run_evidence(dedicated_client):
+        client = dedicated_client
+        item = post(client, '/items', {'itemType': 'research', 'title': '评测攻略整理',
+                                       'payload': {'goal': '交付可核验的攻略'}})
+        candidate = post(client, '/capabilities', {
+            'title': '攻略研究候选', 'target': 'skill',
+            'content': '---\nname: game-research\ndescription: 研究游戏攻略\n---\n\n# 任务\n解释依据',
+            'desiredBehavior': '解释策略和证据', 'validationPlan': '以真实任务与人工证据评估',
+        })
+        evaluation = post(client, '/evaluations', {
+            'itemId': item['id'], 'targetKind': 'capability', 'candidateId': candidate['id'],
+            'title': '攻略研究验证', 'instruction': '整理本轮攻略',
+            'criteria': '说明阵容选择的依据、来源与不确定性',
+        })
+        assert evaluation['candidateVersion'] == candidate['version']
+        assert client.get('/api/lifeweave/team/evaluations/'+evaluation['id']).status_code == 404
+        assert client.post('/api/lifeweave/team/evaluations/'+evaluation['id']+'/start', json={}).status_code == 404
+        knowledge_root = client.app.state.library.roots['personal']
+        knowledge_root.mkdir(parents=True, exist_ok=True)
+        (knowledge_root/'攻略依据.md').write_text('# 攻略依据\n\n核对游戏版本。', encoding='utf-8')
+        method_id = client.app.state.task_sources.catalog('personal')['items'][0]['id']
+        started = client.post('/api/lifeweave/personal/evaluations/'+evaluation['id']+'/start',
+                              json={'engine': 'codex', 'directory': str(ROOT), 'methodId': method_id,
+                                    'knowledgeRefs': ['local:攻略依据.md']})
+        assert started.status_code == 200, started.text
+        run_id = started.json()['runId']
+        run = client.get('/api/lifeweave/personal/runs/'+run_id).json()
+        assert run['state'] == 'queued'
+        assert run['capabilityCandidateId'] == candidate['id']
+        assert '说明阵容选择的依据' in run['instruction']
+        assert run['repositoryPath'] == str(ROOT)
+        assert run['environmentSnapshot']['selectedInputs'] == {
+            'methodId': method_id, 'knowledgeRefs': ['local:攻略依据.md']}
+        assert any(entry['id'] == method_id for entry in run['capabilities'])
+        assert started.json()['run']['selectedInputs']['knowledgeRefs'] == ['local:攻略依据.md']
+>       ordinary_run = post(client, '/runs', {
+            'itemId': item['id'], 'instruction': '沿同一能力继续整理攻略', 'engine': 'codex',
+            'capabilityCandidateId': candidate['id'],
+        }, 202)
+
+tests/test_live_database.py:192: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b92fdbd0>
+route = '/runs'
+body = {'capabilityCandidateId': 'cap-859345b8078446c3', 'engine': 'codex', 'instruction': '沿同一能力继续整理攻略', 'itemId': 'item-7c395cfaae3d4cbd'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+___________ test_task_inputs_are_frozen_and_run_limits_are_enforced ____________
+
+client = <starlette.testclient.TestClient object at 0x7a18b8cafc70>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_task_inputs_are_frozen_an0')
+
+    def test_task_inputs_are_frozen_and_run_limits_are_enforced(client, tmp_path):
+        root = tmp_path/'skills'; method = root/'focused'; method.mkdir(parents=True)
+        (method/'SKILL.md').write_text('---\nname: focused\ndescription: 有界方法\n---\n\n读 references/example.md')
+        (method/'references').mkdir(); support = method/'references/example.md'; support.write_text('原方法依据')
+        catalog = post(client,'/methods/roots',{'root':str(root)},200)
+        method_id = catalog['items'][0]['id']
+        item = post(client,'/items',{'itemType':'research','title':'验证委托输入','payload':{}})
+        refs=[]
+        for number in range(10):
+            name=f'combination-{number}.md'
+            (client.app.state.library.roots['personal']/name).write_text(f'# 文档 {number}\n独立事实 {number}')
+            refs.append('local:'+name)
+        payload = {'itemId':item['id'],'instruction':'只分析指定依据','engine':'codex','methodId':method_id,'knowledgeRefs':refs}
+>       run = post(client,'/runs',payload,202)
+
+tests/test_live_database.py:601: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8cafc70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '只分析指定依据', 'itemId': 'item-b2575b63ae4e4d8c', 'knowledgeRefs': ['local:combination-...md', 'local:combination-2.md', 'local:combination-3.md', 'local:combination-4.md', 'local:combination-5.md', ...], ...}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+____ test_continuation_feedback_is_idempotent_scoped_and_pinned_in_next_run ____
+
+client = <starlette.testclient.TestClient object at 0x7a18b8cafc70>
+
+    def test_continuation_feedback_is_idempotent_scoped_and_pinned_in_next_run(client):
+        item = post(client, '/items', {'itemType':'research','title':'维护噪声识别方法','initialContext':{'goal':'先讨论误报的适用范围，不做代码'}})
+        path = '/items/' + item['id']
+        payload = {'body':'重点是标注分歧，先不要比较训练速度','requestId':'feedback-once'}
+        first = post(client, path+'/feedback', payload)
+        again = post(client, path+'/feedback', payload)
+        assert first == again
+        assert client.post('/api/lifeweave/personal'+path+'/feedback',json={**payload,'body':'不同内容'}).status_code == 409
+        assert client.post('/api/lifeweave/team'+path+'/feedback',json=payload).status_code == 404
+        assert client.post('/api/lifeweave/personal'+path+'/feedback',json={**payload,'runId':'missing'}).status_code == 400
+        assert client.post('/api/lifeweave/personal'+path+'/feedback',json={**payload,'body':'  '}).status_code == 400
+        current = client.get('/api/lifeweave/personal'+path+'/continuation').json()
+        assert current['context']['content']['goal'] == '先讨论误报的适用范围，不做代码'
+        assert [f['id'] for f in current['feedback']] == [first['id']]
+>       run = post(client, '/runs', {'itemId':item['id'],'instruction':'只讨论','engine':'codex'}, 202)
+
+tests/test_live_database.py:672: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8cafc70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '只讨论', 'itemId': 'item-45b0de9c4cfc4ea9'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+_ test_discovery_and_recommendations_reuse_accepted_knowledge_without_a_paper_fixture _
+
+client = <starlette.testclient.TestClient object at 0x7a18b8cafc70>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_discovery_and_recommendat0')
+
+    def test_discovery_and_recommendations_reuse_accepted_knowledge_without_a_paper_fixture(client, tmp_path):
+        idea = post(client, '/entities', {'entityType':'idea','title':'整理阳台植物','payload':{'body':'想了解采光，暂时只记录'}})
+        assert any(row['id'] == idea['id'] for row in client.get('/api/lifeweave/personal/work-discovery?query=阳台采光').json()['items'])
+        item = post(client, '/items', {'itemType':'personal','title':'阳台采光记录','initialContext':{'goal':'比较朝向对植物采光的影响'}})
+        draft = post(client, '/library/revisions', {'path':'生活/采光.md','content':'# 阳台采光\n植物朝向影响照射时长。','baseVersion':'new','reason':'已有领域知识'})
+        post(client, '/library/revisions/'+draft['id']+'/decision', {'accept':True}, 200)
+        method = tmp_path/'methods'/'lighting'; method.mkdir(parents=True)
+        (method/'SKILL.md').write_text('---\nname: lighting\ndescription: 比较植物采光的观察方法\n---\n\n保留朝向、时间与实际观察。')
+        post(client, '/methods/roots', {'root':str(method.parent)}, 200)
+        path = '/api/lifeweave/personal/items/'+item['id']+'/input-recommendations'
+        before = client.get(path).json()
+        assert 'local:生活/采光.md' in before['suggested']['knowledgeRefs']
+        assert before['methods'][0]['title'] == 'lighting'
+        full = client.get('/api/lifeweave/personal/methods/'+before['methods'][0]['id'])
+        assert full.status_code == 200 and '保留朝向' in full.json()['content']
+        assert full.json()['version'] == before['methods'][0]['version']
+        assert client.get('/api/lifeweave/team/methods/'+before['methods'][0]['id']).status_code == 409
+        assert before['methods'][0]['matchedTerms'] and before['documents'][0]['version']
+        version = next(d['version'] for d in before['documents'] if d['ref'] == 'local:生活/采光.md')
+        (client.app.state.library.roots['personal']/'生活/采光.md').write_text('# 阳台采光\n补充新观察')
+>       run = post(client, '/runs', {'itemId':item['id'],'instruction':'观察植物采光','engine':'codex',**before['suggested']}, 202)
+
+tests/test_live_database.py:707: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8cafc70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '观察植物采光', 'itemId': 'item-aba6cca3b01c4e55', 'knowledgeRefs': ['local:生活/采光.md', 'l...ecture.md', 'lifeweave-project:docs/item-workspace-design.md', 'lifeweave-project:docs/research-archive.md', ...], ...}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+_ test_worker_http_reports_keep_input_provenance_and_retry_uses_current_feedback _
+
+client = <starlette.testclient.TestClient object at 0x7a18b8cafc70>
+
+    def test_worker_http_reports_keep_input_provenance_and_retry_uses_current_feedback(client):
+        runtime = client.app.state.lifeweave_runtime_service
+        base = '/api/lifeweave/team'
+    
+        def send(path, body, status=200, headers=None):
+            response = client.post(base+path, json=body, headers=headers)
+            assert response.status_code == status, response.text
+            return response.json()
+    
+        machine = send('/machines/register', {'name':'input provenance regression','capacity':1,
+                       'engines':['codex'],'runtimes':['native']}, 201,
+                       {'X-LifeWeave-Registration-Token':runtime.registration_tokens['team']})
+        auth = {'X-LifeWeave-Worker-Token':machine['workerToken']}
+        item = send('/items', {'itemType':'research','title':'运行全过程保留依据'}, 201)
+        feedback_path = '/items/'+item['id']+'/feedback'
+        first = send(feedback_path, {'body':'先核对依据','requestId':'before-running'}, 201)
+>       run = send('/runs', {'itemId':item['id'],'instruction':'核对依据','engine':'codex',
+                            'machineId':machine['id']}, 202)
+
+tests/test_live_database.py:733: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+path = '/runs'
+body = {'engine': 'codex', 'instruction': '核对依据', 'itemId': 'item-52ac81b3f7d745c8', 'machineId': 'node-t-f52af4960d99'}
+status = 202, headers = None
+
+    def send(path, body, status=200, headers=None):
+        response = client.post(base+path, json=body, headers=headers)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:723: AssertionError
+_ test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable[http] _
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b8129e70>
+transport = 'http'
+
+    @pytest.mark.parametrize('transport', ['http', 'local'])
+    def test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable(dedicated_client, transport):
+        import asyncio
+        import base64
+        import hashlib
+        import json
+        from src.lifeweave_runtime.worker import ServiceWorkerClient
+    
+        client = dedicated_client
+        runtime = client.app.state.lifeweave_runtime_service
+        base = '/api/lifeweave/personal'
+        registered = client.post(base+'/machines/register', json={
+            'name': 'PDF NUL '+transport, 'capacity': 1, 'engines': ['codex'], 'runtimes': ['native'],
+        }, headers={'X-LifeWeave-Registration-Token': runtime.registration_tokens['personal']})
+        assert registered.status_code == 201, registered.text
+        machine = registered.json()
+        auth = {'X-LifeWeave-Worker-Token': machine['workerToken']}
+        prefix = base+'/worker/'+machine['id']
+        local = ServiceWorkerClient(runtime, 'personal', machine['id'], machine['workerToken'])
+        item = post(client, '/items', {'itemType': 'research', 'title': 'PDF 控制字符回归 '+transport})
+>       run = post(client, '/runs', {'itemId': item['id'], 'instruction': '读取论文',
+                                   'engine': 'codex', 'machineId': machine['id']}, 202)
+
+tests/test_live_database.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8129e70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '读取论文', 'itemId': 'item-f9984578423546db', 'machineId': 'node-p-efc7ddf12ae5'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+_ test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable[local] _
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b8d24ee0>
+transport = 'local'
+
+    @pytest.mark.parametrize('transport', ['http', 'local'])
+    def test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable(dedicated_client, transport):
+        import asyncio
+        import base64
+        import hashlib
+        import json
+        from src.lifeweave_runtime.worker import ServiceWorkerClient
+    
+        client = dedicated_client
+        runtime = client.app.state.lifeweave_runtime_service
+        base = '/api/lifeweave/personal'
+        registered = client.post(base+'/machines/register', json={
+            'name': 'PDF NUL '+transport, 'capacity': 1, 'engines': ['codex'], 'runtimes': ['native'],
+        }, headers={'X-LifeWeave-Registration-Token': runtime.registration_tokens['personal']})
+        assert registered.status_code == 201, registered.text
+        machine = registered.json()
+        auth = {'X-LifeWeave-Worker-Token': machine['workerToken']}
+        prefix = base+'/worker/'+machine['id']
+        local = ServiceWorkerClient(runtime, 'personal', machine['id'], machine['workerToken'])
+        item = post(client, '/items', {'itemType': 'research', 'title': 'PDF 控制字符回归 '+transport})
+>       run = post(client, '/runs', {'itemId': item['id'], 'instruction': '读取论文',
+                                   'engine': 'codex', 'machineId': machine['id']}, 202)
+
+tests/test_live_database.py:781: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8d24ee0>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '读取论文', 'itemId': 'item-5e8449ef05b24ae3', 'machineId': 'node-p-8163222b8075'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+________________ test_owned_document_and_external_delivery_http ________________
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b93ebb80>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_owned_document_and_extern0')
+
+    def test_owned_document_and_external_delivery_http(dedicated_client, tmp_path):
+        client = dedicated_client
+        root = repo(tmp_path)
+        client.app.state.output_files.root = tmp_path
+        item = post(client, '/items', {'itemType': 'fix', 'title': '交付阅读'})
+        route = f"/items/{item['id']}"
+>       session = post(client, route + '/external-development/sessions', {
+            'requestId': 'start-files', 'repositoryPath': str(root), 'summary': '实现文件快照',
+            'knowledgeRefs': ['lifeweave-project:docs/status.md']})['sessionId']
+
+tests/test_output_files.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_live_database.py:55: in post
+    response = client.post('/api/lifeweave/personal'+route, json=body)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:556: in post
+    return super().post(
+.venv/lib/python3.10/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+.venv/lib/python3.10/site-packages/starlette/testclient.py:455: in request
+    return super().request(
+.venv/lib/python3.10/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.venv/lib/python3.10/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.10/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.10/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+.venv/lib/python3.10/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:354: in handle_request
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/testclient.py:351: in handle_request
+    portal.call(self.app, scope, receive, send)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:458: in result
+    return self.__get_result()
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:403: in __get_result
+    raise self._exception
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+.venv/lib/python3.10/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+src/api/app.py:188: in local_boundary
+    return await call_next(request)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+.venv/lib/python3.10/site-packages/starlette/middleware/trustedhost.py:51: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+.venv/lib/python3.10/site-packages/fastapi/routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+.venv/lib/python3.10/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+src/lifeweave/external_development.py:249: in start
+    return request.app.state.agent_service.external_start(request, workspace, item_id, body)
+src/lifeweave_agents/service.py:202: in external_start
+    ???
+src/lifeweave_agents/service.py:52: in _record
+    self.db.execute("INSERT INTO workbench.lifeweave_agent_launch "
+src/database/pg_connector.py:131: in execute
+    cursor.execute(statement, params)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=55440 user=lifeweave database=test_lifeweave_ade4f05a3647) at 0x7a18b8843940>
+query = 'INSERT INTO workbench.lifeweave_agent_launch (id,workspace,item_id,request_id,request_fingerprint,agent_id,agent_vers...napshot,kind,reference_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (workspace,kind,reference_id) DO NOTHING'
+params = ('alaunch-cf53473208a24b69a07607dd', 'personal', 'item-545268bb72564bb6', 'start-files', '01a79ac52cdf9f66f1b3f0f5e07af73906c0a8aba31477bfa21890d4de7d6359', 'development', ...)
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidColumnReference: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+.venv/lib/python3.10/site-packages/psycopg/cursor.py:117: InvalidColumnReference
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+_________ test_development_process_shows_plan_then_actual_worker_call __________
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b8394280>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_development_process_shows0')
+
+    def test_development_process_shows_plan_then_actual_worker_call(dedicated_client, tmp_path):
+        client = dedicated_client
+        root = repository(tmp_path)
+        item = post(client, "/items", {"itemType": "requirement", "title": "Trace one real execution"})
+        base = "/api/lifeweave/personal"
+        catalog = client.get(f"{base}/plugins")
+        assert catalog.status_code == 200
+        plugins = {row["id"]: row for row in catalog.json()["items"]}
+        assert plugins["lifeweave.execution.codex"]["runnable"]
+        assert not plugins["lifeweave.execution.opencode"]["runnable"]
+        assert plugins["lifeweave.development"]["composed_of"]
+    
+>       created = client.post(f"{base}/development", json={
+            "requestId": "plugin-process-1", "itemId": item["id"], "instruction": "Inspect the README and propose a change",
+            "repositoryPath": str(root), "reviewMode": "self", "executionScope": "implement",
+        })
+
+tests/test_plugins.py:34: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+.venv/lib/python3.10/site-packages/starlette/testclient.py:556: in post
+    return super().post(
+.venv/lib/python3.10/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+.venv/lib/python3.10/site-packages/starlette/testclient.py:455: in request
+    return super().request(
+.venv/lib/python3.10/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.venv/lib/python3.10/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.10/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.10/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+.venv/lib/python3.10/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:354: in handle_request
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/testclient.py:351: in handle_request
+    portal.call(self.app, scope, receive, send)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:458: in result
+    return self.__get_result()
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:403: in __get_result
+    raise self._exception
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+.venv/lib/python3.10/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+src/api/app.py:188: in local_boundary
+    return await call_next(request)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+.venv/lib/python3.10/site-packages/starlette/middleware/trustedhost.py:51: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+.venv/lib/python3.10/site-packages/fastapi/routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+.venv/lib/python3.10/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+src/lifeweave/development_router.py:71: in create
+    return request.app.state.agent_service.legacy_development(workspace, body)
+src/lifeweave_agents/service.py:169: in legacy_development
+    "WHERE workspace=%s AND item_id=%s AND request_id=%s",
+src/lifeweave_agents/service.py:162: in dispatch
+    self._record(workspace, item_id, request_id, fingerprint, agent, config, kind, reference_id)
+src/lifeweave_agents/service.py:52: in _record
+    self.db.execute("INSERT INTO workbench.lifeweave_agent_launch "
+src/database/pg_connector.py:131: in execute
+    cursor.execute(statement, params)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=55440 user=lifeweave database=test_lifeweave_ce86a6e3e476) at 0x7a18bd1b9e40>
+query = 'INSERT INTO workbench.lifeweave_agent_launch (id,workspace,item_id,request_id,request_fingerprint,agent_id,agent_vers...napshot,kind,reference_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (workspace,kind,reference_id) DO NOTHING'
+params = ('alaunch-b2d34133ab444627985f8bca', 'personal', 'item-634b3f8eba694a7a', 'plugin-process-1', '9abc159185ef810319904420b439dc8e0bcfdba9ec0259e7a1aac8c6008e0c7c', 'development', ...)
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidColumnReference: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+.venv/lib/python3.10/site-packages/psycopg/cursor.py:117: InvalidColumnReference
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+___ test_portable_zip_contains_images_nested_sources_and_preserves_original ____
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+
+    def test_portable_zip_contains_images_nested_sources_and_preserves_original(output_client):
+>       c=output_client;item,run,root,body=specimen(c)
+
+tests/test_research_archive.py:29: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_archive.py:18: in specimen
+    run=completed_run(c,item,body)
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-095fa3c8b6e64d1d'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+____________ test_bundle_limit_and_missing_reference_are_not_silent ____________
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+
+    def test_bundle_limit_and_missing_reference_are_not_silent(output_client):
+        c=output_client
+        item=post(c,'/items',{'itemType':'research','title':'材料上限'})['id']
+        body='\n'.join(f'[材料{i}](research/{i}.txt)' for i in range(MAX_FILES))
+>       run=completed_run(c,item,body)
+
+tests/test_research_archive.py:55: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-1a34af5d09d943fb'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+________ test_archive_uses_github_and_keeps_linear_historical_read_only ________
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_archive_uses_github_and_k0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7a18b841bc40>
+
+    def test_archive_uses_github_and_keeps_linear_historical_read_only(output_client,tmp_path,monkeypatch):
+>       c=output_client;_,run,root,_=specimen(c)
+
+tests/test_research_archive.py:68: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_archive.py:18: in specimen
+    run=completed_run(c,item,body)
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-18fe48aa118745fe'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+_______ test_worker_automatically_archives_success_and_skips_failed_runs _______
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_worker_automatically_arch0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7a18b8ac0040>
+
+    def test_worker_automatically_archives_success_and_skips_failed_runs(output_client,tmp_path,monkeypatch):
+>       c=output_client;_,run,_,_=specimen(c)
+
+tests/test_research_archive.py:85: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_archive.py:18: in specimen
+    run=completed_run(c,item,body)
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-8661cd4e1d7540e3'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+__ test_confirmed_notion_report_is_rechecked_and_remote_drift_becomes_failure __
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_confirmed_notion_report_i0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7a18bd0bf4c0>
+
+    def test_confirmed_notion_report_is_rechecked_and_remote_drift_becomes_failure(output_client,tmp_path,monkeypatch):
+>       c=output_client;_,run,_,_=specimen(c)
+
+tests/test_research_archive.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_archive.py:18: in specimen
+    run=completed_run(c,item,body)
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8753c70>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-3da6a28dd8bf4897'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+___________ test_current_output_preserves_manual_old_and_failed_runs ___________
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+
+    def test_current_output_preserves_manual_old_and_failed_runs(output_client):
+        c=output_client
+        item=post(c,'/items',{'itemType':'research','title':'成果版本验证'})['id']
+        url=f'/api/lifeweave/personal/items/{item}/research-output'
+        assert c.get(url).json()=={'current':None,'versions':[]}
+        manual=post(c,f'/items/{item}/manual-results',{'title':'人工成果','content':'原来的人工正文','verification':'受控fixture','environment':'临时库'})
+        assert c.get(url).json()['current']['id']==manual['artifactId']
+>       first=completed_run(c,item,'# 第一版\n\n保留旧版')
+
+tests/test_research_outputs.py:40: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-0e6753c4fd77475a'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+_ test_version_catalog_is_metadata_and_single_read_is_scoped_without_history_scan _
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+
+    def test_version_catalog_is_metadata_and_single_read_is_scoped_without_history_scan(output_client):
+        c = output_client
+        item = post(c, '/items', {'itemType': 'research', 'title': '按需成果'})['id']
+        other = post(c, '/items', {'itemType': 'research', 'title': '其他事项'})['id']
+        manual = post(c, f'/items/{item}/manual-results', {
+            'title': '人工记录', 'content': 'ONLY_MANUAL_BODY',
+            'verification': '受控fixture', 'environment': '临时库'})
+>       old = completed_run(c, item, '# ONLY_OLD_BODY\n\n![旧图](figures/old.png)')
+
+tests/test_research_outputs.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-0ffaf8434a534600'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+__________ test_candidates_are_atomic_retryable_reviewed_and_reusable __________
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+
+    def test_candidates_are_atomic_retryable_reviewed_and_reusable(output_client):
+        c=output_client
+        item=post(c,'/items',{'itemType':'research','title':'稀缺数据研究'})['id']
+>       run=completed_run(c,item)
+
+tests/test_research_outputs.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-7defc2dd596b4967'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+____________ test_assets_check_scope_paths_bytes_and_missing_files _____________
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_assets_check_scope_paths_0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7a18b87538b0>
+
+    def test_assets_check_scope_paths_bytes_and_missing_files(output_client,tmp_path,monkeypatch):
+        c=output_client
+        monkeypatch.setattr(c.app.state, 'root', c.app.state.research_outputs.root)
+>       item=post(c,'/items',{'itemType':'research','title':'图片边界'})['id'];run=completed_run(c,item)
+
+tests/test_research_outputs.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-7194ac9369a04022'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+__________ test_source_link_and_review_rollback_share_one_transaction __________
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7a18b82f95a0>
+
+    def test_source_link_and_review_rollback_share_one_transaction(output_client,monkeypatch):
+        c=output_client
+>       item=post(c,'/items',{'itemType':'research','title':'事务失败验证'})['id'];run=completed_run(c,item)
+
+tests/test_research_outputs.py:167: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-ff47483ed75c4b16'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+_ test_generated_research_sources_remain_readable_without_opening_private_paths _
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_generated_research_source0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7a18b8d43160>
+
+    def test_generated_research_sources_remain_readable_without_opening_private_paths(output_client,tmp_path,monkeypatch):
+        c=output_client
+        monkeypatch.setattr(c.app.state,'root',tmp_path)
+>       item=post(c,'/items',{'itemType':'research','title':'来源链接'})['id'];run=completed_run(c,item)
+
+tests/test_research_outputs.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-cf118dd0b3534d91'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+___ test_knowledge_reference_projection_preserves_raw_versions_and_conflicts ___
+
+output_client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+
+    def test_knowledge_reference_projection_preserves_raw_versions_and_conflicts(output_client):
+        c=output_client
+        item=post(c,'/items',{'itemType':'research','title':'来源上下文'})['id']
+        body='# 成果\n\n[出处](research/source.md) ![图](<research/fig one.png>) [官网](https://example.org)\n\n```md\n[示例](private.md)\n```\n'
+>       run=completed_run(c,item,body)
+
+tests/test_research_outputs.py:199: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_research_outputs.py:26: in completed_run
+    run = post(client,'/runs',{'itemId':item_id,'instruction':'受控结果测试，不调用模型','engine':'codex'},202)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+client = <starlette.testclient.TestClient object at 0x7a18b8d6be80>
+route = '/runs'
+body = {'engine': 'codex', 'instruction': '受控结果测试，不调用模型', 'itemId': 'item-0e58fd84d27c416c'}
+status = 202
+
+    def post(client, route, body, status=201):
+        response = client.post('/api/lifeweave/personal'+route, json=body)
+>       assert response.status_code == status, response.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_live_database.py:56: AssertionError
+________________ test_http_persistence_and_workspace_isolation _________________
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b8e73e50>
+
+    def test_http_persistence_and_workspace_isolation(dedicated_client):
+        client = dedicated_client
+        item = post(client, '/items', {'itemType': 'research', 'title': 'Graph',
+                                       'payload': {'keep': 'sentinel'}})
+        item_id = item['id']
+        base = f'/api/lifeweave/personal/items/{item_id}'
+        empty = client.get(base + '/work-view')
+        assert empty.status_code == 200, empty.text
+        assert empty.json()['plan']['source'] == 'empty'
+        saved = client.put(base + '/work-plan', json={'version': item['version'],
+            'title': 'Two paths', 'provider': 'manual',
+            'nodes': [step(0), step(1), step(2, ['s0', 's1'])]})
+        assert saved.status_code == 200, saved.text
+        assert saved.json()['plan']['nodes'][2]['dependsOn'] == ['s0', 's1']
+        assert client.get(base).json()['payload']['keep'] == 'sentinel'
+        assert any(entry['kind'] == 'work_plan_updated' for entry in client.get(base).json()['activity'])
+        assert client.put(base + '/work-plan', json={'version': item['version'],
+            'title': 'stale', 'provider': 'manual', 'nodes': []}).status_code == 409
+        dense = [step(index, [f's{earlier}' for earlier in range(index)])
+                 for index in range(MAX_WORK_STEPS)]
+        full = client.put(base + '/work-plan', json={'version': saved.json()['itemVersion'],
+            'title': 'Maximum graph', 'provider': 'manual', 'nodes': dense})
+        assert full.status_code == 200, full.text
+        assert len(full.json()['plan']['nodes']) == MAX_WORK_STEPS
+        too_many = client.put(base + '/work-plan', json={'version': full.json()['itemVersion'],
+            'title': 'Too many', 'provider': 'manual', 'nodes': dense + [step(MAX_WORK_STEPS)]})
+        assert too_many.status_code == 422
+        foreign = post(client, '/items', {'itemType': 'research', 'title': 'Other'})
+        run = client.post('/api/lifeweave/personal/runs', json={
+            'itemId': foreign['id'], 'instruction': 'Check the ownership boundary', 'engine': 'codex'})
+>       assert run.status_code == 202, run.text
+E       AssertionError: {"detail":"there is no unique or exclusion constraint matching the ON CONFLICT specification"}
+E       assert 500 == 202
+E        +  where 500 = <Response [500 Internal Server Error]>.status_code
+
+tests/test_work_view.py:364: AssertionError
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+_____ test_external_steps_require_fixed_matching_outputs_and_keep_attempts _____
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b8a1c130>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_external_steps_require_fi0')
+
+    def test_external_steps_require_fixed_matching_outputs_and_keep_attempts(dedicated_client, tmp_path):
+        client = dedicated_client
+        item = post(client, '/items', {'itemType': 'fix', 'title': 'Shared workflow'})
+        base = f'/api/lifeweave/personal/items/{item["id"]}'
+        saved = client.put(base + '/work-plan', json={
+            'version': item['version'], 'title': 'Checked work', 'provider': 'development',
+            'nodes': [plan_step('verify-a'), plan_step('verify-b')],
+        })
+        assert saved.status_code == 200, saved.text
+        version = saved.json()['plan']['version']
+        # A plan edit cannot claim completion by attaching a same-item result;
+        # the report path is the only owner of current progress.
+        bypass = client.put(base + '/work-plan', json={
+            'version': saved.json()['itemVersion'], 'title': 'Forged completion',
+            'provider': 'development', 'nodes': [{**plan_step('verify-a'), 'state': 'succeeded'},
+                                                 plan_step('verify-b')],
+        })
+        assert bypass.status_code == 400
+        project = git_repository(tmp_path / 'project')
+>       started = post(client, f'/items/{item["id"]}/external-development/sessions', {
+            'requestId': 'external-start', 'repositoryPath': str(project), 'summary': '真实会话',
+            'stepId': 'verify-a', 'planVersion': version,
+        })
+
+tests/test_workflow_protocol.py:54: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_live_database.py:55: in post
+    response = client.post('/api/lifeweave/personal'+route, json=body)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:556: in post
+    return super().post(
+.venv/lib/python3.10/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+.venv/lib/python3.10/site-packages/starlette/testclient.py:455: in request
+    return super().request(
+.venv/lib/python3.10/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.venv/lib/python3.10/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.10/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.10/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+.venv/lib/python3.10/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:354: in handle_request
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/testclient.py:351: in handle_request
+    portal.call(self.app, scope, receive, send)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:458: in result
+    return self.__get_result()
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:403: in __get_result
+    raise self._exception
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+.venv/lib/python3.10/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+src/api/app.py:188: in local_boundary
+    return await call_next(request)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+.venv/lib/python3.10/site-packages/starlette/middleware/trustedhost.py:51: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+.venv/lib/python3.10/site-packages/fastapi/routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+.venv/lib/python3.10/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+src/lifeweave/external_development.py:249: in start
+    return request.app.state.agent_service.external_start(request, workspace, item_id, body)
+src/lifeweave_agents/service.py:202: in external_start
+    ???
+src/lifeweave_agents/service.py:52: in _record
+    self.db.execute("INSERT INTO workbench.lifeweave_agent_launch "
+src/database/pg_connector.py:131: in execute
+    cursor.execute(statement, params)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=55440 user=lifeweave database=test_lifeweave_2ec33a07f5ce) at 0x7a18b8a44040>
+query = 'INSERT INTO workbench.lifeweave_agent_launch (id,workspace,item_id,request_id,request_fingerprint,agent_id,agent_vers...napshot,kind,reference_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (workspace,kind,reference_id) DO NOTHING'
+params = ('alaunch-f482cc1dd3f349f59d4f4092', 'personal', 'item-921c133417c54d8b', 'external-start', 'ab70f2adebe7091f693d56c8a9448b4e058bc01f67ad8c578499389d6d25b944', 'development', ...)
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidColumnReference: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+.venv/lib/python3.10/site-packages/psycopg/cursor.py:117: InvalidColumnReference
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+_ test_optional_expectation_still_needs_real_result_and_removed_step_keeps_report _
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b16700d0>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_optional_expectation_stil0')
+
+    def test_optional_expectation_still_needs_real_result_and_removed_step_keeps_report(dedicated_client, tmp_path):
+        client = dedicated_client
+        item = post(client, '/items', {'itemType': 'fix', 'title': 'Optional output case'})
+        base = f'/api/lifeweave/personal/items/{item["id"]}'
+        saved = client.put(base + '/work-plan', json={
+            'version': item['version'], 'title': 'Optional result', 'provider': 'development',
+            'nodes': [{**plan_step('review'), 'expectedOutputs': [
+                {'id': 'optional', 'title': '可选固定记录', 'kind': 'validation', 'required': False}]}],
+        })
+        assert saved.status_code == 200, saved.text
+        version = saved.json()['plan']['version']
+        project = git_repository(tmp_path / 'project')
+>       started = post(client, f'/items/{item["id"]}/external-development/sessions', {
+            'requestId': 'optional-start', 'repositoryPath': str(project), 'summary': '真实会话',
+            'stepId': 'review', 'planVersion': version,
+        })
+
+tests/test_workflow_protocol.py:126: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_live_database.py:55: in post
+    response = client.post('/api/lifeweave/personal'+route, json=body)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:556: in post
+    return super().post(
+.venv/lib/python3.10/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+.venv/lib/python3.10/site-packages/starlette/testclient.py:455: in request
+    return super().request(
+.venv/lib/python3.10/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.venv/lib/python3.10/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.10/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.10/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+.venv/lib/python3.10/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:354: in handle_request
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/testclient.py:351: in handle_request
+    portal.call(self.app, scope, receive, send)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:458: in result
+    return self.__get_result()
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:403: in __get_result
+    raise self._exception
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+.venv/lib/python3.10/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+src/api/app.py:188: in local_boundary
+    return await call_next(request)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+.venv/lib/python3.10/site-packages/starlette/middleware/trustedhost.py:51: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+.venv/lib/python3.10/site-packages/fastapi/routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+.venv/lib/python3.10/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+src/lifeweave/external_development.py:249: in start
+    return request.app.state.agent_service.external_start(request, workspace, item_id, body)
+src/lifeweave_agents/service.py:202: in external_start
+    ???
+src/lifeweave_agents/service.py:52: in _record
+    self.db.execute("INSERT INTO workbench.lifeweave_agent_launch "
+src/database/pg_connector.py:131: in execute
+    cursor.execute(statement, params)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=55440 user=lifeweave database=test_lifeweave_995ec0a46258) at 0x7a18b8208580>
+query = 'INSERT INTO workbench.lifeweave_agent_launch (id,workspace,item_id,request_id,request_fingerprint,agent_id,agent_vers...napshot,kind,reference_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (workspace,kind,reference_id) DO NOTHING'
+params = ('alaunch-ba00e7ed71464c33837425ad', 'personal', 'item-6271bcc5aa8542a4', 'optional-start', '5f1d129ab4f88c48c9b50da89faa9884e0d2a427be5b90dcb986e466e67e84c1', 'development', ...)
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidColumnReference: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+.venv/lib/python3.10/site-packages/psycopg/cursor.py:117: InvalidColumnReference
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+_______ test_external_phase_report_uses_same_step_rule_and_retry_receipt _______
+
+dedicated_client = <starlette.testclient.TestClient object at 0x7a18b850bca0>
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-41/test_external_phase_report_use0')
+
+    def test_external_phase_report_uses_same_step_rule_and_retry_receipt(dedicated_client, tmp_path):
+        client = dedicated_client
+        item = post(client, '/items', {'itemType': 'fix', 'title': 'External report binding'})
+        base = f'/api/lifeweave/personal/items/{item["id"]}'
+        planned = client.put(base + '/work-plan', json={
+            'version': item['version'], 'title': '验证计划', 'provider': 'development',
+            'nodes': [plan_step('verified')],
+        }).json()
+        version = planned['plan']['version']
+>       started = post(client, f'/items/{item["id"]}/external-development/sessions', {
+            'requestId': 'phase-start', 'repositoryPath': str(git_repository(tmp_path / 'project')),
+            'summary': '外部会话', 'stepId': 'verified', 'planVersion': version,
+        })
+
+tests/test_workflow_protocol.py:183: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+tests/test_live_database.py:55: in post
+    response = client.post('/api/lifeweave/personal'+route, json=body)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:556: in post
+    return super().post(
+.venv/lib/python3.10/site-packages/httpx/_client.py:1144: in post
+    return self.request(
+.venv/lib/python3.10/site-packages/starlette/testclient.py:455: in request
+    return super().request(
+.venv/lib/python3.10/site-packages/httpx/_client.py:825: in request
+    return self.send(request, auth=auth, follow_redirects=follow_redirects)
+.venv/lib/python3.10/site-packages/httpx/_client.py:914: in send
+    response = self._send_handling_auth(
+.venv/lib/python3.10/site-packages/httpx/_client.py:942: in _send_handling_auth
+    response = self._send_handling_redirects(
+.venv/lib/python3.10/site-packages/httpx/_client.py:979: in _send_handling_redirects
+    response = self._send_single_request(request)
+.venv/lib/python3.10/site-packages/httpx/_client.py:1014: in _send_single_request
+    response = transport.handle_request(request)
+.venv/lib/python3.10/site-packages/starlette/testclient.py:354: in handle_request
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/testclient.py:351: in handle_request
+    portal.call(self.app, scope, receive, send)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:458: in result
+    return self.__get_result()
+../../miniconda3/envs/data_science/lib/python3.10/concurrent/futures/_base.py:403: in __get_result
+    raise self._exception
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+.venv/lib/python3.10/site-packages/fastapi/applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:186: in __call__
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/middleware/errors.py:164: in __call__
+    await self.app(scope, receive, _send)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:193: in __call__
+    response = await self.dispatch_func(request, call_next)
+src/api/app.py:188: in local_boundary
+    return await call_next(request)
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:168: in call_next
+    raise app_exc from app_exc.__cause__ or app_exc.__context__
+.venv/lib/python3.10/site-packages/starlette/middleware/base.py:144: in coro
+    await self.app(scope, receive_or_disconnect, send_no_error)
+.venv/lib/python3.10/site-packages/starlette/middleware/trustedhost.py:51: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/middleware/exceptions.py:63: in __call__
+    await wrap_app_handling_exceptions(self.app, conn)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/middleware/asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2734: in app
+    await route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1780: in handle
+    await self.original_router.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:2789: in handle
+    await included_router._handle_selected(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1800: in _handle_selected
+    await original_route.handle(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:1279: in handle
+    await app(scope, receive, send)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:158: in app
+    await wrap_app_handling_exceptions(app, request)(scope, receive, send)
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:53: in wrapped_app
+    raise exc
+.venv/lib/python3.10/site-packages/starlette/_exception_handler.py:42: in wrapped_app
+    await app(scope, receive, sender)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:144: in app
+    response = await f(request)
+.venv/lib/python3.10/site-packages/fastapi/routing.py:706: in app
+    raw_response = await run_endpoint_function(
+.venv/lib/python3.10/site-packages/fastapi/routing.py:354: in run_endpoint_function
+    return await run_in_threadpool(dependant.call, **values)
+.venv/lib/python3.10/site-packages/starlette/concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+../gongzuo-workbench/.venv/lib/python3.10/site-packages/anyio/_backends/_asyncio.py:1100: in run
+    result = context.run(func, *args)
+src/lifeweave/external_development.py:249: in start
+    return request.app.state.agent_service.external_start(request, workspace, item_id, body)
+src/lifeweave_agents/service.py:202: in external_start
+    ???
+src/lifeweave_agents/service.py:52: in _record
+    self.db.execute("INSERT INTO workbench.lifeweave_agent_launch "
+src/database/pg_connector.py:131: in execute
+    cursor.execute(statement, params)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (port=55440 user=lifeweave database=test_lifeweave_6b5731725a9e) at 0x7a18b8209a80>
+query = 'INSERT INTO workbench.lifeweave_agent_launch (id,workspace,item_id,request_id,request_fingerprint,agent_id,agent_vers...napshot,kind,reference_id) VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) ON CONFLICT (workspace,kind,reference_id) DO NOTHING'
+params = ('alaunch-c47d7bf9407949889f8392d9', 'personal', 'item-4a2f875919ec4d71', 'phase-start', '7e75a2286027817763e29dd48bc4e629812f87b1a033b3ac07319153181e07ca', 'development', ...)
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.InvalidColumnReference: there is no unique or exclusion constraint matching the ON CONFLICT specification
+
+.venv/lib/python3.10/site-packages/psycopg/cursor.py:117: InvalidColumnReference
+---------------------------- Captured stdout setup -----------------------------
+已应用 001_work.sql
+已应用 002_execution.sql
+已应用 003_knowledge.sql
+已应用 004_library_connections.sql
+已应用 005_lifeweave_names.sql
+已应用 006_conversations.sql
+已应用 007_research_outputs.sql
+已应用 008_evaluations.sql
+已应用 009_evaluation_improvements.sql
+已应用 010_capability_lineage.sql
+已应用 011_development_assignments.sql
+已应用 012_external_session_lookup.sql
+已应用 013_plugin_foundation.sql
+已应用 014_plugin_evaluations.sql
+已应用 015_development_call_completion.sql
+已应用 016_development_scope.sql
+已应用 017_development_delivery.sql
+已应用 018_item_organization.sql
+已应用 019_agent_center.sql
+=============================== warnings summary ===============================
+.venv/lib/python3.10/site-packages/fastapi/testclient.py:1
+  /home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv/lib/python3.10/site-packages/starlette/testclient.py:53
+  /home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_live_database.py::test_evaluation_tasks_use_frozen_candidate_and_accepted_run_evidence
+FAILED tests/test_live_database.py::test_task_inputs_are_frozen_and_run_limits_are_enforced
+FAILED tests/test_live_database.py::test_continuation_feedback_is_idempotent_scoped_and_pinned_in_next_run
+FAILED tests/test_live_database.py::test_discovery_and_recommendations_reuse_accepted_knowledge_without_a_paper_fixture
+FAILED tests/test_live_database.py::test_worker_http_reports_keep_input_provenance_and_retry_uses_current_feedback
+FAILED tests/test_live_database.py::test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable[http]
+FAILED tests/test_live_database.py::test_pdf_nul_does_not_abort_worker_and_original_evidence_is_recoverable[local]
+FAILED tests/test_output_files.py::test_owned_document_and_external_delivery_http
+FAILED tests/test_plugins.py::test_development_process_shows_plan_then_actual_worker_call
+FAILED tests/test_research_archive.py::test_portable_zip_contains_images_nested_sources_and_preserves_original
+FAILED tests/test_research_archive.py::test_bundle_limit_and_missing_reference_are_not_silent
+FAILED tests/test_research_archive.py::test_archive_uses_github_and_keeps_linear_historical_read_only
+FAILED tests/test_research_archive.py::test_worker_automatically_archives_success_and_skips_failed_runs
+FAILED tests/test_research_archive.py::test_confirmed_notion_report_is_rechecked_and_remote_drift_becomes_failure
+FAILED tests/test_research_outputs.py::test_current_output_preserves_manual_old_and_failed_runs
+FAILED tests/test_research_outputs.py::test_version_catalog_is_metadata_and_single_read_is_scoped_without_history_scan
+FAILED tests/test_research_outputs.py::test_candidates_are_atomic_retryable_reviewed_and_reusable
+FAILED tests/test_research_outputs.py::test_assets_check_scope_paths_bytes_and_missing_files
+FAILED tests/test_research_outputs.py::test_source_link_and_review_rollback_share_one_transaction
+FAILED tests/test_research_outputs.py::test_generated_research_sources_remain_readable_without_opening_private_paths
+FAILED tests/test_research_outputs.py::test_knowledge_reference_projection_preserves_raw_versions_and_conflicts
+FAILED tests/test_work_view.py::test_http_persistence_and_workspace_isolation
+FAILED tests/test_workflow_protocol.py::test_external_steps_require_fixed_matching_outputs_and_keep_attempts
+FAILED tests/test_workflow_protocol.py::test_optional_expectation_still_needs_real_result_and_removed_step_keeps_report
+FAILED tests/test_workflow_protocol.py::test_external_phase_report_uses_same_step_rule_and_retry_receipt
+25 failed, 137 passed, 2 warnings in 154.27s (0:02:34)

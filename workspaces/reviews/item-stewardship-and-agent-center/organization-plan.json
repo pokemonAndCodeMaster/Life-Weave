@@ -1,0 +1,260 @@
+{
+  "personal": {
+    "entities": [
+      {
+        "entityType": "domain",
+        "title": "平台开发",
+        "payload": {
+          "description": "LifeWeave 产品、工程、执行器与工作流程建设。"
+        }
+      },
+      {
+        "entityType": "domain",
+        "title": "研究与学习",
+        "payload": {
+          "description": "论文理解、研究方法和可复用知识积累。"
+        }
+      },
+      {
+        "entityType": "topic",
+        "title": "LifeWeave 平台建设",
+        "payload": {
+          "goal": "让事项、Agent、知识和成果形成能持续使用的工作台。"
+        }
+      },
+      {
+        "entityType": "topic",
+        "title": "自动驾驶论文研究",
+        "payload": {
+          "goal": "持续研读 GSSM 与 Qwen-Drive，形成可理解、可比较和能继续反馈的研究材料。"
+        }
+      },
+      {
+        "entityType": "topic",
+        "title": "平台历史与阶段交付",
+        "payload": {
+          "goal": "保留旧接续方式和初版交付依据，当前开发另在平台建设中推进。"
+        }
+      }
+    ],
+    "assignments": [
+      {
+        "itemId": "item-2a56f97ea1074d71",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。"
+      },
+      {
+        "itemId": "item-7547b65b4f704829",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。"
+      },
+      {
+        "itemId": "item-62fe9c309d994457",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该工作提供双入口开发所需的项目知识或开发交付阅读能力，可作为原目标下的独立可审成果。",
+        "parentId": "item-92989f3f9ca34660"
+      },
+      {
+        "itemId": "item-e044cf4e1af64b0c",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该工作提供双入口开发所需的项目知识或开发交付阅读能力，可作为原目标下的独立可审成果。",
+        "parentId": "item-92989f3f9ca34660"
+      },
+      {
+        "itemId": "item-8891f7cb4f634c8f",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。"
+      },
+      {
+        "itemId": "item-4891c4eedb674483",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。"
+      },
+      {
+        "itemId": "item-c52809b4b3294166",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。"
+      },
+      {
+        "itemId": "item-92989f3f9ca34660",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。"
+      },
+      {
+        "itemId": "item-58363ef3851142d8",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该工作提供双入口开发所需的项目知识或开发交付阅读能力，可作为原目标下的独立可审成果。",
+        "parentId": "item-92989f3f9ca34660"
+      },
+      {
+        "itemId": "item-724331a2968c4420",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。"
+      },
+      {
+        "itemId": "item-36e70781e4c6449b",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "该事项的原目标直接服务 LifeWeave 产品、工程或执行方法建设。"
+      },
+      {
+        "itemId": "item-de7785d0790445d8",
+        "topics": [
+          "自动驾驶论文研究"
+        ],
+        "domains": [
+          "研究与学习"
+        ],
+        "reason": "原事项明确是自动驾驶论文研究，保留独立研究成果和反馈。"
+      },
+      {
+        "itemId": "item-810217743bbb4be2",
+        "topics": [
+          "自动驾驶论文研究"
+        ],
+        "domains": [
+          "研究与学习"
+        ],
+        "reason": "原事项明确是自动驾驶论文研究，保留独立研究成果和反馈。"
+      },
+      {
+        "itemId": "linear-b2ff980d35c647861055",
+        "topics": [
+          "平台历史与阶段交付"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "保留旧 Linear 接续或首次阶段交付的历史目标与状态，不混入新的待开发范围。"
+      },
+      {
+        "itemId": "item-85b6472a17f64292",
+        "topics": [
+          "平台历史与阶段交付"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "保留旧 Linear 接续或首次阶段交付的历史目标与状态，不混入新的待开发范围。"
+      },
+      {
+        "itemId": "item-c0f13d85b5c145fd",
+        "topics": [
+          "LifeWeave 平台建设"
+        ],
+        "domains": [
+          "平台开发"
+        ],
+        "reason": "本轮 Agent 中心与事项公共管理接续双入口开发目标，已有父级保持。"
+      }
+    ],
+    "groups": [
+      {
+        "key": "execution-validation",
+        "title": "LifeWeave 执行器与评测验证",
+        "goal": "汇总 Codex、OpenCode 与方法评测的真实验证事项和证据，持续跟踪已暴露的运行边界。",
+        "itemIds": [
+          "item-8891f7cb4f634c8f",
+          "item-4891c4eedb674483",
+          "item-c52809b4b3294166",
+          "item-724331a2968c4420",
+          "item-36e70781e4c6449b"
+        ]
+      },
+      {
+        "key": "driving-research",
+        "title": "自动驾驶论文持续研读",
+        "goal": "把两篇论文作为独立子事项持续推进，在共同专题中比较方法、数据、实验与对实际工作的启发。",
+        "itemIds": [
+          "item-de7785d0790445d8",
+          "item-810217743bbb4be2"
+        ]
+      }
+    ]
+  },
+  "team": {
+    "entities": [
+      {
+        "entityType": "domain",
+        "title": "团队协作",
+        "payload": {
+          "description": "团队事项、执行与回顾。"
+        }
+      },
+      {
+        "entityType": "topic",
+        "title": "团队工作台验证",
+        "payload": {
+          "goal": "验证团队空间的事项隔离、运行与回顾入口。"
+        }
+      }
+    ],
+    "assignments": [
+      {
+        "itemId": "item-2cab593824114b90",
+        "topics": [
+          "团队工作台验证"
+        ],
+        "domains": [
+          "团队协作"
+        ],
+        "reason": "原事项明确验证团队空间独立事项和执行。"
+      }
+    ],
+    "groups": []
+  }
+}

@@ -1,10 +1,8 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, reactive, shallowRef, watch } from 'vue'
+import { onBeforeUnmount, shallowRef, watch } from 'vue'
 import { apiError, getRun, getRunEvents } from '../api/lifeweave'
-import { cancelDevelopment, createDevelopment, developmentChoices, getDevelopmentDelivery, getDevelopmentDiff, listDevelopment } from '../api/development'
-import { getWorkView } from '../api/workView'
-import type { ItemWorkView } from '../api/workView'
-import type { DevelopmentAssignment, DevelopmentChoices, DevelopmentDelivery as DevelopmentDeliveryValue, DevelopmentDiff } from '../api/development'
+import { cancelDevelopment, getDevelopmentDelivery, getDevelopmentDiff, listDevelopment } from '../api/development'
+import type { DevelopmentAssignment, DevelopmentDelivery as DevelopmentDeliveryValue, DevelopmentDiff } from '../api/development'
 import { pluginProcess } from '../api/plugins'
 import type { PluginProcess as PluginProcessValue } from '../api/plugins'
 import type { LifeWeaveRun, RunEvent, WorkspaceKind } from '../types'
@@ -13,11 +11,9 @@ import RunTrace from './RunTrace.vue'
 import PluginProcess from './PluginProcess.vue'
 import DevelopmentDelivery from './DevelopmentDelivery.vue'
 import ExternalDevelopmentPanel from './ExternalDevelopmentPanel.vue'
+import AgentLaunch from './agents/AgentLaunch.vue'
 
 const props = defineProps<{ workspace: WorkspaceKind; itemId: string; initialInstruction?: string }>()
-const choices = shallowRef<DevelopmentChoices | null>(null)
-const workView = shallowRef<ItemWorkView | null>(null)
-const planError = shallowRef('')
 const assignments = shallowRef<DevelopmentAssignment[]>([])
 const runs = shallowRef<Record<string, LifeWeaveRun>>({})
 const events = shallowRef<Record<string, RunEvent[]>>({})
@@ -27,38 +23,21 @@ const process = shallowRef<PluginProcessValue | null>(null)
 const processError = shallowRef('')
 const error = shallowRef('')
 const busy = shallowRef(false)
-const requestId = shallowRef(crypto.randomUUID())
-const form = reactive({ instruction: '', repositoryPath: '', engine: 'codex' as 'codex' | 'opencode', model: '', reviewMode: 'independent' as 'independent' | 'self', executionScope: 'plan_only' as 'plan_only' | 'implement', acknowledgeExcludedChanges: false, stepId: '' })
-const declaredPlan = computed(() => workView.value?.plan.source === 'declared' ? workView.value.plan : null)
-const targetSteps = computed(() => declaredPlan.value?.nodes.filter(node => node.state !== 'cancelled'
-  && node.expectedOutputs?.some(expected => expected.kind === (form.executionScope === 'implement' ? 'code' : 'plan'))) || [])
-const targetStep = computed(() => targetSteps.value.find(node => node.id === form.stepId) || (targetSteps.value.length === 1 ? targetSteps.value[0] : null))
-watch(() => form.executionScope, () => { form.stepId = '' })
-watch(() => form.engine, engine => { form.model = engine === 'opencode' ? (choices.value?.executors.opencode.verifiedModel || '') : '' })
+const launching = shallowRef(false)
 let generation = 0
 let timer: ReturnType<typeof setTimeout> | undefined
 async function refresh(ticket = generation) {
   try {
-    const [rowsResult, pluginResult, planResult] = await Promise.allSettled([
-      listDevelopment(props.workspace, props.itemId), pluginProcess(props.workspace, props.itemId), getWorkView(props.workspace, props.itemId),
-    ])
+    const [rows, currentProcess] = await Promise.all([listDevelopment(props.workspace, props.itemId), pluginProcess(props.workspace, props.itemId).catch(() => null)])
     if (ticket !== generation) return
-    if (rowsResult.status === 'rejected') throw rowsResult.reason
-    const rows = rowsResult.value
     assignments.value = rows
-    if (planResult.status === 'fulfilled') {
-      workView.value = planResult.value
-      planError.value = ''
-      if (form.stepId && !planResult.value.plan.nodes.some(node => node.id === form.stepId)) form.stepId = ''
-    } else planError.value = apiError(planResult.reason).message
+    process.value = currentProcess
+    processError.value = currentProcess ? '' : '未能读取插件过程。'
     const deliveryRows = await Promise.all(rows.filter(row => ['awaiting_acceptance', 'accepted', 'rejected'].includes(row.status)).map(async row => {
-      try { return { id: row.id, delivery: await getDevelopmentDelivery(props.workspace, row.id) } }
-      catch { return null }
+      try { return { id: row.id, delivery: await getDevelopmentDelivery(props.workspace, row.id) } } catch { return null }
     }))
     if (ticket !== generation) return
-    deliveries.value = Object.fromEntries(deliveryRows.filter((row): row is { id: string; delivery: DevelopmentDeliveryValue } => !!row).map(row => [row.id, row.delivery]))
-    process.value = pluginResult.status === 'fulfilled' ? pluginResult.value : null
-    processError.value = pluginResult.status === 'rejected' ? apiError(pluginResult.reason).message : ''
+    deliveries.value = Object.fromEntries(deliveryRows.filter((row): row is {id:string;delivery:DevelopmentDeliveryValue} => !!row).map(row => [row.id, row.delivery]))
     const runIds = rows.flatMap(row => [row.planRunId, row.reviewRunId, row.implementationRunId]).filter((id): id is string => !!id)
     const snapshots = await Promise.all(runIds.map(async id => ({ id, run: await getRun(props.workspace, id), trace: await getRunEvents(props.workspace, id) })))
     if (ticket !== generation) return
@@ -66,75 +45,20 @@ async function refresh(ticket = generation) {
     events.value = Object.fromEntries(snapshots.map(row => [row.id, row.trace]))
     error.value = ''
   } catch (caught) { if (ticket === generation) error.value = apiError(caught).message }
-  finally { if (ticket === generation) timer = setTimeout(() => void refresh(ticket), 4000) }
+  finally { if (ticket === generation && assignments.value.some(row => ['planning','reviewing','implementing'].includes(row.status))) timer = setTimeout(() => void refresh(ticket), 4000) }
 }
-watch(() => [props.workspace, props.itemId], async () => {
-  const ticket = ++generation
-  clearTimeout(timer); assignments.value = []; runs.value = {}; events.value = {}; diffs.value = {}; deliveries.value = {}; process.value = null; processError.value = ''; choices.value = null; workView.value = null; planError.value = ''; error.value = ''
-  form.instruction = props.initialInstruction || ''; form.repositoryPath = ''; form.engine = 'codex'; form.model = ''; form.executionScope = 'plan_only'; form.stepId = ''
-  try {
-    const value = await developmentChoices(props.workspace, props.itemId)
-    if (ticket !== generation) return
-    choices.value = value; form.repositoryPath = value.recommendedRepositoryPath
-    if (!value.executors.codex.available && value.executors.opencode.available) form.engine = 'opencode'
-  } catch (caught) { if (ticket === generation) error.value = apiError(caught).message }
-  if (ticket === generation) void refresh(ticket)
-}, { immediate: true })
+watch(() => [props.workspace, props.itemId], () => { generation++; clearTimeout(timer); assignments.value=[]; runs.value={}; events.value={}; deliveries.value={}; void refresh(generation) }, { immediate:true })
 onBeforeUnmount(() => { generation++; clearTimeout(timer) })
-async function submit() {
-  if (busy.value || !form.instruction.trim()) return
-  if (planError.value || !workView.value) { error.value = '当前步骤未读取成功，请刷新后再发起开发。'; return }
-  if (declaredPlan.value && !targetStep.value) { error.value = '请先在业务计划中安排对应开发步骤，并选择本次目标步骤。'; return }
-  busy.value = true; error.value = ''
-  try {
-    await createDevelopment(props.workspace, {
-      requestId: requestId.value, itemId: props.itemId, instruction: form.instruction.trim(),
-      repositoryPath: form.repositoryPath.trim(), agentId: 'development', engine: form.engine, model: form.model.trim() || null,
-      methodId: choices.value?.methodId,
-      knowledgeRefs: form.repositoryPath.trim() === choices.value?.recommendedRepositoryPath ? choices.value?.knowledgeRefs : [],
-      reviewMode: form.reviewMode, executionScope: form.executionScope, acknowledgeExcludedChanges: form.acknowledgeExcludedChanges,
-      ...(declaredPlan.value ? { stepId: targetStep.value!.id, planVersion: declaredPlan.value.version } : {}),
-    })
-    requestId.value = crypto.randomUUID(); form.instruction = ''; clearTimeout(timer); await refresh()
-  } catch (caught) { error.value = apiError(caught).message }
-  finally { busy.value = false }
-}
-async function cancel(id: string) {
-  busy.value = true
-  try { await cancelDevelopment(props.workspace, id); clearTimeout(timer); await refresh() }
-  catch (caught) { error.value = apiError(caught).message }
-  finally { busy.value = false }
-}
-async function showDiff(id: string) {
-  try { diffs.value = { ...diffs.value, [id]: await getDevelopmentDiff(props.workspace, id) } }
-  catch (caught) { error.value = apiError(caught).message }
-}
-const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; title: string }> = [
-  { key: 'planRunId', title: '方案' }, { key: 'reviewRunId', title: '独立审阅' }, { key: 'implementationRunId', title: '实施与验证' },
-]
+async function cancel(id: string) { busy.value=true; try { await cancelDevelopment(props.workspace,id); await refresh() } catch (caught) { error.value=apiError(caught).message } finally { busy.value=false } }
+async function showDiff(id: string) { try { diffs.value={...diffs.value,[id]:await getDevelopmentDiff(props.workspace,id)} } catch (caught) { error.value=apiError(caught).message } }
+const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; title: string }> = [{key:'planRunId',title:'方案'},{key:'reviewRunId',title:'独立审阅'},{key:'implementationRunId',title:'实施与验证'}]
 </script>
-
 <template>
   <section class="lw-panel pad development-panel" aria-label="开发 Agent">
-    <div class="lw-between"><div><h2>开发 Agent</h2><p class="lw-small lw-sub">同一事项记录固定背景、方案、审阅、实施和实际验证。默认使用 Codex；其他执行器以当前可用状态为准。</p></div><button class="lw-btn ghost sm" type="button" @click="refresh()">刷新</button></div>
+    <div class="lw-between"><div><h2>开发 Agent</h2><p class="lw-small lw-sub">这里保留本事项的开发历史与固定交付。新的委托使用共同的 Agent 配置。</p></div><button class="lw-btn ghost sm" type="button" @click="refresh()">刷新</button></div>
     <p v-if="error" class="lw-notice warning" role="alert">{{ error }}</p>
-    <p v-if="planError" class="lw-notice warning" role="alert">步骤读取失败：{{ planError }} <button type="button" class="lw-btn sm" @click="refresh()">重新读取</button></p>
-    <form class="lw-stack" @submit.prevent="submit">
-      <label class="lw-label">这次要交付什么<textarea v-model="form.instruction" class="lw-field" rows="4" required maxlength="100000" placeholder="描述具体用户结果、限制和验收方式"></textarea></label>
-      <label class="lw-label">项目 Git 目录<input v-model="form.repositoryPath" class="lw-field" required autocomplete="off" /></label>
-      <div class="lw-form-grid">
-        <label class="lw-label">本次允许做到哪一步<select v-model="form.executionScope" class="lw-field"><option value="plan_only">仅形成方案并审阅，不修改代码</option><option value="implement">审阅通过后允许实施</option></select></label>
-        <label class="lw-label">执行器<select v-model="form.engine" class="lw-field"><option value="codex" :disabled="!choices?.executors.codex.available">开发 Agent · Codex</option><option value="opencode" :disabled="!choices?.executors.opencode.available">开发 Agent · OpenCode{{ choices?.executors.opencode.available ? ` (${choices.executors.opencode.verifiedModel})` : ' (尚不可用)' }}</option></select></label>
-        <label class="lw-label">{{ form.engine === 'codex' ? 'Codex 模型（可选）' : 'OpenCode 模型参数（近期成功）' }}<input v-model="form.model" class="lw-field" maxlength="256" autocomplete="off" :readonly="form.engine === 'opencode'" :placeholder="form.engine === 'codex' ? '留空使用本机 Codex 默认模型' : '先完成指定模型的成功运行'" /></label>
-        <label class="lw-label">方案检查<select v-model="form.reviewMode" class="lw-field"><option value="independent">独立审阅（复杂改动）</option><option value="self">方案自检（小改动）</option></select></label>
-      </div>
-      <div v-if="declaredPlan" class="target-step"><span class="lw-label">本次关联的业务步骤 · 计划 v{{ declaredPlan.version }}</span><label v-if="targetSteps.length > 1" class="lw-label">选择目标步骤<select v-model="form.stepId" class="lw-field" required><option value="">请选择</option><option v-for="step in targetSteps" :key="step.id" :value="step.id">{{ step.title }}</option></select></label><p v-else-if="targetStep" class="lw-small">{{ targetStep.title }}</p><p v-else class="lw-notice warning">当前计划没有预期交付为“{{ form.executionScope === 'implement' ? '代码' : '计划' }}”的可用步骤。请先编辑步骤计划。</p><p v-if="targetStep" class="lw-tiny lw-muted">预期交付：{{ targetStep.expectedOutputs?.map(expected => expected.title).join('、') || '未填写' }}<template v-if="targetStep.acceptance"> · 验收：{{ targetStep.acceptance }}</template></p></div>
-      <p v-if="choices && !choices.executors.opencode.available" class="lw-tiny lw-muted">OpenCode：{{ choices.executors.opencode.reason }}</p>
-      <label class="lw-small"><input v-model="form.acknowledgeExcludedChanges" type="checkbox" /> 我知道仓库未提交改动不会进入受管运行；运行从上方目录的当前提交创建隔离工作树。</label>
-      <p class="lw-tiny lw-muted">固定方法：{{ choices?.methodId || '加载中' }} · 本轮默认项目知识 {{ form.repositoryPath.trim() === choices?.recommendedRepositoryPath ? choices?.knowledgeRefs.length || 0 : 0 }} 篇。执行结果留在隔离工作树，需核对后合入项目。</p>
-      <p v-if="form.engine === 'opencode'" class="lw-tiny lw-muted">{{ choices?.executors.opencode.reason }}。本轮固定 CLI 模型参数，尚无上游模型身份回执；每一阶段的结果仍需核对。</p>
-      <button class="lw-btn primary" type="submit" :disabled="busy || !workView || !!planError || (!!declaredPlan && !targetStep) || !choices?.agents.find(agent => agent.id === 'development')?.available || !choices?.executors[form.engine].available">{{ busy ? '正在登记…' : form.executionScope === 'plan_only' ? '生成并审阅方案' : '开始开发委托' }}</button>
-    </form>
+    <button type="button" class="lw-btn primary" :aria-expanded="launching" @click="launching = !launching">{{ launching ? '收起委托' : '新建开发委托' }}</button>
+    <AgentLaunch v-if="launching" :workspace="workspace" :item-id="itemId" :initial-instruction="initialInstruction" initial-agent-id="development" @close="launching = false" @launched="refresh()" />
     <div v-if="assignments.length" class="development-history">
       <h3>本事项的开发委托</h3>
       <article v-for="assignment in assignments" :key="assignment.id" class="lw-note-card">
@@ -151,12 +75,13 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
         <div v-if="assignment.implementationRunId"><button class="lw-btn ghost sm" type="button" @click="showDiff(assignment.id)">查看实际 Git 差异</button><details v-if="diffs[assignment.id]" open><summary>实际改动 {{ diffs[assignment.id]!.fileCount }} 个文件{{ diffs[assignment.id]!.truncated ? ' · 页面已截断' : '' }}</summary><p class="lw-tiny lw-muted">基于提交 {{ diffs[assignment.id]!.baseRevision.slice(0, 12) }}。执行输入文件已从差异中排除；受管运行本身不会自动合入目标仓。</p><p v-if="diffs[assignment.id]!.generatedArtifactsExcluded.length" class="lw-tiny lw-muted">已排除 {{ diffs[assignment.id]!.generatedArtifactsExcluded.length }} 个未跟踪的测试缓存文件；它们未计入改动数。</p><pre class="development-diff">{{ diffs[assignment.id]!.patch || '没有代码差异' }}</pre></details></div>
         <details v-if="assignment.inputVersions.length"><summary>固定输入与版本</summary><ul><li v-for="entry in assignment.inputVersions" :key="entry.id">{{ entry.id }} · {{ entry.version.slice(0, 12) }} · {{ entry.sourcePath }}</li></ul></details>
         <PluginProcess :process="process" :assignment-id="assignment.id" :error="processError" />
+        <RouterLink class="lw-btn ghost sm" :to="`/lifeweave/${workspace}/agent-executions/managed_development/${assignment.id}`">查看统一执行详情</RouterLink>
         <details v-for="stage in stages" :key="stage.key" :open="stage.key === 'implementationRunId' && assignment.status === 'awaiting_acceptance'">
           <summary>{{ stage.title }} · {{ assignment[stage.key] ? (runs[assignment[stage.key]!]?.state || '读取中') : '尚未开始' }}</summary>
           <template v-if="assignment[stage.key]"><p class="lw-tiny lw-mono">Run {{ assignment[stage.key] }} · {{ runs[assignment[stage.key]!]?.directory || '等待执行机' }}</p><p v-if="runs[assignment[stage.key]!]?.environmentSnapshot" class="lw-tiny lw-muted">实际模型：{{ runs[assignment[stage.key]!]!.environmentSnapshot?.effectiveModel || '执行器未报告' }} · 来源：{{ runs[assignment[stage.key]!]!.environmentSnapshot?.modelSource || '未知' }} · 凭据：{{ runs[assignment[stage.key]!]!.environmentSnapshot?.credentialSource || '未报告' }}</p>
             <MarkdownBody v-if="runs[assignment[stage.key]!]?.result" :content="runs[assignment[stage.key]!]!.result!" />
             <p v-if="runs[assignment[stage.key]!]?.error" class="lw-notice warning">{{ runs[assignment[stage.key]!]!.error }}</p>
-            <RunTrace :events="events[assignment[stage.key]!] || []" />
+            <RouterLink class="lw-text-btn" :to="`/lifeweave/${workspace}/agent-executions/managed_run/${assignment[stage.key]}`">查看完整事件 →</RouterLink><RunTrace :events="events[assignment[stage.key]!] || []" />
           </template>
         </details>
       </article>
@@ -165,7 +90,6 @@ const stages: Array<{ key: 'planRunId' | 'reviewRunId' | 'implementationRunId'; 
     <ExternalDevelopmentPanel :workspace="workspace" :item-id="itemId" />
   </section>
 </template>
-
 <style scoped>
 .development-panel { display: grid; gap: 18px; }
 .development-history { display: grid; gap: 12px; border-top: 1px solid var(--lw-line, #dededb); padding-top: 16px; }

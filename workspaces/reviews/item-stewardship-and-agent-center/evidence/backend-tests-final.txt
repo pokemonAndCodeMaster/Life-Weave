@@ -1,0 +1,57 @@
+........................................................................ [ 43%]
+.....F.................................................................. [ 87%]
+.....................                                                    [100%]
+=================================== FAILURES ===================================
+____ test_child_delegation_prompt_keeps_local_goal_and_pins_parent_context _____
+
+tmp_path = PosixPath('/tmp/pytest-of-yyh/pytest-49/test_child_delegation_prompt_k0')
+
+    def test_child_delegation_prompt_keeps_local_goal_and_pins_parent_context(tmp_path: Path) -> None:
+        from copy import deepcopy
+        from test_lifeweave import service as core_service
+    
+        core, core_repo = core_service()
+        parent = core.create_item(
+            "personal", item_type="requirement", title="改善验收体验", status="open",
+            payload={"goal": "让验收人员看懂结果", "scope": "不改变分配规则"}, actor_id="admin",
+        )
+        child = core.create_item(
+            "personal", item_type="research", title="解释分配缺口", status="open",
+            payload={"goal": "说明每个未分配原因", "parentId": parent["id"]}, actor_id="admin",
+        )
+        core.create_context("personal", parent["id"], content={"goal": "父背景第一版"}, provenance=[], actor_id="admin")
+        core.create_context("personal", child["id"], content={"goal": "子事项独立目标"}, provenance=[], actor_id="admin")
+        core_repo.relation_rows.append({
+            "fromKind": "item", "fromId": child["id"], "toKind": "item",
+            "toId": parent["id"], "relationType": "contributes_to",
+        })
+        runtime, _, _ = service(tmp_path, ShellExecutor())
+        runtime.lifeweave_service = core
+        first = runtime.create_run(
+            "personal", item_id=child["id"], instruction="核查本次缺口解释", engine="codex",
+        )
+        snapshot = deepcopy(runtime.get_run_snapshot("personal", first["id"]))
+        assert snapshot["item_id"] == child["id"]
+        assert snapshot["item_snapshot"]["id"] == child["id"]
+        assert snapshot["context_snapshot"]["inheritedFromItemId"] == parent["id"]
+        assert snapshot["context_snapshot"]["focus"]["goal"] == "子事项独立目标"
+>       assert snapshot["context_snapshot"]["content"]["goal"] == "父背景第一版"
+E       AssertionError: assert '说明每个未分配原因' == '父背景第一版'
+E         
+E         - 父背景第一版
+E         + 说明每个未分配原因
+
+tests/test_lifeweave_runtime.py:420: AssertionError
+=============================== warnings summary ===============================
+.venv/lib/python3.10/site-packages/fastapi/testclient.py:1
+  /home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/fastapi/testclient.py:1: StarletteDeprecationWarning: Using `httpx` with `starlette.testclient` is deprecated; install `httpx2` instead.
+    from starlette.testclient import TestClient as TestClient  # noqa
+
+.venv/lib/python3.10/site-packages/starlette/testclient.py:53
+  /home/yyh/project/lifeweave/.venv/lib/python3.10/site-packages/starlette/testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED tests/test_lifeweave_runtime.py::test_child_delegation_prompt_keeps_local_goal_and_pins_parent_context
+1 failed, 164 passed, 2 warnings in 184.35s (0:03:04)

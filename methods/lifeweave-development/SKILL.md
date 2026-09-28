@@ -7,6 +7,10 @@ description: 在 LifeWeave 或明确绑定的代码仓开发一项已有事项�
 
 先从已有事项读取当前目标和背景。新会话可用 `python scripts/lifeweave.py discover '目标'` 定位，再用 `continue` 回读；没有匹配时用 `work-bind` 选择明确接续、独立子事项或新目标；同名候选先核对目标，重复请求复用 requestId，普通追问不另建事项。读 `knowledge --source lifeweave-project` 找当前项目规范，并用 `read-knowledge 'lifeweave-project:路径'` 读取必要正文。资料的实际版本、Git 仓库和未提交改动要核对；匹配推荐只是初筛，不证明已采用或适用。
 
+事项的归属通过共同服务维护：子项创建后继承父项的专题与领域；明确规则可以补充新建项分类。需要整理现有事项时，先运行 `python scripts/lifeweave_organization.py catalog`，核对目标后用 `propose --file <JSON>` 提交带理由的分类、父级或聚合建议，再用 `apply <proposalId>` 应用；`undo <proposalId>` 只恢复这批组织关系。保留原事项、讨论和成果，不因标题相似而删除或静默合并。
+
+从网页或 CLI 委托一个独立执行时，先用 `agents`、`agent-choices <事项>` 查看可执行配置，再用 `agent-dispatch <事项> --file <JSON> --request-id <稳定ID>` 通过共用入口触发。`agent-executions --item-id <事项>` 与 `agent-execution <kind> <id>` 能读回状态、固定输入、成果与已采集轨迹；当前会话自己实施时仍走下文 external-start，不重复创建一个受管运行。API Key 留在执行器的本机认证配置，不写入 Agent 描述或任务正文。
+
 用普通语言说清本次用户动作、期望结果、方案、代码责任和验收。多步骤开发先读取 `work-view <事项>`，用 `work-plan <事项> --file <JSON>` 保存业务计划；每步写明 `expectedOutputs`（id、title、kind、required）、`acceptance`、依赖及负责人。计划修订说明原因，保留旧版。简单局部修复可用精简步骤，不能省略真实交付。只读问题直接回答，记录想法不启动代码执行。真正实施时先读相关源码，再在适当的隔离工作区修改、运行测试和必要页面验证；失败与未完成项保留。
 
 平台受管开发由服务绑定业务步骤并上报各阶段，Run 自身不重复创建外部会话。若正在**现有 Codex 会话**直接开发，先用 `external-start <事项> --repo <Git目录> --summary <目标> --step-id <步骤> --plan-version <版本>` 关联工作；保留已有用户授权，不因换会话重新审批。

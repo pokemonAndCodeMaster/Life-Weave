@@ -88,6 +88,20 @@ const searchResults = computed(() => {
 })
 
 watch(type, async (next, _previous, onCleanup) => {
+  // Legacy callers still open these modal names. Send them to the shared
+  // Agent launch and execution views so every entry uses one dispatch path.
+  if (next === 'delegate' && item.value) {
+    const target = item.value.id
+    closeModal()
+    void router.push({ path: `/lifeweave/${activeWorkspace.value}/agents`, query: { itemId: target } })
+    return
+  }
+  if (next === 'run-detail' && modal.payload.runId) {
+    const target = String(modal.payload.runId)
+    closeModal()
+    void router.push(`/lifeweave/${activeWorkspace.value}/agent-executions/managed_run/${encodeURIComponent(target)}`)
+    return
+  }
   let active = true
   onCleanup(() => { active = false })
   recommendations.value = null

@@ -1,0 +1,25 @@
+# 前端实施与验证记录（2026-09-28）
+
+本记录仅覆盖 UI owner 在 `/home/yyh/project/lifeweave/web/src` 实际实施与检查的部分。浏览器端最终验收由主 Agent 另行记录。
+
+## 可操作的前端路径
+
+- `/lifeweave/{workspace}/items`：新视图默认按专题分组，保留已保存视图；“整理事项”打开规则、分类/移组、聚合建议、差异预览、应用与撤销。
+- `/lifeweave/{workspace}/items/{id}/overview`：首卡集中显示背景、目标、预期结果、有效进展与实际产出；可编辑介绍，成果仍进入原固定版本阅读器。步骤图和步骤弹窗保留。
+- `/lifeweave/{workspace}/agents`：Agents / 执行记录两栏，注册与修改配置，并按事项触发同一 `AgentLaunch`。旧事项委托和开发历史入口也使用此触发组件；旧 `/runs` 与运行弹窗入口转向统一详情。
+- `/lifeweave/{workspace}/agent-executions/{kind}/{id}`：统一展示来源、配置、固定输入、产出、子运行和已采集事件；事件可搜索、展开原始记录。运行中 3 秒刷新，终态与离页停止，读错时保留错误及重试。外部会话按实际采集范围说明缺口，不标作受管运行。
+- `/lifeweave/{workspace}/settings`：展示执行器、本机执行进程与凭据存在状态，并指向 Agent 中心。
+
+## 本地验证
+
+在 `web/` 执行 `npm run type-check`：通过。`npm test -- --reporter=dot`：37 个测试文件、150 项测试全部通过。`npm run build`：成功生成 `web/dist`；Vite 报告已有大于 500 kB 的 chunk 建议，不影响构建。`git diff --check -- web/src`：通过。
+
+新增/更新的重点回归包括：Agent 注册 POST 不传服务端派生的 `pluginId`、PATCH 不传不可变的 `capability/pluginId`；共享派发保留目录、权限、方法和知识覆盖且默认模型不误覆写；执行详情在运行终态停止轮询、失败明确显示并可重试；概览编辑携带事项版本并在失败时保留草稿；专题默认视图不覆盖用户已保存的分组；原事项/开发入口使用共同派发组件。
+
+## 临时集成服务只读核对
+
+仅对主 Agent 提供的独立数据库服务 `http://127.0.0.1:8012` 做 GET 核对：`/api/lifeweave/personal/agents` 返回四个内置 Agent 与执行器；`/item-organization/catalog` 返回专题/领域、全部事项、已应用整理批次；`/agent-executions?limit=5` 返回受管/外部/整理统一目录；外部会话与整理批次详情分别返回真实事件、来源、覆盖缺口及建议差异。执行目录第一次 5 秒超时，30 秒超时窗口下约 12 秒返回；最终性能仍应以浏览器验收判断。未在此服务提交派发、注册或组织变更。未访问正式服务进行测试，也未启动/重启服务。
+
+## 待主 Agent 浏览器核对
+
+主 Agent 曾在旧构建发现注册 POST 因多发 `pluginId` 返回 422；前端随后按后端 `AgentCreate/AgentPatch` 模型修正并增加交互测试，最终浏览器复测结果不在本记录中。实际产出阅读、组织应用/撤销、Agent 派发及多来源 trace 的端到端浏览器结论也由主 Agent独立记录。

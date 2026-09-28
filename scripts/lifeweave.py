@@ -28,6 +28,7 @@ def main(argv=None):
     for name, help_text in [('continue', 'read accepted background, proposals, feedback and outcomes'),
                             ('work-view', 'read this item\'s actual steps and current outcomes; no execution'),
                             ('development-choices', 'read development options without starting execution'),
+                            ('agent-choices', 'read Agent options, executors and local account readiness without starting work'),
                             ('recommend', 'find versioned materials and methods for this work')]:
         p = commands.add_parser(name, help=help_text); p.add_argument('item_id')
         if name == 'recommend': p.add_argument('--query', default='')
@@ -47,6 +48,19 @@ def main(argv=None):
     p.add_argument('method_id')
     p = commands.add_parser('runs', help='read all current runs in this workspace, optionally for one item')
     p.add_argument('--item-id')
+    commands.add_parser('agents', help='list triggerable Agent configurations and executor readiness')
+    p = commands.add_parser('agent-register', help='register a configuration for an existing executable capability')
+    p.add_argument('--file', required=True, help='Agent JSON; credentials must remain in the local CLI account')
+    p = commands.add_parser('agent-update', help='update a versioned Agent configuration')
+    p.add_argument('agent_id'); p.add_argument('--file', required=True, help='JSON patch including version')
+    p = commands.add_parser('agent-executions', help='list managed, external and organization executions together')
+    p.add_argument('--agent-id'); p.add_argument('--item-id'); p.add_argument('--status')
+    p = commands.add_parser('agent-execution', help='read a complete captured execution trace and coverage boundary')
+    p.add_argument('kind', choices=['managed_development', 'managed_run', 'external_session', 'organization'])
+    p.add_argument('execution_id')
+    p = commands.add_parser('agent-dispatch', help='start one registered Agent on an existing item')
+    p.add_argument('item_id'); p.add_argument('--file', required=True, help='JSON request with agentId, mode and task inputs')
+    p.add_argument('--request-id', help='reuse this ID when retrying the exact same launch')
     p = commands.add_parser('create', help='create work and its initial intent; no execution')
     p.add_argument('title'); p.add_argument('--goal', required=True)
     p.add_argument('--type', choices=['requirement', 'research', 'fix', 'learning', 'review', 'personal', 'hobby', 'game', 'other'], default='other')
@@ -133,6 +147,40 @@ def main(argv=None):
             result = call(f'/items/{item}/work-plan', plan, method='PUT')
         elif args.command == 'development-choices':
             result = call(f'/items/{item}/development/choices')
+        elif args.command == 'agent-choices':
+            result = call(f'/items/{item}/agent-choices')
+        elif args.command == 'agents':
+            result = call('/agents')
+        elif args.command in {'agent-register', 'agent-update', 'agent-dispatch'}:
+            try:
+                payload = json.loads(Path(args.file).read_text(encoding='utf-8'))
+            except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+                parser.error(f'无法读取 Agent JSON：{exc}')
+            if not isinstance(payload, dict): parser.error('Agent JSON 须为对象')
+            if args.command == 'agent-register':
+                result = call('/agents', payload, method='POST')
+            elif args.command == 'agent-update':
+                if not isinstance(payload.get('version'), int): parser.error('更新必须提供当前整数 version')
+                result = call('/agents/' + quote(args.agent_id, safe=''), payload, method='PATCH')
+            else:
+                request_id = args.request_id or payload.get('requestId') or str(uuid4())
+                payload['requestId'] = request_id
+                print('agent-dispatch requestId: ' + request_id, file=sys.stderr)
+                result = call(f'/items/{item}/agent-dispatch', payload, method='POST')
+        elif args.command == 'agent-executions':
+            rows = []
+            while True:
+                params = {'limit': 100, 'offset': len(rows)}
+                if args.agent_id: params['agentId'] = args.agent_id
+                if args.item_id: params['itemId'] = args.item_id
+                if args.status: params['status'] = args.status
+                page = call('/agent-executions?' + urlencode(params))
+                rows.extend(page['items'])
+                if len(rows) >= page['total']: break
+                if not page['items']: raise OSError('执行目录读取期间发生变化，请重试')
+            result = {'items': rows, 'total': len(rows)}
+        elif args.command == 'agent-execution':
+            result = call('/agent-executions/' + args.kind + '/' + quote(args.execution_id, safe=''))
         elif args.command == 'recommend':
             result = call(f'/items/{item}/input-recommendations?' + urlencode({'query': args.query}))
         elif args.command == 'capture':

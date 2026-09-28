@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import hashlib
+from contextlib import nullcontext
 from datetime import date, datetime, timedelta, timezone
 from typing import Any
 from uuid import uuid4
@@ -42,6 +43,15 @@ class LifeWeaveService:
 
     def create_item(self, workspace: str, *, item_type: str, title: str, status: str, payload: dict[str, Any], actor_id: str, initial_context: dict[str, Any] | None = None, provenance: list[dict[str, Any]] | None = None) -> dict[str, Any]:
         workspace=self._workspace(workspace)
+        from .item_organization import ItemOrganizationService
+        explicit_topics = payload.get('topicIds') if 'topicIds' in payload else None
+        explicit_domains = payload.get('domainIds') if 'domainIds' in payload else None
+        if explicit_topics is not None and (not isinstance(explicit_topics, list) or not all(isinstance(value, str) for value in explicit_topics)):
+            raise ValueError('topicIds 必须是实体 ID 列表')
+        if explicit_domains is not None and (not isinstance(explicit_domains, list) or not all(isinstance(value, str) for value in explicit_domains)):
+            raise ValueError('domainIds 必须是实体 ID 列表')
+        payload = {key: value for key, value in payload.items() if key not in {'topicIds', 'domainIds'}}
+        parent_id = str(payload['parentId']) if payload.get('parentId') else None
         if status == 'completed':
             if item_type not in {'personal','hobby','game','learning'}:
                 raise ValueError('正式事项不能在创建时直接完成，必须经过验收')
@@ -50,12 +60,18 @@ class LifeWeaveService:
             payload = {**payload, 'completedAt': datetime.now(timezone.utc).isoformat()}
         else:
             payload = {key: value for key, value in payload.items() if key != 'completedAt'}
-        if payload.get('parentId'):
-            if self.repository.get_item(workspace, str(payload['parentId'])) is None:
+        if parent_id:
+            if self.repository.get_item(workspace, parent_id) is None:
                 raise ValueError('payload.parentId 必须引用同一工作区已有事项；正式继承仍需建立 contributes_to 或 part_of 关系')
         # This is the user's submitted working intent, not inferred policy or a fabricated source.
         context = initial_context if initial_context is not None else {'goal': payload.get('goal', title.strip()), 'scope': payload.get('scope', '')}
-        return self.repository.create_item(workspace, {'id':self._id('item'),'item_type':item_type,'title':title.strip(),'status':status,'payload':payload,'actor':actor_id,'context_id':self._id('context'),'context_version_id':self._id('ctxv'),'initial_context':context,'provenance':provenance or []})
+        row = {'id':self._id('item'),'item_type':item_type,'title':title.strip(),'status':status,'payload':payload,'actor':actor_id,'context_id':self._id('context'),'context_version_id':self._id('ctxv'),'initial_context':context,'provenance':provenance or []}
+        if not isinstance(self.repository, LifeWeaveRepository):
+            return self.repository.create_item(workspace, row)
+        with self.repository._postgres.atomic():
+            item = self.repository.create_item(workspace, row)
+            ItemOrganizationService(self).classify_new(workspace, item, parent_id, explicit_topics, explicit_domains, actor_id)
+            return item
 
     def list_items(self, workspace: str, **filters: Any) -> tuple[list[dict[str,Any]],int]:
         return self.repository.list_items(self._workspace(workspace), **filters)
@@ -67,6 +83,14 @@ class LifeWeaveService:
 
     def update_item(self, workspace: str, item_id: str, *, version:int, actor_id:str, **changes:Any)->dict[str,Any]:
         item=self.get_item(workspace,item_id)
+        proposed_payload = changes.get('payload')
+        if proposed_payload is not None and proposed_payload.get('parentId') != item['payload'].get('parentId'):
+            current_parents = {row['toId'] for row in self.repository.list_relations(self._workspace(workspace), item_id)
+                               if row['fromKind'] == 'item' and row['fromId'] == item_id
+                               and row['toKind'] == 'item' and row['relationType'] in {'part_of','contributes_to'}}
+            actual_parent = next(iter(current_parents)) if len(current_parents) == 1 else None
+            if len(current_parents) > 1 or proposed_payload.get('parentId') != actual_parent:
+                raise ValueError('payload.parentId 必须与规范父级关系一致；请使用事项整理入口改挂')
         if changes.get('status') == 'completed':
             payload = changes.get('payload') if changes.get('payload') is not None else item['payload']
             light = item['itemType'] in {'personal','hobby','game','learning'}
@@ -96,6 +120,13 @@ class LifeWeaveService:
 
     def create_relation(self,workspace:str,*,actor_id:str,**relation:Any)->dict[str,Any]:
         workspace=self._workspace(workspace)
+        transactional = isinstance(self.repository, LifeWeaveRepository)
+        with self.repository._postgres.atomic() if transactional else nullcontext() as connection:
+            if connection is not None and relation['relation_type'] in {'part_of','contributes_to'}:
+                connection.execute(f'LOCK TABLE {self.repository.relations} IN SHARE ROW EXCLUSIVE MODE')
+            return self._create_relation_checked(workspace, actor_id=actor_id, **relation)
+
+    def _create_relation_checked(self, workspace: str, *, actor_id: str, **relation: Any) -> dict[str, Any]:
         for kind, identity in ((relation['from_kind'],relation['from_id']),(relation['to_kind'],relation['to_id'])):
             exists=self.repository.get_item(workspace,identity) if kind=='item' else self.repository.get_entity(workspace,identity)
             if not exists: raise KeyError(identity)
@@ -103,10 +134,51 @@ class LifeWeaveService:
             raise ValueError('关系不能指向自身')
         if relation['relation_type'] in {'part_of','contributes_to'} and (relation['from_kind'] != 'item' or relation['to_kind'] != 'item'):
             raise ValueError('part_of 与 contributes_to 必须从子事项指向父事项')
-        return self.repository.create_relation(workspace,{'id':self._id('rel'),**relation,'actor':actor_id})
+        if relation['relation_type'] in {'part_of','contributes_to'}:
+            child, parent = relation['from_id'], relation['to_id']
+            parents = [row['toId'] for row in self.repository.list_relations(workspace, child)
+                       if row['fromKind'] == 'item' and row['fromId'] == child
+                       and row['toKind'] == 'item' and row['relationType'] in {'part_of','contributes_to'}]
+            if parents and set(parents) != {parent}:
+                raise ValueError('事项只能有一个父级；请通过整理批次显式改挂')
+            seen = {child}
+            cursor = parent
+            while cursor:
+                if cursor in seen: raise ValueError('父级关系不能形成循环')
+                seen.add(cursor)
+                next_parents = [row['toId'] for row in self.repository.list_relations(workspace, cursor)
+                                if row['fromKind'] == 'item' and row['fromId'] == cursor
+                                and row['toKind'] == 'item' and row['relationType'] in {'part_of','contributes_to'}]
+                cursor = next_parents[0] if next_parents else None
+        created = self.repository.create_relation(workspace,{'id':self._id('rel'),**relation,'actor':actor_id})
+        if relation['relation_type'] in {'part_of', 'contributes_to'}:
+            item = self.get_item(workspace, relation['from_id'])
+            if item['payload'].get('parentId') != relation['to_id']:
+                self.update_item(workspace, item['id'], version=item['version'], actor_id=actor_id,
+                                 payload={**item['payload'], 'parentId': relation['to_id']})
+        return created
 
     def delete_relation(self, workspace: str, relation_id: str) -> None:
-        self.repository.delete_relation(self._workspace(workspace), relation_id)
+        workspace = self._workspace(workspace)
+        transactional = isinstance(self.repository, LifeWeaveRepository)
+        with self.repository._postgres.atomic() if transactional else nullcontext() as connection:
+            if connection is not None:
+                connection.execute(f'LOCK TABLE {self.repository.relations} IN SHARE ROW EXCLUSIVE MODE')
+            relation = next((row for row in self.repository.list_relations(workspace) if row['id'] == relation_id), None)
+            if relation is None: raise KeyError(relation_id)
+            self.repository.delete_relation(workspace, relation_id)
+            if relation['fromKind'] == 'item' and relation['toKind'] == 'item' and relation['relationType'] in {'part_of', 'contributes_to'}:
+                remaining = [row['toId'] for row in self.repository.list_relations(workspace, relation['fromId'])
+                             if row['fromKind'] == 'item' and row['fromId'] == relation['fromId']
+                             and row['toKind'] == 'item' and row['relationType'] in {'part_of', 'contributes_to'}]
+                parent_id = remaining[0] if remaining else None
+                item = self.get_item(workspace, relation['fromId'])
+                payload = dict(item['payload'])
+                if parent_id: payload['parentId'] = parent_id
+                else: payload.pop('parentId', None)
+                if payload != item['payload']:
+                    self.update_item(workspace, item['id'], version=item['version'], actor_id='system:item-organization',
+                                     payload=payload)
 
     def add_discussion(self,workspace:str,*,item_id:str|None=None,entity_id:str|None=None,body:str,anchor:str|None,payload:dict[str,Any],actor_id:str)->dict[str,Any]:
         workspace=self._workspace(workspace)
@@ -162,6 +234,21 @@ class LifeWeaveService:
             result['inheritancePath']=chain
             result['focus']=own_context.get('content',{}) if own_context else {}
             result['contextRefs']=[{'itemId':node,'contextId':(self.repository.context(workspace,node) or {}).get('id'),'versionId':(self.repository.context(workspace,node) or {}).get('currentVersionId')} for node in chain]
+        # An explicitly edited item intent is local working input. Keep the
+        # accepted context row untouched and identify the overlay in the snapshot.
+        own_item = self.get_item(workspace, item_id)
+        own_payload = own_item.get('payload') or {}
+        overview = own_payload.get('overview')
+        local_intent = (overview.get('intent') if isinstance(overview, dict) and isinstance(overview.get('intent'), str)
+                        else own_payload.get('goal'))
+        if isinstance(local_intent, str):
+            source = 'item.overview' if isinstance(overview, dict) and isinstance(overview.get('intent'), str) else 'item.payload.goal'
+            result['localIntent'] = {'source': source, 'itemVersion': own_item['version'], 'goal': local_intent}
+            if source == 'item.overview':
+                if len(chain) > 1:
+                    result['focus'] = {**result['focus'], 'goal': local_intent}
+                else:
+                    result['content'] = {**result['content'], 'goal': local_intent}
         return result
 
     def propose_context(self,workspace:str,item_id:str,*,base_version:int,title:str,proposed_content:dict[str,Any],provenance:list[dict[str,Any]],actor_id:str)->dict[str,Any]:

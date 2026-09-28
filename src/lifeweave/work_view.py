@@ -452,10 +452,13 @@ class WorkViewService:
                                       latest_run.get('updated_at') or latest_run.get('finished_at') or
                                       latest_run.get('created_at') if latest_run else None,
                                       *(output.get('createdAt') for output in manual_outputs))
-        return {'itemId': item_id, 'itemVersion': item['version'],
+        view = {'itemId': item_id, 'itemVersion': item['version'],
                 'current': {'state': item['status'], 'label': current_label,
                             'summary': current_summary, 'updatedAt': latest_update},
                 'plan': plan, 'outputs': outputs, 'warnings': warnings}
+        from .item_overview import ItemOverviewService
+        view['overview'] = ItemOverviewService(self.work).project(item, view)
+        return view
 
     def save(self, workspace: str, item_id: str, input: WorkPlanInput, actor_id: str) -> dict[str, Any]:
         item = self.work.get_item(workspace, item_id)

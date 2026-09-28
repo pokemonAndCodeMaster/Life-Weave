@@ -76,6 +76,16 @@ export function useItemWorkView(workspace: Readonly<Ref<WorkspaceKind>>, itemId:
     }
   }
 
+  function acceptSnapshot(result: ItemWorkView) {
+    // A previous GET must not restore the version from before an overview edit.
+    ++loadEpoch
+    clearTimeout(timer)
+    view.value = result
+    error.value = ''
+    conflict.value = false
+    timer = setTimeout(() => void refresh(generation), 12000)
+  }
+
   watch([workspace, itemId], () => {
     generation += 1
     loadEpoch += 1
@@ -89,5 +99,5 @@ export function useItemWorkView(workspace: Readonly<Ref<WorkspaceKind>>, itemId:
   onBeforeUnmount(() => { disposed = true; generation += 1; clearTimeout(timer) })
   // The fetched view is replaced as a whole; the route owns it and only sends
   // immutable snapshots to its children.
-  return { view, loading: readonly(loading), saving: readonly(saving), error: readonly(error), conflict: readonly(conflict), refresh, save }
+  return { view, loading: readonly(loading), saving: readonly(saving), error: readonly(error), conflict: readonly(conflict), refresh, save, acceptSnapshot }
 }

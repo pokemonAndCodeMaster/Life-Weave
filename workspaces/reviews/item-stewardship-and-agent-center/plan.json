@@ -1,0 +1,120 @@
+{
+  "version": 1,
+  "title": "事项管理与 Agent 中心",
+  "provider": "development",
+  "nodes": [
+    {
+      "id": "design",
+      "title": "方案与流程核对",
+      "description": "六项诉求均有用户旅程、责任与验证。",
+      "state": "planned",
+      "dependsOn": [],
+      "outputIds": [],
+      "expectedOutputs": [
+        {
+          "id": "main",
+          "title": "完整方案与接口契约",
+          "kind": "plan",
+          "required": true
+        }
+      ],
+      "acceptance": "六项诉求均有用户旅程、责任与验证。"
+    },
+    {
+      "id": "organization",
+      "title": "事项概述与公共整理",
+      "description": "创建继承、批次整理与撤销均可验证。",
+      "state": "planned",
+      "dependsOn": [
+        "design"
+      ],
+      "outputIds": [],
+      "expectedOutputs": [
+        {
+          "id": "main",
+          "title": "概述和组织治理实现",
+          "kind": "code",
+          "required": true
+        }
+      ],
+      "acceptance": "创建继承、批次整理与撤销均可验证。"
+    },
+    {
+      "id": "agents",
+      "title": "Agent 配置与执行归一",
+      "description": "受管、外部与整理操作同一处可追踪。",
+      "state": "planned",
+      "dependsOn": [
+        "design"
+      ],
+      "outputIds": [],
+      "expectedOutputs": [
+        {
+          "id": "main",
+          "title": "Agent目录、共同触发与执行轨迹",
+          "kind": "code",
+          "required": true
+        }
+      ],
+      "acceptance": "受管、外部与整理操作同一处可追踪。"
+    },
+    {
+      "id": "interface",
+      "title": "共同前端交互",
+      "description": "网页可注册、派发、查看实时过程和固定成果。",
+      "state": "planned",
+      "dependsOn": [
+        "organization",
+        "agents"
+      ],
+      "outputIds": [],
+      "expectedOutputs": [
+        {
+          "id": "main",
+          "title": "概览、Agent中心与共同详情",
+          "kind": "code",
+          "required": true
+        }
+      ],
+      "acceptance": "网页可注册、派发、查看实时过程和固定成果。"
+    },
+    {
+      "id": "verification",
+      "title": "数据整理与真实验收",
+      "description": "保留全部原事项，实际操作和独立审查通过。",
+      "state": "planned",
+      "dependsOn": [
+        "interface"
+      ],
+      "outputIds": [],
+      "expectedOutputs": [
+        {
+          "id": "main",
+          "title": "整理对账、运行证据和独立审查",
+          "kind": "validation",
+          "required": true
+        }
+      ],
+      "acceptance": "保留全部原事项，实际操作和独立审查通过。"
+    },
+    {
+      "id": "acceptance",
+      "title": "用户审阅",
+      "description": "用户查看交付后决定，Agent不代替接受。",
+      "state": "planned",
+      "dependsOn": [
+        "verification"
+      ],
+      "outputIds": [],
+      "expectedOutputs": [
+        {
+          "id": "main",
+          "title": "用户接受或反馈",
+          "kind": "decision",
+          "required": true
+        }
+      ],
+      "acceptance": "用户查看交付后决定，Agent不代替接受。"
+    }
+  ]
+}

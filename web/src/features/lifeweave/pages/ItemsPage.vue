@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed, shallowRef } from 'vue'
 import ItemList from '../components/items/ItemList.vue'
+import ItemOrganizationPanel from '../components/items/ItemOrganizationPanel.vue'
 import LifeWeaveIcon from '../components/LifeWeaveIcon.vue'
 import PageHeader from '../components/PageHeader.vue'
 import StatusBadge from '../components/StatusBadge.vue'
 import { useLifeWeaveWorkspace } from '../composables/useLifeWeaveWorkspace'
 import type { WorkItem } from '../types'
 
-const { activeWorkspace, rootItems, state, actorName, openModal, savePreferences } = useLifeWeaveWorkspace()
+const { activeWorkspace, rootItems, state, actorName, openModal, savePreferences, load } = useLifeWeaveWorkspace()
 const topicSelection = shallowRef<{ name: string } | null>(null)
 const managingTopics = shallowRef(false)
+const organizing = shallowRef(false)
 const items = computed(() => state.value?.items ?? [])
 
 function selectTopic(name: string) {
@@ -23,7 +25,8 @@ function peek(item: WorkItem) { openModal('peek', { item }) }
   <PageHeader title="工作事项" subtitle="跟进事项、查看子工作和关联专题。">
     <button class="lw-btn primary" type="button" @click="openModal('item-create')"><LifeWeaveIcon name="plus" />新建事项</button>
   </PageHeader>
-  <div class="page-utility"><button class="lw-text-btn" type="button" :aria-expanded="managingTopics" @click="managingTopics = !managingTopics">{{ managingTopics ? '收起专题管理' : '管理专题' }}</button></div>
+  <div class="page-utility"><button class="lw-text-btn" type="button" :aria-expanded="organizing" @click="organizing = !organizing">{{ organizing ? '收起整理' : '整理事项' }}</button><button class="lw-text-btn" type="button" :aria-expanded="managingTopics" @click="managingTopics = !managingTopics">{{ managingTopics ? '收起专题管理' : '管理专题' }}</button></div>
+  <ItemOrganizationPanel v-if="organizing" :workspace="activeWorkspace" @updated="load(activeWorkspace)" />
   <section v-if="managingTopics" class="topic-management" aria-label="专题管理">
     <div class="topic-heading"><h2>专题</h2><button class="lw-btn sm" type="button" @click="openModal('entity-create', { entityType: 'topic' })"><LifeWeaveIcon name="plus" />新建专题</button></div>
     <div v-if="state?.topics.length" class="topic-list">
