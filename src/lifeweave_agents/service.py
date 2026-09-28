@@ -245,7 +245,18 @@ class AgentService:
                                  "WHERE workspace=%s AND kind=%s AND reference_id=%s "
                                  "ORDER BY created_at,id", (workspace, kind, reference_id))
 
-    def _reference(self, workspace: str, kind: str, reference_id: str) -> dict[str, Any]:
+    def _historical_agent_names(self, workspace: str) -> dict[str, str]:
+        """Read saved identity without probing CLI, plugins, or live method status."""
+        from .registry import BUILTINS
+
+        names = {identity: values[0] for identity, values in BUILTINS.items()}
+        rows = self.db.fetch_all("SELECT id,configuration FROM workbench.lifeweave_agent_config WHERE workspace=%s",
+                                 (workspace,))
+        names.update({row['id']: row['configuration'].get('name') or row['id'] for row in rows})
+        return names
+
+    def _reference(self, workspace: str, kind: str, reference_id: str,
+                   agent_names: dict[str, str] | None = None) -> dict[str, Any]:
         launch = self._receipt(workspace, kind, reference_id)
         organization_launches = self._launches(workspace, kind, reference_id) if kind == "organization" else []
         if kind == "managed_development":
@@ -307,10 +318,8 @@ class AgentService:
         agent_name = ((launch or parent_launch)["configuration_snapshot"].get("agentName")
                       if launch or parent_launch else None)
         if not agent_name:
-            try:
-                agent_name = self.registry.get(workspace, agent_id)["name"]
-            except KeyError:
-                agent_name = agent_id
+            names = agent_names if agent_names is not None else self._historical_agent_names(workspace)
+            agent_name = names.get(agent_id, agent_id)
         if kind == "external_session":
             coverage = ("bound_hook_partial" if any(row["kind"] == "external_development_hook" for row in events)
                         else "reported_only")
@@ -344,37 +353,87 @@ class AgentService:
                    limit: int = 50, offset: int = 0) -> dict[str, Any]:
         if workspace not in {"personal", "team"} or not 1 <= limit <= 100 or offset < 0:
             raise ValueError("执行目录查询参数不正确")
-        # The canonical owners are queried directly; launch receipts only add
-        # configuration identity. Stage Runs are excluded from top-level rows.
+        # Filter and page the owners before building expensive detail references.
+        # The count is returned even if the requested page lies beyond the end.
         rows = self.db.fetch_all("""
-            SELECT 'managed_development' AS kind,id AS reference_id,item_id,created_at
-              FROM workbench.lifeweave_development_assignment WHERE workspace=%s
-            UNION ALL
-            SELECT 'managed_run',r.id,r.item_id,r.created_at
-              FROM workbench.t_lifeweave_run r WHERE r.workspace=%s
-                AND NOT EXISTS (SELECT 1 FROM workbench.lifeweave_development_assignment d
-                  WHERE d.workspace=r.workspace AND r.id IN (d.plan_run_id,d.review_run_id,d.implementation_run_id))
-            UNION ALL
-            SELECT 'external_session',a.payload->>'sessionId',a.item_id,a.created_at
-              FROM workbench.t_lifeweave_activity a WHERE a.workspace_key=%s
-                AND a.kind='external_development_start'
-            UNION ALL
-            SELECT 'organization',l.reference_id,MIN(l.item_id),MIN(l.created_at)
-              FROM workbench.lifeweave_agent_launch l WHERE l.workspace=%s AND l.kind='organization'
-              GROUP BY l.reference_id
-            ORDER BY created_at DESC,reference_id DESC
-        """, (workspace, workspace, workspace, workspace))
-        refs = []
-        for row in rows:
-            ref = self._reference(workspace, row["kind"], row["reference_id"])
-            if item_id and item_id not in ref["itemIds"]:
-                continue
-            if agent_id and agent_id not in ref["agentIds"]:
-                continue
-            if status and ref["status"] != status:
-                continue
-            refs.append(ref)
-        return {"items": refs[offset:offset + limit], "total": len(refs),
+            WITH candidates AS (
+              SELECT 'managed_development'::text AS kind,d.id AS reference_id,
+                     d.item_id,d.created_at,d.status::text AS status,
+                     'development'::text AS default_agent_id
+                FROM workbench.lifeweave_development_assignment d WHERE d.workspace=%s
+              UNION ALL
+              SELECT 'managed_run',r.id,r.item_id,r.created_at,r.state,
+                     CASE WHEN i.item_type='research' THEN 'research' ELSE 'general' END
+                FROM workbench.t_lifeweave_run r
+                JOIN workbench.t_lifeweave_item i ON i.id=r.item_id AND i.workspace_key=r.workspace
+               WHERE r.workspace=%s
+                 AND NOT EXISTS (SELECT 1 FROM workbench.lifeweave_development_assignment d
+                   WHERE d.workspace=r.workspace AND r.id IN (d.plan_run_id,d.review_run_id,d.implementation_run_id))
+              UNION ALL
+              SELECT 'external_session',a.payload->>'sessionId',a.item_id,a.created_at,
+                     CASE WHEN COALESCE(events.blocked,false) THEN 'blocked'
+                          WHEN COALESCE(events.finished,false) THEN 'finished'
+                          WHEN events.event_count>1 THEN 'reported' ELSE 'started' END,
+                     'development'
+                FROM workbench.t_lifeweave_activity a
+                CROSS JOIN LATERAL (
+                  SELECT count(*) AS event_count,
+                         bool_or(e.kind='external_development_event' AND e.payload->>'phase'='blocked') AS blocked,
+                         bool_or(e.kind='external_development_event' AND e.payload->>'phase'='finished') AS finished
+                    FROM workbench.t_lifeweave_activity e
+                   WHERE e.workspace_key=a.workspace_key AND e.item_id=a.item_id
+                     AND e.payload->>'sessionId'=a.payload->>'sessionId'
+                ) events
+               WHERE a.workspace_key=%s AND a.kind='external_development_start'
+              UNION ALL
+              SELECT 'organization',l.reference_id,MIN(l.item_id),MIN(l.created_at),p.status,NULL::text
+                FROM workbench.lifeweave_agent_launch l
+                JOIN workbench.t_lifeweave_organization_proposal p
+                  ON p.workspace_key=l.workspace AND p.id=l.reference_id
+               WHERE l.workspace=%s AND l.kind='organization'
+               GROUP BY l.reference_id,p.status
+            ), filtered AS (
+              SELECT c.* FROM candidates c
+               WHERE (%s::text IS NULL OR (%s='active' AND c.status IN
+                 ('queued','claimed','running','planning','reviewing','implementing')) OR c.status=%s)
+                 AND (%s::text IS NULL OR (
+                   c.item_id=%s OR (c.kind='organization' AND (
+                     EXISTS (SELECT 1 FROM workbench.lifeweave_agent_launch l
+                              WHERE l.workspace=%s AND l.kind=c.kind AND l.reference_id=c.reference_id
+                                AND (l.item_id=%s OR COALESCE(l.configuration_snapshot #>
+                                  '{inputSnapshot,organization,itemIds}','[]'::jsonb) ? %s))
+                     OR EXISTS (SELECT 1 FROM workbench.t_lifeweave_organization_proposal p,
+                                       jsonb_array_elements(p.changes) change
+                                 WHERE p.workspace_key=%s AND p.id=c.reference_id
+                                   AND change->>'itemId'=%s)
+                     OR EXISTS (SELECT 1 FROM workbench.t_lifeweave_organization_proposal p,
+                                       jsonb_array_elements(p.groups) group_entry,
+                                       jsonb_array_elements_text(COALESCE(group_entry->'itemIds','[]'::jsonb)) member
+                                 WHERE p.workspace_key=%s AND p.id=c.reference_id AND member=%s)
+                   ))))
+                 AND (%s::text IS NULL OR (
+                   EXISTS (SELECT 1 FROM workbench.lifeweave_agent_launch l
+                            WHERE l.workspace=%s AND l.kind=c.kind AND l.reference_id=c.reference_id
+                              AND l.agent_id=%s)
+                   OR (c.default_agent_id=%s AND NOT EXISTS (
+                     SELECT 1 FROM workbench.lifeweave_agent_launch l
+                      WHERE l.workspace=%s AND l.kind=c.kind AND l.reference_id=c.reference_id))
+                 ))
+            ), page AS (
+              SELECT kind,reference_id FROM filtered
+               ORDER BY created_at DESC,reference_id DESC LIMIT %s OFFSET %s
+            )
+            SELECT total.total,page.kind,page.reference_id
+              FROM (SELECT count(*) AS total FROM filtered) total LEFT JOIN page ON true
+        """, (workspace, workspace, workspace, workspace,
+              status, status, status, item_id, item_id,
+              workspace, item_id, item_id, workspace, item_id, workspace, item_id,
+              agent_id, workspace, agent_id, agent_id, workspace,
+              limit, offset))
+        agent_names = self._historical_agent_names(workspace) if rows[0]["kind"] else {}
+        refs = [self._reference(workspace, row["kind"], row["reference_id"], agent_names)
+                for row in rows if row["kind"]]
+        return {"items": refs, "total": rows[0]["total"],
                 "limit": limit, "offset": offset}
 
     def _run_events(self, workspace: str, run_id: str) -> list[dict[str, Any]]:
@@ -419,15 +478,23 @@ class AgentService:
                                      "status": self.runtime.get_run_snapshot(workspace, run_id)["state"]})
                     events.extend(self._run_events(workspace, run_id))
             if row.get("plan"):
-                outputs.append({"kind": "plan", "content": safe(row["plan"]), "sha256": row.get("planSha256")})
+                outputs.append({"kind": "plan", "id": f"run:{row['planRunId']}" if row.get('planRunId') else None,
+                                "content": safe(row["plan"]), "sha256": row.get("planSha256")})
             if row.get("review"):
-                outputs.append({"kind": "review", "content": safe(row["review"]), "decision": row.get("reviewDecision")})
+                outputs.append({"kind": "review", "id": f"run:{row['reviewRunId']}" if row.get('reviewRunId') else None,
+                                "content": safe(row["review"]), "decision": row.get("reviewDecision")})
+            if row.get('implementationRunId'):
+                implementation = self.runtime.get_run_snapshot(workspace, row['implementationRunId'])
+                if implementation.get('result'):
+                    outputs.append({"kind": "result",
+                                    "id": f"run:{row['implementationRunId']}" if implementation['state'] == 'succeeded' else None,
+                                    "content": safe(implementation['result'])})
             try:
                 delivery = self.development.delivery(workspace, reference_id)
             except (ValueError, KeyError):
                 delivery = None
             if delivery:
-                outputs.append({"kind": "delivery", "id": delivery["id"],
+                outputs.append({"kind": "delivery", "id": f"delivery:{reference_id}",
                                 "artifactSha256": delivery["artifactSha256"]})
             calls = self.db.fetch_all("SELECT * FROM workbench.lifeweave_plugin_call "
                                       "WHERE workspace=%s AND assignment_id=%s ORDER BY started_at,id",
@@ -442,8 +509,15 @@ class AgentService:
                            "environment": row["environment_snapshot"]})
             events = self._run_events(workspace, reference_id)
             if row.get("result"):
-                outputs.append({"kind": "result", "content": safe(row["result"])})
-            outputs.extend(safe(row.get("artifact_candidates") or []))
+                outputs.append({"kind": "result", "id": f"run:{reference_id}" if row['state'] == 'succeeded' else None,
+                                "content": safe(row["result"])})
+            for candidate in row.get("artifact_candidates") or []:
+                if isinstance(candidate, dict):
+                    value = safe(candidate)
+                    candidate_id = value.pop('id', None)
+                    outputs.append({**value, "kind": "artifact_candidate", "candidateId": candidate_id})
+                else:
+                    outputs.append({"kind": "artifact_candidate", "summary": safe(str(candidate))})
             calls = self.db.fetch_all("SELECT * FROM workbench.lifeweave_plugin_call "
                                       "WHERE workspace=%s AND run_id=%s ORDER BY started_at,id",
                                       (workspace, reference_id))
@@ -463,10 +537,14 @@ class AgentService:
                                "occurredAt": row["createdAt"].isoformat() if isinstance(row["createdAt"], datetime) else row["createdAt"],
                                "payload": safe(row["payload"])})
             fixed = self.db.fetch_all(
-                "SELECT id,title,payload FROM workbench.t_lifeweave_entity WHERE workspace_key=%s "
-                "AND payload->'fixedDelivery'->>'sessionId'=%s ORDER BY created_at,id",
-                (workspace, reference_id))
-            outputs = [{"kind": "delivery", "id": row["id"], "title": row["title"],
+                "SELECT e.id,e.title,e.payload FROM workbench.t_lifeweave_entity e "
+                "JOIN workbench.t_lifeweave_relation r ON r.workspace_key=e.workspace_key "
+                "AND r.to_kind='entity' AND r.to_id=e.id AND r.from_kind='item' "
+                "AND r.from_id=%s AND r.relation_type='produces' "
+                "WHERE e.workspace_key=%s AND e.payload->'fixedDelivery'->>'sessionId'=%s "
+                "ORDER BY e.created_at,e.id",
+                (item_id, workspace, reference_id))
+            outputs = [{"kind": "delivery", "id": f"artifact:{row['id']}", "title": row["title"],
                         "version": row["payload"]["fixedDelivery"]["sha256"]} for row in fixed]
             calls = []
         else:

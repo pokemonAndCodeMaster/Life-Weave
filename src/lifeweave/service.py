@@ -126,6 +126,18 @@ class LifeWeaveService:
                 connection.execute(f'LOCK TABLE {self.repository.relations} IN SHARE ROW EXCLUSIVE MODE')
             return self._create_relation_checked(workspace, actor_id=actor_id, **relation)
 
+    def is_organization_relation(self, workspace: str, *, from_kind: str, from_id: str,
+                                 to_kind: str, to_id: str, relation_type: str) -> bool:
+        workspace = self._workspace(workspace)
+        if from_kind != 'item':
+            return False
+        if to_kind == 'item' and relation_type in {'part_of', 'contributes_to'}:
+            return True
+        if to_kind == 'entity':
+            entity = self.repository.get_entity(workspace, to_id)
+            return bool(entity and entity['entityType'] in {'topic', 'domain'})
+        return False
+
     def _create_relation_checked(self, workspace: str, *, actor_id: str, **relation: Any) -> dict[str, Any]:
         for kind, identity in ((relation['from_kind'],relation['from_id']),(relation['to_kind'],relation['to_id'])):
             exists=self.repository.get_item(workspace,identity) if kind=='item' else self.repository.get_entity(workspace,identity)

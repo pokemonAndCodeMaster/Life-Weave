@@ -12,6 +12,7 @@ import {
   mutateWorkspace,
   runAction,
 } from '../api/lifeweave'
+import { applyOrganizationProposal, createOrganizationProposal, getOrganizationCatalog } from '../api/itemOrganization'
 import type {
   ApiErrorShape,
   LifeWeaveRun,
@@ -313,8 +314,23 @@ async function createEntity(entityType: 'topic' | 'domain' | 'resource', title: 
   try {
     const entity = await mutateWorkspace<{ id: string }>(activeWorkspace.value, '/entities', 'post', { entityType, title, payload })
     if (relatedItem) {
-      const relationType = entityType === 'topic' ? 'serves' : entityType === 'domain' ? 'references' : 'impacts'
-      await mutateWorkspace(activeWorkspace.value, '/relations', 'post', { fromKind: 'item', fromId: relatedItem.id, toKind: 'entity', toId: entity.id, relationType })
+      if (entityType === 'resource') {
+        await mutateWorkspace(activeWorkspace.value, '/relations', 'post', { fromKind: 'item', fromId: relatedItem.id, toKind: 'entity', toId: entity.id, relationType: 'impacts' })
+      } else {
+        const catalog = await getOrganizationCatalog(activeWorkspace.value)
+        const current = catalog.items.find((entry) => entry.id === relatedItem.id)
+        if (!current) throw new Error('找不到当前事项，请刷新后再关联。')
+        const topicIds = entityType === 'topic' ? [...new Set([...current.topicIds, entity.id])] : current.topicIds
+        const domainIds = entityType === 'domain' ? [...new Set([...current.domainIds, entity.id])] : current.domainIds
+        const axis = entityType === 'topic' ? { topicIds } : { domainIds }
+        await applyClassification(relatedItem.id, current.version, axis, '用户新建并关联专题或领域')
+        const latest = await getItemDetail(activeWorkspace.value, relatedItem.id)
+        const nextPayload = { ...latest.payload,
+          topics: catalog.topics.filter((entry) => topicIds.includes(entry.id)).map((entry) => entry.title),
+          domains: catalog.domains.filter((entry) => domainIds.includes(entry.id)).map((entry) => entry.title),
+        }
+        await mutateWorkspace(activeWorkspace.value, `/items/${encodeURIComponent(relatedItem.id)}`, 'patch', { version: latest.version, payload: nextPayload })
+      }
     }
     await load(activeWorkspace.value, true)
     if (relatedItem) await loadItem(relatedItem.id, true)
@@ -333,19 +349,50 @@ async function updateRelations(item: WorkItem, payload: Record<string, unknown>)
   return mutate(`/items/${encodeURIComponent(item.id)}`, 'patch', { version: item.version, payload }, '事项属性已更新。关系的增删将通过关系接口保存。')
 }
 
+function sameIds(left: string[], right: string[]) {
+  return left.length === right.length && left.every((id) => right.includes(id))
+}
+
+async function applyClassification(itemId: string, itemVersion: number, axes: { topicIds?: string[]; domainIds?: string[] }, reason: string) {
+  const workspace = activeWorkspace.value
+  const proposal = await createOrganizationProposal(workspace, {
+    requestId: crypto.randomUUID(),
+    changes: [{ itemId, itemVersion, ...axes, reason }],
+    reason,
+  })
+  await applyOrganizationProposal(workspace, proposal.id)
+}
+
 async function saveRelations(item: WorkItem, payload: Record<string, unknown>, desired: Array<{ entityId: string; relationType: string }>) {
-  const relevant = (item.relations ?? []).filter((relation) => relation.fromId === item.id && relation.toKind === 'entity' && ['serves', 'references', 'impacts'].includes(relation.relationType))
-  const wanted = new Set(desired.map((relation) => `${relation.relationType}:${relation.entityId}`))
-  const existing = new Set(relevant.map((relation) => `${relation.relationType}:${relation.toId}`))
+  const workspace = activeWorkspace.value
+  const wantedResources = new Set(desired.filter((relation) => relation.relationType === 'impacts').map((relation) => relation.entityId))
+  const topicIds = desired.filter((relation) => relation.relationType === 'serves').map((relation) => relation.entityId)
+  const domainIds = desired.filter((relation) => relation.relationType === 'references').map((relation) => relation.entityId)
   try {
-    await mutateWorkspace(activeWorkspace.value, `/items/${encodeURIComponent(item.id)}`, 'patch', { version: item.version, payload })
-    for (const relation of desired) if (!existing.has(`${relation.relationType}:${relation.entityId}`)) {
-      await mutateWorkspace(activeWorkspace.value, '/relations', 'post', { fromKind: 'item', fromId: item.id, toKind: 'entity', toId: relation.entityId, relationType: relation.relationType })
+    const catalog = await getOrganizationCatalog(workspace)
+    const current = catalog.items.find((entry) => entry.id === item.id)
+    if (!current) throw new Error('找不到当前事项，请刷新后再保存。')
+    if (!sameIds(current.topicIds, topicIds) || !sameIds(current.domainIds, domainIds)) {
+      await applyClassification(item.id, current.version, { topicIds, domainIds }, '用户在关系编辑中明确调整专题和领域')
     }
-    for (const relation of relevant) if (!wanted.has(`${relation.relationType}:${relation.toId}`)) {
-      await mutateWorkspace(activeWorkspace.value, `/relations/${encodeURIComponent(relation.id)}`, 'delete')
+    // Read the latest record after applying the organization batch: it may have
+    // changed version and parentId. Only edit the remaining legacy attributes.
+    const latest = await getItemDetail(workspace, item.id)
+    const latestPayload = latest.payload ?? {}
+    const nextPayload = { ...latestPayload, owner: payload.owner, due: payload.due, assets: payload.assets,
+      topics: catalog.topics.filter((entity) => topicIds.includes(entity.id)).map((entity) => entity.title),
+      domains: catalog.domains.filter((entity) => domainIds.includes(entity.id)).map((entity) => entity.title),
     }
-    await load(activeWorkspace.value, true)
+    await mutateWorkspace(workspace, `/items/${encodeURIComponent(item.id)}`, 'patch', { version: latest.version, payload: nextPayload })
+    const resources = (latest.relations ?? []).filter((relation) => relation.fromId === item.id && relation.toKind === 'entity' && relation.relationType === 'impacts')
+    const existingResources = new Set(resources.map((relation) => relation.toId))
+    for (const entityId of wantedResources) if (!existingResources.has(entityId)) {
+      await mutateWorkspace(workspace, '/relations', 'post', { fromKind: 'item', fromId: item.id, toKind: 'entity', toId: entityId, relationType: 'impacts' })
+    }
+    for (const relation of resources) if (!wantedResources.has(relation.toId)) {
+      await mutateWorkspace(workspace, `/relations/${encodeURIComponent(relation.id)}`, 'delete')
+    }
+    await load(workspace, true)
     await loadItem(item.id, true)
     closeModal(); notify('工作关系已更新，同一事项 ID 保持不变。')
   } catch (caught) { const problem = apiError(caught); notify(problem.message); throw problem }

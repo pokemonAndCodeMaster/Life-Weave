@@ -29,14 +29,23 @@ watch(() => [props.workspace, props.initialAgentId], () => { agentId.value = pro
 watch([agentId, itemId, status], () => { generation++; rows.value = []; void load(false, generation) })
 onBeforeUnmount(() => { generation++; clearTimeout(timer) })
 const source: Record<string,string> = {managed_development:'受管开发',managed_run:'受管运行',external_session:'外部会话',organization:'事项整理'}
+const statusLabels: Record<string,string> = {
+  queued:'等待执行', claimed:'准备中', running:'运行中', planning:'形成方案', reviewing:'审阅中', implementing:'实施中',
+  pause_requested:'正在暂停', paused:'已暂停', cancelling:'正在取消', cancelled:'已取消',
+  succeeded:'已成功', failed:'执行失败', unavailable:'环境不可用', blocked:'受阻',
+  plan_ready:'方案待审阅', awaiting_acceptance:'成果待验收', delivery_failed:'交付生成失败',
+  accepted:'已接受', rejected:'已拒绝', reported:'已有外部报告', finished:'外部会话已结束',
+  proposed:'建议待应用', applied:'已应用', undone:'已撤销',
+}
+function statusLabel(value:string) { return statusLabels[value] ?? '状态未说明' }
 </script>
 
 <template>
   <section class="execution-list">
-    <div class="filters"><label class="lw-label">Agent ID<input v-model="agentId" class="lw-field" placeholder="全部 Agent" /></label><label class="lw-label">事项 ID<input v-model="itemId" class="lw-field" placeholder="全部事项" /></label><label class="lw-label">状态<select v-model="status" class="lw-field"><option value="">全部状态</option><option value="running">运行中</option><option value="succeeded">成功</option><option value="failed">失败</option><option value="awaiting_acceptance">待验收</option><option value="cancelled">已取消</option></select></label><button type="button" class="lw-btn sm" @click="load()">刷新</button></div>
+    <div class="filters"><label class="lw-label">Agent ID<input v-model="agentId" class="lw-field" placeholder="全部 Agent" /></label><label class="lw-label">事项 ID<input v-model="itemId" class="lw-field" placeholder="全部事项" /></label><label class="lw-label">状态<select v-model="status" class="lw-field"><option value="">全部状态</option><option value="active">进行中</option><option value="succeeded">成功</option><option value="failed">失败</option><option value="blocked">受阻</option><option value="plan_ready">方案待审阅</option><option value="delivery_failed">交付生成失败</option><option value="awaiting_acceptance">待验收</option><option value="cancelled">已取消</option></select></label><button type="button" class="lw-btn sm" @click="load()">刷新</button></div>
     <p v-if="error" role="alert" class="lw-notice warning">{{ error }} <button type="button" class="lw-btn sm" @click="load()">重试</button></p>
     <p v-if="loading && !rows.length" role="status">正在读取执行记录…</p>
-    <div class="lw-panel"><ul v-if="rows.length" class="execution-rows"><li v-for="row in rows" :key="row.kind + ':' + row.id"><RouterLink class="execution-link" :to="`/lifeweave/${workspace}/agent-executions/${row.kind}/${encodeURIComponent(row.id)}`"><strong>{{ row.title || row.agentName || row.agentId || row.id }}</strong><span>{{ source[row.kind] }} · {{ row.status }} · {{ row.createdAt ? new Date(row.createdAt).toLocaleString('zh-CN') : '时间未报告' }}</span><small>事项 {{ row.itemId }} · {{ row.traceCoverage || '轨迹覆盖未说明' }}</small></RouterLink></li></ul><div v-else-if="!loading" class="lw-empty">没有符合条件的执行记录。</div></div>
+    <div class="lw-panel"><ul v-if="rows.length" class="execution-rows"><li v-for="row in rows" :key="row.kind + ':' + row.id"><RouterLink class="execution-link" :to="`/lifeweave/${workspace}/agent-executions/${row.kind}/${encodeURIComponent(row.id)}`"><strong>{{ row.title || row.agentName || row.agentId || row.id }}</strong><span>{{ source[row.kind] }} · {{ statusLabel(row.status) }} · {{ row.createdAt ? new Date(row.createdAt).toLocaleString('zh-CN') : '时间未报告' }}</span><small>事项 {{ row.itemId }} · {{ row.traceCoverage || '轨迹覆盖未说明' }}</small></RouterLink></li></ul><div v-else-if="!loading" class="lw-empty">没有符合条件的执行记录。</div></div>
     <div class="footer"><span>{{ rows.length }} / {{ total }} 条</span><button v-if="rows.length < total" type="button" class="lw-btn sm" :disabled="loading" @click="load(true)">加载更多</button></div>
   </section>
 </template>

@@ -142,13 +142,24 @@ def get_entity(workspace:str,entity_id:str,service:Service)->dict[str,Any]:
 
 @router.post('/relations',status_code=status.HTTP_201_CREATED)
 def create_relation(workspace:str,payload:RelationCreate,service:Service,actor_id:Actor)->dict[str,Any]:
-    try:return service.create_relation(workspace,actor_id=actor_id,**payload.model_dump())
+    try:
+        relation = payload.model_dump()
+        if service.is_organization_relation(workspace, **relation):
+            raise ConcurrentUpdateError('专题、领域或父级关系请通过事项整理建议预览并应用，以保留版本和撤销记录')
+        return service.create_relation(workspace,actor_id=actor_id,**relation)
     except (KeyError,ValueError) as exc:raise _fail(exc) from exc
 
 
 @router.delete('/relations/{relation_id}',status_code=status.HTTP_204_NO_CONTENT)
 def delete_relation(workspace:str,relation_id:str,service:Service)->Response:
     try:
+        relation = next((row for row in service.repository.list_relations(service._workspace(workspace))
+                         if row['id'] == relation_id), None)
+        if relation is None: raise KeyError(relation_id)
+        if service.is_organization_relation(workspace, from_kind=relation['fromKind'], from_id=relation['fromId'],
+                                            to_kind=relation['toKind'], to_id=relation['toId'],
+                                            relation_type=relation['relationType']):
+            raise ConcurrentUpdateError('专题、领域或父级关系请通过事项整理建议预览并应用，以保留版本和撤销记录')
         service.delete_relation(workspace,relation_id)
         return Response(status_code=status.HTTP_204_NO_CONTENT)
     except (KeyError,ValueError) as exc:raise _fail(exc) from exc

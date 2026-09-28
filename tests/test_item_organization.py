@@ -127,9 +127,10 @@ def test_undo_rejects_cycle_created_outside_original_batch(client):
         'changes': [{'itemId': child['id'], 'itemVersion': child['version'], 'parentId': None,
                      'reason': '暂时独立'}]})
     post(client, f'/item-organization/proposals/{proposal["id"]}/apply', {'requestId': 'reparent-apply'})
-    attach = post(client, '/relations', {'fromKind': 'item', 'fromId': parent['id'],
-        'toKind': 'item', 'toId': child['id'], 'relationType': 'part_of'}, 201)
-    assert attach['toId'] == child['id']
+    attach = post(client, '/item-organization/proposals', {'requestId': 'attach-preview',
+        'changes': [{'itemId': parent['id'], 'itemVersion': parent['version'],
+                     'parentId': child['id'], 'reason': '后续明确新的拆分'}]})
+    post(client, f'/item-organization/proposals/{attach["id"]}/apply', {'requestId': 'attach-apply'})
     undo = client.post(BASE + f'/item-organization/proposals/{proposal["id"]}/undo',
                        json={'requestId': 'reparent-undo'})
     assert undo.status_code == 400 or undo.status_code == 409
@@ -167,16 +168,60 @@ def test_legacy_relation_and_item_update_cannot_bypass_parent_governance(client)
     child = create_item(client, '业务子项', {'parentId': first['id']})
     duplicate_parent = client.post(BASE + '/relations', json={'fromKind': 'item', 'fromId': child['id'],
         'toKind': 'item', 'toId': second['id'], 'relationType': 'contributes_to'})
-    assert duplicate_parent.status_code == 400
+    assert duplicate_parent.status_code == 409
     cycle = client.post(BASE + '/relations', json={'fromKind': 'item', 'fromId': first['id'],
         'toKind': 'item', 'toId': child['id'], 'relationType': 'part_of'})
-    assert cycle.status_code == 400
+    assert cycle.status_code == 409
     forged = client.patch(BASE + f'/items/{child["id"]}', json={'version': child['version'],
                            'payload': {**child['payload'], 'parentId': second['id']}})
     assert forged.status_code == 400
     valid_reference = post(client, '/relations', {'fromKind': 'item', 'fromId': child['id'],
         'toKind': 'item', 'toId': second['id'], 'relationType': 'references'}, 201)
     assert valid_reference['relationType'] == 'references'
+    assert client.delete(BASE + f'/relations/{valid_reference["id"]}').status_code == 204
+
+
+def test_public_relation_routes_require_organization_receipt_for_classification(client):
+    item = create_item(client, '分类事项')
+    topic = create_entity(client, 'topic', '专题分类')
+    domain = create_entity(client, 'domain', '领域分类')
+    resource = create_entity(client, 'resource', '普通资料')
+    for entity, relation_type in ((topic, 'serves'), (domain, 'references'), (domain, 'serves')):
+        denied = client.post(BASE + '/relations', json={'fromKind': 'item', 'fromId': item['id'],
+            'toKind': 'entity', 'toId': entity['id'], 'relationType': relation_type})
+        assert denied.status_code == 409
+        assert '事项整理' in denied.json()['detail']
+    ordinary = post(client, '/relations', {'fromKind': 'item', 'fromId': item['id'],
+        'toKind': 'entity', 'toId': resource['id'], 'relationType': 'impacts'}, 201)
+    assert client.delete(BASE + f'/relations/{ordinary["id"]}').status_code == 204
+    proposal = post(client, '/item-organization/proposals', {'requestId': 'classify-safe',
+        'changes': [{'itemId': item['id'], 'itemVersion': item['version'],
+                     'topicIds': [topic['id']], 'domainIds': [domain['id']],
+                     'reason': '明确将当前事项归入这些分类'}]})
+    post(client, f'/item-organization/proposals/{proposal["id"]}/apply', {'requestId': 'classify-apply'})
+    item_relations = client.get(BASE + f'/items/{item["id"]}').json()['relations']
+    for relation in item_relations:
+        if relation['toId'] in {topic['id'], domain['id']}:
+            assert client.delete(BASE + f'/relations/{relation["id"]}').status_code == 409
+
+
+def test_legacy_domain_reference_remains_visible_and_undo_restores_relation(client):
+    item = create_item(client, '已有领域引用')
+    domain = create_entity(client, 'domain', '历史领域')
+    relation = client.app.state.lifeweave_service.create_relation('personal', actor_id='legacy-import',
+        from_kind='item', from_id=item['id'], to_kind='entity', to_id=domain['id'], relation_type='references')
+    catalog = client.get(BASE + '/item-organization/catalog').json()
+    assert next(row for row in catalog['items'] if row['id'] == item['id'])['domainIds'] == [domain['id']]
+    assert client.delete(BASE + f'/relations/{relation["id"]}').status_code == 409
+    proposal = post(client, '/item-organization/proposals', {'requestId': 'legacy-domain-clear',
+        'changes': [{'itemId': item['id'], 'itemVersion': item['version'], 'domainIds': [],
+                     'reason': '明确移除旧领域分类'}]})
+    post(client, f'/item-organization/proposals/{proposal["id"]}/apply', {'requestId': 'legacy-domain-apply'})
+    assert next(row for row in client.get(BASE + '/item-organization/catalog').json()['items']
+                if row['id'] == item['id'])['domainIds'] == []
+    post(client, f'/item-organization/proposals/{proposal["id"]}/undo', {'requestId': 'legacy-domain-undo'})
+    restored = client.get(BASE + f'/items/{item["id"]}').json()['relations']
+    assert any(row['id'] == relation['id'] and row['relationType'] == 'references' for row in restored)
 
 
 def test_group_inherits_only_common_explicit_owner(client):

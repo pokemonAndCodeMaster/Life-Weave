@@ -80,10 +80,10 @@ class ItemOrganizationService:
             raise ValueError(f'事项 {item_id} 存在多个父级，请先明确唯一父级')
         topic_ids, domain_ids = [], []
         for row in outbound:
-            if row['toKind'] != 'entity' or row['relationType'] != 'serves':
+            if row['toKind'] != 'entity' or row['relationType'] not in {'serves', 'references'}:
                 continue
             entity = self.repo.get_entity(workspace, row['toId'])
-            if entity and entity['entityType'] == 'topic': topic_ids.append(entity['id'])
+            if entity and entity['entityType'] == 'topic' and row['relationType'] == 'serves': topic_ids.append(entity['id'])
             if entity and entity['entityType'] == 'domain': domain_ids.append(entity['id'])
         return {'topicIds': sorted(set(topic_ids)), 'domainIds': sorted(set(domain_ids)),
                 'parentId': parent[0] if parent else None}
@@ -95,9 +95,9 @@ class ItemOrganizationService:
                 continue
             if relation['toKind'] == 'item' and relation['relationType'] in PARENT_TYPES:
                 pass
-            elif relation['toKind'] == 'entity' and relation['relationType'] == 'serves':
+            elif relation['toKind'] == 'entity' and relation['relationType'] in {'serves', 'references'}:
                 entity = self.repo.get_entity(workspace, relation['toId'])
-                if not entity or entity['entityType'] not in {'topic', 'domain'}:
+                if not entity or (entity['entityType'] == 'topic' and relation['relationType'] != 'serves') or entity['entityType'] not in {'topic', 'domain'}:
                     continue
             else:
                 continue
