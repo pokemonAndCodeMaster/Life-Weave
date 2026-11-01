@@ -32,3 +32,4 @@
 - [补齐开发任务使用当前项目知识的操作说明](research/personal/item-e044cf4e1af64b0c/gzrun-20260926-172527-abab3301/report.md) · `gzrun-20260926-172527-abab3301`
 - [补齐开发任务使用当前项目知识的操作说明](research/personal/item-e044cf4e1af64b0c/gzrun-20260926-172650-784859ce/report.md) · `gzrun-20260926-172650-784859ce`
 - [手机外网任务执行验收（测试数据）](research/personal/item-e1de29edbe474f27/gzrun-20261101-080552-65897e23/report.md) · `gzrun-20261101-080552-65897e23`
+- [手机外网任务执行验收（测试数据）](research/personal/item-e1de29edbe474f27/gzrun-20261101-080947-936c5dff/report.md) · `gzrun-20261101-080947-936c5dff`
